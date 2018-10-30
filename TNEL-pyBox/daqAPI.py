@@ -17,7 +17,6 @@ dev = 'Dev2'
 Class for Digital Outputs. Can send (and maybe see what has been written. Hasn't been tested)
 Also holds task information.
 Must Call exampleclass.end() to correctly reset DAQ.
-
 If using mult. lines use sendDByte function to send info sendDByte(3)
 If using 1 line use sendDBit function to send info sendDBit(True)
 '''

@@ -1,6 +1,5 @@
 import daqAPI
 
-
 '''
 Use to check presses on Levers
 Needs Interface class as inputs
