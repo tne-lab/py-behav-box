@@ -7,9 +7,6 @@ Created on Thu Oct 25 12:35:01 2018
 import daqAPI
 import time
 
-
-
-
 def leverTest():
     #Push out levers
     leverOutput = daqAPI.leverOutputSetup()
@@ -24,9 +21,7 @@ def leverTest():
     print(press)
 
 def main():
-    [outAddress,serviceRequest] = daqAPI.startUpBox()
     leverTest()
-    daqAPI.closeBox(outAddress,serviceRequest)
 
 
 main()
