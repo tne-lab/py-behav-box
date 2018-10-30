@@ -5,7 +5,7 @@
 Created on Thu Oct 25 13:13:48 2018
 @author: Ephys
 
-Communicates with layafette instruments DAQ 41510-NL
+Communicates with DAQ
 to control a behavioral box
 """
 import nidaqmx
