@@ -89,7 +89,7 @@ def sendPulse(address,bits):
             line_grouping=LineGrouping.CHAN_FOR_ALL_LINES)
 
         task.write(bits)
-        
+
 ####################################################
 ##      OUTPUTS
 ####################################################
