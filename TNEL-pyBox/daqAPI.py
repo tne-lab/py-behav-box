@@ -161,7 +161,7 @@ def cabinLightSetup():
 Returns a new low tone task
 '''
 def lowToneSetup():
-    lowToneAddress = dev + '/port1/line9'
+    lowToneAddress = dev + '/port2/line1'
     lowTone = InterfaceOut(lowToneAddress)
     lowTone.startTask()
     return lowTone
@@ -170,7 +170,7 @@ def lowToneSetup():
 Returns a new high tone Task
 '''
 def highToneSetup():
-    highToneAddress = dev + '/port1/line10'
+    highToneAddress = dev + '/port2/line2'
     highTone = InterfaceOut(highToneAddress)
     highTone.startTask()
     return highTone
@@ -202,9 +202,9 @@ def foodEatInputSetup():
 '''
 Returns left nose poke input Task
 '''
-def leftNoseInputSetup(): # 3
+def leftNoseInputSetup():
     leftNoseInputAddress = dev + '/port6/line3'
-    leftNose = InterfaceIn(foodEatAddress)
+    leftNose = InterfaceIn(leftNoseInputAddress)
     leftNose.startTask()
     return leftNose
 
