@@ -1,0 +1,12 @@
+trial 1, 0.01
+conditionInfo,{'desired response' : 'lever-press-right'}
+camera-on, 0.02
+levers-out, 0.03
+lever-press-right, 0.2
+food, 0.205
+trial 2, 0.21
+conditionInfo,{'desired response' : 'lever-press-right'}
+camera-on, 0.22
+levers-out, 0.23
+lever-press-left, 0.3
+shock, 0.41

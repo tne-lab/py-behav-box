@@ -1,0 +1,3 @@
+Trial Number,response,correct response,outcome,time from start
+1,lever-press-right,True,food,0.19
+2,lever-press-left,False,shock,0.09
