@@ -19,7 +19,7 @@ def parseLog():
     return trials
 
 def parseTrials(trials):
-    data = {'trial number': [], 'response' : [],'correct response' : [],'outcome' : [],'time from start' : []}
+    data = {'trial number': [], 'response' : [],'correct_response' : [],'outcome' : [],'time_from_start' : []}
     i = 0
     for trial in trials:
         startTime = 0
@@ -29,14 +29,14 @@ def parseTrials(trials):
                 data['trial number'].append(key[-1])
                 startTime = trial[key]
             if key == trial['conditionInfo']['desired response']:
-                data['correct response'].append('True')
+                data['correct_response'].append('True')
             if key == 'lever-press-right' or key == 'lever-press-left':
                 data['response'].append(key)
-                data['time from start'].append(trial[key] - startTime)
-                if len(data['correct response']) == i+1:
+                data['time_from_start'].append(trial[key] - startTime)
+                if len(data['correct_response']) == i+1:
                     continue
                 else:
-                    data['correct response'].append('False')
+                    data['correct_response'].append('False')
 
             if key == 'food' or key == 'shock':
                 data['outcome'].append(key)
@@ -48,7 +48,7 @@ def main():
     trials = parseLog()
     data = parseTrials(trials)
 
-    df = pandas.DataFrame(data,columns = ['response','correct response','outcome','time from start'], index = data['trial number'])
+    df = pandas.DataFrame(data,columns = ['response','correct_response','outcome','time_from_start'], index = data['trial number'])
     df.index.name = 'Trial Number'
     df.to_csv('ex.csv')
 
