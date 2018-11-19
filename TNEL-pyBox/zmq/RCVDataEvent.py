@@ -1,33 +1,38 @@
 import zmq
 import numpy as np
 from convertString import convertString
-
-context = zmq.Context()
-
-#  Socket to talk to server
-print("Connecting to hello world server...")
-socket = context.socket(zmq.SUB)
-socket.connect("tcp://localhost:5557")
-# 1 for data events , 2 for spikes!
-socket.setsockopt(zmq.SUBSCRIBE, b'\x01\x00')
-socket.setsockopt(zmq.SUBSCRIBE, b'\x02\x00')
-
-for request in range(10):
-    print('waiting')
-
-    recv = socket.recv_multipart()
-    type = recv[0]
-    if type == b'\x01\x00':
-        eventData = {'type' : 'Event'}
-    elif type == b'\x02\x00':
-        eventData = {'type' : 'Spike'}
+import json
 
 
-    eventData['timestamp'] =  convertString(recv[1].decode('utf-8'))
+def parseJson(jsonStr):
+    for key in jsonStr.keys():
+        if type(jsonStr[key]) is dict:
+            print(key + "\t")
+            parseJson(jsonStr[key])
+        else:
+            print(key, ": ", jsonStr[key])
 
-    #skip raw data
-    for i in range(2,len(recv)-1,2):
-        eventData[recv[i].decode('utf-8')] = convertString(recv[i+1].decode('utf-8'))
+def main():
+    context = zmq.Context()
 
-    print(eventData)
-    print('\n')
+    #  Socket to listen to OE
+    print("Connecting to hello world server...")
+    socket = context.socket(zmq.SUB)
+    socket.connect("tcp://localhost:5557")
+    #Have to Set to the beginning for the envelope!
+    socket.setsockopt(zmq.SUBSCRIBE, b'event')
+    socket.setsockopt(zmq.SUBSCRIBE, b'spike')
+
+    for request in range(10):
+        print('waiting')
+
+        #Get raw input from socket
+        envelope, jsonStr = socket.recv_multipart()
+        print(envelope)
+
+        #Our actual json object (last part)
+        jsonStr = json.loads(jsonStr);
+        parseJson(jsonStr)
+
+        print('\n')
+main()

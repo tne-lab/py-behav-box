@@ -1,0 +1,1 @@
+{'Crossing Point': 304300, 'Crossing level': 13.0649995803833, 'Direction': 1, 'Learning rate': 0.0, 'Threshold': 0.0, 'state': False, 'timing': {'sample rate': 30000.0, 'timestamp': 10.148333333333333}}
