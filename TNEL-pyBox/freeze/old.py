@@ -25,24 +25,26 @@ class Vid:
             self.threshold = 20
             self.length = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
             self.index = 0
+            self.freezeThreshold = 1000
         else:
             self.capError = True
-        self.csv = pd.read_csv('FR1_freezing.csv')
-        self.csvText = ''
+
 
     def trackBar(self,winName,trackName,min, max):
         cv2.createTrackbar(trackName, winName,min,max,
         lambda x: self.picFrame(x, self))
 
     def picFrame(x, frame, self):
-        self.index = frame
-        #self.cap.set(1,self.startFrame)
-        #self.isFrozen = False
-        #self.timeFrozen = 0
+        self.startFrame = frame
+        self.cap.set(1,self.startFrame)
+        self.isFrozen = False
+        self.timeFrozen = 0
 
+        '''
     def setByTime(self):
         self.cap.set(0,self.timeToMilli(self.csv['Time'][self.index]))
         self.index+=1
+        '''
 
     def timeToMilli(self, s):
         s = s.replace(".",":")
@@ -56,11 +58,11 @@ class Vid:
         noPrevThresh = True
         while(self.cap.isOpened()):
             #Get frame
-            self.setByTime()
+            cur = time.perf_counter()
             ret, frame = self.cap.read()
             if not ret:
                 break
-
+            print(time.perf_counter() - cur)
             # Create ROI if not done yet
             # Otherwise grab ROI
             if noROI:
@@ -106,18 +108,15 @@ class Vid:
                     self.freezeFile.write('freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
                     self.text = 'freeze'
 
-            if self.csv['Freezing'][self.index-1]:
-                self.csvText = 'Freeze'
-            else:
-                self.csvText = 'move'
+
             # Write freeze/move on screen
             cv2.putText(prevThresh, self.text, (10, 50),cv2.FONT_HERSHEY_SIMPLEX, .5, (255, 255, 255), 2)
             cv2.putText(prevThresh, str(self.timeFrozen), (100, 50),cv2.FONT_HERSHEY_SIMPLEX, .5, (255, 255, 255), 2)
 
-            cv2.putText(prevThresh, self.csvText, (10, 75),cv2.FONT_HERSHEY_SIMPLEX, .5, (255, 255, 255), 2)
+            #cv2.putText(prevThresh, self.csvText, (10, 75),cv2.FONT_HERSHEY_SIMPLEX, .5, (255, 255, 255), 2)
             cv2.putText(prevThresh, str(self.startFrame), (10,95), cv2.FONT_HERSHEY_SIMPLEX, .5, (255,255,255),2)
 
-            cv2.putText(prevThresh, str(self.csv['Time'][self.index-1]), (10,110), cv2.FONT_HERSHEY_SIMPLEX, .5, (255,255,255),2)
+            #cv2.putText(prevThresh, str(self.csv['Time'][self.index-1]), (10,110), cv2.FONT_HERSHEY_SIMPLEX, .5, (255,255,255),2)
             cv2.putText(prevThresh, self.milliToTime(self.cap.get(0)), (10,125), cv2.FONT_HERSHEY_SIMPLEX, .5, (255,255,255),2)
 
             cv2.imshow('thresh',prevThresh)
@@ -148,7 +147,6 @@ class Vid:
     def checkFreeze(self):
         if self.timeFrozen < self.freezeThreshold:
             self.timeFrozen+=self.spf
-            print('freeze time: ' + str(self.timeFrozen))
             return False
         else:
             self.timeFrozen+=self.spf
@@ -159,7 +157,7 @@ class Vid:
         self.cap.release()
         cv2.destroyAllWindows()
 
-    def milliToTime(milliseconds):
+    def milliToTime(self, milliseconds):
         seconds=(milliseconds/1000)%60
         minutes=(milliseconds/(1000*60))%60
         hours=(milliseconds/(1000*60*60))%24
