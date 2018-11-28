@@ -97,31 +97,31 @@ class SNDEvent:
         print("Received reply %s " %  message)
 
 
-    #### ZMQ classes to kill external processes ####
-        # Maybe hardcode port so you don't need to think about that?
-    # Head GUI process has this. Send a kill command to let others know experiment is over.
-    class GUIPub:
-        def __init__(self, port):
-            context = zmq.Context()
-            self.socket = context.socket(zmq.PUB)
-            self.socket.bind("tcp://localhost:" + str(port))
+#### ZMQ classes to kill external processes ####
+    # Maybe hardcode port so you don't need to think about that?
+# Head GUI process has this. Send a kill command to let others know experiment is over.
+class GUIPub:
+    def __init__(self, port):
+        context = zmq.Context()
+        self.socket = context.socket(zmq.PUB)
+        self.socket.bind("tcp://localhost:" + str(port))
 
-        def sendKill(self):
-            self.socket.send(b'kill')
+    def sendKill(self):
+        self.socket.send(b'kill')
 
-    # Other processes that need to be told when experiment is over
-    class GUISub:
-        def __init__(self, port):
-            context = zmq.Context()
-            self.socket = context.socket(zmq.SUB)
-            self.socket.bind("tcp://localhost:" + str(port))
-            self.socket.setsockopt(zmq.SUBSCRIBE, b'kill')
+# Other processes that need to be told when experiment is over
+class GUISub:
+    def __init__(self, port):
+        context = zmq.Context()
+        self.socket = context.socket(zmq.SUB)
+        self.socket.bind("tcp://localhost:" + str(port))
+        self.socket.setsockopt(zmq.SUBSCRIBE, b'kill')
 
-        # Non blocking check for a kill command from main GUI
-        def checkKill(self):
-            try:
-                self.socket.recv(flags=zmq.NOBLOCK)
-                return True
-            except zmq.Again as e:
-                return False
-    ##############################################
+    # Non blocking check for a kill command from main GUI
+    def checkKill(self):
+        try:
+            self.socket.recv(flags=zmq.NOBLOCK)
+            return True
+        except zmq.Again as e:
+            return False
+##############################################
