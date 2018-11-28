@@ -10,7 +10,7 @@ def parseJson(jsonStr):
             print(key + "\t")
             parseJson(jsonStr[key])
         else:
-            print(key, ": ", jsonStr[key])
+            print(key, ": ", convertString(jsonStr[key]))
 
 def main():
     context = zmq.Context()
