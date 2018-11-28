@@ -32,7 +32,7 @@ def main():
 
         #Our actual json object (last part)
         jsonStr = json.loads(jsonStr);
-        parseJson(jsonStr)
+        print(parseJson(jsonStr))
 
         print('\n')
 main()

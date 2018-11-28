@@ -1,1 +1,9 @@
-{'Crossing Point': 304300, 'Crossing level': 13.0649995803833, 'Direction': 1, 'Learning rate': 0.0, 'Threshold': 0.0, 'state': False, 'timing': {'sample rate': 30000.0, 'timestamp': 10.148333333333333}}
+import zmqClasses
+
+def main():
+    rcv = zmqClasses.RCVEvent(5557, [b'event',b'spike'])
+
+    for i in range(0,10):
+        rcv.rcv()
+
+main()
