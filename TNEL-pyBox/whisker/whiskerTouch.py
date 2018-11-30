@@ -2,15 +2,28 @@
 # whisker/test_twisted.py
 
 '''
-import whiskerTouch
+################### EXAMPLE CODE ##################################
+# Probably some bugs..
 
+import whiskerTouch
+# Init whisker thread (lots of optional args here, check main function to see them) (trial_length,ON_RESPONSE,media_dir...)
 whiskerThread = threading.Thread(target = whiskerTouch.main args=(whiskerQ,whiskerBack_q))
 
-for i in range(0,trials-1):
+# Note this is Queue() not deque(what we were using before) here. Simplier and easier to implement a FIFO
+whiskerQ = Queue(maxsize = trialNum + 1) # Might want to check this size to be correct and not losing trials..
+whiskerBack_q = Queue()
+
+for i in range(0,trialNum-1):
+    # Can change pics/xy however you would like
     whiskerQ.put({'end' : False, 'next' : True, 'pics': ['santa_fe.bmp','test.bmp'], 'XYarray' : [(0,100),(250,100)]})
+whiskerQ.put({'end' : True})
 
+# Start whisker thread after Q is full
+whiskerThread.start()
 
-whiskerThread.start() 
+# msg in form of => {'picture' : picName, 'XY' : (x,y)}
+if whiskerBack_q.empty() == False:
+    msg = whiskerBack_q.get()
 '''
 
 
@@ -59,8 +72,6 @@ from whisker.api import (
 from whisker.constants import DEFAULT_PORT
 from whisker.twistedclient import WhiskerTwistedTask
 
-log = logging.getLogger(__name__)
-
 DEFAULT_DISPLAY_NUM = 0
 DEFAULT_MEDIA_DIR = r"C:\Program Files (x86)\WhiskerControl\Client Media"
 DEFAULT_WAV = "telephone.wav"
@@ -73,13 +84,11 @@ AUDIO = "audio"
 class MyWhiskerTask(WhiskerTwistedTask):
     """
     Class deriving from :class:`whisker.twistedclient.WhiskerTwistedTask`
-    Creates a bandit task on screen and sends info back to GUI
+    Creates a task on screen and sends info back to GUI
     """
     def __init__(self,
                  display_num,
                  media_dir,
-                 pics,
-                 XYarray,
                  trial_length,
                  ON_RESPONSE,
                  q,
@@ -89,8 +98,6 @@ class MyWhiskerTask(WhiskerTwistedTask):
         super().__init__()  # call base class init
         self.display_num = display_num
         self.media_dir = media_dir
-        self.pics = pics
-        self.XYarray = XYarray
         self.trial_length = trial_length
         self.q = q
         self.back_q = back_q
@@ -111,20 +118,18 @@ class MyWhiskerTask(WhiskerTwistedTask):
         """
         self.whisker.report_name("Whisker Twisted Client for touchscreen Task")
         self.whisker.timestamps(True)
-
-
-
         # BP
         self.whisker.claim_display(number=self.display_num, alias=DISPLAY)
         self.whisker.claim_audio(number=0, alias=AUDIO)
         self.whisker.set_media_directory(self.media_dir)
-        display_size = self.whisker.display_get_size(DISPLAY)
+        self.display_size = self.whisker.display_get_size(DISPLAY)
         self.whisker.display_event_coords(True)
 
         self.whisker.display_scale_documents(DISPLAY, True)
         bg_col = (0, 0, 100)
         self.whisker.display_blank(DISPLAY)
         # Draw stuff to finish up with setting up connection
+        self.checkQ()
         self.draw()
 
 
@@ -142,7 +147,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
         with self.whisker.display_cache_wrapper(DOC):
             # Draw background
             self.whisker.display_add_obj_rectangle(DOC, "background",
-                Rectangle(left = 0, top = 0, width = display_size[0], height = display_size[1]),
+                Rectangle(left = 0, top = 0, width = self.display_size[0], height = self.display_size[1]),
                 self.pen, self.brush1)
 
             # Draw stop button (only for debugging)
@@ -154,30 +159,31 @@ class MyWhiskerTask(WhiskerTwistedTask):
             # Draw pictures
             for i in range(0,len(self.pics)):
                 bit = self.whisker.display_add_obj_bitmap(
-                    DOC,"picture" + str(i),self.XYarray[i],filename=self.pics[i],
+                    DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
                     stretch = False, height = 100, width = 100)
                 if not bit:
                     print('failed drawing picture')
             self.whisker.display_send_to_back(DOC, "background")
-            self.setPicEvents()
+            self.setEvents()
 
     # Handle creation/deletion of picture Events
-    def setPicEvents(self):
+    def setEvents(self):
         # Set event for trial length
-        self.whisker.timer_set_event("TmrEndOfTrial", trial_length*1000)
+        self.whisker.timer_set_event("TmrEndOfTrial", self.trial_length*1000)
         # Set events for all pictures
         for i in range(0,len(self.pics)):
             self.whisker.display_set_event(DOC, "picture" + str(i), self.pics[i])
         # Set event for background and end of task
         self.whisker.display_set_event(DOC, "rectangle", "RectEndOfTask")
         self.whisker.display_set_event(DOC, "background", "missedClick")
-    def clearPicEvents(self):
-        # Clears events for all pictures to get ready for new ones
+    def clearEvents(self):
+        # Clears events and DOC for all pictures to get ready for new ones
         for i in range(0,len(self.pics)):
             self.whisker.display_clear_event(DOC, "picture" + str(i))
         self.whisker.display_clear_event(DOC, "rectangle")
         self.whisker.display_clear_event(DOC, "background")
         self.whisker.timer_clear_event("TmrEndOfTrial")
+        self.whisker.display_delete_document(DOC)
     #############################################
 
     # Handle event
@@ -199,15 +205,17 @@ class MyWhiskerTask(WhiskerTwistedTask):
                 reactor.stop()
             # Or a picture
             else:
-                for i in self.pics:
-                    if i == event:
-                        sendDict = {'picture' : str(i), 'XY' : (x,y)}
+                for picName in self.pics:
+                    if picName == event:
+                        sendDict = {'picture' : picName, 'XY' : (x,y)}
                         print(sendDict)
                         self.back_q.put(sendDict)
                         if self.ON_RESPONSE:
+                            self.clearEvents()
                             self.checkQ()
         except ValueError:
             if "EndOfTrial" in event:
+                self.clearEvents()
                 self.checkQ()
 
     def checkQ(self):
@@ -218,17 +226,14 @@ class MyWhiskerTask(WhiskerTwistedTask):
             msg = self.q.get()
             if msg['end'] == True:
                 reactor.stop()
-            if msg['next'] == True:
-                self.clearPicEvents()
-                self.whisker.display_delete_document(DOC)
+            elif msg['next'] == True:
                 self.pics = msg['pics']
                 self.XYarray = msg['XYarray']
                 self.draw()
 
 
 def main(q, back_q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA_DIR,
-    pics = ['test.bmp', 'santa_fe.bmp'], port = DEFAULT_PORT, XYarray = [(0,100),(250,100)],
-    trial_length = 30, ON_RESPONSE = False):
+    port = DEFAULT_PORT, trial_length = 30, ON_RESPONSE = False):
     '''
     Generates a touchscreen task.
     NO SPACES IN FILENAMES!
@@ -236,8 +241,6 @@ def main(q, back_q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA
     w = MyWhiskerTask(
         display_num=display_num,
         media_dir=media_dir,
-        pics = pics,
-        XYarray = XYarray,
         trial_length = trial_length,
         ON_RESPONSE = ON_RESPONSE,
         q = q,
