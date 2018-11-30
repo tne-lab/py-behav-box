@@ -1,33 +1,6 @@
 #!/usr/bin/env python
 # whisker/test_twisted.py
 
-'''
-################### EXAMPLE CODE ##################################
-# Probably some bugs..
-
-import whiskerTouch
-# Init whisker thread (lots of optional args here, check main function to see them) (trial_length,ON_RESPONSE,media_dir...)
-whiskerThread = threading.Thread(target = whiskerTouch.main args=(whiskerQ,whiskerBack_q))
-
-# Note this is Queue() not deque(what we were using before) here. Simplier and easier to implement a FIFO
-whiskerQ = Queue(maxsize = trialNum + 1) # Might want to check this size to be correct and not losing trials..
-whiskerBack_q = Queue()
-
-for i in range(0,trialNum-1):
-    # Can change pics/xy however you would like
-    whiskerQ.put({'end' : False, 'next' : True, 'pics': ['santa_fe.bmp','test.bmp'], 'XYarray' : [(0,100),(250,100)]})
-whiskerQ.put({'end' : True})
-
-# Start whisker thread after Q is full
-whiskerThread.start()
-
-# msg in form of => {'picture' : picName, 'XY' : (x,y)}
-if whiskerBack_q.empty() == False:
-    msg = whiskerBack_q.get()
-'''
-
-
-
 ###
 
 """
@@ -98,6 +71,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
         super().__init__()  # call base class init
         self.display_num = display_num
         self.media_dir = media_dir
+        self.ON_RESPONSE = ON_RESPONSE
         self.trial_length = trial_length
         self.q = q
         self.back_q = back_q
@@ -138,8 +112,6 @@ class MyWhiskerTask(WhiskerTwistedTask):
         Draws current pics stored in self.pics, background and stop button
         Also creates events corresponding to all
         '''
-        display_clear_event(doc: str, obj: str, event_type: whisker.api.DocEventType = <DocEventType.touch_down: 5>)
-        display_set_event(doc: str, obj: str, event: str, event_type: whisker.api.DocEventType = <DocEventType.touch_down: 5>)
         # Display stuff on screen
         # Create a new document everytime we draw a new screen. (otherwise we might be drawing stuff on top of eachother.. seems bad)
         self.whisker.display_create_document(DOC)
