@@ -86,7 +86,7 @@ class Vid:
 
             # Create dict to send back to main GUI
             backDict = {'vid_time':vid_cur_time, 'FROZEN':self.isFrozen, 'NIDAQ_time':time_from_GUI, 'Vid-NIDAQ':msg['time_diff']}
-            back_q.append(backDict)
+            back_q.put(backDict)
 
             # Get next frame and check if we are done
             self.startFrame+=1
