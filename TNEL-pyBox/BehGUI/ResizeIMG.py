@@ -1,0 +1,46 @@
+# download from: 
+# https://www.pyimagesearch.com/2014/01/20/basic-image-manipulations-in-python-and-opencv-resizing-scaling-rotating-and-cropping/
+# and modified on 11/30/2018
+
+import cv2
+ 
+# load the image and show it
+image = cv2.imread("TNElogo.png")
+cv2.imshow("original", image)
+cv2.waitKey(0)
+
+print (image.shape)
+
+# we need to keep in mind aspect ratio so the image does
+# not look skewed or distorted -- therefore, we calculate
+# the ratio of the new image to the old image
+r = 100.0 / image.shape[1]
+dim = (100, int(image.shape[0] * r))
+
+# RESIZE 
+# perform the actual resizing of the image and show it
+resized = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
+cv2.imshow("resized", resized)
+cv2.waitKey(0)
+##
+### ROTATE
+### grab the dimensions of the image and calculate the center
+### of the image
+##(h, w) = image.shape[:2]
+##center = (w / 2, h / 2)
+## 
+### rotate the image by 180 degrees
+##M = cv2.getRotationMatrix2D(center, 180, 1.0)
+##rotated = cv2.warpAffine(image, M, (w, h))
+##cv2.imshow("rotated", rotated)
+##cv2.waitKey(0)
+##
+### CROP
+### crop the image using array slices -- it's a NumPy array
+### after all!
+##cropped = image[70:170, 440:540]
+##cv2.imshow("cropped", cropped)
+##cv2.waitKey(0)
+##	
+# write the cropped image to disk in PNG format
+cv2.imwrite("TNElogoSmall.bmp", resized)
