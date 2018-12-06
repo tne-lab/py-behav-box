@@ -53,8 +53,8 @@ class InterfaceOut:
 
     def end(self):
         self.task.close()
-
-
+        
+        
 
 
 def enableSetup():
@@ -65,7 +65,19 @@ def enableSetup():
 
 
 '''
-Pulses control line to indicate state changed 
+!!! DEPRECIATED !!!!
+Enable pulse for when sending bits/bytes.
+(Doesn't need a global task because its just a pulse).
+!! Plus it seems like making a class on port0 isn't a good idea.
+'''
+'''
+def enablePulse():
+    try:
+            enable.enable()
+        enable.end()
+    except:
+        print('woops')
+    return
 '''
 def enablePulse():
     enable = dev + '/port0/line4'
@@ -199,7 +211,7 @@ class InterfaceIn:
     def end(self):
         self.task.stop()
         self.task.close()
-
+        
 class InterfaceInNEW:
     def __init__(self, address):
         self.task = nidaqmx.Task()
@@ -227,7 +239,7 @@ class debounce:
 
 '''
 Returns a new lever input task
-'''
+'''        
 def leverInputSetup():
     leftAddress = dev + '/port6/line0'
     checkPressLeft = InterfaceIn(leftAddress)

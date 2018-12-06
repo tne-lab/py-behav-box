@@ -2,9 +2,13 @@ import cv2
 import time
 
 class Vid:
-    def __init__(self, videoPath, winName = 'vid'):
+    def __init__(self, videoPath, q, back_q, winName = 'vid'):
         self.cap = cv2.VideoCapture(videoPath)
         self.winName = winName
+        self.q = q
+        self.back_q = back_q
+        self.out = None
+        self.outPath = 'NOT SET'
         cv2.namedWindow(self.winName)
         if self.cap.isOpened():
             if not self.vidOrLive(videoPath):
@@ -26,6 +30,7 @@ class Vid:
             lambda thresh: self.changeThresh(thresh))
             # Init some stuff
             self.initROIFrames()
+            self.back_q.put('vid ready')
         else:
             print('error opening vid')
             self.capError = True
@@ -45,13 +50,14 @@ class Vid:
         # livestream!
         elif isinstance(videoPath, int):
             # Number of frames to capture
+            print('estimating FPS')
             numFrames = 120;
             print("Number of frames to cap: ", numFrames)
 
             # Start time
             start = time.time()
             # Grab a few frames
-            for i in xrange(0, numFrames) :
+            for i in range(0, numFrames) :
                 ret, frame = self.cap.read()
             # End time
             end = time.time()
@@ -61,8 +67,8 @@ class Vid:
             # Calculate frames per second
             fps  = numFrames / seconds;
             print("Estimated frames per second : ", fps)
-            self.mspf = 1/fps
-            self.length = ''
+            self.mspf = int(1/fps * 1000)
+            self.length = None
             return True
         # Something else?
         else:
@@ -91,21 +97,21 @@ class Vid:
 #######################################################################################
 #######################################################################################
     # Call this every loop
-    def run(self, q, back_q, out):
+    def run(self):
         while(self.cap.isOpened()):
             vid_cur_time = time.perf_counter()
 
             # Run video
             try:
-                msg = q.pop()
+                msg = self.q.pop()
                 time_from_GUI = msg['cur_time']
                 STATE = msg['STATE']
                 msg['time_diff'] = vid_cur_time - time_from_GUI
                 msg['vid_time'] = vid_cur_time
-                msg['out'] = out
-            except:
-                return
-
+                if msg['PATH_FILE'] != self.outPath:
+                    self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))
+            except IndexError:
+                continue
             #Get frame
             ret, frame = self.cap.read()
             if not ret:
@@ -136,7 +142,7 @@ class Vid:
             # Write stuff on screen
             self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, frame)
             if msg['STATE'] == 'REC':
-                msg['out'].write(frame)
+                self.out.write(frame)
 
             # Show the frames
             cv2.imshow('thresh',self.prevThresh)
@@ -144,19 +150,30 @@ class Vid:
 
             # Create dict to send back to main GUI
             backDict = {'vid_time':vid_cur_time, 'FROZEN':self.isFrozen, 'NIDAQ_time':time_from_GUI, 'Vid-NIDAQ':msg['time_diff']}
-            back_q.put(backDict)
+            self.back_q.put(backDict)
 
             # Get next frame and check if we are done
             self.startFrame+=1
             if cv2.waitKey(self.mspf) & 0xFF == ord('q'):
-                self.close()
-                return
-            if msg['STATE'] == 'STOP':
+                self.out.release()
                 self.close()
                 return
 
+            if msg['STATE'] == 'STOP':
+                self.out.release()
+                self.close()
+                return
+
+
 ################################################################################################
 ################################################################################################
+
+    def openOutfile(self, path, height, width):
+        self.outPath = path
+        fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
+        print(1.0/self.mspf * 1000)
+        self.out = cv2.VideoWriter(path,fourcc, 1.0/self.mspf * 1000, (int(width),int(height)))
+        print("SAVING TO: ", path)
 
     def mouse_callback(self, event, x, y, flags, params):
         if event == 2:
