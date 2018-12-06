@@ -17,7 +17,7 @@ def main():
         if not p.isAlive():
             break
         time.sleep(.01)
-        dict = {'STATE' : 'REC', 'cur_time' : time.perf_counter()}
+        dict = {'STATE' : 'ON', 'cur_time' : time.perf_counter()}
         q.append(dict)
         try:
             back = back_q.pop()

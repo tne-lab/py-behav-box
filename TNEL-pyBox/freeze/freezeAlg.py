@@ -2,17 +2,16 @@ import cv2
 import time
 
 class Vid:
-    def __init__(self, videoPath, winName):
+    def __init__(self, videoPath, winName = 'vid'):
         self.cap = cv2.VideoCapture(videoPath)
+        self.winName = winName
+        cv2.namedWindow(self.winName)
         if self.cap.isOpened():
+            if not self.vidOrLive(videoPath):
+                return False
             # Setup video
             self.startFrame = 1
             self.cap.set(1,self.startFrame)
-            self.winName = winName
-            cv2.namedWindow(self.winName)
-            # Get info from video
-            self.spf = int((1/self.cap.get(5))*1000)
-            self.length = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
             # Init vars
             self.min = 0
             self.timeFrozen = 0
@@ -23,14 +22,71 @@ class Vid:
             self.threshold = 8
             # in milliseconds (2000 = 2 seconds)
             self.freezeLength = 5000
-
-            # Trackbars
             cv2.createTrackbar('threshold', 'vid', 0, 30,
-            lambda x: self.changeThresh(x, self))
-            self.frameBar(winName,'frameNumber',0, self.length)
+            lambda thresh: self.changeThresh(thresh))
+            # Init some stuff
+            self.initROIFrames()
         else:
             print('error opening vid')
             self.capError = True
+
+    # Init based on video file or livestream
+    def vidOrLive(self, videoPath):
+        # Check if video or livestream
+        # Video File
+        if isinstance(videoPath, str):
+            # Get info from video
+            self.mspf = int((1/self.cap.get(5))*1000)
+            print(self.mspf)
+            self.length = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            # Trackbars
+            self.frameBar(self.winName,'frameNumber',0, self.length)
+            return True
+        # livestream!
+        elif isinstance(videoPath, int):
+            # Number of frames to capture
+            numFrames = 120;
+            print("Number of frames to cap: ", numFrames)
+
+            # Start time
+            start = time.time()
+            # Grab a few frames
+            for i in xrange(0, numFrames) :
+                ret, frame = self.cap.read()
+            # End time
+            end = time.time()
+            # Time elapsed
+            seconds = end - start
+            print("Time taken seconds: ", seconds)
+            # Calculate frames per second
+            fps  = numFrames / seconds;
+            print("Estimated frames per second : ", fps)
+            self.mspf = 1/fps
+            self.length = ''
+            return True
+        # Something else?
+        else:
+            print('other video type.. Going to break')
+            return False
+
+    # Generates inital stuff
+    def initROIFrames(self):
+        ret, frame = self.cap.read()
+        if not ret:
+            print('frame read error')
+            return
+        self.genROI(frame)
+
+        # Gen prev frame and threshold (Use size of ROI)
+        self.startFrame+=1
+        ret, newFrame = self.cap.read()
+        if not ret:
+            print('frame read error')
+            return
+        frameROI = frame[int(self.r[1]):int(self.r[1]+self.r[3]),int(self.r[0]):int(self.r[0] + self.r[2])]
+        newFrameROI = newFrame[int(self.r[1]):int(self.r[1]+self.r[3]),int(self.r[0]):int(self.r[0] + self.r[2])]
+        self.genPrev(newFrameROI, frameROI)
+
 
 #######################################################################################
 #######################################################################################
@@ -69,10 +125,12 @@ class Vid:
                 if self.isFrozen:
                     self.isFrozen = False
                     self.freezeFile.write('end freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
+                    #back_q.put({'FREEZE' : False, 'TIME' : time_from_GUI})
             else:
                 if self.checkFreeze() and not self.isFrozen:
                     self.isFrozen = True
                     self.freezeFile.write('freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
+                    #back_q.put({'FREEZE' : True, 'TIME' : time_from_GUI})
                     self.text = 'freeze'
 
             # Write stuff on screen
@@ -90,7 +148,7 @@ class Vid:
 
             # Get next frame and check if we are done
             self.startFrame+=1
-            if cv2.waitKey(self.spf) & 0xFF == ord('q'):
+            if cv2.waitKey(self.mspf) & 0xFF == ord('q'):
                 self.close()
                 return
             if msg['STATE'] == 'STOP':
@@ -100,6 +158,12 @@ class Vid:
 ################################################################################################
 ################################################################################################
 
+    def mouse_callback(self, event, x, y, flags, params):
+        if event == 2:
+            self.clicks color = int(self.frame[x, y])
+### #set mouse callback function for window
+c#v2.setMouseCallback('image', mouse_callback)
+
     # Close everything
     def close(self):
         self.freezeFile.close()
@@ -108,6 +172,18 @@ class Vid:
 
     ### Helper Functions ###
 
+    # Wrtie a ton of stuff on frames...
+    def writeStuff(self, time_from_GUI, vid_time, time_diff, movingPxls, frame):
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(frame,"NIDAQ time = " + str(time_from_GUI),(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(frame,"Video time = " + str(vid_time),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(frame,"time diff = " + str(time_diff),(20,455), font, 0.5,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
+        cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(self.prevThresh, "Time frozen = " + str(self.timeFrozen), (100, 50),font, .5, (255, 255, 255), 2)
+        cv2.putText(self.prevThresh, "Current frame = " + str(self.startFrame), (10,95), font, .5, (255,255,255),2)
+        cv2.putText(self.prevThresh, "Number of frames = " + str(self.length), (10,110), font, .5, (255,255,255),2)
+
     # Creates a trackbar to scroll through frames. Could use some work
     # to account for any trackbar
     def frameBar(self,winName,trackName, min, max):
@@ -115,7 +191,7 @@ class Vid:
         lambda x: self.picFrame(x, self))
 
     # Change the threshold
-    def changeThresh(x, thresh, self):
+    def changeThresh(self, thresh):
         self.threshold = thresh
 
     # Changes the frame to start at
@@ -131,7 +207,7 @@ class Vid:
         self.r = cv2.selectROI(frame)
         cv2.destroyWindow("ROI selector")
 
-    # Create a previous frame and thresh to be used for comparison
+    # Create a previous frame and thresh to be used for comparison on first frames only
     def genPrev(self, frame, prevFrame):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (21, 21), 0)
@@ -162,30 +238,18 @@ class Vid:
     # If frozen look at how long its been frozen to change state
     def checkFreeze(self):
         if self.timeFrozen < self.freezeLength:
-            self.timeFrozen+=self.spf
+            self.timeFrozen+=self.mspf
             return False
         else:
-            self.timeFrozen+=self.spf
+            self.timeFrozen+=self.mspf
             return True
-
-    # Wrtie a ton of stuff on frames...
-    def writeStuff(self, time_from_GUI, vid_time, time_diff, movingPxls, frame):
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"NIDAQ time = " + str(time_from_GUI),(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(frame,"Video time = :" + str(vid_time),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(frame,"time diff = :" + str(time_diff),(20,455), font, 0.5,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
-        cv2.putText(self.prevThresh, str(self.timeFrozen), (100, 50),font, .5, (255, 255, 255), 2)
-        cv2.putText(self.prevThresh, str(self.startFrame), (10,95), font, .5, (255,255,255),2)
-        cv2.putText(self.prevThresh, str(self.length), (10,110), font, .5, (255,255,255),2)
 
     # Timing stuff
     # Go from milliseconds to time string
     def milliToTime(self, milliseconds):
-        seconds=(milliseconds/1000)%60
-        minutes=(milliseconds/(1000*60))%60
-        hours=(milliseconds/(1000*60*60))%24
+        seconds = (milliseconds/1000) % 60
+        minutes = (milliseconds/(1000*60)) % 60
+        hours = (milliseconds/(1000*60*60)) % 24
         return str(int(hours)) + ":" + str(int(minutes)) + ":" + str(seconds)
     # Go from time string to milliseconds
     def timeToMilli(self, s):

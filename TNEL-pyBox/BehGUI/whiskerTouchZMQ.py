@@ -115,16 +115,16 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
         ############# zmq #########
         context = zmq.Context()
-        self.socket = context.socket(zmq.PAIR)
+        self.socket = context.socket(zmq.SUB)
         #self.socket.connect("tcp://134.84.77.234:5579")
         self.socket.bind("tcp://*:5979")
         #self.socket.connect("tcp://localhost:5979")
-        #self.socket.setsockopt(zmq.SUBSCRIBE, b'touchscreen') # b'touchscreen')
+        self.socket.setsockopt(zmq.SUBSCRIBE, 'touchscreen') # b'touchscreen')
         time.sleep(1)
         #self.socket.setsockopt(zmq.SUBSCRIBE, b'touchscreen')
         #self.socket.connect("tcp://localhost:5559")
 
-        
+
     def fully_connected(self) -> None:
         """
         Called when the server is fully connected. Sets up the "task".
@@ -234,19 +234,19 @@ class MyWhiskerTask(WhiskerTwistedTask):
     def RCVCMD(self):
         #[topic,msg] = self.socket.recv_multipart()
         print('waiting for message \n\n...............\n')
-        msgstring = pair_server("Got it!",self.socket)
-        #msgstring = self.socket.recv_string()
+
+        msgstring = self.socket.recv_string()
         #print(msgstring)
         #msg_string = msgstring.split(' ',1)
         print ("MSG received FROM GUI: ",msgstring)
         #msg = json.loads(msgstring)
-        #print ("MSG received FROM GUI: ",msg)        
+        #print ("MSG received FROM GUI: ",msg)
         i=0
         pics = []
         XYarray = []
         for img in msgstring:
                 print("img",img)
-                
+
                 for im,coords in img.items():
                     print(im,coords)
                     pics.append(im)
