@@ -95,13 +95,15 @@ class MyWhiskerTask(WhiskerTwistedTask):
     def __init__(self,
                  display_num,
                  media_dir,
-                 back_q
+                 back_q,
+                 q
                  ) -> None:
 
         super().__init__()  # call base class init
         self.display_num = display_num
         self.media_dir = media_dir
         self.back_q = back_q
+        self.q = q
 
         #Brushes + pens
         self.brush1 = Brush(
@@ -113,6 +115,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             opaque=True, style=BrushStyle.hatched,
             hatch_style=BrushHatchStyle.bdiagonal)
 
+        '''
         ############# zmq #########
         context = zmq.Context()
         #self.socket = context.socket(zmq.PAIR)
@@ -125,7 +128,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
         time.sleep(1)
         #self.socket.setsockopt(zmq.SUBSCRIBE, b'touchscreen')
         #self.socket.connect("tcp://localhost:5559")
-
+        '''
 
 
 
@@ -165,13 +168,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             self.whisker.display_add_obj_rectangle(DOC, "background",
                 Rectangle(left = 0, top = 0, width = self.display_size[0], height = self.display_size[1]),
                 self.pen, self.brush1)
-            '''
-            # Draw stop button (only for debugging)
-            self.whisker.display_add_obj_rectangle(
-                DOC, "rectangle",
-                Rectangle(left=10, top=10, width=50, height=50),
-                self.pen, self.brush)
-            '''
+
             # Draw pictures
             for i in range(0,len(self.pics)):
                 bit = self.whisker.display_add_obj_bitmap(
@@ -233,12 +230,9 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
     ######## zmq ############
     def RECVCMD(self):
-        try:
-            msgstring = self.socket.recv_string()
-
-            print('\n\n\n\n\nWHISKER TOUCH!!\n' + msgstring + '\n\n\n')
-            topic, jsonStr = msgstring.split(' ',1)
-            msg = json.loads(jsonStr)
+        if not self.q.empty():
+            msg = self.q.get()
+            #msg = json.loads(jsonStr)
             if msg == 'stop':
                 self.clearEvents()
                 reactor.stop()
@@ -257,16 +251,12 @@ class MyWhiskerTask(WhiskerTwistedTask):
             self.XYarray = XYarray
             self.clearEvents()
             self.draw()
-        except:
-            pass
 
     def RECVFIRST(self):
         while True:
-            try:
-                msgstring = self.socket.recv_string()
-                print('\n\n\n\n\nWHISKER TOUCH!!\n' + msgstring + '\n\n\n')
-                topic, jsonStr = msgstring.split(' ',1)
-                msg = json.loads(jsonStr)
+            if not self.q.empty():
+                msg = self.q.get()
+                #msg = json.loads(jsonStr)
                 if msg == 'stop':
                     self.clearEvents()
                     reactor.stop()
@@ -286,10 +276,8 @@ class MyWhiskerTask(WhiskerTwistedTask):
                 self.clearEvents()
                 self.draw()
                 break
-            except:
-                continue
 
-def main(back_q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA_DIR, port = DEFAULT_PORT):
+def main(back_q, q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA_DIR, port = DEFAULT_PORT):
     '''
     Generates a touchscreen task.
     '''
@@ -297,7 +285,8 @@ def main(back_q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA_DI
     w = MyWhiskerTask(
         display_num=display_num,
         media_dir=media_dir,
-        back_q = back_q
+        back_q = back_q,
+        q = q
     )
     w.connect('localhost', port)
     reactor.run()

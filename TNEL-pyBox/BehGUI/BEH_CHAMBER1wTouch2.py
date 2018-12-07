@@ -302,7 +302,7 @@ def log_event(event_lst, event, cur_time, other=''):
 
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 def StartTouchScreen():
-    global TOUCH_TRHEAD_STARTED, TOUCH_IMG_PATH, whiskerBack_q
+    global TOUCH_TRHEAD_STARTED, TOUCH_IMG_PATH, whiskerBack_q, TSq
     '''
     Generates a bandit task. NO SPACES IN FILENAMES!
 
@@ -311,7 +311,7 @@ def StartTouchScreen():
     global TOUCH_IMG_PATH,touch_img_files
 
     if not TOUCH_TRHEAD_STARTED:
-        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(whiskerBack_q,))#, kwargs=({'media_dir' : TOUCH_IMG_PATH}))
+        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(whiskerBack_q,TSq))#, kwargs=({'media_dir' : TOUCH_IMG_PATH}))
 
         whiskerThread.start()
         TOUCH_TRHEAD_STARTED = True
@@ -726,18 +726,6 @@ def draw_lighting(surface, SHOCK_ON, x,y,scale,color,width):
         return lightning # Returns a Rect object.  Neede to see if mouse clicked on icon
 
 #-----------------------------------------------------------------------
-def pair_client(clientmsg,socket):
-    '''
-    srvmsg = socket.recv_string()
-    servmsg = json.loads(srvmsg)
-    print("server msg: ",servmsg)
-    json_string = json.dumps(clientmsg)
-    socket.send_string(json_string)
-    #time.sleep(3)
-    '''
-    topic = 'touchscreen'
-    json_string = json.dumps(clientmsg)
-    socket.send_string("%s %s" % (topic,json_string))
 
 #-----------------------------------------------------------------------
 ################################################################################
@@ -752,15 +740,6 @@ def BehavioralChamber():
     global L_LEVER_EXTENDED,R_LEVER_EXTENDED,LEVERS_EXTENDED, TONE_ON, TOUCHSCREEN_USED
 
 #ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
-    # Create the socket
-    context = zmq.Context()
-    #socket = context.socket(zmq.PAIR)
-    socket = context.socket(zmq.PUB)
-    #socket.connect("tcp://localhost:5979")
-    #socket.connect("tcp://134.84.77.234:5579")
-    socket.connect("tcp://localhost:5979")
-   # time.sleep(1)
-
 
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (20,40)
     myscreen = pygame.display.set_mode((460,990),pygame.RESIZABLE,32)
@@ -1626,8 +1605,8 @@ def BehavioralChamber():
                     #json_string = json.dumps(touch_img_files)
                     #print(json_string)
                     print(type(touch_img_files))
-                    pair_client(touch_img_files,socket)
-
+                    #pair_client(touch_img_files,socket)
+                    TSq.put(touch_img_files)
                     #print("WHISKER MSG",whisker_msg )
                     #socket.send_string("%s %s" % (topic,json_string))
                     #print(" MSG SENT from GUI ")
@@ -1871,9 +1850,7 @@ def BehavioralChamber():
                             else: #"PELLET##"
                                 probability_of_reward = float(outcome[6:])
                                 print("probability_of_reward: ",probability_of_reward)
-                                ran =random.random()*100
-                                print('arndom', ran)
-                                if ran <= probability_of_reward:
+                                if random.random()*100 <= probability_of_reward:
                                     FOOD_REWARD(events,"Food_Pellet w"+str(probability_of_reward)+ "% probability", cur_time)
                                 else:
                                     log_event(events,"Reward NOT given w " + str(probability_of_reward)+"% probability", cur_time)
@@ -1922,7 +1899,7 @@ def BehavioralChamber():
                L_CONDITIONING_LIGHT(events,False,cur_time)
                R_CONDITIONING_LIGHT(events,False,cur_time)
                if TOUCHSCREEN_USED:
-                   pair_client('', socket)
+                   TSq.put('')
                    TOUCHSCREEN_USED = False
 
         # end of if START_EXPT:
