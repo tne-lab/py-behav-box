@@ -43,7 +43,7 @@ from multiprocessing import Process, Queue
 import threading
 import childVid
 import whiskerTouchZMQ
-import ZMQClasses
+import zmqClasses
 import eventRECV
 
 #import BEHTouchscreen
@@ -132,7 +132,6 @@ TSq = Queue()
 #TSback_q =  Queue() # FIFO
 whiskerBack_q = Queue()
 TOUCH_TRHEAD_STARTED = False
-
 
 ################################################################
 # GENERAL GLOBALS
@@ -365,6 +364,7 @@ def exit_game():
     pygame.quit()
     sys.exit()
 
+
 def load_expt_file(expt_file_path_name):
     global protocol, conditions
     global Expt_Name, Subject
@@ -506,10 +506,13 @@ def load_expt_file(expt_file_path_name):
                         video_file_path = video_file_path.strip()
                         print(video_file_path)
                     elif 'OPEN_EPHYS_PATH' in line:
+                        print('opening ephys')
                         words = line.split('=')
                         open_ephys_path = words[1].strip()
-                        p = Process(target=os.system, args=(open_ephys_path,))
-                        p.start()
+                        print(open_ephys_path)
+                        open_ephys = threading.Thread(target=os.system, args=(open_ephys_path,))
+                        open_ephys.start()
+                        time.sleep(1)
 
                 elif TONE1:#TONE1
                     if 'DURATION' in line:
@@ -772,9 +775,9 @@ def BehavioralChamber():
 
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (20,40)
     myscreen = pygame.display.set_mode((460,990),pygame.RESIZABLE,32)
-    UMNlogo = pygame.image.load('UMNlogo.png')
+    UMNlogo = pygame.image.load(r'.\RESOURCES\UMNlogo.png')
     pygame.display.set_icon(UMNlogo)
-    TNElogo = pygame.image.load('TNE logo.jpg')
+    TNElogo = pygame.image.load(r'.\RESOURCES\TNE logo.jpg')
     TNElogo = pygame.transform.scale(TNElogo, (70, 50))
     pygame.display.set_caption('Behavioral Chamber Control 1.0 by F. da Silva and M. Shatza Oct. 30, 2018') # Enter your window caption here
     #by Flavio J.K. da Silva and Mark Shatza Oct. 30, 2018') #
@@ -910,12 +913,12 @@ def BehavioralChamber():
     TOUCH_IMAGES_SENT = False
 
     # Open ephys stuff
-    snd = zmqClasses.SNDEvent(5556, recordingDir = 'C:\\Users\\Ephys\\Desktop\\RecDir', prependText = 'CHANGE ME') # subject number or something
+    snd = zmqClasses.SNDEvent(5556, recordingDir = '', prependText = 'CHANGE ME') # subject number or something
 
     openEphysBack_q = Queue()
     # Start thread
-    p = threading.Thread(target=eventRECV.rcv, args=(openEphys_q, openEphysBack_q) kwargs={'flags' : [b'event']})
-    p.start()
+    event_recv = threading.Thread(target=eventRECV.rcv, args=(openEphysBack_q,), kwargs={'flags' : [b'event']})
+    event_recv.start()
 
     ################################################################################
     #  MAIN LOOP
@@ -942,9 +945,9 @@ def BehavioralChamber():
                         UNFROZEN_ALREADY_LOGGED = True
 
             #print('problem with back_queue')
-    if not openEphysBack_q.empty():
-        OEMsg = openEphysBack_q.get()
-        print(OEMsg)
+        if not openEphysBack_q.empty():
+            OEMsg = openEphysBack_q.get()
+            print(OEMsg)
         #######################
         # DRAW SCREEN AND GUI ELEMENTS
         #######################
@@ -1223,6 +1226,8 @@ def BehavioralChamber():
 
                                elif button.text == "START EXPT":
                                     print("EXPT STARTED!")
+                                    snd.send(snd.START_ACQ)
+                                    snd.send(snd.START_REC)
                                     button.UP_DN = "DN"
                                     Expt_Count +=1
                                     if EXPT_FILE_LOADED:
@@ -1529,8 +1534,6 @@ def BehavioralChamber():
             key = list(protocolDict.keys())[0] # First key in protocolDict
 
             # Tell open ephys to start acquisiton and recording?
-            snd.send(snd.START_ACQ)
-            snd.send(snd.START_REC)
 
 
             if key == "":
@@ -1637,6 +1640,7 @@ def BehavioralChamber():
                         lever.STATE = "IN"
                    for button in buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
+
             elif "DRAW_IMAGES" in key:
                 if TOUCHSCREEN_USED:
                     print("\n\nSENDING MSG TO WHISPER TOUCH ZMQ: ")

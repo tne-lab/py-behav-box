@@ -293,7 +293,6 @@ def main(back_q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA_DI
     '''
     Generates a touchscreen task.
     '''
-    print("STARTING TOUCH SCREEN TASK")
     w = MyWhiskerTask(
         display_num=display_num,
         media_dir=media_dir,
