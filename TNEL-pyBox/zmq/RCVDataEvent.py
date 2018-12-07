@@ -4,19 +4,19 @@ from convertString import convertString
 import json
 
 
-def parseJson(jsonStr):
+def prettyJson(jsonStr, tab = ''):
     for key in jsonStr.keys():
         if type(jsonStr[key]) is dict:
-            print(key + "\t")
-            parseJson(jsonStr[key])
+            print(key + "\n", end='')
+            prettyJson(jsonStr[key], tab + '\t')
         else:
-            print(key, ": ", convertString(jsonStr[key]))
+            print(tab, key, ": ", convertString(jsonStr[key]))
 
 def main():
     context = zmq.Context()
 
     #  Socket to listen to OE
-    print("Connecting to hello world server...")
+    print("Connecting to Open Ephys...")
     socket = context.socket(zmq.SUB)
     socket.connect("tcp://localhost:5557")
     #Have to Set to the beginning for the envelope!
@@ -32,7 +32,7 @@ def main():
 
         #Our actual json object (last part)
         jsonStr = json.loads(jsonStr);
-        print(parseJson(jsonStr))
+        prettyJson(jsonStr)
 
         print('\n')
 main()

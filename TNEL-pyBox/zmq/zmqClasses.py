@@ -34,6 +34,14 @@ class RCVEvent:
                 self.parseJson(jsonStr[key])
             else:
                 print(key, ": ", convertString(jsonStr[key]))
+    # And this prints it out pretty
+    def prettyJson(jsonStr, tab = ''):
+        for key in jsonStr.keys():
+            if type(jsonStr[key]) is dict:
+                print(key + "\n", end='')
+                prettyJson(jsonStr[key], tab + '\t')
+            else:
+                print(tab, key, ": ", convertString(jsonStr[key]))
 
 class SNDEvent:
     # port default is 5556 for event rcver on OE
