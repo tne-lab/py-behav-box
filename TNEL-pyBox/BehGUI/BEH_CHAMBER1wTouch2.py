@@ -272,7 +272,7 @@ def Food_Light_ONOFF (events,ON_OFF,cur_time):
 
 
 
-def FOOD_REWARD(events, text, cur_time):
+def FOOD_REWARD(events, text,cur_time):
     global give_food,num_pellets, NIDAQ_AVAILABLE
     log_event(events,text,cur_time)
     num_pellets +=1
@@ -311,7 +311,7 @@ def StartTouchScreen():
     global TOUCH_IMG_PATH,touch_img_files
 
     if not TOUCH_TRHEAD_STARTED:
-        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(whiskerBack_q,), kwargs=({'media_dir' : TOUCH_IMG_PATH}))
+        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(whiskerBack_q,))#, kwargs=({'media_dir' : TOUCH_IMG_PATH}))
 
         whiskerThread.start()
         TOUCH_TRHEAD_STARTED = True
@@ -1815,8 +1815,6 @@ def BehavioralChamber():
                                 HAS_ALREADY_RESPONDED = True
                                 for i in range(len(touch_img_files)):
                                     for key in touch_img_files[i].keys():
-                                        print('key', key)
-                                        print('touc', touchMsg['picture'])
                                         if key in touchMsg['picture']:
                                             if i == 0 and cond["DES_IMG1_PRESSP"]:
                                                 log_event(events,"CORRECT Response",cur_time)
@@ -1869,7 +1867,7 @@ def BehavioralChamber():
                         if 'PELLET' in outcome:
                             print("OUTCOME",type(outcome),len(outcome),outcome)
                             if len(outcome)<=6: # Just 'PELLET'
-                                FOOD_REWARD(events,cur_time,"Food_Pellet")
+                                FOOD_REWARD(events,"Food_Pellet",cur_time)
                             else: #"PELLET##"
                                 probability_of_reward = float(outcome[6:])
                                 print("probability_of_reward: ",probability_of_reward)
@@ -1924,7 +1922,8 @@ def BehavioralChamber():
                L_CONDITIONING_LIGHT(events,False,cur_time)
                R_CONDITIONING_LIGHT(events,False,cur_time)
                if TOUCHSCREEN_USED:
-                   pair_client('stop', socket)
+                   pair_client('', socket)
+                   TOUCHSCREEN_USED = False
 
         # end of if START_EXPT:
 ################################################################################

@@ -121,10 +121,12 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.socket.bind("tcp://*:5979")
         #self.socket.connect("tcp://localhost:5979")
         self.socket.setsockopt_string(zmq.SUBSCRIBE, 'touchscreen') # b'touchscreen')
-        self.socket.setsockopt_string(zmq.RCVTIMEO, 5) # b'touchscreen')
+        self.socket.setsockopt(zmq.RCVTIMEO, 5) # b'touchscreen')
         time.sleep(1)
         #self.socket.setsockopt(zmq.SUBSCRIBE, b'touchscreen')
         #self.socket.connect("tcp://localhost:5559")
+
+
 
 
     def fully_connected(self) -> None:
@@ -145,7 +147,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
         bg_col = (0, 0, 100)
         self.whisker.display_blank(DISPLAY)
         # Draw stuff to finish up with setting up connection
-        self.RCVCMD()
+        self.RECVFIRST()
         #pair_server(serv_msg,socket):
 
 
@@ -163,13 +165,13 @@ class MyWhiskerTask(WhiskerTwistedTask):
             self.whisker.display_add_obj_rectangle(DOC, "background",
                 Rectangle(left = 0, top = 0, width = self.display_size[0], height = self.display_size[1]),
                 self.pen, self.brush1)
-
+            '''
             # Draw stop button (only for debugging)
             self.whisker.display_add_obj_rectangle(
                 DOC, "rectangle",
                 Rectangle(left=10, top=10, width=50, height=50),
                 self.pen, self.brush)
-
+            '''
             # Draw pictures
             for i in range(0,len(self.pics)):
                 bit = self.whisker.display_add_obj_bitmap(
@@ -188,14 +190,16 @@ class MyWhiskerTask(WhiskerTwistedTask):
         for i in range(0,len(self.pics)):
             self.whisker.display_set_event(DOC, "picture" + str(i), self.pics[i])
         # Set event for background and end of task
-        self.whisker.display_set_event(DOC, "rectangle", "RectEndOfTask")
+        #self.whisker.display_set_event(DOC, "rectangle", "RectEndOfTask")
         self.whisker.display_set_event(DOC, "background", "missedClick")
+        self.whisker.timer_set_event("checkZMQ", 5, -1)
     def clearEvents(self):
         # Clears events and DOC for all pictures to get ready for new ones
         for i in range(0,len(self.pics)):
             self.whisker.display_clear_event(DOC, "picture" + str(i))
-        self.whisker.display_clear_event(DOC, "rectangle")
+        #self.whisker.display_clear_event(DOC, "rectangle")
         self.whisker.display_clear_event(DOC, "background")
+        self.whisker.timer_clear_event("checkZMQ")
         #self.whisker.timer_clear_event("TmrEndOfTrial")
         self.whisker.display_delete_document(DOC)
     #############################################
@@ -205,7 +209,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
         """
         Responds to incoming events from Whisker.
         """
-        print("Event: {e} (timestamp {t})".format(e=event, t=timestamp))
+        #print("Event: {e} (timestamp {t})".format(e=event, t=timestamp))
         try:
             event, x, y = event.split(' ')
             # Clicked background
@@ -221,19 +225,46 @@ class MyWhiskerTask(WhiskerTwistedTask):
                         sendDict = {'picture' : picName, 'XY' : (x,y)}
                         print(sendDict)
                         self.back_q.put(sendDict)
-                        self.RCVCMD()
+                        self.RECVCMD()
         except ValueError:
-            if "EndOfTrial" in event:
-                self.clearEvents()
-                self.RCVCMD()
+            if "checkZMQ" in event:
+                #print('echingQ')
+                self.RECVCMD()
 
     ######## zmq ############
-    def RCVCMD(self):
+    def RECVCMD(self):
+        try:
+            msgstring = self.socket.recv_string()
+
+            print('\n\n\n\n\nWHISKER TOUCH!!\n' + msgstring + '\n\n\n')
+            topic, jsonStr = msgstring.split(' ',1)
+            msg = json.loads(jsonStr)
+            if msg == 'stop':
+                self.clearEvents()
+                reactor.stop()
+                return
+
+            pics = []
+            XYarray = []
+            for img in msg:
+                    for im,coords in img.items():
+                        print(im,coords)
+                        pics.append(im)
+                        XYarray.append(coords)
+
+
+            self.pics = pics
+            self.XYarray = XYarray
+            self.clearEvents()
+            self.draw()
+        except:
+            pass
+
+    def RECVFIRST(self):
         while True:
             try:
                 msgstring = self.socket.recv_string()
-
-                print('WHISKER TOUCH!!\n' + msgstring + '\n\n\n')
+                print('\n\n\n\n\nWHISKER TOUCH!!\n' + msgstring + '\n\n\n')
                 topic, jsonStr = msgstring.split(' ',1)
                 msg = json.loads(jsonStr)
                 if msg == 'stop':
@@ -254,9 +285,9 @@ class MyWhiskerTask(WhiskerTwistedTask):
                 self.XYarray = XYarray
                 self.clearEvents()
                 self.draw()
-            except ZMQError:
+                break
+            except:
                 continue
-
 
 def main(back_q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA_DIR, port = DEFAULT_PORT):
     '''

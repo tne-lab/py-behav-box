@@ -51,7 +51,7 @@ class Vid:
         elif isinstance(videoPath, int):
             # Number of frames to capture
             print('estimating FPS')
-            numFrames = 120;
+            numFrames = 60;
             print("Number of frames to cap: ", numFrames)
 
             # Start time
