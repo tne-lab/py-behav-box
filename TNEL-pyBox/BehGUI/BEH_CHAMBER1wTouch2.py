@@ -41,7 +41,7 @@ from collections import deque
 
 from multiprocessing import Process, Queue
 import threading
-import childVid3
+import childVid
 import whiskerTouchZMQ
 #import BEHTouchscreen
 # Reading an excel file using Python
@@ -328,7 +328,7 @@ def MyVideo():
     global vidDict, q , back_q
     if vidDict['STATE'] == 'ON':
           print("STATE: ",vidDict['STATE'])
-          p = threading.Thread(target=childVid3.vidCapture, args=(q,back_q,))
+          p = threading.Thread(target=childVid.vidCapture, args=(q,back_q,))
           print (p)
           p.start()
           q.append(vidDict)
