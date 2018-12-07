@@ -121,6 +121,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.socket.bind("tcp://*:5979")
         #self.socket.connect("tcp://localhost:5979")
         self.socket.setsockopt_string(zmq.SUBSCRIBE, 'touchscreen') # b'touchscreen')
+        self.socket.setsockopt_string(zmq.RCVTIMEO, 5) # b'touchscreen')
         time.sleep(1)
         #self.socket.setsockopt(zmq.SUBSCRIBE, b'touchscreen')
         #self.socket.connect("tcp://localhost:5559")
@@ -228,30 +229,33 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
     ######## zmq ############
     def RCVCMD(self):
+        while True:
+            try:
+                msgstring = self.socket.recv_string()
 
-        msgstring = self.socket.recv_string()
+                print('WHISKER TOUCH!!\n' + msgstring + '\n\n\n')
+                topic, jsonStr = msgstring.split(' ',1)
+                msg = json.loads(jsonStr)
+                if msg == 'stop':
+                    self.clearEvents()
+                    reactor.stop()
+                    return
 
-        print('WHISKER TOUCH!!\n' + msgstring + '\n\n\n')
-        topic, jsonStr = msgstring.split(' ',1)
-        msg = json.loads(jsonStr)
-        if msg == 'stop':
-            self.clearEvents()
-            reactor.stop()
-            return
-
-        pics = []
-        XYarray = []
-        for img in msg:
-                for im,coords in img.items():
-                    print(im,coords)
-                    pics.append(im)
-                    XYarray.append(coords)
+                pics = []
+                XYarray = []
+                for img in msg:
+                        for im,coords in img.items():
+                            print(im,coords)
+                            pics.append(im)
+                            XYarray.append(coords)
 
 
-        self.pics = pics
-        self.XYarray = XYarray
-        self.clearEvents()
-        self.draw()
+                self.pics = pics
+                self.XYarray = XYarray
+                self.clearEvents()
+                self.draw()
+            except ZMQError:
+                continue
 
 
 def main(back_q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA_DIR, port = DEFAULT_PORT):
