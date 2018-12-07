@@ -43,6 +43,9 @@ from multiprocessing import Process, Queue
 import threading
 import childVid
 import whiskerTouchZMQ
+import ZMQClasses
+import eventRECV
+
 #import BEHTouchscreen
 # Reading an excel file using Python
 #import openpyxl, xlrd, xlwt
@@ -502,6 +505,11 @@ def load_expt_file(expt_file_path_name):
                         video_file_path = words[1].strip()
                         video_file_path = video_file_path.strip()
                         print(video_file_path)
+                    elif 'OPEN_EPHYS_PATH' in line:
+                        words = line.split('=')
+                        open_ephys_path = words[1].strip()
+                        p = Process(target=os.system, args=(open_ephys_path,))
+                        p.start()
 
                 elif TONE1:#TONE1
                     if 'DURATION' in line:
@@ -900,6 +908,15 @@ def BehavioralChamber():
     Expt_Count = 0
 
     TOUCH_IMAGES_SENT = False
+
+    # Open ephys stuff
+    snd = zmqClasses.SNDEvent(5556, recordingDir = 'C:\\Users\\Ephys\\Desktop\\RecDir', prependText = 'CHANGE ME') # subject number or something
+
+    openEphysBack_q = Queue()
+    # Start thread
+    p = threading.Thread(target=eventRECV.rcv, args=(openEphys_q, openEphysBack_q) kwargs={'flags' : [b'event']})
+    p.start()
+
     ################################################################################
     #  MAIN LOOP
     ################################################################################
@@ -925,7 +942,9 @@ def BehavioralChamber():
                         UNFROZEN_ALREADY_LOGGED = True
 
             #print('problem with back_queue')
-
+    if not openEphysBack_q.empty():
+        OEMsg = openEphysBack_q.get()
+        print(OEMsg)
         #######################
         # DRAW SCREEN AND GUI ELEMENTS
         #######################
@@ -1509,6 +1528,11 @@ def BehavioralChamber():
             protocolDict = protocol[Protocol_ln_num]
             key = list(protocolDict.keys())[0] # First key in protocolDict
 
+            # Tell open ephys to start acquisiton and recording?
+            snd.send(snd.START_ACQ)
+            snd.send(snd.START_REC)
+
+
             if key == "":
                 Protocol_ln_num +=1
             elif key == "FAN_ON":
@@ -1616,23 +1640,10 @@ def BehavioralChamber():
             elif "DRAW_IMAGES" in key:
                 if TOUCHSCREEN_USED:
                     print("\n\nSENDING MSG TO WHISPER TOUCH ZMQ: ")
-
-#xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-##                   if TOUCH_IMAGES_PATH != "": # there are toucn images to use
-# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    #socket.send_multipart([b'touchscreen',pickle.dumps(touch_img_files)])
                     print("TOUCH IMG FILES: ",touch_img_files)
-                    #json_string = json.dumps(touch_img_files)
-                    #print(json_string)
                     print(type(touch_img_files))
                     pair_client(touch_img_files,socket)
-
-                    #print("WHISKER MSG",whisker_msg )
-                    #socket.send_string("%s %s" % (topic,json_string))
-                    #print(" MSG SENT from GUI ")
                     Protocol_ln_num +=1
-
 
             elif "START_LOOP" in key:
                 print("\n.............TRIAL = ",trial_num, "LOOP: ", loop,"..................")
@@ -1921,6 +1932,11 @@ def BehavioralChamber():
                LEDs[1].ONOFF = "OFF"
                L_CONDITIONING_LIGHT(events,False,cur_time)
                R_CONDITIONING_LIGHT(events,False,cur_time)
+
+               # TEll open ephys to stop acquistion and recording?
+               snd.send(snd.STOP_ACQ)
+               snd.send(snd.STOP_REC)
+
                if TOUCHSCREEN_USED:
                    pair_client('', socket)
                    TOUCHSCREEN_USED = False
