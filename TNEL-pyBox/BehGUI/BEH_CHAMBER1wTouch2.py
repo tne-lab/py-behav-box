@@ -305,7 +305,7 @@ def log_event(event_lst, event, cur_time, other=''):
 
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 def StartTouchScreen():
-    global TOUCH_TRHEAD_STARTED, TOUCH_IMG_PATH, whiskerBack_q
+    global TOUCH_TRHEAD_STARTED, TOUCH_IMG_PATH, whiskerBack_q, TSq
     '''
     Generates a bandit task. NO SPACES IN FILENAMES!
 
@@ -314,7 +314,7 @@ def StartTouchScreen():
     global TOUCH_IMG_PATH,touch_img_files
 
     if not TOUCH_TRHEAD_STARTED:
-        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(whiskerBack_q,))#, kwargs=({'media_dir' : TOUCH_IMG_PATH}))
+        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(whiskerBack_q,TSq))#, kwargs=({'media_dir' : TOUCH_IMG_PATH}))
 
         whiskerThread.start()
         TOUCH_TRHEAD_STARTED = True
@@ -510,8 +510,8 @@ def load_expt_file(expt_file_path_name):
                         words = line.split('=')
                         open_ephys_path = words[1].strip()
                         print(open_ephys_path)
-                        p = Process(target=os.system, args=(open_ephys_path,))
-                        p.start()
+                        open_ephys_thread = threading.Thread(target=os.system, args=(open_ephys_path,))
+                        open_ephys_thread.start()
 
                 elif TONE1:#TONE1
                     if 'DURATION' in line:
@@ -736,18 +736,6 @@ def draw_lighting(surface, SHOCK_ON, x,y,scale,color,width):
         return lightning # Returns a Rect object.  Neede to see if mouse clicked on icon
 
 #-----------------------------------------------------------------------
-def pair_client(clientmsg,socket):
-    '''
-    srvmsg = socket.recv_string()
-    servmsg = json.loads(srvmsg)
-    print("server msg: ",servmsg)
-    json_string = json.dumps(clientmsg)
-    socket.send_string(json_string)
-    #time.sleep(3)
-    '''
-    topic = 'touchscreen'
-    json_string = json.dumps(clientmsg)
-    socket.send_string("%s %s" % (topic,json_string))
 
 #-----------------------------------------------------------------------
 ################################################################################
@@ -762,15 +750,6 @@ def BehavioralChamber():
     global L_LEVER_EXTENDED,R_LEVER_EXTENDED,LEVERS_EXTENDED, TONE_ON, TOUCHSCREEN_USED
 
 #ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
-    # Create the socket
-    context = zmq.Context()
-    #socket = context.socket(zmq.PAIR)
-    socket = context.socket(zmq.PUB)
-    #socket.connect("tcp://localhost:5979")
-    #socket.connect("tcp://134.84.77.234:5579")
-    socket.connect("tcp://localhost:5979")
-   # time.sleep(1)
-
 
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (20,40)
     myscreen = pygame.display.set_mode((460,990),pygame.RESIZABLE,32)
@@ -916,8 +895,8 @@ def BehavioralChamber():
 
     openEphysBack_q = Queue()
     # Start thread
-    p = threading.Thread(target=eventRECV.rcv, args=(openEphysBack_q,), kwargs={'flags' : [b'event']})
-    p.start()
+    open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(openEphysBack_q,), kwargs={'flags' : [b'event']})
+    open_ephys_rcv.start()
 
     ################################################################################
     #  MAIN LOOP
@@ -1531,8 +1510,8 @@ def BehavioralChamber():
             key = list(protocolDict.keys())[0] # First key in protocolDict
 
             # Tell open ephys to start acquisiton and recording?
-            snd.send(snd.START_ACQ)
-            snd.send(snd.START_REC)
+            #snd.send(snd.START_ACQ)
+            #snd.send(snd.START_REC)
 
 
             if key == "":
@@ -1644,7 +1623,11 @@ def BehavioralChamber():
                     print("\n\nSENDING MSG TO WHISPER TOUCH ZMQ: ")
                     print("TOUCH IMG FILES: ",touch_img_files)
                     print(type(touch_img_files))
-                    pair_client(touch_img_files,socket)
+                    #pair_client(touch_img_files,socket)
+                    TSq.put(touch_img_files)
+                    #print("WHISKER MSG",whisker_msg )
+                    #socket.send_string("%s %s" % (topic,json_string))
+                    #print(" MSG SENT from GUI ")
                     Protocol_ln_num +=1
 
             elif "START_LOOP" in key:
@@ -1884,9 +1867,7 @@ def BehavioralChamber():
                             else: #"PELLET##"
                                 probability_of_reward = float(outcome[6:])
                                 print("probability_of_reward: ",probability_of_reward)
-                                ran =random.random()*100
-                                print('arndom', ran)
-                                if ran <= probability_of_reward:
+                                if random.random()*100 <= probability_of_reward:
                                     FOOD_REWARD(events,"Food_Pellet w"+str(probability_of_reward)+ "% probability", cur_time)
                                 else:
                                     log_event(events,"Reward NOT given w " + str(probability_of_reward)+"% probability", cur_time)
@@ -1936,11 +1917,11 @@ def BehavioralChamber():
                R_CONDITIONING_LIGHT(events,False,cur_time)
 
                # TEll open ephys to stop acquistion and recording?
-               snd.send(snd.STOP_ACQ)
-               snd.send(snd.STOP_REC)
+              # snd.send(snd.STOP_ACQ)
+               #snd.send(snd.STOP_REC)
 
                if TOUCHSCREEN_USED:
-                   pair_client('', socket)
+                   TSq.put('')
                    TOUCHSCREEN_USED = False
 
         # end of if START_EXPT:
