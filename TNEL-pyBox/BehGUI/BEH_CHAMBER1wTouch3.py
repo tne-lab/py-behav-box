@@ -133,7 +133,6 @@ TSq = Queue()
 whiskerBack_q = Queue()
 TOUCH_TRHEAD_STARTED = False
 
-
 ################################################################
 # GENERAL GLOBALS
 ################################################################
@@ -365,6 +364,7 @@ def exit_game():
     pygame.quit()
     sys.exit()
 
+
 def load_expt_file(expt_file_path_name):
     global protocol, conditions
     global Expt_Name, Subject
@@ -510,8 +510,9 @@ def load_expt_file(expt_file_path_name):
                         words = line.split('=')
                         open_ephys_path = words[1].strip()
                         print(open_ephys_path)
-                        p = Process(target=os.system, args=(open_ephys_path,))
-                        p.start()
+                        open_ephys = threading.Thread(target=os.system, args=(open_ephys_path,))
+                        open_ephys.start()
+                        time.sleep(1)
 
                 elif TONE1:#TONE1
                     if 'DURATION' in line:
@@ -912,12 +913,12 @@ def BehavioralChamber():
     TOUCH_IMAGES_SENT = False
 
     # Open ephys stuff
-    snd = zmqClasses.SNDEvent(5556, recordingDir = 'C:\\Users\\Ephys\\Desktop\\RecDir', prependText = 'CHANGE ME') # subject number or something
+    snd = zmqClasses.SNDEvent(5556, recordingDir = '', prependText = 'CHANGE ME') # subject number or something
 
     openEphysBack_q = Queue()
     # Start thread
-    p = threading.Thread(target=eventRECV.rcv, args=(openEphysBack_q,), kwargs={'flags' : [b'event']})
-    p.start()
+    event_recv = threading.Thread(target=eventRECV.rcv, args=(openEphysBack_q,), kwargs={'flags' : [b'event']})
+    event_recv.start()
 
     ################################################################################
     #  MAIN LOOP
@@ -1225,6 +1226,8 @@ def BehavioralChamber():
 
                                elif button.text == "START EXPT":
                                     print("EXPT STARTED!")
+                                    snd.send(snd.START_ACQ)
+                                    snd.send(snd.START_REC)
                                     button.UP_DN = "DN"
                                     Expt_Count +=1
                                     if EXPT_FILE_LOADED:
@@ -1531,8 +1534,6 @@ def BehavioralChamber():
             key = list(protocolDict.keys())[0] # First key in protocolDict
 
             # Tell open ephys to start acquisiton and recording?
-            snd.send(snd.START_ACQ)
-            snd.send(snd.START_REC)
 
 
             if key == "":
@@ -1639,6 +1640,7 @@ def BehavioralChamber():
                         lever.STATE = "IN"
                    for button in buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
+
             elif "DRAW_IMAGES" in key:
                 if TOUCHSCREEN_USED:
                     print("\n\nSENDING MSG TO WHISPER TOUCH ZMQ: ")
