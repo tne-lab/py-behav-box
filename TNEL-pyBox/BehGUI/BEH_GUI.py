@@ -1,0 +1,1032 @@
+#
+"""
+NOTE: 1. Please Start Whisker server first
+      2. Check daqAPI.py on this directory.
+         be sure Devices are named properly:
+
+         on Ephis-1 'Dev1' runs behavior box
+                    'pciDAQ' runs open ephys
+
+         on Ephis-2 'Dev2' runs behavior box
+                    'Dev1' runs open ephis
+Developed by Flavio J.K. da Silva and  Mark Schatza Nov. 31, 2018
+
+
+"""
+
+from win32api import GetSystemMetrics
+import os
+import sys, time
+import pygame
+import math, random
+import numpy as np
+import zmq
+import json
+from NIDAQ_GUI_elements import *
+from RESOURCES.GUI_elements_by_flav import play_sound
+try:
+    import daqHelper
+    import daqAPI
+    NIDAQ_AVAILABLE = True
+except:
+    NIDAQ_AVAILABLE = False
+
+from collections import deque
+from multiprocessing import Process, Queue
+import threading
+import childVid
+import whiskerTouchZMQ
+import zmqClasses
+import eventRECV
+
+
+beh = BEH_GUI(NIDAQ_AVAILABLE)
+beh.BehavioralChamber()
+
+class BEH_GUI():
+    def __init__(self, NIDAQ_AVAILABLE):
+        self.NIDAQ_AVAILABLE = NIDAQ_AVAILABLE
+        self.setGlobals()
+        random.seed()
+        self.loadProtocol()
+        self.setupGUI()
+
+    from setGlobals import setGlobals
+    from loadProtocol import load_expt_file
+    import GUIFunctions
+    from setupGUI import setupGUI
+
+    def BehavioralChamber(self):
+        while True:
+            cur_time =  time.perf_counter()
+
+            if not self.VIDBack_q.empty():
+                backDict = self.VIDBack_q.get()
+                if backDict['FROZEN']: # FROZEN
+                      # NOTE: this must be "debounced"
+                      if not FROZEN_ALREADY_LOGGED:
+                          print("LOGGING FROZEN")
+                          log_event(self.events,"Frozen",cur_time,("Orig_NIDAQ_t",backDict['NIDAQ_time'],"video_time",backDict['vid_time'],"time_diff",backDict['Vid-NIDAQ']))
+                          self.FROZEN_ALREADY_LOGGED = True
+                          self.UNFROZEN_ALREADY_LOGGED = False
+
+                else:  # UN FROZEN
+                    if PREVIOUSLY_FROZEN:
+                       # NOTE: this must be "debounced"
+                       if not UNFROZEN_ALREADY_LOGGED:
+                            log_event(self.events,"Unfrozen",cur_time)
+                            self.FROZEN_ALREADY_LOGGED = False
+                            self.UNFROZEN_ALREADY_LOGGED = True
+
+            if not openEphysBack_q.empty():
+                OEMsg = openEphysBack_q.get()
+                print(OEMsg)
+
+        self.drawScreen()
+        self.checkSystemEvents()
+        self.checkNIDAQEvents()
+
+        if self.START_EXPT:
+            self.runExpt()
+
+        ######################################
+        #   UPDATE SCREEN
+        ######################################
+        pygame.display.flip()
+
+        ######################################
+        #   UPDATE VIDEO
+        ######################################
+        vidDict['cur_time'] = cur_time
+        q.append(vidDict)
+
+    def drawScreen(self):
+        #######################
+        # DRAW SCREEN AND GUI ELEMENTS
+        #######################
+        self.myscreen.fill(self.Background_color)
+        self.myscreen.blit(self.TNElogo,(380,5))
+        for button in self.buttons:
+            button.draw()
+
+        for box in self.boxes: # Must draw before items that go on top
+            box.draw()
+
+
+        for lever in self.levers:
+            #lever.state = "IN"
+            # Delay displaying lever state for visual purposes only (NOTE: PROGRAM IS NOT PAUSED!)
+            if lever.index == 0: # LEFT LEVER
+               if  lever.STATE == "OUT":
+                   if self.LEVER_PRESSED_L:
+                      if (cur_time - LEVER_PRESS_TIME) > 0.5: #Leaves on for 0.5 sec
+                         lever.STATE = "OUT"
+                         LEVER_PRESSED_L = False
+                      else:
+                         lever.STATE = "DN"
+               # else lever.state == "IN" or "DN"
+
+            if lever.index == 1: # RIGHT LEVER
+               if  lever.STATE == "OUT":
+                   if self.LEVER_PRESSED_R:
+                      if (cur_time - self.LEVER_PRESS_TIME) > 0.5: #Leaves on for 0.5 sec
+                         lever.STATE= "OUT"
+                         self.LEVER_PRESSED_R = False
+                      else:
+                         lever.STATE = "DN"
+               # else lever.state == "IN" or "DN"
+
+            lever.draw()
+
+        for LED in self.LEDs:
+            # Leaves nose poke LED ON for 1 sec so user can see it (NOTE: PROGRAM IS NOT PAUSED!)
+            if LED.index == 2: #Left NOSE POKE
+               if self.NOSE_POKED_L:
+                   if (cur_time - self.NOSE_POKE_TIME) > 0.25: #Leaves on for 0.25 sec
+                         LED.ONOFF = "OFF"  # NOW OFF
+                         self.NOSE_POKED_L = False
+                   else:
+                         LED.ONOFF = "ON"
+
+            elif LED.index == 3: #Right NOSE POKE
+                if self.NOSE_POKED_R:
+                   if (cur_time - self.NOSE_POKE_TIME) > 1.0:
+                         LED.ONOFF = "OFF"  # NOW OFF
+                         self.NOSE_POKED_R = False
+                   else:
+                         LED.ONOFF = "ON"
+
+            LED.draw()
+
+        for tog in self.toggles:
+            tog.draw()
+
+        for sld in self.sliders:
+            sld.draw()
+
+        for lbl in self.labels: # Last so on top
+            lbl.draw()
+
+        for info in self.info_boxes: # Last so on top
+            if info.label == "L NOSE POKES":
+                  info.text = [str(self.num_L_nose_pokes)]
+            elif info.label == "R NOSE POKES":
+                  info.text = [str(self.num_R_nose_pokes)]
+            elif info.label == "L PRESSES":
+                  info.text = [str(self.num_L_lever_preses)]
+            elif info.label == "R PRESSES":
+                  info.text = [str(self.num_R_lever_preses) ]
+            elif info.label == "PELLETS":
+                  info.text = [str(self.num_pellets)]
+            elif info.label == "EATEN":
+                  info.text = [str(self.num_eaten)]
+            elif info.label == "DATE":
+                  info.text = [str(self.date)]
+            elif info.label == "EVENT LOG":
+                  lines_in_txt = len(self.events)
+                  if lines_in_txt > 14:
+                      info.text = self.events[-14:]
+                  else: info.text = self.events
+
+            info.draw()
+
+        # USER INPUTS
+        for user_input in self.user_inputs:
+            if user_input.label == "EXPT":
+                 user_input.text = str(self.Expt_Name)
+            elif user_input.label == "SUBJECT":
+                 user_input.text = str(self.Subject)
+            elif user_input.label == "TRIAL":
+                 user_input.text  = str(self.trial_num)
+            elif user_input.label == "EXPT PATH":
+                 user_input.text = str(self.datapath)
+            elif user_input.label == "EXPT FILE NAME":
+                 user_input.text = str(self.expt_file_name)
+            elif user_input.label == "Spk(S)":
+                 user_input.text  = str(self.Tone1_Duration)
+            elif user_input.label == "Freq(Hz)":
+                 user_input.text  = str(self.Tone1_Freq)
+            elif user_input.label == "Vol(0-1)":
+                 user_input.text  = str(self.Tone1_Vol)
+            elif user_input.label == "Shck(S)":
+                 user_input.text = str(self.Shock_Duration)
+            elif user_input.label == "V":
+                 user_input.text = str(self.Shock_V)
+            elif user_input.label == "Amps":
+                 user_input.text = str(self.Shock_Amp)
+
+            user_input.draw()
+
+
+        # DRAW SPEEKER
+        self.speeker = draw_speeker(self.myscreen,230,85,self.TONE_ON) #TONE_ON is T/F
+
+        if self.TONE_ON:
+              if (cur_time - self.TONE_TIME) > float(self.Tone1_Duration): # seconds
+                  print("TONE OFF")
+                  self.TONE_ON = False
+                  log_event(self.events,"Tone_OFF",cur_time)
+
+        # DRAW LIGHTNING
+        self.shock = draw_lighting(self.myscreen, self.SHOCK_ON, 228,150,1,(255,255,0),2)
+        if self.SHOCK_ON:
+              if (cur_time - self.SHOCK_TIME) <= self.Shock_Duration: # seconds
+                  #shock.sendDBit(True)
+                  #Event Logged at mouse Click
+                  pass
+              else:
+                  self.SHOCK_ON = False
+                  #shock.sendDBit(False)
+                  print("SHOCK OFF")
+                  log_event(self.events,"Shock_OFF",cur_time)
+
+
+        # DRAW CAMERA
+        # draw_camera(self.myscreen,fill_color, ON_OFF, REC, x, y, w,h, linew)
+        self.camera = draw_camera(self.myscreen, (100,100,100),self.CAMERA_ON,self.RECORDING,215, 255, 30,20, 2)
+
+    def checkSystemEvents(self):
+        #########################################################
+        #  SYSTEM EVENTS
+        #########################################################
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                exit_game()
+            ########################################
+            #  Keyboard Events
+            ########################################
+
+            #########################################################
+            #  MOUSE EVENTS (always active independent of game mode)
+            #########################################################
+            # MOUSE MOVE
+            elif (event.type == pygame.MOUSEMOTION):#
+                cur_x,cur_y = pygame.mouse.get_pos()
+                if self.SLIDER_SELECTED:
+                    cur_slider.sliderX = cur_x
+                    # The following limits the slider to the slot.
+                    if cur_slider.sliderX < cur_slider.x:
+                        cur_slider.sliderX = cur_slider.x
+                    if cur_slider.sliderX > cur_slider.x + cur_slider.slotL:
+                        cur_slider.sliderX = cur_slider.x + cur_slider.slotL
+                    cur_slider.percent = cur_slider.x / cur_slider.slotL
+            # ----------------------------------------
+            # MOUSE DOWN
+            elif (event.type == pygame.MOUSEBUTTONDOWN ):#Mouse Clicked
+                cur_x,cur_y = pygame.mouse.get_pos()
+                if event.button == 1:
+                    LEFT_MOUSE_DOWN = True
+                elif event.button == 3:
+                    RIGHT_MOUSE_DOWN = True
+                # BUTTONS
+                if LEFT_MOUSE_DOWN:
+                    print("MOUSE_Button ",event.button, "pressed!")
+                    cur_time = time.perf_counter()
+                    # BUTTONS
+                    for button in self.buttons: # Check for collision with EXISTING buttons
+                        if button.rect.collidepoint(cur_x,cur_y):
+                               button.UP_DN = "DN"
+                               #button.draw()
+                               if button.text == "CABIN LT":
+                                   if Cself.AB_LIGHT_ON: #Toggle OFF
+                                       Background_color = CAB_LIGHT(self.events,False,cur_time)
+                                       self.CAB_LIGHT_ON = False
+                                   else: # Toggle ON
+                                       Background_color = CAB_LIGHT(self.events,True,cur_time)
+                                       self.CAB_LIGHT_ON = True
+                               if button.text == "FAN": #TOGGLE ON TOGGLE OFF
+                                    if self.FAN_0N:
+                                       self.FAN_0N = False
+                                       FAN_ON_OFF(self.events,self.FAN_0N,cur_time)
+
+                                    else:
+                                       self.FAN_0N = True
+                                       FAN_ON_OFF(self.events,self.FAN_0N,cur_time)
+
+                               elif button.text == "FEED":
+                                    button.UP_DN = "DN"
+                                    self.FEED = True
+                                    FOOD_REWARD(self.events,"Food_Pellet", cur_time)
+
+                               # LEFT LEVER
+                               elif button.text == "L":
+                                    if L_LEVER_EXTENDED: # Was EXTENDED
+                                          button.UP_DN = "UP"
+                                          EXTEND_LEVERS(self.events,"L_Lever_Retracted",False,False,cur_time)
+                                          self.levers[0].STATE = "IN"
+
+                                    else: # Was not extended
+                                          button.UP_DN = "DN"
+                                          EXTEND_LEVERS(self.events,"L_Lever_Extended",True,False,cur_time)
+                                          self.levers[0].STATE = "OUT"
+
+                               # RIGHT LEVER
+                               elif button.text == "R":
+                                    if self.R_LEVER_EXTENDED: # Was EXTENDED
+                                          button.UP_DN = "UP"
+                                          EXTEND_LEVERS(self.events,"R_Lever_Retracted",False,False,cur_time)
+                                          self.levers[1].STATE = "IN"
+
+                                    else: # was not extended
+                                          button.UP_DN = "DN"
+                                          EXTEND_LEVERS(self.events,"R_Lever_Extended",False,True,cur_time)
+                                          self.levers[1].STATE = "OUT"
+
+                               # BOTH LEVERS AT ONCE
+                               elif button.text == "EXTEND" or button.text == "RETRACT":
+                                    if self.LEVERS_EXTENDED: #Toggle EXTEND and RETRACT
+                                          button.UP_DN = "UP"
+                                          #LEVERS_EXTENDED = False
+                                          EXTEND_LEVERS(self.events,"Levers_Retracted",False,False,cur_time)
+                                          button.text = "EXTEND"
+                                          for lever in self.levers:
+                                                lever.STATE = "IN"
+
+                                    else: # not extended
+                                          button.UP_DN = "DN"
+                                          button.text = "RETRACT"
+                                          #LEVERS_EXTENDED = True
+                                          EXTEND_LEVERS(self.events,"Levers_Extended",True,True,cur_time)
+                                          for lever in self.levers:
+                                                lever.STATE = "OUT"
+
+                               elif button.text == "REC":
+                                    if self.CAMERA_ON:
+                                          if self.RECORDING: #STOP RECORDING BUT KEEP CAMERA ON
+                                                self.RECORDING = False
+                                                log_event(self.events,"STOP RECORDING",cur_time)
+                                                self.vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+                                                button.UP_DN = "UP"
+                                          else:
+                                                self.RECORDING = True
+                                                button.UP_DN = "DN"
+                                                log_event(self.events,"START RECORDING",cur_time)
+                                                self.vidDict = {'cur_time':cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
+
+
+                                    else:
+                                          print("CAMERA NOT ON!")
+
+                               elif button.text == "LOAD FILE":
+                                    button.UP_DN = "DN"
+                                    print(self.expt_file_path_name)
+                                    if self.load_expt_file():
+                                        self.EXPT_FILE_LOADED = True
+                                        log_event(self.events,"EXPT FILE LOADED",cur_time)
+
+                                    else:
+                                        print("HUMPH!")
+                                        log_event(self.events,"Expt File name or path DOES NOT EXIST",cur_time)
+
+                               elif button.text == "START EXPT":
+                                    print("EXPT STARTED!")
+                                    button.UP_DN = "DN"
+                                    self.Expt_Count +=1
+                                    if self.EXPT_FILE_LOADED:
+                                        self.trial_num = 0
+                                        for user_input in self.user_inputs:
+                                            if user_input.label == "EXPT":
+                                                user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
+                                        log_event(self.events,"EXPT STARTED",cur_time)
+                                        self.START_EXPT = True
+                                        # RUN EXPERIMENT CONDITIONS DESCRIBED IN EXPT FILE
+                                    else:
+                                        log_event(self.events,"EXPT FILE NOT LOADED!!!!",cur_time)
+                                    if self.TOUCHSCREEN_USED: StartTouchScreen()
+                               self.LEFT_MOUSE_DOWN = False
+                               self.BUTTON_SELECTED = True
+                               dx = cur_x - button.x
+                               dy = cur_y - button.y
+
+                    # LEVERS
+                    for lever in self.levers:
+                        if lever.rect.collidepoint(cur_x,cur_y): # Check for collision with EXISTING levers
+                            #LEVER_PRESS_TIME = time.perf_counter()
+                            if lever.text == "L LEVER":
+                                if self.L_LEVER_EXTENDED:
+                                      lever.STATE = "DN"
+                                      #NOTE: Lever presses are not logged here, but when actually pressed in Behavioral Chamber
+
+
+                            if lever.text == "R LEVER":
+                                if self.R_LEVER_EXTENDED:
+                                      lever.STATE = "DN"
+                                      #NOTE: Lever presses are not logged here, but when actually pressed in Behavioral Chamber
+
+                            # NOTE:  We are redrawing here again (instead of just in main loop)
+                            #       because state will be reset ot actual machine state (which is what
+                            #       really matters.  I you don't care about this, comment out next 3 lines.
+                            lever.draw()
+                            pygame.display.flip()
+                            time.sleep(0.5) # sec
+                            lever.STATE = "OUT"
+
+                    # LEDS
+                    for LED in self.LEDs: # Check for collision with EXISTING buttons
+                        if LED.rect.collidepoint(cur_x,cur_y):
+                            idx = LEDs.index(LED)
+                            print ("LED ID: ",idx)
+                            if LED.ONOFF == "OFF": # WAS OFF
+                                LED.ONOFF = "ON"   # NOW ON
+                                if   LED.index == 0: # LEFT CONDITION LIGHT
+                                    self.L_CONDITIONING_LIGHT(self.events,True,cur_time)
+                                elif LED.index == 1: # RIGHT CONDITION LIGHT
+                                    self.R_CONDITIONING_LIGHT(self.events,True,cur_time)
+
+                                # NOSE POKES
+                                elif LED.index == 2 or LED.index == 3: # NOSE POKES
+                                   self.NOSE_POKE_TIME = time.perf_counter()
+                                   # NOTE:  We are redrawing here again (instead of just in main loop)
+                                   #       because state will be reset ot actual machine state (which is what
+                                   #       really matters.  I you don't care about this, comment out next 3 lines.
+                                   LED.draw()
+                                   pygame.display.flip()
+                                   time.sleep(0.25) # sec
+
+                                # FEEDER LEDS
+                                elif LED.index == 4 or LED.index == 5: # FEEDER LIGHTS
+                                    box.fill_color,LEDsONOFF = self.Food_Light_ONOFF (self.events,True,cur_time)
+                                    self.LEDs[4].ONOFF = LEDsONOFF
+                                    self.LEDs[5].ONOFF = LEDsONOFF
+
+                            else:                  # WAS ON
+                                LED.ONOFF = "OFF"  # NOW OFF
+                                LED.draw()
+                                if   LED.index == 0: # LEFT CONDITION LIGHT
+                                    self.L_CONDITIONING_LIGHT(self.events,False,cur_time)
+                                elif LED.index == 1: # RIGHT CONDITION LIGHT
+                                    self.R_CONDITIONING_LIGHT(self.events,False,cur_time)
+
+                                # FEEDER LEDS
+                                elif LED.index == 4 or LED.index == 5: # FEEDER LIGHTS
+                                    box.fill_color,LEDsONOFF = self.Food_Light_ONOFF (self.events,False,cur_time)
+                                    self.LEDs[4].ONOFF = LEDsONOFF
+                                    self.LEDs[5].ONOFF = LEDsONOFF
+
+
+                    # FEEDER BOXES
+                    for box in self.boxes: # Check for collision with EXISTING buttons
+                        if box.rect.collidepoint(cur_x,cur_y):
+                           if FEEDER_LT_ON: #Toggle OFF
+                              box.fill_color,LEDsONOFF = self.Food_Light_ONOFF (self.events,False,cur_time)
+                              self.LEDs[4].ONOFF = LEDsONOFF
+                              self.LEDs[5].ONOFF = LEDsONOFF
+                           else: # Toggle ON
+                              box.fill_color,LEDsONOFF = self.Food_Light_ONOFF (self.events,True,cur_time)
+                              self.FEEDER_LT_ON = True
+
+                    # SPEEKER PRESSED
+                    if self.speeker.collidepoint(cur_x,cur_y):
+                          # NOTE: Tone_OFF logged while drawing speeker above in main loop
+                          self.PLAY_TONE(self.events,"TONE1",cur_time)
+
+
+                    # SHOCK PRESSED
+                    if self.shock.collidepoint(cur_x,cur_y):
+                          self.SHOCK_TIME = cur_time
+                          if self.SHOCK_ON:
+                                self.SHOCK_ON = False
+                                log_event(self.events,"Shock_OFF",cur_time)
+                                # NOTE: SHOCK ALSO TURNED OFF IN GAME LOOP AFTER Shock_Duration (s)
+                          else:
+                                self.SHOCK_ON = True
+                                log_event(self.events,"Shock_ON",cur_time,("Voltage", str(Shock_V),"Amps",str(Shock_Amp),"Duration(S)",str(Shock_Duration)))
+                                # NOTE: SHOCK ALSO TURNED OFF IN GAME LOOP AFTER Shock_Duration (s)
+
+                          print("SHOCK PRESSED")
+
+                    # CAMERA PRESSED
+                    if self.camera.collidepoint(cur_x,cur_y):
+                          if CAMERA_ON: #CAMERAL ALREWADY ON, TURN CAMERA OFF
+                                self.CAMERA_ON = False
+                                self.RECORDING = False
+                                log_event(self.events,"Camera_OFF",cur_time)
+                                print("CAMERA OFF")
+                                self.vidDict = {'cur_time':cur_time, 'STATE':'STOP', 'PATH_FILE':self.video_file_path_name}
+
+                          else: #TURN CAMERA ON
+                                self.CAMERA_ON = True
+                                log_event(self.events,"Camera_ON",cur_time)
+                                print("CAMERA ON")
+                                self.vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+                                MyVideo()
+
+                    # USER KEYBOARD INPUTS
+                    for user_input in self.user_inputs:
+                        if user_input.rect.collidepoint(cur_x,cur_y):
+                            user_input.get_key_input()
+                            if user_input.label == "EXPT":
+                                 self.Expt_Name=user_input.text
+                            elif user_input.label == "SUBJECT":
+                                 self.Subject = user_input.text
+                            elif user_input.label == "TRIAL":
+                                 self.trial_num =  user_input.text
+                            elif user_input.label == "EXPT PATH":
+                                 self.datapath = user_input.text
+                            elif user_input.label == "EXPT FILE NAME":
+                                 self.expt_file_name = user_input.text
+                                 self.expt_file_path_name = os.path.join(self.datapath,self.expt_file_name )
+
+                            elif user_input.label == "Spk(S)":
+                                 self.Tone1_Duration = float(user_input.text)
+                            elif user_input.label == "Freq(Hz)":
+                                 self.Tone1_Freq = float(user_input.text)
+                            elif user_input.label == "Vol(0-1)":
+                                 self.Tone1_Vol = float(user_input.text)
+
+                            elif user_input.label == "Shck(S)":
+                                 self.Shock_Duration = float(user_input.text)
+                            elif user_input.label == "V":
+                                 self.Shock_V = float(user_input.text)
+                            elif user_input.label == "Amps":
+                                 self.Shock_Amps = float(user_input.text)
+
+
+           # MOUSE UP
+            elif (event.type == pygame.MOUSEBUTTONUP ):
+                self.NEW_BUTTON = False
+                self.LEFT_MOUSE_DOWN = False
+                self.RIGHT_MOUSE_DOWN = False
+                self.BUTTON_SELECTED = False
+                self.LBL_SELECTED = False
+                self.LED_SELECTED = False
+                self.BOX_SELECTED = False
+                self.CORNER_SET = False
+                self.DELETE_ITEM = False
+                self.CIRC_SELECTED = False
+                self.SLIDER_SELECTED = False
+
+                for button in self.buttons: # Check for collision with EXISTING buttons
+                    if button.text == "REC":  # Leave REC button down while recording
+                        if not self.RECORDING: button.UP_DN = "UP"
+
+                    elif button.text == "R":  # Leave R button down while recording
+                        if not self.R_LEVER_EXTENDED: button.UP_DN = "UP"
+                    elif button.text == "L":  # Leave R button down while recording
+                        if not self.L_LEVER_EXTENDED: button.UP_DN = "UP"
+
+                    else: # ALL OTHER BUTTONS, NOT REC BUTTON
+                        button.UP_DN = "UP"
+
+    def checkNIDAQEvents(self):
+        ######################################
+        #   CHECK INPUTS FROM BEH CHAMBER
+        ######################################
+        if self.NIDAQ_AVAILABLE:
+            if self.L_LEVER_EXTENDED or self.R_LEVER_EXTENDED:
+                  wasleverPressed = daqHelper.detectPress(self.checkPressLeft, self.checkPressRight)
+                  cur_time = time.perf_counter()
+                  self.LEVER_PRESS_TIME = cur_time
+                  if  wasleverPressed == 'Right':
+                        log_event(self.events,"Lever_Pressed_R",cur_time)
+                        self.LEVER_PRESSED_R = True
+                        print("RIGHT LEVER PRESSED")
+                        self.num_R_lever_preses += 1
+                        self.levers[1].STATE = "DN"
+
+                  if  wasleverPressed == 'Left':
+                        log_event(self.events,"Lever_Pressed_L",cur_time)
+                        self.LEVER_PRESSED_L = True
+                        print("LEFT LEVER PRESSED")
+                        self.num_L_lever_preses += 1
+                        self.levers[0].STATE = "DN"
+
+            # nose pokes
+            cur_time = time.perf_counter()
+            was_nose_poked_L = daqHelper.checkLeftNosePoke(self.L_nose_poke)
+
+            if was_nose_poked_L:
+                print("LEFT Nose Poked")
+                self.NOSE_POKE_TIME = cur_time
+                #events.append("LEFT Nose Poke: " + str(cur_time))
+                log_event(self.events,"Nose_Poke_L",cur_time)
+                self.NOSE_POKED_L = True
+                self.num_L_nose_pokes += 1
+                for LED in self.LEDs:
+                    if LED.index == 2: # R NOSE POKES
+                          LED.ONOFF = "ON"
+            else:
+                for LED in self.LEDs:
+                    if LED.index == 2: # R NOSE POKES
+                          LED.ONOFF = "OFF"
+
+            was_nose_poked_R = daqHelper.checkRightNosePoke(self.R_nose_poke)
+            if was_nose_poked_R:
+                print("Right Nose Poked")
+                #events.append("RIGHT Nose Poke: " + str(cur_time))
+                log_event(self.events,"Nose_Poke_R",cur_time)
+                self.NOSE_POKE_TIME = time.perf_counter()
+                self.NOSE_POKED_R = True
+                self.num_R_nose_pokes += 1
+                for LED in self.LEDs:
+                    if LED.index == 3: # R NOSE POKES
+                      LED.ONOFF = "ON"
+            else:
+                for LED in self.LEDs:
+                    if LED.index == 3: # R NOSE POKES
+                          LED.ONOFF = "OFF"
+
+            # food eaten
+            cur_time = time.perf_counter()
+            foodEaten = checkFoodEaten(self.eaten)
+
+            if foodEaten:
+                print("Yum!")
+                self.num_eaten +=1
+                #events.append("Food Eaten: " + str(cur_time))
+                log_event(self.events,"Food_Eaten",cur_time)
+
+    def runExpt(self):
+
+        ################################################################
+        # RUN EXPERIMENTAL PROTOCOL IF START EXPT BUTTON PRESSED
+        ################################################################
+        protocolDict = self.protocol[self.Protocol_ln_num]
+        key = list(protocolDict.keys())[0] # First key in protocolDict
+
+        # Tell open ephys to start acquisiton and recording?
+        #snd.send(snd.START_ACQ)
+        #snd.send(snd.START_REC)
+
+
+        if key == "":
+            self.Protocol_ln_num +=1
+        elif key == "FAN_ON":
+           val = str2bool(protocolDict[key])
+           print("FAN")
+           FAN_ON_OFF(self.events,val,cur_time) # {'FAN_ON': True} or {'FAN_ON': False}
+           self.Protocol_ln_num +=1
+
+        elif key == "CAB_LIGHT":
+           val = str2bool(protocolDict[key])
+           print("CAB_LIGHT")
+           self.Background_color = CAB_LIGHT(self.events,val,cur_time)
+           #CAB_LIGHT(events,val,cur_time)
+           self.Protocol_ln_num +=1
+
+        elif "TONE" in key:
+            self.Protocol_ln_num +=1
+            idx = key[4:]
+            print("TONE idx: ",idx)
+            if idx == '1':
+                 PLAY_TONE(self.events,"TONE1",cur_time)
+                 self.TONE_TIME = cur_time
+            elif idx == '2':
+                 PLAY_TONE(self.events,"TONE2",cur_time)
+                 self.TONE_TIME = cur_time
+            self.TONE_ON = True
+
+        elif key == "FOOD_LIGHT":
+            val = str2bool(protocolDict[key])
+            self.Protocol_ln_num +=1
+            self.box.fill_color,LEDsONOFF = Food_Light_ONOFF(self.events,val,cur_time)
+            self.LEDs[4].ONOFF = LEDsONOFF
+            self.LEDs[5].ONOFF = LEDsONOFF
+
+        elif key == "L_CONDITIONING_LIGHT":
+            val = str2bool(protocolDict[key])
+            self.Protocol_ln_num +=1
+            if val:
+                daqHelper.L_CONDITIONING_LIGHT(self.events,True,cur_time)
+                self.LEDs[0].ONOFF = "ON"
+            else:
+                daqHelper.L_CONDITIONING_LIGHT(self.events,False,cur_time)
+                self.LEDs[0].ONOFF = "OFF"
+
+        elif key == "R_CONDITIONING_LIGHT":
+            val = str2bool(protocolDict[key])
+            self.Protocol_ln_num +=1
+
+            if val:
+                daqHelper.R_CONDITIONING_LIGHT(self.events,True,cur_time)
+                self.LEDs[1].ONOFF = "ON"
+            else:
+                daqHelper.R_CONDITIONING_LIGHT(self.events,False,cur_time)
+                self.LEDs[1].ONOFF = "OFF"
+
+        elif key == "CAMERA":
+            print("CAMERA")
+            val = str2bool(protocolDict[key])
+            self.Protocol_ln_num +=1
+            if val:  # TURN CAMERA ON
+                if not self.CAMERA_ON: # CAMERA WAS OFF
+                    self.CAMERA_ON = True
+                    log_event(self.events,"Camera_ON",cur_time)
+                    self.vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+                    MyVideo()
+                else: # CAMERA IS ALREADY ON
+                    log_event(self.events,"Camera is ALREADY ON",cur_time)
+            else: # TURN CAMERA OFF
+                if self.CAMERA_ON: # CAMERA CURRENTLY ON
+                    self.CAMERA_ON = False
+                    self.RECORDING = False
+                    log_event(self.events,"Camera_OFF",cur_time)
+                    self.vidDict = {'cur_time':cur_time, 'STATE':'STOP', 'PATH_FILE':self.video_file_path_name}
+
+
+        elif key == "REC":
+            print ("rec")
+            val = str2bool(protocolDict[key])
+            self.Protocol_ln_num +=1
+            if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
+                self.vidDict = {'cur_time':cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
+            else:
+                self.vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+
+        elif "EXTEND_LEVERS" in key:
+            val = str2bool(protocolDict[key])
+            self.Protocol_ln_num +=1
+            if val: # EXTEND_LEVERS == True
+               print ("EXTEND LEVERS")
+               EXTEND_LEVERS(self.events,"Levers Extended",True,True,cur_time)
+               for lever in self.levers:
+                     lever.STATE = "OUT"
+
+               for button in self.buttons:
+                    if button.text == "EXTEND": button.text = "RETRACT"
+
+            else: # RETRACT LEVERS (EXTEND_LEVERS == False)
+               print ("RETRACT LEVERS")
+               EXTEND_LEVERS(self.events,"Levers_Retracted",False,False,cur_time)
+               for lever in self.levers:
+                    lever.STATE = "IN"
+               for button in self.buttons:
+                    if button.text == "RETRACT": button.text = "EXTEND"
+        elif "DRAW_IMAGES" in key:
+            if self.TOUCHSCREEN_USED:
+                TSq.put(self.touch_img_files)
+                self.Protocol_ln_num +=1
+
+        elif "START_LOOP" in key:
+            print("\n.............TRIAL = ",trial_num, "LOOP: ", loop,"..................")
+            self.loop +=1
+            self.trial_num +=1
+            for user_input in self.user_inputs:
+                if user_input.label == "TRIAL":
+                        user_input.text = str(self.trial_num)
+
+
+            self.CONDITONS_NOT_SET = True
+
+            self.loop_start_line_num = self.Protocol_ln_num
+            self.Protocol_ln_num +=1
+            if "RANDOM" in protocolDict[key]:
+                if self.LOOP_FIRST_PASS:
+                    intrange = protocolDict[key][7:len(protocolDict[key])-1]
+                    print("intrange: ", intrange)
+                    a,b = intrange.split(",")
+                    print("a,b: ", a,b)
+                    self.NUM_LOOPS = random.randint(int(a), int(b))
+                    self.LOOP_FIRST_PASS = False
+            else:  self.NUM_LOOPS = int(protocolDict[key])
+            log_event(self.events,"LOOPING "+ str(self.NUM_LOOPS)+ " times, TRIAL "+str(self.trial_num),cur_time)
+
+        elif "END_LOOP" in key:
+            self.num_lines_in_loop = self.Protocol_ln_num - self.loop_start_line_num
+            if self.loop  < int(self.NUM_LOOPS):
+                self.Protocol_ln_num = self.Protocol_ln_num - self.num_lines_in_loop
+            else:
+                self.Protocol_ln_num +=1
+                log_event(self.events,"END_OF_LOOP",cur_time)
+                self.loop = 0
+                self.LOOP_FIRST_PASS = True
+            #trial = 0 Do not set here in case there are more than 1 loops
+
+        elif key == "PAUSE":
+            self.PAUSE_TIME = float(protocolDict["PAUSE"])
+            if not Pself.AUSE_STARTED:
+                log_event(self.events,"PAUSEING FOR "+str(self.PAUSE_TIME)+" sec",cur_time)
+                self.PAUSE_STARTED = True
+                self.pause_start_time = cur_time
+            else: #PAUSE_STARTED
+                time_elapsed = cur_time - self.pause_start_time
+                if time_elapsed >= self.PAUSE_TIME:
+                    self.Protocol_ln_num +=1 #Go to next protocol item
+                    self.PAUSE_STARTED = False
+
+
+        elif key == "CONDITIONS":
+            self.runConditions()
+
+        else:
+            print("PROTOCOL ITEM NOT RECOGNIZED",key)
+
+        if self.Protocol_ln_num >= len(self.protocol):
+           print("Protocol_ln_num: ",Protocol_ln_num,"plength: ", len(protocol),"\n")
+           print("PROTOCOL ENDED")
+           print(".................")
+           log_event(self.events,"PROTOCOL ENDED",cur_time)
+           self.START_EXPT = False
+           self.Protocol_ln_num = 0
+           self.LEDs[0].ONOFF = "OFF"
+           self.LEDs[1].ONOFF = "OFF"
+           daqHelper.L_CONDITIONING_LIGHT(self.events,False,cur_time)
+           daqHelper.R_CONDITIONING_LIGHT(self.events,False,cur_time)
+
+           # TEll open ephys to stop acquistion and recording?
+          # snd.send(snd.STOP_ACQ)
+           #snd.send(snd.STOP_REC)
+
+           if self.TOUCHSCREEN_USED:
+               self.TSq.put('')
+               self.TOUCHSCREEN_USED = False
+
+    def runConditions(self):
+        num_conditions = len(self.conditions)
+        if protocolDict["CONDITIONS"] == "RANDOM": #Or SEQUENTIAL or a particular condition number
+            self.choose_cond = random.randint(0,num_conditions-1)
+        elif  protocolDict["CONDITIONS"] == "SEQUENTIAL":
+            self.condition_idx += 1
+            self.choose_cond = self.condition_idx
+        else: # a particual sequence number
+            cond_num = int(protocolDict["CONDITIONS"])
+            self.choose_cond = cond_num
+
+        ###############################
+        # SET CONDITONS HERE
+        ###############################
+        if self.CONDITONS_NOT_SET:
+            self.HAS_ALREADY_RESPONDED = False
+            self.CONDITONS_NOT_SET = False
+            self.cond = self.conditions[self.choose_cond]
+            log_event(self.events,"CONDITION["+str(self.choose_cond)+"]",cur_time)
+            COND_MAX_TIME = float(cond["MAX_TIME"])
+            reset = cond["RESET"]
+
+            print("\n\nCONDTION")
+            print(cond)
+            #condkey = list(condDict.keys())[0] # First key in condDict
+
+
+            # SET CONDITIONS
+            # SET LEVERS WHEN IN CONDITIONS
+            try:
+                if self.cond['EXTEND_L_LEVER'] and self.cond['EXTEND_R_LEVER']:
+                    daqHelper.EXTEND_LEVERS(self.events,"Levers Extended",True,True,cur_time)
+
+                elif self.cond['EXTEND_L_LEVER']:
+                    daqHelper.EXTEND_LEVERS(self.events,"L Lever Extended",True,False,cur_time)
+
+                elif self.cond['EXTEND_R_LEVER']:
+                    daqHelper.EXTEND_LEVERS(self.events,"R Lever Extended",False,True,cur_time)
+
+                else:
+                    daqHelper.EXTEND_LEVERS(self.events,"Levers Retracted",False,False,cur_time)
+
+            except:
+                pass
+            # SET CONDITIONING LIGHTS
+            try: # if conditionaing lights are used
+                if self.cond['L_CONDITION_LT']: # Left_Conditioning lit 1/0
+                    daqHelper.L_CONDITIONING_LIGHT(self.events,True,cur_time)
+                    self.LEDs[0].ONOFF = "ON"
+                else:
+                    daqHelper.L_CONDITIONING_LIGHT(self.events,False,cur_time)
+                    self.LEDs[0].ONOFF = "OFF"
+
+
+                if self.cond['R_CONDITION_LT']: # Left_Conditioning lit 1/0
+                    daqHelper.R_CONDITIONING_LIGHT(self.events,True,cur_time)
+                    self.LEDs[1].ONOFF = "ON"
+                else:
+                    daqHelper.R_CONDITIONING_LIGHT(self.events,False,cur_time)
+                    self.LEDs[1].ONOFF = "OFF"
+            except: # Conditionaing lights not used, Use Touch screen instead
+                pass
+
+        # Wait for response
+        if not self.CONDITION_STARTED: #
+           self.condition_start_time = cur_time
+           self.CONDITION_STARTED = True
+           self.TIME_IS_UP = False
+           self.CORRECT = False
+           self.WRONG = False
+           self.NO_ACTION_TAKEN = False
+
+        else: # CONDITION STARTED
+           cond_time_elapsed = cur_time - self.condition_start_time
+
+           if self.levers[0].PRESSED: # LEFT LEVER
+               log_event(self.events,"Left_Lever_Pressed",cur_time)
+               self.levers[0].PRESSED = False
+               if not self.HAS_ALREADY_RESPONDED:# Prevents rewarding for multiple presses
+                   if self.cond['DES_L_LEVER_PRESS']:
+                       log_event(self.events,"CORRECT Response",cur_time)
+                       self.CORRECT = True
+                       if self.cond["RESET"] == "ON_RESPONSE":
+                          self.CONDITION_STARTED = False
+                   else:
+                       self.WRONG = True
+                       log_event(self.events,"WRONG Response",cur_time)
+                   self.HAS_ALREADY_RESPONDED = True
+                   daqHelper.L_CONDITIONING_LIGHT(self.events,False,cur_time)
+                   daqHelper.R_CONDITIONING_LIGHT(self.events,False,cur_time)
+                   self.LEDs[0].ONOFF = "OFF"
+                   self.LEDs[1].ONOFF = "OFF"
+
+           if self.levers[1].PRESSED: # RIGHT LEVER
+               log_event(self.events,"Right_Lever_Pressed",cur_time)
+               self.levers[1].PRESSED = False
+               if not self.HAS_ALREADY_RESPONDED:# Prevents rewarding for multiple presses
+                   print("cond['DES_R_LEVER_PRESS']",self.cond['DES_R_LEVER_PRESS'])
+                   if self.cond['DES_R_LEVER_PRESS']:
+                       log_event(self.events,"CORRECT Response",cur_time)
+                       self.CORRECT = True
+                       if self.cond["RESET"] == "ON_RESPONSE":
+                          self.CONDITION_STARTED = False
+                   else:
+                       self.WRONG = True
+                       log_event(self.events,"WRONG Response",cur_time)
+                   self.HAS_ALREADY_RESPONDED = True
+                   self.LEDs[0].ONOFF = "OFF"
+                   self.LEDs[1].ONOFF = "OFF"
+                   daqHelper.L_CONDITIONING_LIGHT(self.events,False,cur_time)
+                   daqHelper.R_CONDITIONING_LIGHT(self.events,False,cur_time)
+
+           if self.TOUCHSCREEN_USED:
+               if notself. whiskerBack_q.empty():
+                   touchMsg = self.whiskerBack_q.get()
+                   log_event(self.events,touchMsg['picture'] + " Pressed " + str(touchMsg['XY']) , cur_time)
+                   if touchMsg['picture'] == 'missed':
+                       print('missed')
+                   elif not self.HAS_ALREADY_RESPONDED:
+                       self.HAS_ALREADY_RESPONDED = True
+                       for i in range(len(self.touch_img_files)):
+                           for key in self.touch_img_files[i].keys():
+                               if key in touchMsg['picture']:
+                                   if i == 0 and self.cond["DES_IMG1_PRESSP"]:
+                                       log_event(self.events,"CORRECT Response",cur_time)
+                                       self.CORRECT = True
+                                       break
+                                   elif i == 1 and self.cond["DES_IMG2_PRESSP"]:
+                                       log_event(self.events,"CORRECT Response",cur_time)
+                                       self.CORRECT = True
+                                       break
+                       if not self.CORRECT:
+                           self.WRONG = True
+                           log_event(self.events,"WRONG Response",cur_time)
+
+           if self.cond["RESET"] == "FIXED":
+               if cond_time_elapsed >= float(self.cond["MAX_TIME"]): # Time is up
+                  self.CONDITION_STARTED = False
+                  if not self.WRONG and not self.CORRECT:
+                      self.NO_ACTION_TAKEN = True
+                      log_event(self.events,"END_OF_TRIAL: NO_ACTION_TAKEN",cur_time)
+                  self.TIME_IS_UP = True
+
+           if self.cond["RESET"] == "ON_RESPONSE":
+               #print (cond["Reset"])
+               if self.WRONG or self.CORRECT: # A response was given
+                   self.CONDITION_STARTED = False  # Time is up
+                   log_event(self.events,"END_OF_TRIAL",cur_time)
+                   self.TIME_IS_UP = True
+               if cond_time_elapsed >= float(self.cond["MAX_TIME"]): # Time is up
+                  self.CONDITION_STARTED = False
+                  if not self.WRONG and not self.CORRECT:
+                      self.NO_ACTION_TAKEN = True
+                      log_event(self.events,"END_OF_TRIAL: NO_ACTION_TAKEN",cur_time)
+                  self.TIME_IS_UP = True
+
+           if self.TIME_IS_UP:
+               # SET OUTCOMES
+               if self.CORRECT:
+                  outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
+                  print("Correct")
+               elif WRONG:
+                  outcome = self.cond['WRONG'].upper()    # Outcome for wrong response(in Expt File)
+                  print("Wrong")
+               else:
+                  print("No Action Taken")
+                  outcome = self.cond['NO_ACTION'].upper()# Outcome for No_Action taken(in Expt File)
+
+               # OUTCOMES
+
+               if 'PELLET' in outcome:
+                   if len(outcome)<=6: # Just 'PELLET'
+                       FOOD_REWARD(self.events,"Food_Pellet",cur_time)
+                   else: #"PELLET##"
+                       probability_of_reward = float(outcome[6:])
+                       if random.random()*100 <= probability_of_reward:
+                           FOOD_REWARD(self.events,"Food_Pellet w"+str(probability_of_reward)+ "% probability", cur_time)
+                       else:
+                           log_event(self.events,"Reward NOT given w " + str(probability_of_reward)+"% probability", cur_time)
+
+
+               elif 'TONE' in outcome:
+                   idx = outcome[4:]
+                   if idx == '1':
+                      PLAY_TONE(self.events,"TONE1",cur_time)
+                      self.TONE_TIME = cur_time
+                   elif idx == '2':
+                      PLAY_TONE(self.events,"TONE2",cur_time)
+                      self.TONE_TIME = cur_time
+
+               elif outcome == 'SHOCK':
+                    log_event(self.events,"Shock_ON",cur_time,("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
+                    self.SHOCK_ON = True
+               else: #outcome == 'NONE'
+                   log_event(self.events,"NONE",cur_time)
+                   print("Outcome = NONE")
+               self.TIME_IS_UP = False
+               self.CONDITION_STARTED = False
+               self.Protocol_ln_num +=1

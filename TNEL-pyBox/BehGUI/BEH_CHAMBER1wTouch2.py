@@ -16,13 +16,12 @@ Developed by Flavio J.K. da Silva and  Mark Schatza Nov. 31, 2018
 
 from win32api import GetSystemMetrics
 import os
-import sys, errno, time, calendar
+import sys, time
 import pygame
 import math, random
 import numpy as np
 import zmq
 import json
-import pickle
 #import pylab
 from NIDAQ_GUI_elements import *
 from RESOURCES.GUI_elements_by_flav import play_sound
