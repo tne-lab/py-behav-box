@@ -1,3 +1,6 @@
+from RESOURCES.GUI_elements_by_flav import convertString
+import os
+
 def load_expt_file(self):
     print("LOADING: ", self.expt_file_path_name)
     self.protocol = []
@@ -26,6 +29,8 @@ def load_expt_file(self):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
                 elif '[TONE1' in line:
                     EXPERIMENT = False
                     TONE1 = True
@@ -35,6 +40,8 @@ def load_expt_file(self):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
                 elif '[TONE2' in line:
                     EXPERIMENT = False
                     TONE1 = False
@@ -44,6 +51,8 @@ def load_expt_file(self):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
                 elif '[SHOCK]' in line:
                     EXPERIMENT = False
                     TONE1 = False
@@ -53,6 +62,8 @@ def load_expt_file(self):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
                 elif '[FREEZE]' in line:
                     EXPERIMENT = False
                     TONE1 = False
@@ -62,6 +73,8 @@ def load_expt_file(self):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
 
                 elif '[TOUCHSCREEN]' in line:
                     EXPERIMENT = False
@@ -72,6 +85,20 @@ def load_expt_file(self):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = True
+                    BAR_PRESS = False
+                    SETUP = False
+
+                elif '[BAR_PRESS]' in line:
+                    EXPERIMENT = False
+                    TONE1 = False
+                    TONE2 = False
+                    SHOCK = False
+                    FREEZE = False
+                    PROTOCOL = False
+                    CONDITIONS = False
+                    TOUCH = False
+                    BAR_PRESS = True
+                    SETUP = False
 
                 elif '[PROTOCOL' in line:
                     EXPERIMENT = False
@@ -82,6 +109,20 @@ def load_expt_file(self):
                     PROTOCOL = True
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
+
+                elif '[SETUP' in line:
+                    EXPERIMENT = False
+                    TONE1 = False
+                    TONE2 = False
+                    SHOCK = False
+                    FREEZE = False
+                    PROTOCOL = False
+                    CONDITIONS = False
+                    TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = True
 
                 elif '[CONDITIONS' in line:
                     EXPERIMENT = False
@@ -92,6 +133,8 @@ def load_expt_file(self):
                     PROTOCOL = False
                     CONDITIONS = True
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
 
                 elif '[END' in line:
                     EXPERIMENT = False
@@ -102,6 +145,8 @@ def load_expt_file(self):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
 
 
                 if EXPERIMENT:
@@ -139,6 +184,10 @@ def load_expt_file(self):
                         print(open_ephys_path)
                         open_ephys_thread = threading.Thread(target=os.system, args=(open_ephys_path,))
                         open_ephys_thread.start()
+                    elif 'VI_TIMES_LIST_PATH' in line:
+                        words = line.split('=')
+                        self.VIs_file_path = words[1].strip()
+                        print(self.VIs_file_path)
 
                 elif TONE1:#TONE1
                     if 'DURATION' in line:
@@ -185,7 +234,16 @@ def load_expt_file(self):
                         y = y.strip(")")
                         touch_image_dict[img_file_name] = (int(x),int(y))
                         self.touch_img_files.append(touch_image_dict)
-
+                elif BAR_PRESS:
+                    BAR_PRESS_INDEPENDENT_PROTOCOL = True
+                    if "VI" in line:
+                        words = line.split('=')
+                        VI = words[1].strip()
+                        try:
+                            self.var_interval_reward = int(VI)
+                            print("var_interval_reward: ",self.var_interval_reward)
+                        except:
+                            print ("!!!!!!!!!!!VI must = a number in EXP file!!!!!!!!!!!!!!", )
 
                 elif SHOCK:
                     if 'DURATION' in line:
@@ -215,6 +273,20 @@ def load_expt_file(self):
                         Min_Pixels = words[1].strip()
                         Min_Pixels = Min_Pixels.strip()
                         #print(Min_Pixels)
+                elif SETUP:
+                    if "SETUP" not in line:
+                        #print(line)
+                        try:
+                            words = line.split('=')
+                            word1 = words[0].strip()
+                            word1 = word1.upper()
+                            word2 = words[1].strip() #Do NOT make this an upper() to retain True and False
+                            word2 = word2.split("#") #IGNORES "#" FOLLOWED BY COMMENTS
+                            word2 = word2[0].strip()
+                            self.setup.append({word1:word2})
+                        except:
+                            self.setup.append({line:True}) # For lines without an '=' in them
+                            #if line == 'END': PROTOCOL = False
                 elif PROTOCOL:
                     if "PROTOCOL" not in line:
                         #print(line)
@@ -223,6 +295,8 @@ def load_expt_file(self):
                             word1 = words[0].strip()
                             word1 = word1.upper()
                             word2 = words[1].strip() #Do NOT make this an upper() to retain True and False
+                            word2 = word2.split("#") #IGNORES "#" FOLLOWED BY COMMENTS
+                            word2 = word2[0].strip()
                             self.protocol.append({word1:word2})
                         except:
                             self.protocol.append({line:True}) # For lines without an '=' in them
@@ -265,15 +339,15 @@ def load_expt_file(self):
 
     # DATA PATH + FILES
     try:
-        expt_file_name_COPY = self.Expt_Name + "-" + self.Subject + '-' +  dateTm + '-EXPT_file'  + '.txt'
+        expt_file_name_COPY = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-EXPT_file'  + '.txt'
         self.expt_file_path_name_COPY = os.path.join(self.datapath,expt_file_name_COPY)
         print(self.expt_file_path_name_COPY)
 
-        log_file_name = self.Expt_Name + "-" + self.Subject + '-' +  dateTm + '-LOG_file'  + '.txt'
+        log_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-LOG_file'  + '.txt'
         self.log_file_path_name = os.path.join(log_file_path,log_file_name)
         print(self.log_file_path_name)
 
-        video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  dateTm + '-VIDEO_file' + '.avi'
+        video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
         self.video_file_path_name = os.path.join(video_file_path,video_file_name)
         print(self.video_file_path_name)
     except:
@@ -293,6 +367,52 @@ def load_expt_file(self):
         for k,v in dct.items():
             print(str(k)+" = " + str(v))
 
-
+    if self.VIs_file_path != "":
+        try:
+            f = open(self.VIs_file_path,'r')
+                # Read Line by line
+            for line in f:
+                line = line.strip() # Remove leading and trailoing blanks and \n
+                line = line.upper()
+                print(line)
+                if "HABITUATION" in line:
+                    words = line.split(':')
+                    words = words[1].strip()
+                    words = words.split(',')
+                    print("length of words: ",len(words))
+                    for items in words:
+                        num = items.strip()
+                        print(num)
+                        self.habituation_vi_times.append(int(num))
+                if "CONDITIONING" in line:
+                    words = line.split(':')
+                    words = words[1].strip()
+                    words = words.split(',')
+                    print("length of words: ",len(words))
+                    for items in words:
+                        num = items.strip()
+                        print(num)
+                        self.conditioning_vi_times.append(int(num))
+                if "EXTINCTION" in line:
+                    words = line.split(':')
+                    words = words[1].strip()
+                    words = words.split(',')
+                    print("length of words: ",len(words))
+                    for items in words:
+                        num = items.strip()
+                        print(num)
+                        self.extinction_vi_times.append(int(num))
+                if "RECALL" in line:
+                    words = line.split(':')
+                    words = words[1].strip()
+                    words = words.split(',')
+                    print("length of words: ",len(words))
+                    for items in words:
+                        num = items.strip()
+                        print(num)
+                        self.recall_vi_times.append(int(num))
+        except:
+            print("Could not open ",VIs_file_path)
+            return False
 
     return True

@@ -115,21 +115,6 @@ class MyWhiskerTask(WhiskerTwistedTask):
             opaque=True, style=BrushStyle.hatched,
             hatch_style=BrushHatchStyle.bdiagonal)
 
-        '''
-        ############# zmq #########
-        context = zmq.Context()
-        #self.socket = context.socket(zmq.PAIR)
-        self.socket = context.socket(zmq.SUB)
-        #self.socket.connect("tcp://134.84.77.234:5579")
-        self.socket.bind("tcp://*:5979")
-        #self.socket.connect("tcp://localhost:5979")
-        self.socket.setsockopt_string(zmq.SUBSCRIBE, 'touchscreen') # b'touchscreen')
-        self.socket.setsockopt(zmq.RCVTIMEO, 5) # b'touchscreen')
-        time.sleep(1)
-        #self.socket.setsockopt(zmq.SUBSCRIBE, b'touchscreen')
-        #self.socket.connect("tcp://localhost:5559")
-        '''
-
 
 
     def fully_connected(self) -> None:
@@ -233,7 +218,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
         if not self.q.empty():
             msg = self.q.get()
             #msg = json.loads(jsonStr)
-            if msg == 'stop':
+            if msg == 'STOP':
                 self.clearEvents()
                 reactor.stop()
                 return
@@ -257,7 +242,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             if not self.q.empty():
                 msg = self.q.get()
                 #msg = json.loads(jsonStr)
-                if msg == 'stop':
+                if msg == 'STOP':
                     self.clearEvents()
                     reactor.stop()
                     return

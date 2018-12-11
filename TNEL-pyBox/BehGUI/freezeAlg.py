@@ -274,4 +274,13 @@ class Vid:
         hours, minutes, seconds, milliseconds = s.split(":")
         return int(hours)*60*60*1000 + int(minutes)*60*1000 + int(seconds)*1000 + int(milliseconds)
 
+def runVid(q, back_q):
+    vid = freezeAlg.Vid('/home/ephys/Documents/groom.avi', q ,back_q)
+
+    if not vid.capError:
+        vid.run()
+        return
+    else:
+        print('error opening video')
+
 print('freezeAlg Loaded')

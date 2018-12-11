@@ -10,21 +10,25 @@ class RCVEvent:
         context = zmq.Context()
         self.socket = context.socket(zmq.SUB)
         self.socket.connect("tcp://localhost:" + str(port))
+        self.socket.setsockopt(zmq.RCVTIMEO, 500)
 
         for sub in SUBSCRIBE:
             self.socket.setsockopt(zmq.SUBSCRIBE, sub)
 
     def rcv(self):
-        #Get raw input from socket
-        envelope, jsonStr = self.socket.recv_multipart()
-        print(envelope)
+        try:
+            #Get raw input from socket
+            envelope, jsonStr = self.socket.recv_multipart()
+            print(envelope)
 
-        #Our actual json object (last part)
-        jsonStr = json.loads(jsonStr);
-        #print(self.parseJson(jsonStr))
-        print(jsonStr)
-        print('\n')
-        return jsonStr
+            #Our actual json object (last part)
+            jsonStr = json.loads(jsonStr);
+            #print(self.parseJson(jsonStr))
+            print(jsonStr)
+            print('\n')
+            return jsonStr
+        except:
+            return False
 
     # First version of Json parser that breaks up the json object
     # Doesn't really do anything useful yet. Probably change this depending on how we want to do stuff

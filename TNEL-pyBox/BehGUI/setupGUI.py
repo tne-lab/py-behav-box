@@ -1,6 +1,10 @@
 from RESOURCES.GUI_elements_by_flav import *
+import pygame
+import zmqClasses
+from queue import Queue
+import eventRECV
 
-def NIDAQ_GUI_ELEMENTS(self, myscreen):
+def NIDAQ_GUI_ELEMENT(self, myscreen):
     #global boxes,circles,LEDs,labels,toggles,info_boxes,sliders
 
     # BOXES
@@ -89,16 +93,16 @@ def NIDAQ_GUI_ELEMENTS(self, myscreen):
     # TOGGLES
     toggles = []
 
-    return buttons, levers, boxes, circles, LEDs, toggles, sliders, info_boxes, user_inputs, labels
+    return buttons, levers, boxes, circles, LEDs, toggles, info_boxes, user_inputs, labels
 
 
 def setupGUI(self):
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (20,40)
     self.myscreen = pygame.display.set_mode((460,990),pygame.RESIZABLE,32)
-    self.UMNlogo = pygame.image.load(r'.\RESOURCES\UMNlogo.png')
-    pygame.display.set_icon(UMNlogo)
-    self.TNElogo = pygame.image.load(r'.\RESOURCES\TNE logo.jpg')
-    self.TNElogo = pygame.transform.scale(self.TNElogo, (70, 50))
+    #self.UMNlogo = pygame.image.load(r'\RESOURCES\UMNlogo.PNG')
+    #pygame.display.set_icon(self.UMNlogo)
+    #self.TNElogo = pygame.image.load(r'.\RESOURCES\TNE logo.jpg')
+    #self.TNElogo = pygame.transform.scale(self.TNElogo, (70, 50))
     pygame.display.set_caption('Behavioral Chamber Control 1.0 by F. da Silva and M. Shatza Oct. 30, 2018') # Enter your window caption here
     #by Flavio J.K. da Silva and Mark Shatza Oct. 30, 2018') #
     pygame.init()
@@ -135,19 +139,21 @@ def setupGUI(self):
     self.CORNER_SET = False
     self.DELETE_ITEM = False
 
-    self.buttons,self.levers,self.boxes,self.circles,self.LEDs,self.toggles,self.sliders,self.info_boxes,self.user_inputs,self.labels = NIDAQ_GUI_ELEMENTS(myscreen,buttons,levers,boxes,circles,LEDs,toggles,sliders,info_boxes,user_inputs,labels)
-    print(len(buttons), " buttons")
-    print(len(levers), " levers")
-    print(len(boxes), " boxes")
-    print(len(circles), " circles")
-    print(len(LEDs), " LEDs")
-    print(len(toggles), " toggles" )
-    print(len(sliders), " sliders")
-    print(len(labels), " labels")
-    print(len(info_boxes), " info_boxes")
-    print(len(info_boxes), " user_imputs")
+    self.events = []
+
+    self.buttons,self.levers,self.boxes,self.circles,self.LEDs,self.toggles,self.info_boxes,self.user_inputs,self.labels = NIDAQ_GUI_ELEMENT(self, self.myscreen )
+    self.feederBox = self.boxes[0]
+    print(len(self.buttons), " buttons")
+    print(len(self.levers), " levers")
+    print(len(self.boxes), " boxes")
+    print(len(self.circles), " circles")
+    print(len(self.LEDs), " LEDs")
+    print(len(self.toggles), " toggles" )
+    print(len(self.labels), " labels")
+    print(len(self.info_boxes), " info_boxes")
+    print(len(self.info_boxes), " user_imputs")
     # USER INPUTS DEFAULT VALUES
-    for user_input in user_inputs:
+    for user_input in self.user_inputs:
         if user_input.label == "EXPT":
              user_input.text = str(self.Expt_Name)
         elif user_input.label == "SUBJECT":
@@ -173,10 +179,9 @@ def setupGUI(self):
 
     # MAIN LOOP
     self.clk_time_start = time.perf_counter()
-    print (clk_time_start)
     self.FAN_0N = False
     self.CAB_LIGHT_ON = False
-    self.Background_color = (darkgray)
+    self.Background_color = (self.darkgray)
     self.FEEDER_LT_ON = False
 
     START_TIME = time.perf_counter()
@@ -216,6 +221,8 @@ def setupGUI(self):
     self.LOOP_FIRST_PASS = True
     self.CONDITONS_NOT_SET = True
     self.CONDITION_STARTED = False
+    self.RUN_SETUP = False
+    self.VI_index = 0
 
     self.Expt_Count = 0
 
@@ -225,6 +232,7 @@ def setupGUI(self):
     self.snd = zmqClasses.SNDEvent(5556, recordingDir = 'C:\\Users\\Ephys\\Desktop\\RecDir', prependText = 'CHANGE ME') # subject number or something
 
     self.openEphysBack_q = Queue()
+    self.openEphysQ = Queue()
     # Start thread
-    open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(openEphysBack_q,), kwargs={'flags' : [b'event']})
+    open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'event']})
     open_ephys_rcv.start()

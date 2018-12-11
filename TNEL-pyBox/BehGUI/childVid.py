@@ -14,7 +14,7 @@ def vidCapture(q,back_q):
 
     # Create video class
     # Need path to vid or 0 for camera
-    vid = freezeAlg.Vid(0, q ,back_q)
+    vid = freezeAlg.Vid('/home/ephys/Documents/groom.avi', q ,back_q)
     if not vid.capError:
         # Make ROI
 

@@ -4,7 +4,6 @@ SUBJECT = RAT
 EXPT_PATH 	= C:\\ephys-2\Desktop\BehChamGUI\DATA
 LOG_FILE_PATH 	= C:\\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
 VIDEO_FILE_PATH	= C:\\ephys-2\Desktop\BehChamGUI\DATA
-OPEN_EPHYS_PATH = C:/Users/ephys-2/Documents/GitHub/plugin-GUI-private/Builds/VisualStudio2013/x64/Release64/bin/open-ephys.exe
 
 [TONE1] # Need TONE1, TONE2
 Duration(s) 	= 3

@@ -1,21 +1,30 @@
+import pygame
+import GUIFunctions
+import threading
+import whiskerTouchZMQ
+import childVid
+import time
+from RESOURCES.GUI_elements_by_flav import play_sound
+import sys
+
 def FAN_ON_OFF(self, events, FAN_ON, cur_time):
     if FAN_ON:
-        log_event(events,"Fan_ON",cur_time)
+        GUIFunctions.log_event(self, events,"Fan_ON",cur_time)
         if self.NIDAQ_AVAILABLE:    self.fan.sendDBit(True)
     else:
-        log_event(events,"Fan_OFF",cur_time)
+        GUIFunctions.log_event(self, events,"Fan_OFF",cur_time)
         if self.NIDAQ_AVAILABLE:    self.fan.sendDBit(False)
         #self.fan.end()
 
 def PLAY_TONE(self, events, TONE_ID, cur_time):
     # NOTE: Tone_OFF logged while drawing speeker above in main loop
     if TONE_ID == 'TONE1':
-        log_event(events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
+        GUIFunctions.log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
 
         newThread = threading.Thread(target=play_sound, args=(self.Tone1_Freq, self.Tone1_Vol,self.Tone1_Duration))
 
     elif TONE_ID == 'TONE2':
-        log_event(events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
+        GUIFunctions.log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
         newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration))
 
     newThread.start()
@@ -26,13 +35,13 @@ def CAB_LIGHT(self, events, ON_OFF, cur_time):
     gray        = (100,100,100)
     darkgray    = (50,50,50)
     if ON_OFF: # ON
-       log_event(events,"Cabin Light ON",cur_time)
+       GUIFunctions.log_event(self, events,"Cabin Light ON",cur_time)
        Background_color = gray
        #self.cabin_light = daqAPI.cabinLightSetup()
        if self.NIDAQ_AVAILABLE:  self.cabin_light.sendDBit(True)
 
     else: # ON_OFF = False
-       log_event(events,"Cabin Light OFF",cur_time)
+       GUIFunctions.log_event(self, events,"Cabin Light OFF",cur_time)
        Background_color = darkgray
        if self.NIDAQ_AVAILABLE: self.cabin_light.sendDBit(False)
        #self.cabin_light.end()
@@ -42,47 +51,46 @@ def CAB_LIGHT(self, events, ON_OFF, cur_time):
 def EXTEND_LEVERS(self, events, text, L_LVR, R_LVR, cur_time):
     if L_LVR and R_LVR: # Extend both levers
         if self.NIDAQ_AVAILABLE:  self.leverOut.sendDByte(3)
-        log_event(events, text, cur_time)
+        GUIFunctions.log_event(self, events, text, cur_time)
         self.LEVERS_EXTENDED = True
         self.R_LEVER_EXTENDED = True
         self.L_LEVER_EXTENDED = True
 
     elif L_LVR:  # Extend L lever only
         if self.NIDAQ_AVAILABLE:  self.leverOut.sendDByte(1)
-        log_event(events, text, cur_time)
+        GUIFunctions.log_event(self, events, text, cur_time)
         self.LEVERS_EXTENDED = False
         self.R_LEVER_EXTENDED = False
         self.L_LEVER_EXTENDED = True
     elif R_LVR:  # Extend R lever only
         if self.NIDAQ_AVAILABLE:  self.leverOut.sendDByte(2)
-        log_event(events, text, cur_time)
+        GUIFunctions.log_event(self, events, text, cur_time)
         self.LEVERS_EXTENDED = False
         self.R_LEVER_EXTENDED = True
         self.L_LEVER_EXTENDED = False
     else: # Retract both
         if self.NIDAQ_AVAILABLE:  self.leverOut.sendDByte(0)
-        log_event(events, text, cur_time)
+        GUIFunctions.log_event(self, events, text, cur_time)
         self.LEVERS_EXTENDED = False
         self.R_LEVER_EXTENDED = False
         self.L_LEVER_EXTENDED = False
 
 def L_CONDITIONING_LIGHT(self, events,ON_OFF,cur_time):
     if ON_OFF : # ON
-       log_event(events,"Left_Light_ON",cur_time)
+       GUIFunctions.log_event(self, events,"Left_Light_ON",cur_time)
        if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(True)
 
     else: # ON_OFF = False
-       log_event(events,"Left_Light_OFF",cur_time)
+       GUIFunctions.log_event(self, events,"Left_Light_OFF",cur_time)
        if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(False)
 
 def R_CONDITIONING_LIGHT(self, events,ON_OFF,cur_time):
-    global R_condition_Lt,self.NIDAQ_AVAILABLE
     if ON_OFF: # ON
-       log_event(events,"Right_Light_ON",cur_time)
+       GUIFunctions.log_event(self, events,"Right_Light_ON",cur_time)
        if self.NIDAQ_AVAILABLE:   R_condition_Lt.sendDBit(True)
 
     else: # ON_OFF = False
-       log_event(events,"Right_Light_OFF",cur_time)
+       GUIFunctions.log_event(self, events,"Right_Light_OFF",cur_time)
        if self.NIDAQ_AVAILABLE:   R_condition_Lt.sendDBit(False)
 
 def Food_Light_ONOFF(self, events,ON_OFF,cur_time):
@@ -91,19 +99,19 @@ def Food_Light_ONOFF(self, events,ON_OFF,cur_time):
     if ON_OFF: # ON
           fill_color = gray
           LEDsONOFF = "ON"
-          log_event(events,"Feeder_Light_ON",cur_time)
+          GUIFunctions.log_event(self, events,"Feeder_Light_ON",cur_time)
           if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(True)
 
     else:
           fill_color = black
           LEDsONOFF = "OFF"
           if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(False)
-          log_event(events,"Feeder_Light_OFF",cur_time)
+          GUIFunctions.log_event(self, events,"Feeder_Light_OFF",cur_time)
 
     return fill_color,LEDsONOFF
 
 def FOOD_REWARD(self, events, text,cur_time):
-    log_event(events,text,cur_time)
+    GUIFunctions.log_event(self, events,text,cur_time)
     self.num_pellets +=1
     if self.NIDAQ_AVAILABLE:
         self.give_food.sendDBit(True)
@@ -128,27 +136,24 @@ def log_event(self, event_lst, event, cur_time, other=''):
         print ('Log file not created yet. Check EXPT PATH, then Press "LOAD EXPT FILE BUTTON"')
 
 def StartTouchScreen(self):
-    global self.TOUCH_IMG_PATH,touch_img_files
-
     if not self.TOUCH_TRHEAD_STARTED:
-        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(self.whiskerBack_q,self.TSq))#, kwargs=({'media_dir' : self.TOUCH_IMG_PATH}))
-
+        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(self.TSBack_q,self.TSq))#, kwargs=({'media_dir' : self.TOUCH_IMG_PATH}))
+        whiskerThread.daemon = True
         whiskerThread.start()
         self.TOUCH_TRHEAD_STARTED = True
 
 def MyVideo(self):
-    global self.vidDict, self.VIDq , self.VIDBack_q
-    if self.vidDict['STATE'] == 'ON':
-          print("STATE: ",self.vidDict['STATE'])
-          vid_thread = threading.Thread(target=childVid.vidCapture, args=(self.VIDq,self.VIDBack_q,))
-          vid_thread.start()
-          self.VIDq.append(self.vidDict)
-          while True:
-              time.sleep(0.1)
-              if not self.VIDBack_q.empty():
-                  msg = self.VIDBack_q.get()
-                  if msg == 'vid ready':
-                      return
+      vid_thread = threading.Thread(target=childVid.vidCapture, args=(self.VIDq,self.VIDBack_q,))
+      vid_thread.daemon = True
+      self.VIDq.append(self.vidDict)
+      vid_thread.start()
+
+      while True:
+          time.sleep(0.1)
+          if not self.VIDBack_q.empty():
+              msg = self.VIDBack_q.get()
+              if msg == 'vid ready':
+                  return
 
 
 def exit_game(self):
@@ -169,11 +174,17 @@ def exit_game(self):
       self.checkPressLeft.end()
       self.checkPressRight.end()
 
+    if self.vidDict['STATE'] == 'ON' or self.vidDict['STATE'] == 'REC':
+        self.vidDict['STATE'] = 'STOP'
+        self.VIDq.append(self.vidDict)
+    if self.TOUCH_TRHEAD_STARTED == True:
+        self.TSq.put('STOP')
+    self.openEphysQ.put('STOP')
     pygame.quit()
     sys.exit()
 
 
-def draw_speeker(self, myscreen, x, y, TONE_ON):
+def draw_speeker(myscreen, x, y, TONE_ON):
         if TONE_ON: col = (0,255,0)
         else:       col = (0,0,0)
         speeker = pygame.draw.circle(myscreen,col,(x, y),40,2)
@@ -195,7 +206,7 @@ def draw_speeker(self, myscreen, x, y, TONE_ON):
 
         return speeker # Returns a Rect object.  Neede to see if mouse clicked on icon
 
-def draw_camera(self, myscreen,fill_color, CAMERA_ON, REC, x, y, w,h, linew):
+def draw_camera( myscreen,fill_color, CAMERA_ON, REC, x, y, w,h, linew):
         half_h = h/2
         pt1 = (x + w,y+half_h)
         pt2 = (x+w+20,y)
@@ -210,7 +221,7 @@ def draw_camera(self, myscreen,fill_color, CAMERA_ON, REC, x, y, w,h, linew):
         pygame.draw.rect(myscreen,col, (x, y, w,h), linew)
         return camera
 
-def draw_lighting(self, surface, SHOCK_ON, x,y,scale,color,width):
+def draw_lighting( surface, SHOCK_ON, x,y,scale,color,width):
         if SHOCK_ON: col = (255,0,0)
         else: col = (0,0,0)
         pt1 = (x,y)

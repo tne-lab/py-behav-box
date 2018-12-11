@@ -1,38 +1,47 @@
-import daqAPI
+try:
+    import daqAPI
+except:
+    pass
 
+import pygame
+import os
+import time
+from collections import deque
+from queue import Queue
 
 def setGlobals(self):
     ################################################################
     # GUI GLOBALS
     ################################################################
-    self.SCREEN_WIDTH = GetSystemMetrics(0)
-    self.SCREEN_HEIGHT = GetSystemMetrics(1)
-    self.WINDOW_WIDTH = SCREEN_WIDTH - 100
-    self.WINDOW_WCENTER = WINDOW_WIDTH/2
-    self.WINDOW_HEIGHT = SCREEN_HEIGHT -100
-    self.WINDOW_HCENTER = WINDOW_HEIGHT/2
+    SCREEN_WIDTH = 1920
+    SCREEN_HEIGHT = 1080
+    WINDOW_WIDTH = SCREEN_WIDTH - 100
+    WINDOW_WCENTER = WINDOW_WIDTH/2
+    WINDOW_HEIGHT = SCREEN_HEIGHT -100
+    WINDOW_HCENTER = WINDOW_HEIGHT/2
     self.GAME_AREA = pygame.Rect(20, 10, WINDOW_WIDTH, WINDOW_HEIGHT)
     ################################################################
     # NIDAQ GLOBALS
     ################################################################
     # OUTPUTS
-    self.fan = daqAPI.fanSetup()
-    self.cabin_light = daqAPI.cabinLightSetup()
-    self.leverOut = daqAPI.leverOutputSetup()
-    self.food_light = daqAPI.foodLightSetup()
-    self.give_food = daqAPI.giveFoodSetup()
+    if self.NIDAQ_AVAILABLE:
+        self.fan = daqAPI.fanSetup()
+        self.cabin_light = daqAPI.cabinLightSetup()
+        self.leverOut = daqAPI.leverOutputSetup()
+        self.food_light = daqAPI.foodLightSetup()
+        self.give_food = daqAPI.giveFoodSetup()
 
-    self.high_tone = daqAPI.highToneSetup()
+        self.high_tone = daqAPI.highToneSetup()
 
-    self.L_condition_Lt = daqAPI.conditioningLightsLeftSetup()
-    self.R_condition_Lt = daqAPI.conditioningLightsRightSetup()
+        self.L_condition_Lt = daqAPI.conditioningLightsLeftSetup()
+        self.R_condition_Lt = daqAPI.conditioningLightsRightSetup()
 
 
-    #INPUTS
-    self.L_nose_poke = daqAPI.leftNoseInputSetup()
-    self.R_nose_poke = daqAPI.rightNoseInputSetup()
-    self.checkPressLeft, checkPressRight = daqAPI.leverInputSetup()
-    self.eaten = daqAPI.foodEatInputSetup()
+        #INPUTS
+        self.L_nose_poke = daqAPI.leftNoseInputSetup()
+        self.R_nose_poke = daqAPI.rightNoseInputSetup()
+        self.checkPressLeft, checkPressRight = daqAPI.leverInputSetup()
+        self.eaten = daqAPI.foodEatInputSetup()
     ##################
     # DATA
     ##################
@@ -42,8 +51,8 @@ def setGlobals(self):
     print("....")
     print (self.datapath)
 
-    self.expt_file_name = 'protocolbandit_touch3.txt'
-    self.expt_file_path_name = os.path.join(self.datapath,expt_file_name )
+    self.expt_file_name = 'PROTOCOLBANDIT_TOUCH3.txt'
+    self.expt_file_path_name = os.path.join(self.datapath,self.expt_file_name )
     print("EXPT FILE TO LOAD: ", self.expt_file_path_name)
 
     self.date = time.strftime("%b_%d_%y")#month-day-Year-H:M
@@ -59,11 +68,16 @@ def setGlobals(self):
     self.TOUCH_IMG_PATH = ''
     self.touch_img_files = []
 
+    self.VIs_file_path = ''
+    self.habituation_vi_times = []
+    self.conditioning_vi_times = []
+    self.extinction_vi_times = []
+    self.recall_vi_times = []
+
     ################################################################
     # VIDEO GLOBALS
     ################################################################
-    globals = {}
-    self.vidDict = {}
+    self.vidDict = {'STATE' : 'STOP'}
     self.VIDq = deque(maxlen = 1) # Most recent
     self.VIDBack_q = Queue()
     ################################################################
@@ -76,6 +90,7 @@ def setGlobals(self):
     # GENERAL GLOBALS
     ################################################################
     self.globalsTone1_Duration = 1.0 # sec
+    self.Tone1_Duration = 1.0 # sec
     self.Tone1_Freq = 450.0
     self.Tone1_Vol = 1.0
     self.Tone2_Duration = 1.0 # sec
@@ -92,6 +107,7 @@ def setGlobals(self):
     self.num_pellets = 0
     self.EXPT_FILE_LOADED = False
 
+    self.setup = []
     self.protocol = []
     self.conditions = []
 
@@ -99,3 +115,5 @@ def setGlobals(self):
     self.R_LEVER_EXTENDED = False
     self.LEVERS_EXTENDED = False
     self.TOUCHSCREEN_USED = False
+    self.var_interval_reward = 0.0
+    self.BAR_PRESS_INDEPENDENT_PROTOCOL = False
