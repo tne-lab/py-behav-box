@@ -92,10 +92,10 @@ def sendPulse(address,bits):
                 address,
                 line_grouping=LineGrouping.CHAN_FOR_ALL_LINES)
 
-                print(task.write(bits))
+                #print(task.write(bits))
             break
          except:
-            print('trying')
+            print('trying to send pulse')
 
 ####################################################
 ##      OUTPUTS
@@ -140,12 +140,19 @@ def giveFoodSetup():
 Returns a new food light task
 '''
 def foodLightSetup():
-    foodLightAddress = dev + '/port1/line5'
+    foodLightAddress = dev + '/port1/line5' 
     foodLight = InterfaceOut(foodLightAddress)
     foodLight.startTask()
     return foodLight
 
-
+'''
+Returns a SHOCKER task
+'''
+def shockerSetup():
+    shockerAddress = dev + '/port1/line6' 
+    shocker = InterfaceOut(shockerAddress)
+    shocker.startTask()
+    return shocker
 '''
 Returns a new fan task
 '''

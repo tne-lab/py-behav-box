@@ -75,7 +75,7 @@ if NIDAQ_AVAILABLE:
     leverOut = daqAPI.leverOutputSetup()
     food_light = daqAPI.foodLightSetup()
     give_food = daqAPI.giveFoodSetup()
-
+    apply_shock = daqAPI.shockerSetup()
     high_tone = daqAPI.highToneSetup()
 
     L_condition_Lt = daqAPI.conditioningLightsLeftSetup()
@@ -282,9 +282,8 @@ def Food_Light_ONOFF (events,ON_OFF,cur_time):
     return fill_color,LEDsONOFF
 
 
-
 def FOOD_REWARD(events, text,cur_time):
-    global give_food,num_pellets, NIDAQ_AVAILABLE
+    global give_food, num_pellets, NIDAQ_AVAILABLE
     log_event(events,text,cur_time)
     num_pellets +=1
     if NIDAQ_AVAILABLE:
@@ -293,12 +292,14 @@ def FOOD_REWARD(events, text,cur_time):
 
 def log_event(event_lst, event, cur_time, other=''):
     global log_file_path_name
-    #print("Log file: ", log_file_path_name)
-    event_string = str(cur_time) + ',  ' + event
+    time = str(cur_time)
+    print("time: ",time)
+    print("Log file: ", log_file_path_name, cur_time)
+    event_string = time + ',  ' + event
     #print (event_string, other)
     event_other = ''
     for item in other:
-        print (item)
+        #print (item)
         event_other = event_other + ",  " +  str(item)
 
     event_lst.append(event_string+event_other) # To Display on GUI
@@ -969,7 +970,7 @@ def BehavioralChamber():
              user_input.text = str(Shock_Duration)
         elif user_input.label == "V":
              user_input.text = str(Shock_V)
-        elif user_input.label == "Amps":
+        elif "Amps" in user_input.label: # == "Amps"
              user_input.text = str(Shock_Amp)
 
     # MAIN LOOP
@@ -1187,20 +1188,22 @@ def BehavioralChamber():
                   TONE_ON = False
                   log_event(events,"Tone_OFF",cur_time)
 
-        # DRAW LIGHTNING
-        shock = draw_lighting(myscreen, SHOCK_ON, 228,150,1,(255,255,0),2)
+        # DRAW LIGHTNING SHOCK
+        shock = draw_lighting(myscreen, SHOCK_ON, 228,150,1,(255,255,0),2) #--> returns a Rect Object used for mouse click
         if SHOCK_ON:
               if (cur_time - SHOCK_TIME) <= Shock_Duration: # seconds
-                  #shock.sendDBit(True)
-                  #Event Logged at mouse Click
+                  apply_shock.sendDBit(True) # NOTE: THIS IS DONE ON MOUSE CLICK OR IN PROTOCOL OR CONDITION
+                  #Event Logged at mouse Click event
                   pass
               else:
                   SHOCK_ON = False
-                  #shock.sendDBit(False)
+                  apply_shock.sendDBit(False)
                   print("SHOCK OFF")
-                  log_event(events,"Shock_OFF",cur_time)
+                  log_event(events,"Shock_OFF",cur_time) # Also logged when user turns off in mouse press event
+        else: apply_shock.sendDBit(False) # SHOCK OFF
 
 
+        
         # DRAW CAMERA
         # draw_camera(myscreen,fill_color, ON_OFF, REC, x, y, w,h, linew)
         camera = draw_camera(myscreen, (100,100,100),CAMERA_ON,RECORDING,215, 255, 30,20, 2)
@@ -1265,7 +1268,7 @@ def BehavioralChamber():
                                elif button.text == "FEED":
                                     button.UP_DN = "DN"
                                     FEED = True
-                                    FOOD_REWARD(events,cur_time,"Food_Pellet")
+                                    FOOD_REWARD(events,"Food_Pellet",cur_time)
 
                                # LEFT LEVER
                                elif button.text == "L":
@@ -1456,7 +1459,7 @@ def BehavioralChamber():
                           PLAY_TONE(events,"TONE1",cur_time)
 
 
-                    # SHOCK PRESSED
+                    # SHOCK PRESSED (TOGGLE)
                     if shock.collidepoint(cur_x,cur_y):
                           SHOCK_TIME = cur_time
                           if SHOCK_ON:
@@ -1465,8 +1468,9 @@ def BehavioralChamber():
                                 # NOTE: SHOCK ALSO TURNED OFF IN GAME LOOP AFTER Shock_Duration (s)
                           else:
                                 SHOCK_ON = True
+                                print("SHOCKING!!!")
                                 log_event(events,"Shock_ON",cur_time,("Voltage", str(Shock_V),"Amps",str(Shock_Amp),"Duration(S)",str(Shock_Duration)))
-                                # NOTE: SHOCK ALSO TURNED OFF IN GAME LOOP AFTER Shock_Duration (s)
+                                # NOTE: SHOCK TURNED OFF IN GAME LOOP AFTER Shock_Duration (s)
 
                           print("SHOCK PRESSED")
 
@@ -1534,8 +1538,8 @@ def BehavioralChamber():
                                  Shock_Duration = float(user_input.text)
                             elif user_input.label == "V":
                                  Shock_V = float(user_input.text)
-                            elif user_input.label == "Amps":
-                                 Shock_Amps = float(user_input.text)
+                            elif "Amps" in user_input.label: # == "Amps":
+                                 Shock_Amp = float(user_input.text)
 
 
            # MOUSE UP
@@ -1763,6 +1767,11 @@ def BehavioralChamber():
                 box.fill_color,LEDsONOFF = Food_Light_ONOFF (events,val,cur_time)
                 LEDs[4].ONOFF = LEDsONOFF
                 LEDs[5].ONOFF = LEDsONOFF
+
+            elif key  == 'SHOCK':
+                 log_event(events,"Shock_ON",cur_time,("Voltage", str(Shock_V),"Amps",str(Shock_Amp),"Duration(S)",str(Shock_Duration)))
+                 SHOCK_ON = True
+
 
             elif key == "L_CONDITIONING_LIGHT":
                 val = str2bool(protocolDict[key])
@@ -2121,6 +2130,11 @@ def BehavioralChamber():
                         elif outcome == 'SHOCK':
                              log_event(events,"Shock_ON",cur_time,("Voltage", str(Shock_V),"Amps",str(Shock_Amp),"Duration(S)",str(Shock_Duration)))
                              SHOCK_ON = True
+                             #shock.sendDBit(True)
+                             #print("SHOCK ON")
+                             #log_event(events,"Shock_ON",cur_time) # Also logged when user turns off in mouse press event
+                             # NOTE: THIS IS A LATCH. TURNED OFF WHEN shock.sendDBit(False)
+                             
                         else: #outcome == 'NONE'
                             log_event(events,"NONE",cur_time)
                             print("Outcome = NONE")
