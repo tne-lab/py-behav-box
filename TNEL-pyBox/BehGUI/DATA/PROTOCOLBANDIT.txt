@@ -1,11 +1,13 @@
 [EXPERIMENT]
 EXPT_NAME = TESTING
 SUBJECT = RAT
-EXPT_PATH 	= C:\Users\ephys-2\Desktop\FLAVsSTUFF\DATA
-LOG_FILE_PATH 	= C:\Users\ephys-2\Desktop\FLAVsSTUFF\DATA
-VIDEO_FILE_PATH	= C:\Users\ephys-2\Desktop\FLAVsSTUFF\DATA
+EXPT_PATH 	= C:\\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
+LOG_FILE_PATH 	= C:\\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
+VIDEO_FILE_PATH	= C:\\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
+VI_TIMES_LIST_PATH	= C:\\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
+
 [TONE1] # Need TONE1, TONE2
-Duration(s) 	= 3
+Duration(s) 	= 30
 Freq(Hz)	= 1800
 Volume(0-1)	= 0.6
 
@@ -23,7 +25,7 @@ Amps(mA)	= 100
 Min Duration(s)	= 2
 Min Moving Pix	= 5000
 Min Theshold = 26
-	
+
 [PROTOCOL] #Note: CONDITIONS cand be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 FAN_ON=True
 CAB_LIGHT=True
@@ -76,8 +78,7 @@ FAN_ON=False
 TONE2
 [END PROTOCOL]
 
-[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS. 
+[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS.
 MAX_TIME, RESET, L_CONDITION_LT, R_CONDITION_LT, DES_L_LEVER_PRESS, DES_R_LEVER_PRESS, CORRECT, 	WRONG, NO_ACTION
 3,      ON_RESPONSE,	  1,		  0,		  1,		    0,	       PELLET80,	PELLET20,  TONE1
 3,      ON_RESPONSE,  	  0,		  1,		  0,		    1,	       PELLET80,	PELLET20,  TONE2
-

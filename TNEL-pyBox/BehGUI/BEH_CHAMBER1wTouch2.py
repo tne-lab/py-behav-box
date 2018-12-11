@@ -101,7 +101,7 @@ datapath = os.path.join(cwd,'DATA' )
 print("....")
 print (datapath)
 
-expt_file_name = 'protocolbandit_touch3.txt'
+expt_file_name = 'protocol_habituation_and_conditioning.txt'
 expt_file_path_name = os.path.join(datapath,expt_file_name )
 print("EXPT FILE TO LOAD: ",expt_file_path_name)
 
@@ -118,6 +118,11 @@ data_file_name = ''
 data_file_path_name = ''
 TOUCH_IMG_PATH = ''
 touch_img_files = []
+VIs_file_path = ''
+habituation_vi_times = []
+conditioning_vi_times = []
+extinction_vi_times = []
+recall_vi_times = []
 ################################################################
 # VIDEO GLOBALS
 ################################################################
@@ -154,6 +159,7 @@ trial_num = 0
 num_pellets = 0
 EXPT_FILE_LOADED = False
 
+setup = []
 protocol = []
 conditions = []
 
@@ -161,6 +167,8 @@ L_LEVER_EXTENDED = False
 R_LEVER_EXTENDED = False
 LEVERS_EXTENDED = False
 TOUCHSCREEN_USED = False
+var_interval_reward = 0.0
+BAR_PRESS_INDEPENDENT_PROTOCOL = False
 ################################################################
 
 def FAN_ON_OFF(events,FAN_ON,cur_time):
@@ -370,8 +378,11 @@ def load_expt_file(expt_file_path_name):
     global Expt_Name, Subject
     global Tone1_Duration, Tone1_Freq, Tone1_Vol,Tone2_Duration, Tone2_Freq, Tone2_Vol
     global Shock_Duration,Shock_V,Shock_Amp
-    global datapath, log_file_path_name, data_file_path_name, video_file_path_name
+    global datapath, log_file_path_name, data_file_path_name, video_file_path_name, VIs_file_path
     global TOUCH_IMG_PATH, touch_img_files, TOUCHSCREEN_USED
+    global var_interval_reward,     BAR_PRESS_INDEPENDENT_PROTOCOL
+    global habituation_vi_times, conditioning_vi_times, extinction_vi_times, recall_vi_times
+
     print("LOADING: ", expt_file_path_name)
     protocol = []
     conditions = []
@@ -399,6 +410,8 @@ def load_expt_file(expt_file_path_name):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
                 elif '[TONE1' in line:
                     EXPERIMENT = False
                     TONE1 = True
@@ -408,6 +421,8 @@ def load_expt_file(expt_file_path_name):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
                 elif '[TONE2' in line:
                     EXPERIMENT = False
                     TONE1 = False
@@ -417,6 +432,8 @@ def load_expt_file(expt_file_path_name):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
                 elif '[SHOCK]' in line:
                     EXPERIMENT = False
                     TONE1 = False
@@ -426,6 +443,8 @@ def load_expt_file(expt_file_path_name):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
                 elif '[FREEZE]' in line:
                     EXPERIMENT = False
                     TONE1 = False
@@ -435,6 +454,8 @@ def load_expt_file(expt_file_path_name):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
 
                 elif '[TOUCHSCREEN]' in line:
                     EXPERIMENT = False
@@ -445,6 +466,19 @@ def load_expt_file(expt_file_path_name):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = True
+                    BAR_PRESS = False
+                    SETUP = False
+                elif '[BAR_PRESS]' in line:
+                    EXPERIMENT = False
+                    TONE1 = False
+                    TONE2 = False
+                    SHOCK = False
+                    FREEZE = False
+                    PROTOCOL = False
+                    CONDITIONS = False
+                    TOUCH = False
+                    BAR_PRESS = True
+                    SETUP = False
 
                 elif '[PROTOCOL' in line:
                     EXPERIMENT = False
@@ -455,6 +489,8 @@ def load_expt_file(expt_file_path_name):
                     PROTOCOL = True
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
 
                 elif '[CONDITIONS' in line:
                     EXPERIMENT = False
@@ -465,7 +501,21 @@ def load_expt_file(expt_file_path_name):
                     PROTOCOL = False
                     CONDITIONS = True
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
 
+                elif '[SETUP' in line:
+                    EXPERIMENT = False
+                    TONE1 = False
+                    TONE2 = False
+                    SHOCK = False
+                    FREEZE = False
+                    PROTOCOL = False
+                    CONDITIONS = False
+                    TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = True
+                    
                 elif '[END' in line:
                     EXPERIMENT = False
                     TONE1 = False
@@ -475,6 +525,8 @@ def load_expt_file(expt_file_path_name):
                     PROTOCOL = False
                     CONDITIONS = False
                     TOUCH = False
+                    BAR_PRESS = False
+                    SETUP = False
 
 
                 if EXPERIMENT:
@@ -512,6 +564,11 @@ def load_expt_file(expt_file_path_name):
                         print(open_ephys_path)
                         open_ephys_thread = threading.Thread(target=os.system, args=(open_ephys_path,))
                         open_ephys_thread.start()
+                        
+                    elif 'VI_TIMES_LIST_PATH' in line:
+                        words = line.split('=')
+                        VIs_file_path = words[1].strip()
+                        print(VIs_file_path)
 
                 elif TONE1:#TONE1
                     if 'DURATION' in line:
@@ -546,6 +603,7 @@ def load_expt_file(expt_file_path_name):
                     if 'IMAGES_PATH' in line:
                         words = line.split('=')
                         TOUCH_IMG_PATH = words[1].strip()
+                        print("\n\nTOUCH_IMG_PATH: ",TOUCH_IMG_PATH)
                         TOUCHSCREEN_USED = True
                     elif 'IMG' in line:
                         words = line.split('=')
@@ -559,6 +617,16 @@ def load_expt_file(expt_file_path_name):
                         touch_image_dict[img_file_name] = (int(x),int(y))
                         touch_img_files.append(touch_image_dict)
 
+                elif BAR_PRESS:
+                    BAR_PRESS_INDEPENDENT_PROTOCOL = True
+                    if "VI" in line:
+                        words = line.split('=')
+                        VI = words[1].strip()
+                        try:
+                            var_interval_reward = int(VI)
+                            print("var_interval_reward: ",var_interval_reward)
+                        except:
+                            print ("!!!!!!!!!!!VI must = a number in EXP file!!!!!!!!!!!!!!", )
 
                 elif SHOCK:
                     if 'DURATION' in line:
@@ -588,6 +656,22 @@ def load_expt_file(expt_file_path_name):
                         Min_Pixels = words[1].strip()
                         Min_Pixels = Min_Pixels.strip()
                         #print(Min_Pixels)
+
+                elif SETUP:
+                    if "SETUP" not in line:
+                        #print(line)
+                        try:
+                            words = line.split('=')
+                            word1 = words[0].strip()
+                            word1 = word1.upper()
+                            word2 = words[1].strip() #Do NOT make this an upper() to retain True and False
+                            word2 = word2.split("#") #IGNORES "#" FOLLOWED BY COMMENTS
+                            word2 = word2[0].strip()
+                            setup.append({word1:word2})
+                        except:
+                            setup.append({line:True}) # For lines without an '=' in them
+                            #if line == 'END': PROTOCOL = False
+
                 elif PROTOCOL:
                     if "PROTOCOL" not in line:
                         #print(line)
@@ -596,6 +680,8 @@ def load_expt_file(expt_file_path_name):
                             word1 = words[0].strip()
                             word1 = word1.upper()
                             word2 = words[1].strip() #Do NOT make this an upper() to retain True and False
+                            word2 = word2.split("#") #IGNORES "#" FOLLOWED BY COMMENTS
+                            word2 = word2[0].strip()
                             protocol.append({word1:word2})
                         except:
                             protocol.append({line:True}) # For lines without an '=' in them
@@ -667,8 +753,54 @@ def load_expt_file(expt_file_path_name):
             print(str(k)+" = " + str(v))
 
 
-    print("\n\nTOUCH_IMG_PATH: ",TOUCH_IMG_PATH)
+    if VIs_file_path != "":
+        try:
+            f = open(VIs_file_path,'r')
+                # Read Line by line
 
+            for line in f:
+                line = line.strip() # Remove leading and trailoing blanks and \n
+                line = line.upper()        
+                print(line)
+                if "HABITUATION" in line:
+                    words = line.split(':')
+                    words = words[1].strip()
+                    words = words.split(',')
+                    print("length of words: ",len(words))
+                    for items in words:
+                        num = items.strip()
+                        print(num)
+                        habituation_vi_times.append(int(num))
+                if "CONDITIONING" in line:
+                    words = line.split(':')
+                    words = words[1].strip()
+                    words = words.split(',')
+                    print("length of words: ",len(words))
+                    for items in words:
+                        num = items.strip()
+                        print(num)
+                        conditioning_vi_times.append(int(num))
+                if "EXTINCTION" in line:
+                    words = line.split(':')
+                    words = words[1].strip()
+                    words = words.split(',')
+                    print("length of words: ",len(words))
+                    for items in words:
+                        num = items.strip()
+                        print(num)
+                        extinction_vi_times.append(int(num))
+                if "RECALL" in line:
+                    words = line.split(':')
+                    words = words[1].strip()
+                    words = words.split(',')
+                    print("length of words: ",len(words))
+                    for items in words:
+                        num = items.strip()
+                        print(num)
+                        recall_vi_times.append(int(num))
+        except:
+            print("Could not open ",VIs_file_path)
+            return False
     return True
 
 ##       whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(whiskerBack_q), kwargs=({'media_dir' : TOUCH_IMG_PATH}))
@@ -747,7 +879,7 @@ def BehavioralChamber():
     global datapath, expt_file_name, expt_file_path_name,log_file_path_name,video_file_path_name,data_file_path_name,TOUCH_IMG_PATH
     global Tone1_Duration, Tone1_Freq, Tone1_Vol,  Tone2_Duration, Tone2_Freq, Tone2_Vol
     global Shock_Duration,Shock_V,Shock_Amp, trial_num
-    global L_LEVER_EXTENDED,R_LEVER_EXTENDED,LEVERS_EXTENDED, TONE_ON, TOUCHSCREEN_USED
+    global L_LEVER_EXTENDED,R_LEVER_EXTENDED,LEVERS_EXTENDED, TONE_ON, TOUCHSCREEN_USED, BAR_PRESS_INDEPENDENT_PROTOCOL
 
 #ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
 
@@ -885,7 +1017,10 @@ def BehavioralChamber():
     LOOP_FIRST_PASS = True
     CONDITONS_NOT_SET = True
     CONDITION_STARTED = False
+    RUN_SETUP = False
+    VI_index = 0
 
+    
     Expt_Count = 0
 
     TOUCH_IMAGES_SENT = False
@@ -1191,32 +1326,48 @@ def BehavioralChamber():
                                     else:
                                           print("CAMERA NOT ON!")
 
+                               # LOAD EXPT FILE AND RUN SETUP
                                elif button.text == "LOAD FILE":
                                     button.UP_DN = "DN"
                                     print( expt_file_path_name)
                                     if load_expt_file(expt_file_path_name):
                                         EXPT_FILE_LOADED = True
                                         log_event(events,"EXPT FILE LOADED",cur_time)
-
+                                        RUN_SETUP = True
+                                        setup_ln_num = 0
+                                        
                                     else:
                                         print("HUMPH!")
                                         log_event(events,"Expt File name or path DOES NOT EXIST",cur_time)
-
+                                        
+                                        
+                                        
                                elif button.text == "START EXPT":
                                     print("EXPT STARTED!")
                                     button.UP_DN = "DN"
                                     Expt_Count +=1
                                     if EXPT_FILE_LOADED:
                                         trial_num = 0
+                                        if TOUCHSCREEN_USED: StartTouchScreen()
                                         for user_input in user_inputs:
                                             if user_input.label == "EXPT":
                                                 user_input.text = str(Expt_Name)+str(Expt_Count)
+
+                                        ############################################################################
+                                        if  BAR_PRESS_INDEPENDENT_PROTOCOL:
+                                        # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
+                                            VI_start = cur_time
+                                            VI = random.randint(0,int(var_interval_reward*2))
+                                            print("VI.......................", VI)
+                                        ###############################################################################
+                                        # RUN EXPERIMENT CONDITIONS DESCRIBED IN EXPT FILE
                                         log_event(events,"EXPT STARTED",cur_time)
                                         START_EXPT = True
-                                        # RUN EXPERIMENT CONDITIONS DESCRIBED IN EXPT FILE
+
                                     else:
                                         log_event(events,"EXPT FILE NOT LOADED!!!!",cur_time)
-                                    if TOUCHSCREEN_USED: StartTouchScreen()
+
+                                    
                                LEFT_MOUSE_DOWN = False
                                BUTTON_SELECTED = True
                                dx = cur_x - button.x
@@ -1500,12 +1651,76 @@ def BehavioralChamber():
 
 
 ########################################################################################################################
+        ################################################################
+        # SETUP EXPERIMENTAL WHEN START EXPT BUTTON PRESSED
+        ################################################################
+        if RUN_SETUP:
+            print("SETUPDICT:....................",setup,"length: ",len(setup),"linenum: ",setup_ln_num)
+            setupDict = setup[setup_ln_num]
+            key = list(setupDict.keys())[0] # First key in protocolDict
+            print ("KEY:.....................",key)
+            if key == "":
+                setup_ln_num +=1
+            elif key == "FAN_ON":
+               val = str2bool(setupDict[key])
+               print("FAN")
+               FAN_ON_OFF(events,val,cur_time) # {'FAN_ON': True} or {'FAN_ON': False}
+               setup_ln_num +=1
+
+            elif key == "CAB_LIGHT":
+               val = str2bool(setupDict[key])
+               print("CAB_LIGHT")
+               Background_color = CAB_LIGHT(events,val,cur_time)
+               #CAB_LIGHT(events,val,cur_time)
+               setup_ln_num +=1
+
+            elif key == "FOOD_LIGHT":
+                print("FOOD LIGHT: ",setupDict["FOOD_LIGHT"])
+                val = str2bool(setupDict[key])
+                setup_ln_num +=1
+                box.fill_color,LEDsONOFF = Food_Light_ONOFF (events,val,cur_time)
+                LEDs[4].ONOFF = LEDsONOFF
+                LEDs[5].ONOFF = LEDsONOFF
+
+            elif key == "CAMERA":
+                print("CAMERA")
+                val = str2bool(setupDict[key])
+                setup_ln_num +=1
+                if val:  # TURN CAMERA ON
+                    if not CAMERA_ON: # CAMERA WAS OFF
+                        CAMERA_ON = True
+                        log_event(events,"Camera_ON",cur_time)
+                        vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':video_file_path_name}
+                        MyVideo()
+                    else: # CAMERA IS ALREADY ON
+                        log_event(events,"Camera is ALREADY ON",cur_time)
+                else: # TURN CAMERA OFF
+                    if CAMERA_ON: # CAMERA CURRENTLY ON
+                        CAMERA_ON = False
+                        RECORDING = False
+                        log_event(events,"Camera_OFF",cur_time)
+                        vidDict = {'cur_time':cur_time, 'STATE':'STOP', 'PATH_FILE':video_file_path_name}
+
+
+            elif key == "REC":
+                print ("recording")
+                val = str2bool(setupDict[key])
+                setup_ln_num +=1
+                if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
+                    vidDict = {'cur_time':cur_time, 'STATE':'REC', 'PATH_FILE':video_file_path_name}
+                else:
+                    vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':video_file_path_name}
+
+            if setup_ln_num >= len(setup):
+                RUN_SETUP = False
+
 
         ################################################################
         # RUN EXPERIMENTAL PROTOCOL IF START EXPT BUTTON PRESSED
         ################################################################
 
         if START_EXPT:
+
             protocolDict = protocol[Protocol_ln_num]
             key = list(protocolDict.keys())[0] # First key in protocolDict
 
@@ -1591,7 +1806,7 @@ def BehavioralChamber():
 
 
             elif key == "REC":
-                print ("rec")
+                print ("recording")
                 val = str2bool(protocolDict[key])
                 Protocol_ln_num +=1
                 if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
@@ -1600,24 +1815,30 @@ def BehavioralChamber():
                     vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':video_file_path_name}
 
             elif "EXTEND_LEVERS" in key:
-                val = str2bool(protocolDict[key])
-                Protocol_ln_num +=1
-                if val: # EXTEND_LEVERS == True
-                   print ("EXTEND LEVERS")
-                   EXTEND_LEVERS(events,"Levers Extended",True,True,cur_time)
-                   for lever in levers:
-                         lever.STATE = "OUT"
+                if protocolDict[key] == "L_LVR":
+                   EXTEND_LEVERS(events,"Levers Extended",True,False,cur_time)
+                elif protocolDict[key] == "R_LVR":
+                   EXTEND_LEVERS(events,"Levers Extended",False,True,cur_time)
+                else:
+                    val = str2bool(protocolDict[key])
+                    Protocol_ln_num +=1
+                    if val: # EXTEND_LEVERS == True
+                       print ("EXTEND LEVERS")
+                       EXTEND_LEVERS(events,"Levers Extended",True,True,cur_time)
+                       for lever in levers:
+                             lever.STATE = "OUT"
 
-                   for button in buttons:
-                        if button.text == "EXTEND": button.text = "RETRACT"
+                       for button in buttons:
+                            if button.text == "EXTEND": button.text = "RETRACT"
 
-                else: # RETRACT LEVERS (EXTEND_LEVERS == False)
-                   print ("RETRACT LEVERS")
-                   EXTEND_LEVERS(events,"Levers_Retracted",False,False,cur_time)
-                   for lever in levers:
-                        lever.STATE = "IN"
-                   for button in buttons:
-                        if button.text == "RETRACT": button.text = "EXTEND"
+
+                    else: # RETRACT LEVERS (EXTEND_LEVERS == False)
+                       print ("RETRACT LEVERS")
+                       EXTEND_LEVERS(events,"Levers_Retracted",False,False,cur_time)
+                       for lever in levers:
+                            lever.STATE = "IN"
+                       for button in buttons:
+                            if button.text == "RETRACT": button.text = "EXTEND"
             elif "DRAW_IMAGES" in key:
                 if TOUCHSCREEN_USED:
                     print("\n\nSENDING MSG TO WHISPER TOUCH ZMQ: ")
@@ -1630,9 +1851,13 @@ def BehavioralChamber():
                     #print(" MSG SENT from GUI ")
                     Protocol_ln_num +=1
 
+
+
+
             elif "START_LOOP" in key:
                 print("\n.............TRIAL = ",trial_num, "LOOP: ", loop,"..................")
                 loop +=1
+                
                 trial_num +=1
                 for user_input in user_inputs:
                     if user_input.label == "TRIAL":
@@ -1652,10 +1877,13 @@ def BehavioralChamber():
                         print("a,b: ", a,b)
                         NUM_LOOPS = random.randint(int(a), int(b))
                         LOOP_FIRST_PASS = False
-                else:  NUM_LOOPS = int(protocolDict[key])
+                else:
+                    print ('NUM_LOOPS:..............................................',protocolDict[key])
+                    NUM_LOOPS = int(protocolDict[key])
                 log_event(events,"LOOPING "+ str(NUM_LOOPS)+ " times, TRIAL "+str(trial_num),cur_time)
 
             elif "END_LOOP" in key:
+                VI_index = 0
                 num_lines_in_loop = Protocol_ln_num - loop_start_line_num
                 if loop  < int(NUM_LOOPS):
                     Protocol_ln_num = Protocol_ln_num - num_lines_in_loop
@@ -1665,9 +1893,19 @@ def BehavioralChamber():
                     loop = 0
                     LOOP_FIRST_PASS = True
                 #trial = 0 Do not set here in case there are more than 1 loops
-
+                    
+############################################################################################
             elif key == "PAUSE":
-                PAUSE_TIME = float(protocolDict["PAUSE"])
+                try: # WAS A NUMBER
+                    PAUSE_TIME = float(protocolDict["PAUSE"])
+                except: # NOT A NUMBER. MUST BE VI_TIMES
+                    #print(protocolDict["PAUSE"])
+                    #print(habituation_vi_times)
+                    if "HABITUATION" in protocolDict["PAUSE"]:
+                        PAUSE_TIME = habituation_vi_times[VI_index]
+                    if "CONDITIONING" in protocolDict["PAUSE"]:
+                        PAUSE_TIME = conditioning_vi_times[VI_index]
+                #print("PAUSE_TIME:.....................................",PAUSE_TIME)        
                 if not PAUSE_STARTED:
                     log_event(events,"PAUSEING FOR "+str(PAUSE_TIME)+" sec",cur_time)
                     PAUSE_STARTED = True
@@ -1675,8 +1913,11 @@ def BehavioralChamber():
                 else: #PAUSE_STARTED
                     time_elapsed = cur_time - pause_start_time
                     if time_elapsed >= PAUSE_TIME:
+                        VI_index +=1
                         Protocol_ln_num +=1 #Go to next protocol item
                         PAUSE_STARTED = False
+                
+##############################################################################################
 
 
             elif key == "CONDITIONS":
@@ -1689,6 +1930,7 @@ def BehavioralChamber():
                  else: # a particual sequence number
                      cond_num = int(protocolDict["CONDITIONS"])
                      choose_cond = cond_num
+
 
                  ###############################
                  # SET CONDITONS HERE
@@ -1741,15 +1983,6 @@ def BehavioralChamber():
                              LEDs[1].ONOFF = "OFF"
                      except: # Conditionaing lights not used, Use Touch screen instead
                          pass
-##                     try: # if TOUCHSCREEN is used
-##                         if cond['IMG1']: # Left_Conditioning img
-##                             socket.send(dict/string of stuff)
-##                         if cond['IMG2']: # Left_Conditioning img
-##                             socket.send(dict/string of stuff)
-
-
-
-
 
 
                  # Wait for response
@@ -1846,6 +2079,9 @@ def BehavioralChamber():
                                log_event(events,"END_OF_TRIAL: NO_ACTION_TAKEN",cur_time)
                            TIME_IS_UP = True
 
+                    if cond["RESET"] == "VI":
+                        pass  # TBD
+
                     if TIME_IS_UP:
                         # SET OUTCOMES
                         if CORRECT:
@@ -1892,20 +2128,23 @@ def BehavioralChamber():
                         CONDITION_STARTED = False
                         Protocol_ln_num +=1
                     #print("CONDITIONS",conditions[choose_cond])
-
-##            elif "[END" in key or "[END PROTOCOL" in key:
-##               log_event(events,"PROTOCOL ENDED.......",cur_time)
-##               START_EXPT = False
-##               Protocol_ln_num = 0
-##               LEDs[0].ONOFF = "OFF"
-##               LEDs[1].ONOFF = "OFF"
-##               L_CONDITIONING_LIGHT(events,False,cur_time)
-##               R_CONDITIONING_LIGHT(events,False,cur_time)
             else:
-                print("PROTOCOL ITEM NOT RECOGNIZED",key)
+               print("PROTOCOL ITEM NOT RECOGNIZED",key)
+               
+########################################################################################################                        
+            if BAR_PRESS_INDEPENDENT_PROTOCOL: #Running independently of CONDITIONS. Used for conditioning, habituation, extinction, and recall
+               #print (cur_time,"VI................", VI, (VI_start + VI))
+               if cur_time > (VI_start + VI):
+                  #print("REWARD IS NOW POSSIBLE")
+                  if levers[1].PRESSED: # RIGHT LEVER
+                     levers[1].PRESSED = False
+                     VI_start = cur_time
+                     FOOD_REWARD(events,"Food_Pellet",cur_time)
+##########################################################################################################
+
 
             if Protocol_ln_num >= len(protocol):
-               print("Protocol_ln_num: ",Protocol_ln_num,"plength: ", len(protocol),"\n")
+               #print("Protocol_ln_num: ",Protocol_ln_num,"plength: ", len(protocol),"\n")
                print("PROTOCOL ENDED")
                print(".................")
                log_event(events,"PROTOCOL ENDED",cur_time)
@@ -1938,3 +2177,27 @@ def main():
 if __name__ =='__main__':
 
        main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       
