@@ -1,30 +1,29 @@
 import pygame
-import GUIFunctions
 import threading
 import whiskerTouchZMQ
-import childVid
 import time
 from RESOURCES.GUI_elements_by_flav import play_sound
 import sys
+import freezeAlg
 
 def FAN_ON_OFF(self, events, FAN_ON, cur_time):
     if FAN_ON:
-        GUIFunctions.log_event(self, events,"Fan_ON",cur_time)
+        log_event(self, events,"Fan_ON",cur_time)
         if self.NIDAQ_AVAILABLE:    self.fan.sendDBit(True)
     else:
-        GUIFunctions.log_event(self, events,"Fan_OFF",cur_time)
+        log_event(self, events,"Fan_OFF",cur_time)
         if self.NIDAQ_AVAILABLE:    self.fan.sendDBit(False)
         #self.fan.end()
 
 def PLAY_TONE(self, events, TONE_ID, cur_time):
     # NOTE: Tone_OFF logged while drawing speeker above in main loop
     if TONE_ID == 'TONE1':
-        GUIFunctions.log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
+        log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
 
         newThread = threading.Thread(target=play_sound, args=(self.Tone1_Freq, self.Tone1_Vol,self.Tone1_Duration))
 
     elif TONE_ID == 'TONE2':
-        GUIFunctions.log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
+        log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
         newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration))
 
     newThread.start()
@@ -35,13 +34,13 @@ def CAB_LIGHT(self, events, ON_OFF, cur_time):
     gray        = (100,100,100)
     darkgray    = (50,50,50)
     if ON_OFF: # ON
-       GUIFunctions.log_event(self, events,"Cabin Light ON",cur_time)
+       log_event(self, events,"Cabin Light ON",cur_time)
        Background_color = gray
        #self.cabin_light = daqAPI.cabinLightSetup()
        if self.NIDAQ_AVAILABLE:  self.cabin_light.sendDBit(True)
 
     else: # ON_OFF = False
-       GUIFunctions.log_event(self, events,"Cabin Light OFF",cur_time)
+       log_event(self, events,"Cabin Light OFF",cur_time)
        Background_color = darkgray
        if self.NIDAQ_AVAILABLE: self.cabin_light.sendDBit(False)
        #self.cabin_light.end()
@@ -51,46 +50,46 @@ def CAB_LIGHT(self, events, ON_OFF, cur_time):
 def EXTEND_LEVERS(self, events, text, L_LVR, R_LVR, cur_time):
     if L_LVR and R_LVR: # Extend both levers
         if self.NIDAQ_AVAILABLE:  self.leverOut.sendDByte(3)
-        GUIFunctions.log_event(self, events, text, cur_time)
+        log_event(self, events, text, cur_time)
         self.LEVERS_EXTENDED = True
         self.R_LEVER_EXTENDED = True
         self.L_LEVER_EXTENDED = True
 
     elif L_LVR:  # Extend L lever only
         if self.NIDAQ_AVAILABLE:  self.leverOut.sendDByte(1)
-        GUIFunctions.log_event(self, events, text, cur_time)
+        log_event(self, events, text, cur_time)
         self.LEVERS_EXTENDED = False
         self.R_LEVER_EXTENDED = False
         self.L_LEVER_EXTENDED = True
     elif R_LVR:  # Extend R lever only
         if self.NIDAQ_AVAILABLE:  self.leverOut.sendDByte(2)
-        GUIFunctions.log_event(self, events, text, cur_time)
+        log_event(self, events, text, cur_time)
         self.LEVERS_EXTENDED = False
         self.R_LEVER_EXTENDED = True
         self.L_LEVER_EXTENDED = False
     else: # Retract both
         if self.NIDAQ_AVAILABLE:  self.leverOut.sendDByte(0)
-        GUIFunctions.log_event(self, events, text, cur_time)
+        log_event(self, events, text, cur_time)
         self.LEVERS_EXTENDED = False
         self.R_LEVER_EXTENDED = False
         self.L_LEVER_EXTENDED = False
 
 def L_CONDITIONING_LIGHT(self, events,ON_OFF,cur_time):
     if ON_OFF : # ON
-       GUIFunctions.log_event(self, events,"Left_Light_ON",cur_time)
+       log_event(self, events,"Left_Light_ON",cur_time)
        if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(True)
 
     else: # ON_OFF = False
-       GUIFunctions.log_event(self, events,"Left_Light_OFF",cur_time)
+       log_event(self, events,"Left_Light_OFF",cur_time)
        if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(False)
 
 def R_CONDITIONING_LIGHT(self, events,ON_OFF,cur_time):
     if ON_OFF: # ON
-       GUIFunctions.log_event(self, events,"Right_Light_ON",cur_time)
+       log_event(self, events,"Right_Light_ON",cur_time)
        if self.NIDAQ_AVAILABLE:   R_condition_Lt.sendDBit(True)
 
     else: # ON_OFF = False
-       GUIFunctions.log_event(self, events,"Right_Light_OFF",cur_time)
+       log_event(self, events,"Right_Light_OFF",cur_time)
        if self.NIDAQ_AVAILABLE:   R_condition_Lt.sendDBit(False)
 
 def Food_Light_ONOFF(self, events,ON_OFF,cur_time):
@@ -99,19 +98,19 @@ def Food_Light_ONOFF(self, events,ON_OFF,cur_time):
     if ON_OFF: # ON
           fill_color = gray
           LEDsONOFF = "ON"
-          GUIFunctions.log_event(self, events,"Feeder_Light_ON",cur_time)
+          log_event(self, events,"Feeder_Light_ON",cur_time)
           if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(True)
 
     else:
           fill_color = black
           LEDsONOFF = "OFF"
           if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(False)
-          GUIFunctions.log_event(self, events,"Feeder_Light_OFF",cur_time)
+          log_event(self, events,"Feeder_Light_OFF",cur_time)
 
     return fill_color,LEDsONOFF
 
 def FOOD_REWARD(self, events, text,cur_time):
-    GUIFunctions.log_event(self, events,text,cur_time)
+    log_event(self, events,text,cur_time)
     self.num_pellets +=1
     if self.NIDAQ_AVAILABLE:
         self.give_food.sendDBit(True)
@@ -143,7 +142,7 @@ def StartTouchScreen(self):
         self.TOUCH_TRHEAD_STARTED = True
 
 def MyVideo(self):
-      vid_thread = threading.Thread(target=childVid.vidCapture, args=(self.VIDq,self.VIDBack_q,))
+      vid_thread = threading.Thread(target=freezeAlg.runVid, args=(self.VIDq,self.VIDBack_q,))
       vid_thread.daemon = True
       self.VIDq.append(self.vidDict)
       vid_thread.start()
@@ -154,6 +153,7 @@ def MyVideo(self):
               msg = self.VIDBack_q.get()
               if msg == 'vid ready':
                   return
+      self.winthread += 1
 
 
 def exit_game(self):

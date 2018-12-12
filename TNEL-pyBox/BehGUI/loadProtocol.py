@@ -1,5 +1,6 @@
 from RESOURCES.GUI_elements_by_flav import convertString
 import os
+import threading
 
 def load_expt_file(self):
     print("LOADING: ", self.expt_file_path_name)
@@ -14,7 +15,8 @@ def load_expt_file(self):
 
         for line in f:
             line = line.strip() # Remove leading and trailoing blanks and \n
-            line = line.upper()
+            if not 'HAB_COND_EXT_AND_RECALL_VIs' in line:
+                line = line.upper()
             print(line)
             lines.append(line)
             if line != "":
@@ -333,7 +335,7 @@ def load_expt_file(self):
         f.close()
         print(".......\n")
         print(self.touch_img_files)
-    except:
+    except OSError:
         print("NO SUCH FILE!!!!",self.expt_file_path_name)
         return False
 
@@ -411,8 +413,8 @@ def load_expt_file(self):
                         num = items.strip()
                         print(num)
                         self.recall_vi_times.append(int(num))
-        except:
-            print("Could not open ",VIs_file_path)
+        except OSError:
+            print("Could not open ",self.VIs_file_path)
             return False
 
     return True

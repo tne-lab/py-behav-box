@@ -17,7 +17,6 @@ def vidCapture(q,back_q):
     vid = freezeAlg.Vid('/home/ephys/Documents/groom.avi', q ,back_q)
     if not vid.capError:
         # Make ROI
-
         # Run the video thread
         vid.run()
         return

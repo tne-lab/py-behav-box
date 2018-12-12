@@ -34,7 +34,6 @@ except:
 from collections import deque
 from multiprocessing import Process, Queue
 import threading
-import childVid
 import whiskerTouchZMQ
 import zmqClasses
 import eventRECV
@@ -271,6 +270,8 @@ class BEH_GUI():
             # ----------------------------------------
             # MOUSE DOWN
             elif (event.type == pygame.MOUSEBUTTONDOWN ):#Mouse Clicked
+                LEFT_MOUSE_DOWN = False
+                RIGHT_MOUSE_DOWN = False
                 cur_x,cur_y = pygame.mouse.get_pos()
                 if event.button == 1:
                     LEFT_MOUSE_DOWN = True
@@ -648,6 +649,7 @@ class BEH_GUI():
         '''
         RUN SETUP
         '''
+        cur_time = time.perf_counter()
         print("SETUPDICT:....................",self.setup,"length: ",len(self.setup),"linenum: ",self.setup_ln_num)
         setupDict = self.setup[self.setup_ln_num]
         key = list(setupDict.keys())[0] # First key in protocolDict
@@ -851,15 +853,16 @@ class BEH_GUI():
             GUIFunctions.log_event(self, self.events,"LOOPING "+ str(self.NUM_LOOPS)+ " times, TRIAL "+str(self.trial_num),cur_time)
 
         elif "END_LOOP" in key:
-            self.VI_index = 0
             self.num_lines_in_loop = self.Protocol_ln_num - self.loop_start_line_num
             if self.loop  < int(self.NUM_LOOPS):
                 self.Protocol_ln_num = self.Protocol_ln_num - self.num_lines_in_loop
+                self.VI_index += 1
             else:
                 self.Protocol_ln_num +=1
                 GUIFunctions.log_event(self, self.events,"END_OF_LOOP",cur_time)
                 self.loop = 0
                 self.LOOP_FIRST_PASS = True
+                self.VI_index = 0
             #trial = 0 Do not set here in case there are more than 1 loops
 
         elif key == "PAUSE":
@@ -869,6 +872,7 @@ class BEH_GUI():
                 #print(protocolDict["PAUSE"])
                 #print(habituation_vi_times)
                 if "HABITUATION" in protocolDict["PAUSE"]:
+                    print(self.VI_index)
                     self.PAUSE_TIME = self.habituation_vi_times[self.VI_index]
                 if "CONDITIONING" in protocolDict["PAUSE"]:
                     self.PAUSE_TIME = self.conditioning_vi_times[self.VI_index]
@@ -880,7 +884,6 @@ class BEH_GUI():
                 time_elapsed = cur_time - self.pause_start_time
                 if time_elapsed >= self.PAUSE_TIME:
                     self.Protocol_ln_num +=1 #Go to next protocol item
-                    self.VI_index += 1
                     self.PAUSE_STARTED = False
 
         elif key == "CONDITIONS":

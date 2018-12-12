@@ -51,7 +51,7 @@ def setGlobals(self):
     print("....")
     print (self.datapath)
 
-    self.expt_file_name = 'PROTOCOLBANDIT_TOUCH3.txt'
+    self.expt_file_name = 'PROTOCOL_HABITUATION_AND_CONDITIONING.txt'
     self.expt_file_path_name = os.path.join(self.datapath,self.expt_file_name )
     print("EXPT FILE TO LOAD: ", self.expt_file_path_name)
 
@@ -80,6 +80,7 @@ def setGlobals(self):
     self.vidDict = {'STATE' : 'STOP'}
     self.VIDq = deque(maxlen = 1) # Most recent
     self.VIDBack_q = Queue()
+    self.vidthread = 0
     ################################################################
     # TOUCH GLOBALS
     ################################################################

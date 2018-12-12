@@ -9,7 +9,7 @@ class Vid:
         self.back_q = back_q
         self.out = None
         self.outPath = 'NOT SET'
-        cv2.namedWindow(self.winName)
+        cv2.namedWindow('vid')
         if self.cap.isOpened():
             if not self.vidOrLive(videoPath):
                 return False
@@ -50,9 +50,7 @@ class Vid:
         # livestream!
         elif isinstance(videoPath, int):
             # Number of frames to capture
-            print('estimating FPS')
             numFrames = 60;
-            print("Number of frames to cap: ", numFrames)
 
             # Start time
             start = time.time()
@@ -63,10 +61,8 @@ class Vid:
             end = time.time()
             # Time elapsed
             seconds = end - start
-            print("Time taken seconds: ", seconds)
             # Calculate frames per second
             fps  = numFrames / seconds;
-            print("Estimated frames per second : ", fps)
             self.mspf = int(1/fps * 1000)
             self.length = None
             return True
@@ -155,11 +151,13 @@ class Vid:
             # Get next frame and check if we are done
             self.startFrame+=1
             if cv2.waitKey(self.mspf) & 0xFF == ord('q'):
+                cv2.destroyAllWindows()
                 self.out.release()
                 self.close()
                 return
 
             if msg['STATE'] == 'STOP':
+                cv2.destroyAllWindows()
                 self.out.release()
                 self.close()
                 return
@@ -186,6 +184,8 @@ class Vid:
         self.freezeFile.close()
         self.cap.release()
         cv2.destroyAllWindows()
+        for i in range(1,10):
+            cv2.waitKey(1)
 
     ### Helper Functions ###
 
@@ -275,10 +275,11 @@ class Vid:
         return int(hours)*60*60*1000 + int(minutes)*60*1000 + int(seconds)*1000 + int(milliseconds)
 
 def runVid(q, back_q):
-    vid = freezeAlg.Vid('/home/ephys/Documents/groom.avi', q ,back_q)
+    vid = Vid('/home/ephys/Documents/groom.avi', q ,back_q)
 
     if not vid.capError:
         vid.run()
+        vid.close()
         return
     else:
         print('error opening video')
