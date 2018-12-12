@@ -80,7 +80,6 @@ def setGlobals(self):
     self.vidDict = {'STATE' : 'STOP'}
     self.VIDq = deque(maxlen = 1) # Most recent
     self.VIDBack_q = Queue()
-    self.vidthread = 0
     ################################################################
     # TOUCH GLOBALS
     ################################################################
@@ -118,3 +117,5 @@ def setGlobals(self):
     self.TOUCHSCREEN_USED = False
     self.var_interval_reward = 0.0
     self.BAR_PRESS_INDEPENDENT_PROTOCOL = False
+
+    self.open_ephys_started = False

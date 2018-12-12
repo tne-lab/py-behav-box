@@ -180,12 +180,14 @@ def load_expt_file(self):
                         video_file_path = video_file_path.strip()
                         print(video_file_path)
                     elif 'OPEN_EPHYS_PATH' in line:
-                        print('opening ephys')
-                        words = line.split('=')
-                        open_ephys_path = words[1].strip()
-                        print(open_ephys_path)
-                        open_ephys_thread = threading.Thread(target=os.system, args=(open_ephys_path,))
-                        open_ephys_thread.start()
+                        if not self.open_ephys_started:
+                            print('opening ephys')
+                            self.open_ephys_started = True
+                            words = line.split('=')
+                            open_ephys_path = words[1].strip()
+                            print(open_ephys_path)
+                            open_ephys_thread = threading.Thread(target=os.system, args=(open_ephys_path,))
+                            open_ephys_thread.start()
                     elif 'VI_TIMES_LIST_PATH' in line:
                         words = line.split('=')
                         self.VIs_file_path = words[1].strip()

@@ -153,7 +153,6 @@ def MyVideo(self):
               msg = self.VIDBack_q.get()
               if msg == 'vid ready':
                   return
-      self.winthread += 1
 
 
 def exit_game(self):

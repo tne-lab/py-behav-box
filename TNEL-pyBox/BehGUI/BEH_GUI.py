@@ -77,7 +77,7 @@ class BEH_GUI():
 
             if not self.openEphysBack_q.empty():
                 OEMsg = self.openEphysBack_q.get()
-                print(OEMsg)
+                #print(OEMsg)
 
             self.drawScreen()
             self.checkSystemEvents()
@@ -397,6 +397,8 @@ class BEH_GUI():
                                             print("VI.......................", self.VI)
                                         GUIFunctions.log_event(self, self.events,"EXPT STARTED",cur_time)
                                         self.START_EXPT = True
+                                        self.snd.send(self.snd.START_ACQ)
+                                        self.snd.send(self.snd.START_REC)
                                     else:
                                         GUIFunctions.log_event(self, self.events,"EXPT FILE NOT LOADED!!!!",cur_time)
 
@@ -712,8 +714,6 @@ class BEH_GUI():
         key = list(protocolDict.keys())[0] # First key in protocolDict
 
         # Tell open ephys to start acquisiton and recording?
-        #snd.send(snd.START_ACQ)
-        #snd.send(snd.START_REC)
         cur_time = time.perf_counter()
 
         if key == "":
@@ -872,7 +872,6 @@ class BEH_GUI():
                 #print(protocolDict["PAUSE"])
                 #print(habituation_vi_times)
                 if "HABITUATION" in protocolDict["PAUSE"]:
-                    print(self.VI_index)
                     self.PAUSE_TIME = self.habituation_vi_times[self.VI_index]
                 if "CONDITIONING" in protocolDict["PAUSE"]:
                     self.PAUSE_TIME = self.conditioning_vi_times[self.VI_index]
@@ -914,8 +913,8 @@ class BEH_GUI():
            GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,cur_time)
 
            # TEll open ephys to stop acquistion and recording?
-          # snd.send(snd.STOP_ACQ)
-           #snd.send(snd.STOP_REC)
+           self.snd.send(self.snd.STOP_ACQ)
+           self.snd.send(self.snd.STOP_REC)
 
            if self.TOUCHSCREEN_USED:
                self.TSq.put('')
