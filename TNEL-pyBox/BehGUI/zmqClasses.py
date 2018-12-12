@@ -81,12 +81,10 @@ class SNDEvent:
         else:
             print('case not created')
             return
-        print('sned a ' + control + ' to oe \n\n')
         self.socket.send(self.switch(control))
 
         #  Get the reply.
         message = self.socket.recv()
-        print("Received reply %s " %  message)
 
     # Function that acts as a C switch. Gets your desired string
     def switch(self, x):

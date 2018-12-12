@@ -135,8 +135,11 @@ class Vid:
                     #back_q.put({'FREEZE' : True, 'TIME' : time_from_GUI})
                     self.text = 'freeze'
 
-            # Write stuff on screen
-            self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, frame)
+            # Write stuff on screen (need to add trial number and probably not time differential)
+            self.drawInfo(msg['cur_time'], msg['trial_num'], movingPxls, frame)
+            #self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, frame)
+            # draw trial start circle
+
             if msg['STATE'] == 'REC':
                 self.out.write(frame)
 
@@ -188,6 +191,16 @@ class Vid:
             cv2.waitKey(1)
 
     ### Helper Functions ###
+
+
+    # Update screen info
+    def drawInfo(self, time_from_GUI, trial_num, movingPxls, frame):
+        #cv2.circle(frame, (x,y), 15, (255,0,0))
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(frame,"NIDAQ time = " + str(time_from_GUI),(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
+        cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(self.prevThresh, "Trial Number = " + str(trial_num), (100, 50),font, .5, (255, 255, 255), 2)
 
     # Wrtie a ton of stuff on frames...
     def writeStuff(self, time_from_GUI, vid_time, time_diff, movingPxls, frame):

@@ -354,13 +354,13 @@ class BEH_GUI():
                                           if self.RECORDING: #STOP RECORDING BUT KEEP CAMERA ON
                                                 self.RECORDING = False
                                                 GUIFunctions.log_event(self, self.events,"STOP RECORDING",cur_time)
-                                                self.vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+                                                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
                                                 button.UP_DN = "UP"
                                           else:
                                                 self.RECORDING = True
                                                 button.UP_DN = "DN"
                                                 GUIFunctions.log_event(self, self.events,"START RECORDING",cur_time)
-                                                self.vidDict = {'cur_time':cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
+                                                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
 
 
                                     else:
@@ -511,13 +511,13 @@ class BEH_GUI():
                                 self.RECORDING = False
                                 GUIFunctions.log_event(self, self.events,"Camera_OFF",cur_time)
                                 print("CAMERA OFF")
-                                self.vidDict = {'cur_time':cur_time, 'STATE':'STOP', 'PATH_FILE':self.video_file_path_name}
+                                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'STOP', 'PATH_FILE':self.video_file_path_name}
 
                           else: #TURN CAMERA ON
                                 self.CAMERA_ON = True
                                 GUIFunctions.log_event(self, self.events,"Camera_ON",cur_time)
                                 print("CAMERA ON")
-                                self.vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+                                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
                                 GUIFunctions.MyVideo(self)
 
                     # USER KEYBOARD INPUTS
@@ -684,7 +684,7 @@ class BEH_GUI():
                 if not self.CAMERA_ON: # CAMERA WAS OFF
                     self.CAMERA_ON = True
                     GUIFunctions.log_event(self, self.events,"Camera_ON",cur_time)
-                    self.vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
                     GUIFunctions.MyVideo(self)
                 else: # CAMERA IS ALREADY ON
                     GUIFunctions.log_event(self, self.events,"Camera is ALREADY ON",cur_time)
@@ -693,15 +693,15 @@ class BEH_GUI():
                     self.CAMERA_ON = False
                     self.RECORDING = False
                     GUIFunctions.log_event(self, self.events,"Camera_OFF",cur_time)
-                    self.vidDict = {'cur_time':cur_time, 'STATE':'STOP', 'PATH_FILE':self.video_file_path_name}
+                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'STOP', 'PATH_FILE':self.video_file_path_name}
         elif key == "REC":
             print ("recording")
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
-                self.vidDict = {'cur_time':cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
+                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
             else:
-                self.vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
         if self.setup_ln_num >= len(self.setup):
             self.RUN_SETUP = False
 
@@ -779,7 +779,7 @@ class BEH_GUI():
                 if not self.CAMERA_ON: # CAMERA WAS OFF
                     self.CAMERA_ON = True
                     GUIFunctions.log_event(self, self.events,"Camera_ON",cur_time)
-                    self.vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
                     GUIFunctions.MyVideo(self)
                 else: # CAMERA IS ALREADY ON
                     GUIFunctions.log_event(self, self.events,"Camera is ALREADY ON",cur_time)
@@ -788,7 +788,7 @@ class BEH_GUI():
                     self.CAMERA_ON = False
                     self.RECORDING = False
                     GUIFunctions.log_event(self, self.events,"Camera_OFF",cur_time)
-                    self.vidDict = {'cur_time':cur_time, 'STATE':'STOP', 'PATH_FILE':self.video_file_path_name}
+                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'STOP', 'PATH_FILE':self.video_file_path_name}
 
 
         elif key == "REC":
@@ -796,9 +796,9 @@ class BEH_GUI():
             val = str2bool(protocolDict[key])
             self.Protocol_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
-                self.vidDict = {'cur_time':cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
+                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
             else:
-                self.vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
 
         elif "EXTEND_LEVERS" in key:
             if protocolDict[key] == "L_LVR":
