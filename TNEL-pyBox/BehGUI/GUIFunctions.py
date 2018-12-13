@@ -161,7 +161,7 @@ def exit_game(self):
       self.cabin_light.end()
       self.food_light.end()
       self.give_food.end()
-      eaten.end()
+      self.eaten.end()
 
       self.leverOut.end()
 
