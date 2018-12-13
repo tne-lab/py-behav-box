@@ -22,22 +22,55 @@ import math, random
 import numpy as np
 import zmq
 import json
-import pickle
-#import pylab
+import subprocess
+ 
 from NIDAQ_GUI_elements import *
 from RESOURCES.GUI_elements_by_flav import play_sound
 
-##from helperFunc import *
-##import daqAPI
-##NIDAQ_AVAILABLE = True
 try:
     from helperFunc import *
     import daqAPI
     NIDAQ_AVAILABLE = True
+    print("NIDAQ IS AVAILABLE")
 except:
     NIDAQ_AVAILABLE = False
-
+    print("!!!!NIDAQ NOT AVAILABLE!!!! USING GUI ONLY!")
 from collections import deque
+
+
+
+import win32gui, win32con
+
+###################################################################
+import win32gui
+print(".............................................")
+IsWhiskerRunning = False
+def lookForWhisker(hwnd, args):
+    global IsWhiskerRunning
+    if 'WhiskerServer' in win32gui.GetWindowText(hwnd):
+        win32gui.CloseWindow(hwnd) # Minimize Window
+        IsWhiskerRunning = True
+       
+win32gui.EnumWindows(lookForWhisker, None)
+
+if not IsWhiskerRunning:
+    try:
+        ws = "C:\Program Files (x86)\WhiskerControl\WhiskerServer.exe"
+        window = subprocess.Popen(ws)# # doesn't capture output
+        time.sleep(2)
+        print("WHISKER server started", window)
+        win32gui.EnumWindows(lookForWhisker, None)
+    except:
+        print("Could not start WHISKER server")
+else: print("Whisker server is already RUNNING")
+print(".............................................")
+
+############################################################
+
+    
+#hwnd = win32gui.GetForegroundWindow()
+#win32gui.ShowWindow(hwnd, win32con.SW_MINIMIZE)
+#print ("hwnd: ", hwnd)
 
 from multiprocessing import Process, Queue
 import threading
@@ -101,12 +134,13 @@ datapath = os.path.join(cwd,'DATA' )
 print("....")
 print (datapath)
 
-expt_file_name = 'protocol_habituation_and_conditioning.txt'
+expt_file_name = 'PROTOCOL_habituation_and_conditioning.txt'
 expt_file_path_name = os.path.join(datapath,expt_file_name )
 print("EXPT FILE TO LOAD: ",expt_file_path_name)
 
 date = time.strftime("%b_%d_%y")#month-day-Year-H:M
-dateTm = time.strftime("%b_%d_%y-%H_%M")#month-day-Year-H:M
+dateTm = time.strftime("%b_%d_%y-%H_%M")#month_day_Year-H:M
+exptTime = time.strftime("%H-%M")
 print(date)
 
 ##
@@ -562,10 +596,8 @@ def load_expt_file(expt_file_path_name):
                         print('opening ephys')
                         words = line.split('=')
                         open_ephys_path = words[1].strip()
-                        print(open_ephys_path)
-                        open_ephys_thread = threading.Thread(target=os.system, args=(open_ephys_path,))
-                        open_ephys_thread.start()
-                        
+                        print("open_ephys_path: ",open_ephys_path)
+                        subprocess.Popen(open_ephys_path)
                     elif 'VI_TIMES_LIST_PATH' in line:
                         words = line.split('=')
                         VIs_file_path = words[1].strip()
@@ -724,17 +756,24 @@ def load_expt_file(expt_file_path_name):
         return False
 
     # DATA PATH + FILES
+    
     try:
-        expt_file_name_COPY = Expt_Name + "-" + Subject + '-' +  dateTm + '-EXPT_file'  + '.txt'
+        new_dir = os.path.join(datapath,Expt_Name)
+        if not os.path.exists(new_dir ):  os.mkdir(new_dir)
+        new_sub_dir = os.path.join(new_dir,date)
+        if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
+        new_sub_dir = os.path.join(new_sub_dir,exptTime) 
+        if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
+        datapath = new_sub_dir
+        expt_file_name_COPY = expt_file_name[:-4] + '_COPY.txt' # Removes the '.txt' from original name and adds 'COPY.txt'
         expt_file_path_name_COPY = os.path.join(datapath,expt_file_name_COPY)
         print(expt_file_path_name_COPY)
-
         log_file_name = Expt_Name + "-" + Subject + '-' +  dateTm + '-LOG_file'  + '.txt'
-        log_file_path_name = os.path.join(log_file_path,log_file_name)
+        log_file_path_name = os.path.join(datapath,log_file_name)
         print(log_file_path_name)
 
         video_file_name = Expt_Name + "-" + Subject + '-' +  dateTm + '-VIDEO_file' + '.avi'
-        video_file_path_name = os.path.join(video_file_path,video_file_name)
+        video_file_path_name = os.path.join(datapath,video_file_name)
         print(video_file_path_name)
     except:
         print("Could not create data file names")
@@ -755,11 +794,24 @@ def load_expt_file(expt_file_path_name):
 
 
     if VIs_file_path != "":
+##        expt_file_name_COPY = expt_file_name[:-4] + '_COPY.txt' # Removes the '.txt' from original name and adds 'COPY.txt'
+##        expt_file_path_name_COPY = os.path.join(datapath,expt_file_name_COPY)
+        path,name = os.path.split(VIs_file_path)
+        VIs_file_path_COPY = name[:-4] + '_copy.txt'
+        VIs_file_path_COPY = os.path.join(datapath,VIs_file_path_COPY)
+        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        print(path, name)
+        print("VIs_file_path: ",VIs_file_path)
+        print("VIs_file_path_COPY: ",VIs_file_path_COPY)
+        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
         try:
             f = open(VIs_file_path,'r')
+            fw = open(VIs_file_path_COPY,'w')
+
                 # Read Line by line
 
             for line in f:
+                fw.write(line)
                 line = line.strip() # Remove leading and trailoing blanks and \n
                 line = line.upper()        
                 print(line)
@@ -799,6 +851,7 @@ def load_expt_file(expt_file_path_name):
                         num = items.strip()
                         print(num)
                         recall_vi_times.append(int(num))
+        
         except:
             print("Could not open ",VIs_file_path)
             return False
@@ -832,7 +885,7 @@ def draw_speeker(myscreen, x, y, TONE_ON):
 
         return speeker # Returns a Rect object.  Neede to see if mouse clicked on icon
 
-def draw_camera(myscreen,fill_color, CAMERA_ON, REC, x, y, w,h, linew):
+def draw_camera(myscreen,fill_color, CAMERA_ON, RECORDING, x, y, w,h, linew):
         half_h = h/2
         pt1 = (x + w,y+half_h)
         pt2 = (x+w+20,y)
@@ -840,7 +893,7 @@ def draw_camera(myscreen,fill_color, CAMERA_ON, REC, x, y, w,h, linew):
         ptlist = [pt1,pt2,pt3]
         pygame.draw.polygon(myscreen, fill_color, ptlist, 0)#
         camera = pygame.draw.rect(myscreen,fill_color, (x, y, w,h), 0)
-        if REC:       col = (255,0,0)
+        if RECORDING:       col = (255,0,0)
         elif CAMERA_ON: col = (0,255,0)
         else:           col = (0,0,0)
         pygame.draw.polygon(myscreen, col, ptlist, linew)#
@@ -1268,30 +1321,30 @@ def BehavioralChamber():
                                elif button.text == "FEED":
                                     button.UP_DN = "DN"
                                     FEED = True
-                                    FOOD_REWARD(events,"Food_Pellet",cur_time)
+                                    FOOD_REWARD(events,"Food_Pellet_by_GUI",cur_time)
 
                                # LEFT LEVER
                                elif button.text == "L":
                                     if L_LEVER_EXTENDED: # Was EXTENDED
                                           button.UP_DN = "UP"
-                                          EXTEND_LEVERS(events,"L_Lever_Retracted",False,False,cur_time)
+                                          EXTEND_LEVERS(events,"L_Lever_Retracted_by_GUI",False,False,cur_time)
                                           levers[0].STATE = "IN"
 
                                     else: # Was not extended
                                           button.UP_DN = "DN"
-                                          EXTEND_LEVERS(events,"L_Lever_Extended",True,False,cur_time)
+                                          EXTEND_LEVERS(events,"L_Lever_Extended_by_GUI",True,False,cur_time)
                                           levers[0].STATE = "OUT"
 
                                # RIGHT LEVER
                                elif button.text == "R":
                                     if R_LEVER_EXTENDED: # Was EXTENDED
                                           button.UP_DN = "UP"
-                                          EXTEND_LEVERS(events,"R_Lever_Retracted",False,False,cur_time)
+                                          EXTEND_LEVERS(events,"R_Lever_Retracted_by_GUI",False,False,cur_time)
                                           levers[1].STATE = "IN"
 
                                     else: # was not extended
                                           button.UP_DN = "DN"
-                                          EXTEND_LEVERS(events,"R_Lever_Extended",False,True,cur_time)
+                                          EXTEND_LEVERS(events,"R_Lever_Extended_by_GUI",False,True,cur_time)
                                           levers[1].STATE = "OUT"
 
                                # BOTH LEVERS AT ONCE
@@ -1299,7 +1352,7 @@ def BehavioralChamber():
                                     if LEVERS_EXTENDED: #Toggle EXTEND and RETRACT
                                           button.UP_DN = "UP"
                                           #LEVERS_EXTENDED = False
-                                          EXTEND_LEVERS(events,"Levers_Retracted",False,False,cur_time)
+                                          EXTEND_LEVERS(events,"Levers_Retracted_by_GUI",False,False,cur_time)
                                           button.text = "EXTEND"
                                           for lever in levers:
                                                 lever.STATE = "IN"
@@ -1308,7 +1361,7 @@ def BehavioralChamber():
                                           button.UP_DN = "DN"
                                           button.text = "RETRACT"
                                           #LEVERS_EXTENDED = True
-                                          EXTEND_LEVERS(events,"Levers_Extended",True,True,cur_time)
+                                          EXTEND_LEVERS(events,"Levers_Extended_by_GUI",True,True,cur_time)
                                           for lever in levers:
                                                 lever.STATE = "OUT"
 
@@ -1316,13 +1369,13 @@ def BehavioralChamber():
                                     if CAMERA_ON:
                                           if RECORDING: #STOP RECORDING BUT KEEP CAMERA ON
                                                 RECORDING = False
-                                                log_event(events,"STOP RECORDING",cur_time)
+                                                log_event(events,"STOP RECORDING_by_GUI",cur_time)
                                                 vidDict = {'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':video_file_path_name}
                                                 button.UP_DN = "UP"
                                           else:
                                                 RECORDING = True
                                                 button.UP_DN = "DN"
-                                                log_event(events,"START RECORDING",cur_time)
+                                                log_event(events,"START RECORDING_by_GUI",cur_time)
                                                 vidDict = {'cur_time':cur_time, 'STATE':'REC', 'PATH_FILE':video_file_path_name}
 
 
@@ -1708,6 +1761,7 @@ def BehavioralChamber():
 
             elif key == "REC":
                 print ("recording")
+                RECORDING = True
                 val = str2bool(setupDict[key])
                 setup_ln_num +=1
                 if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
@@ -1816,6 +1870,7 @@ def BehavioralChamber():
 
             elif key == "REC":
                 print ("recording")
+                RECORDING = True
                 val = str2bool(protocolDict[key])
                 Protocol_ln_num +=1
                 if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
