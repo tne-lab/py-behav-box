@@ -205,7 +205,7 @@ def draw_speeker(myscreen, x, y, TONE_ON):
 
         return speeker # Returns a Rect object.  Neede to see if mouse clicked on icon
 
-def draw_camera( myscreen,fill_color, CAMERA_ON, REC, x, y, w,h, linew):
+def draw_camera( myscreen,fill_color, CAMERA_ON, RECORDING, x, y, w,h, linew):
         half_h = h/2
         pt1 = (x + w,y+half_h)
         pt2 = (x+w+20,y)
@@ -213,7 +213,7 @@ def draw_camera( myscreen,fill_color, CAMERA_ON, REC, x, y, w,h, linew):
         ptlist = [pt1,pt2,pt3]
         pygame.draw.polygon(myscreen, fill_color, ptlist, 0)#
         camera = pygame.draw.rect(myscreen,fill_color, (x, y, w,h), 0)
-        if REC:       col = (255,0,0)
+        if RECORDING:       col = (255,0,0)
         elif CAMERA_ON: col = (0,255,0)
         else:           col = (0,0,0)
         pygame.draw.polygon(myscreen, col, ptlist, linew)#

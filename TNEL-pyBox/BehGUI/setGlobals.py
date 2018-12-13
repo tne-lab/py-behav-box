@@ -56,7 +56,8 @@ def setGlobals(self):
     print("EXPT FILE TO LOAD: ", self.expt_file_path_name)
 
     self.date = time.strftime("%b_%d_%y")#month-day-Year-H:M
-    self.dateTm = time.strftime("%b_%d_%y-%H_%M")#month-day-Year-H:M
+    self.dateTm = time.strftime("%b_%d_%y-%H_%M")#month_day_Year-H:M
+    self.exptTime = time.strftime("%H-%M")
 
     ##
     self.log_file_name = ''

@@ -38,6 +38,29 @@ import whiskerTouchZMQ
 import zmqClasses
 import eventRECV
 import GUIFunctions
+import subprocess
+import win32gui, win32con
+
+def lookForWhisker(hwnd, args):
+    global IsWhiskerRunning
+    if 'WhiskerServer' in win32gui.GetWindowText(hwnd):
+        win32gui.CloseWindow(hwnd) # Minimize Window
+        IsWhiskerRunning = True
+
+def openWhisker():
+    IsWhiskerRunning = False
+    win32gui.EnumWindows(lookForWhisker, None)
+     if not IsWhiskerRunning:
+        try:
+            ws = "C:\Program Files (x86)\WhiskerControl\WhiskerServer.exe"
+            window = subprocess.Popen(ws)# # doesn't capture output
+            time.sleep(2)
+            print("WHISKER server started", window)
+            win32gui.EnumWindows(lookForWhisker, None)
+        except:
+            print("Could not start WHISKER server")
+    else: print("Whisker server is already RUNNING")
+    print(".............................................")
 
 
 class BEH_GUI():
@@ -305,30 +328,30 @@ class BEH_GUI():
                                elif button.text == "FEED":
                                     button.UP_DN = "DN"
                                     self.FEED = True
-                                    GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet", cur_time)
+                                    GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet_by_GUI", cur_time)
 
                                # LEFT LEVER
                                elif button.text == "L":
                                     if self.L_LEVER_EXTENDED: # Was EXTENDED
                                           button.UP_DN = "UP"
-                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"L_Lever_Retracted",False,False,cur_time)
+                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"L_Lever_Retracted_by_GUI",False,False,cur_time)
                                           self.levers[0].STATE = "IN"
 
                                     else: # Was not extended
                                           button.UP_DN = "DN"
-                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"L_Lever_Extended",True,False,cur_time)
+                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"L_Lever_Extended_by_GUI",True,False,cur_time)
                                           self.levers[0].STATE = "OUT"
 
                                # RIGHT LEVER
                                elif button.text == "R":
                                     if self.R_LEVER_EXTENDED: # Was EXTENDED
                                           button.UP_DN = "UP"
-                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"R_Lever_Retracted",False,False,cur_time)
+                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"R_Lever_Retracted_by_GUI",False,False,cur_time)
                                           self.levers[1].STATE = "IN"
 
                                     else: # was not extended
                                           button.UP_DN = "DN"
-                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"R_Lever_Extended",False,True,cur_time)
+                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"R_Lever_Extended_by_GUI",False,True,cur_time)
                                           self.levers[1].STATE = "OUT"
 
                                # BOTH LEVERS AT ONCE
@@ -336,7 +359,7 @@ class BEH_GUI():
                                     if self.LEVERS_EXTENDED: #Toggle EXTEND and RETRACT
                                           button.UP_DN = "UP"
                                           #LEVERS_EXTENDED = False
-                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"Levers_Retracted",False,False,cur_time)
+                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"Levers_Retracted_by_GUI",False,False,cur_time)
                                           button.text = "EXTEND"
                                           for lever in self.levers:
                                                 lever.STATE = "IN"
@@ -345,7 +368,7 @@ class BEH_GUI():
                                           button.UP_DN = "DN"
                                           button.text = "RETRACT"
                                           #LEVERS_EXTENDED = True
-                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"Levers_Extended",True,True,cur_time)
+                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"Levers_Extended_by_GUI",True,True,cur_time)
                                           for lever in self.levers:
                                                 lever.STATE = "OUT"
 
@@ -353,13 +376,13 @@ class BEH_GUI():
                                     if self.CAMERA_ON:
                                           if self.RECORDING: #STOP RECORDING BUT KEEP CAMERA ON
                                                 self.RECORDING = False
-                                                GUIFunctions.log_event(self, self.events,"STOP RECORDING",cur_time)
+                                                GUIFunctions.log_event(self, self.events,"STOP_RECORDING_by_GUI",cur_time)
                                                 self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
                                                 button.UP_DN = "UP"
                                           else:
                                                 self.RECORDING = True
                                                 button.UP_DN = "DN"
-                                                GUIFunctions.log_event(self, self.events,"START RECORDING",cur_time)
+                                                GUIFunctions.log_event(self, self.events,"START_RECORDING_by_GUI",cur_time)
                                                 self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
 
 
@@ -696,6 +719,7 @@ class BEH_GUI():
                     self.vidDict = {'trial_num' : self.trial_num, 'cur_time':cur_time, 'STATE':'STOP', 'PATH_FILE':self.video_file_path_name}
         elif key == "REC":
             print ("recording")
+            self.RECORDING = True
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
@@ -793,6 +817,7 @@ class BEH_GUI():
 
         elif key == "REC":
             print ("rec")
+            self.RECORDING = True
             val = str2bool(protocolDict[key])
             self.Protocol_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
@@ -1128,5 +1153,6 @@ class BEH_GUI():
                self.Protocol_ln_num +=1
 
 if __name__ == "__main__":
+    openWhisker()
     beh = BEH_GUI(NIDAQ_AVAILABLE)
     beh.BehavioralChamber()

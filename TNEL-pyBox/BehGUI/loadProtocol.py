@@ -1,6 +1,7 @@
 from RESOURCES.GUI_elements_by_flav import convertString
 import os
 import threading
+import subprocess
 
 def load_expt_file(self):
     print("LOADING: ", self.expt_file_path_name)
@@ -185,9 +186,7 @@ def load_expt_file(self):
                             self.open_ephys_started = True
                             words = line.split('=')
                             open_ephys_path = words[1].strip()
-                            print(open_ephys_path)
-                            open_ephys_thread = threading.Thread(target=os.system, args=(open_ephys_path,))
-                            open_ephys_thread.start()
+                            subprocess.Popen(open_ephys_path)
                     elif 'VI_TIMES_LIST_PATH' in line:
                         words = line.split('=')
                         self.VIs_file_path = words[1].strip()
@@ -343,16 +342,23 @@ def load_expt_file(self):
 
     # DATA PATH + FILES
     try:
-        expt_file_name_COPY = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-EXPT_file'  + '.txt'
+        new_dir = os.path.join(self.datapath,self.Expt_Name)
+        if not os.path.exists(new_dir ):  os.mkdir(new_dir)
+        new_sub_dir = os.path.join(new_dir,self.date)
+        if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
+        new_sub_dir = os.path.join(new_sub_dir,exptTime)
+        if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
+        self.datapath = new_sub_dir
+        expt_file_name_COPY = self.expt_file_name[:-4] + '_COPY.txt' # Removes the '.txt' from original name and adds 'COPY.txt'
         self.expt_file_path_name_COPY = os.path.join(self.datapath,expt_file_name_COPY)
         print(self.expt_file_path_name_COPY)
 
         log_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-LOG_file'  + '.txt'
-        self.log_file_path_name = os.path.join(log_file_path,log_file_name)
+        self.log_file_path_name = os.path.join(self.datapath,log_file_name)
         print(self.log_file_path_name)
 
         video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
-        self.video_file_path_name = os.path.join(video_file_path,video_file_name)
+        self.video_file_path_name = os.path.join(self.datapath,video_file_name)
         print(self.video_file_path_name)
     except:
         print("Could not create data file names")
@@ -373,9 +379,14 @@ def load_expt_file(self):
 
     if self.VIs_file_path != "":
         try:
+            path,name = os.path.split(self.VIs_file_path)
+            VIs_file_path_COPY = name[:-4] + '_copy.txt'
+            VIs_file_path_COPY = os.path.join(self.datapath,self.VIs_file_path_COPY)
             f = open(self.VIs_file_path,'r')
+            fw = open(VIs_file_path_COPY,'w')
                 # Read Line by line
             for line in f:
+                fw.write(line)
                 line = line.strip() # Remove leading and trailoing blanks and \n
                 line = line.upper()
                 print(line)
