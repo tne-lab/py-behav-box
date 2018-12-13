@@ -48,7 +48,7 @@ class Vid:
             self.frameBar(self.winName,'frameNumber',0, self.length)
             return True
         # livestream!
-        elif isinstance(videoPath, int):
+        elif isinstance(videoPath, int): # Calculates Frames Per Sec (FPS)
             # Number of frames to capture
             numFrames = 60;
 
@@ -71,7 +71,7 @@ class Vid:
             print('other video type.. Going to break')
             return False
 
-    # Generates inital stuff
+    # Generates inital stuff. GET Region of Interest (ROI)
     def initROIFrames(self):
         ret, frame = self.cap.read()
         if not ret:
@@ -234,6 +234,8 @@ class Vid:
 
     # Create Region of Interest coordinates
     def genROI(self, frame):
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.9,(255,255,255),2,cv2.LINE_AA)        
         self.r = cv2.selectROI(frame)
         cv2.destroyWindow("ROI selector")
 

@@ -360,8 +360,8 @@ def load_expt_file(self):
     video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
     self.video_file_path_name = os.path.join(self.datapath,video_file_name)
     print(self.video_file_path_name)
-    #except:
-    #    print("Could not create data file names")
+
+    # COPY EXPT FILE TO EXPT FILE DATAPATH
     try:
         exf = open(self.expt_file_path_name_COPY,'w')
         for l in lines:

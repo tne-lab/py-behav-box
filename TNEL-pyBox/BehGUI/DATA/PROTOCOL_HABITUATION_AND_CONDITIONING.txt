@@ -2,10 +2,7 @@
 EXPT_NAME = TESTING
 SUBJECT = RAT
 EXPT_PATH 	= C:\Users\ephys-2\Desktop\BehChamGUI\DATA
-LOG_FILE_PATH 	= C:\Users\ephys-2\Desktop\BehChamGUI\DATA
-VIDEO_FILE_PATH	= C:\Users\ephys-2\Desktop\BehChamGUI\DATA
-
-VI_TIMES_LIST_PATH	=  C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA\HAB_COND_EXT_AND_RECALL_VIs.txt
+VI_TIMES_LIST_PATH	=  C:\Users\ephys-2\Desktop\BehChamGUI\DATA\HAB_COND_EXT_AND_RECALL_VIs.txt
 OPEN_EPHYS_PATH = C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe
 
 [TONE1] # Need TONE1, TONE2

@@ -99,10 +99,10 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
 def setupGUI(self):
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (20,40)
     self.myscreen = pygame.display.set_mode((460,990),pygame.RESIZABLE,32)
-    #self.UMNlogo = pygame.image.load(r'\RESOURCES\UMNlogo.PNG')
-    #pygame.display.set_icon(self.UMNlogo)
-    #self.TNElogo = pygame.image.load(r'.\RESOURCES\TNE logo.jpg')
-    #self.TNElogo = pygame.transform.scale(self.TNElogo, (70, 50))
+    self.UMNlogo = pygame.image.load(r'.\RESOURCES\UMNlogo.PNG')
+    pygame.display.set_icon(self.UMNlogo)
+    self.TNElogo = pygame.image.load(r'.\RESOURCES\TNE logo.jpg')
+    self.TNElogo = pygame.transform.scale(self.TNElogo, (70, 50))
     pygame.display.set_caption('Behavioral Chamber Control 1.0 by F. da Silva and M. Shatza Oct. 30, 2018') # Enter your window caption here
     #by Flavio J.K. da Silva and Mark Shatza Oct. 30, 2018') #
     pygame.init()
@@ -229,7 +229,7 @@ def setupGUI(self):
     self.TOUCH_IMAGES_SENT = False
 
     # Open ephys stuff
-    self.snd = zmqClasses.SNDEvent(5556, recordingDir = 'C:\\Users\\Ephys\\Desktop\\RecDir', prependText = 'CHANGE ME') # subject number or something
+    self.snd = zmqClasses.SNDEvent(5556, recordingDir = self.datapath, prependText = 'OPEN-EPHYS') # subject number or something
 
     self.openEphysBack_q = Queue()
     self.openEphysQ = Queue()

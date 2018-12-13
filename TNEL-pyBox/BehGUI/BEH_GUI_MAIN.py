@@ -130,7 +130,7 @@ class BEH_GUI():
         # DRAW SCREEN AND GUI ELEMENTS
         #######################
         self.myscreen.fill(self.Background_color)
-        #self.myscreen.blit(self.TNElogo,(380,5))
+        self.myscreen.blit(self.TNElogo,(380,5))
         for button in self.buttons:
             button.draw()
 
@@ -146,7 +146,7 @@ class BEH_GUI():
                    if self.LEVER_PRESSED_L:
                       if (cur_time - LEVER_PRESS_TIME) > 0.5: #Leaves on for 0.5 sec
                          lever.STATE = "OUT"
-                         LEVER_PRESSED_L = False
+                         self.LEVER_PRESSED_L = False
                       else:
                          lever.STATE = "DN"
                # else lever.state == "IN" or "DN"
@@ -250,9 +250,7 @@ class BEH_GUI():
               if (cur_time - self.TONE_TIME) > float(self.Tone1_Duration): # seconds
                   print("TONE OFF")
                   self.TONE_ON = False
-                  GUIFunctions.
-
-                  log_event(self, self.events,"Tone_OFF",cur_time)
+                  GUIFunctions.log_event(self, self.events,"Tone_OFF",cur_time)
 
         # DRAW LIGHTNING
         self.shock = GUIFunctions.draw_lighting(self.myscreen, self.SHOCK_ON, 228,150,1,(255,255,0),2)
@@ -423,7 +421,7 @@ class BEH_GUI():
                                         GUIFunctions.log_event(self, self.events,"EXPT STARTED",cur_time)
                                         self.START_EXPT = True
                                         self.snd.send(self.snd.START_ACQ)
-                                        #self.snd.send(self.snd.START_REC)
+                                        self.snd.send(self.snd.START_REC)
                                     else:
                                         GUIFunctions.log_event(self, self.events,"EXPT FILE NOT LOADED!!!!",cur_time)
 
@@ -502,11 +500,12 @@ class BEH_GUI():
                     for box in self.boxes: # Check for collision with EXISTING buttons
                         if box.rect.collidepoint(cur_x,cur_y):
                            if self.FEEDER_LT_ON: #Toggle OFF
-                              box.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self, self.events,False,cur_time)
+                              self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self, self.events,False,cur_time)
                               self.LEDs[4].ONOFF = LEDsONOFF
                               self.LEDs[5].ONOFF = LEDsONOFF
+                              self.FEEDER_LT_ON = False
                            else: # Toggle ON
-                              box.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF (self, self.events,True,cur_time)
+                              self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF (self, self.events,True,cur_time)
                               self.FEEDER_LT_ON = True
 
                     # SPEEKER PRESSED
@@ -928,6 +927,7 @@ class BEH_GUI():
               if self.LEVER_PRESSED_R: # RIGHT LEVER
                  self.VI_start = cur_time
                  self.VI = random.randint(0,int(self.var_interval_reward*2))
+                 print("new vi", self.VI)
                  GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",cur_time)
 
         # Clean up vars
