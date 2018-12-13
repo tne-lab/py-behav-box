@@ -237,7 +237,7 @@ class BEH_GUI():
                  user_input.text = str(self.Shock_Duration)
             elif user_input.label == "V":
                  user_input.text = str(self.Shock_V)
-            elif user_input.label == "Amps":
+            elif "Amps" in user_input.label:
                  user_input.text = str(self.Shock_Amp)
 
             user_input.draw()
@@ -256,12 +256,10 @@ class BEH_GUI():
         self.shock = GUIFunctions.draw_lighting(self.myscreen, self.SHOCK_ON, 228,150,1,(255,255,0),2)
         if self.SHOCK_ON:
               if (cur_time - self.SHOCK_TIME) <= self.Shock_Duration: # seconds
-                  #shock.sendDBit(True)
-                  #Event Logged at mouse Click
-                  pass
+                  self.apply_shock.sendDBit(True)
               else:
                   self.SHOCK_ON = False
-                  #shock.sendDBit(False)
+                  self.apply_shock.sendDBit(False)
                   print("SHOCK OFF")
                   GUIFunctions.log_event(self, self.events,"Shock_OFF",cur_time)
 
@@ -422,7 +420,7 @@ class BEH_GUI():
                                             print("VI.......................", self.VI)
                                         GUIFunctions.log_event(self, self.events,"EXPT STARTED",cur_time)
                                         self.START_EXPT = True
-                                        #self.snd.send(self.snd.START_ACQ)
+                                        self.snd.send(self.snd.START_ACQ)
                                         #self.snd.send(self.snd.START_REC)
                                     else:
                                         GUIFunctions.log_event(self, self.events,"EXPT FILE NOT LOADED!!!!",cur_time)
@@ -572,8 +570,8 @@ class BEH_GUI():
                                  self.Shock_Duration = float(user_input.text)
                             elif user_input.label == "V":
                                  self.Shock_V = float(user_input.text)
-                            elif user_input.label == "Amps":
-                                 self.Shock_Amps = float(user_input.text)
+                            elif "Amps" in user_input.label:
+                                 self.Shock_Amp = float(user_input.text)
 
 
            # MOUSE UP
@@ -775,6 +773,10 @@ class BEH_GUI():
             self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self, self.events,val,cur_time)
             self.LEDs[4].ONOFF = LEDsONOFF
             self.LEDs[5].ONOFF = LEDsONOFF
+
+        elif key  == 'SHOCK':
+                 log_event(self.events,"Shock_ON",cur_time,("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
+                 self.SHOCK_ON = True
 
         elif key == "L_CONDITIONING_LIGHT":
             val = str2bool(protocolDict[key])

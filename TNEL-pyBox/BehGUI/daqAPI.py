@@ -53,8 +53,8 @@ class InterfaceOut:
 
     def end(self):
         self.task.close()
-        
-        
+
+
 
 
 def enableSetup():
@@ -92,7 +92,7 @@ def sendPulse(address,bits):
                 address,
                 line_grouping=LineGrouping.CHAN_FOR_ALL_LINES)
 
-                print(task.write(bits))
+                #print(task.write(bits))
             break
          except:
             print('trying')
@@ -144,7 +144,14 @@ def foodLightSetup():
     foodLight = InterfaceOut(foodLightAddress)
     foodLight.startTask()
     return foodLight
-
+'''
+Returns a SHOCKER task
+'''
+def shockerSetup():
+    shockerAddress = dev + '/port1/line6'
+    shocker = InterfaceOut(shockerAddress)
+    shocker.startTask()
+    return shocker
 
 '''
 Returns a new fan task
@@ -211,7 +218,7 @@ class InterfaceIn:
     def end(self):
         self.task.stop()
         self.task.close()
-        
+
 class InterfaceInNEW:
     def __init__(self, address):
         self.task = nidaqmx.Task()
@@ -239,7 +246,7 @@ class debounce:
 
 '''
 Returns a new lever input task
-'''        
+'''
 def leverInputSetup():
     leftAddress = dev + '/port6/line0'
     checkPressLeft = InterfaceIn(leftAddress)

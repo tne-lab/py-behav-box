@@ -31,6 +31,7 @@ def setGlobals(self):
         self.food_light = daqAPI.foodLightSetup()
         self.give_food = daqAPI.giveFoodSetup()
 
+        self.apply_shock = daqAPI.shockerSetup()
         self.high_tone = daqAPI.highToneSetup()
 
         self.L_condition_Lt = daqAPI.conditioningLightsLeftSetup()
