@@ -40,17 +40,19 @@ import eventRECV
 import GUIFunctions
 import subprocess
 import win32gui, win32con
-
+IsWhiskerRunning = False
+IsOpenEphysRunning = False
+# Add open ephys here possibly?
 def lookForWhisker(hwnd, args):
-    global IsWhiskerRunning
+    global IsWhiskerRunning, IsOpenEphysRunning
     if 'WhiskerServer' in win32gui.GetWindowText(hwnd):
         win32gui.CloseWindow(hwnd) # Minimize Window
         IsWhiskerRunning = True
 
 def openWhisker():
-    IsWhiskerRunning = False
+    global IsWhiskerRunning, IsOpenEphysRunning
     win32gui.EnumWindows(lookForWhisker, None)
-     if not IsWhiskerRunning:
+    if not IsWhiskerRunning:
         try:
             ws = "C:\Program Files (x86)\WhiskerControl\WhiskerServer.exe"
             window = subprocess.Popen(ws)# # doesn't capture output
@@ -84,7 +86,7 @@ class BEH_GUI():
                 backDict = self.VIDBack_q.get()
                 if backDict['FROZEN']: # FROZEN
                       # NOTE: this must be "debounced"
-                      if not FROZEN_ALREADY_LOGGED:
+                      if not self.FROZEN_ALREADY_LOGGED:
                           print("LOGGING FROZEN")
                           GUIFunctions.log_event(self, self.events,"Frozen",cur_time,("Orig_NIDAQ_t",backDict['NIDAQ_time'],"video_time",backDict['vid_time'],"time_diff",backDict['Vid-NIDAQ']))
                           self.FROZEN_ALREADY_LOGGED = True
@@ -121,7 +123,7 @@ class BEH_GUI():
             ######################################
             self.vidDict['cur_time'] = cur_time
             self.VIDq.append(self.vidDict)
-
+########################################################################################
     def drawScreen(self):
         cur_time = time.perf_counter()
         #######################
@@ -420,8 +422,8 @@ class BEH_GUI():
                                             print("VI.......................", self.VI)
                                         GUIFunctions.log_event(self, self.events,"EXPT STARTED",cur_time)
                                         self.START_EXPT = True
-                                        self.snd.send(self.snd.START_ACQ)
-                                        self.snd.send(self.snd.START_REC)
+                                        #self.snd.send(self.snd.START_ACQ)
+                                        #self.snd.send(self.snd.START_REC)
                                     else:
                                         GUIFunctions.log_event(self, self.events,"EXPT FILE NOT LOADED!!!!",cur_time)
 
@@ -661,7 +663,7 @@ class BEH_GUI():
 
             # food eaten
             cur_time = time.perf_counter()
-            foodEaten = checkFoodEaten(self.eaten)
+            foodEaten = daqHelper.checkFoodEaten(self.eaten)
 
             if foodEaten:
                 print("Yum!")
@@ -917,13 +919,16 @@ class BEH_GUI():
             print("PROTOCOL ITEM NOT RECOGNIZED",key)
 
         if self.BAR_PRESS_INDEPENDENT_PROTOCOL: #Running independently of CONDITIONS. Used for conditioning, habituation, extinction, and recall
-           #print (cur_time,"VI................", VI, (VI_start + VI))
+           #print (cur_time,"VI................", self.VI, (self.VI_start + self.VI))
            if cur_time > (self.VI_start + self.VI):
-              #print("REWARD IS NOW POSSIBLE")
-              if self.levers[1].PRESSED: # RIGHT LEVER
-                 self.levers[1].PRESSED = False
+              if self.LEVER_PRESSED_R: # RIGHT LEVER
                  self.VI_start = cur_time
+                 self.VI = random.randint(0,int(self.var_interval_reward*2))
                  GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",cur_time)
+
+        # Clean up vars
+        self.LEVER_PRESSED_R = False
+        self.LEVER_PRESSED_L = False
 
         if self.Protocol_ln_num >= len(self.protocol):
            print("Protocol_ln_num: ",self.Protocol_ln_num,"plength: ", len(self.protocol),"\n")
@@ -1024,9 +1029,8 @@ class BEH_GUI():
         else: # CONDITION STARTED
            cond_time_elapsed = cur_time - self.condition_start_time
 
-           if self.levers[0].PRESSED: # LEFT LEVER
+           if self.LEVER_PRESSED_L: # LEFT LEVER
                GUIFunctions.log_event(self, self.events,"Left_Lever_Pressed",cur_time)
-               self.levers[0].PRESSED = False
                if not self.HAS_ALREADY_RESPONDED:# Prevents rewarding for multiple presses
                    if self.cond['DES_L_LEVER_PRESS']:
                        GUIFunctions.log_event(self, self.events,"CORRECT Response",cur_time)
@@ -1042,9 +1046,8 @@ class BEH_GUI():
                    self.LEDs[0].ONOFF = "OFF"
                    self.LEDs[1].ONOFF = "OFF"
 
-           if self.levers[1].PRESSED: # RIGHT LEVER
+           if self.LEVER_PRESSED_R: # RIGHT LEVER
                GUIFunctions.log_event(self, self.events,"Right_Lever_Pressed",cur_time)
-               self.levers[1].PRESSED = False
                if not self.HAS_ALREADY_RESPONDED:# Prevents rewarding for multiple presses
                    print("cond['DES_R_LEVER_PRESS']",self.cond['DES_R_LEVER_PRESS'])
                    if self.cond['DES_R_LEVER_PRESS']:

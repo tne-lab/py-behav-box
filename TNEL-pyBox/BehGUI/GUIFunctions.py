@@ -86,11 +86,11 @@ def L_CONDITIONING_LIGHT(self, events,ON_OFF,cur_time):
 def R_CONDITIONING_LIGHT(self, events,ON_OFF,cur_time):
     if ON_OFF: # ON
        log_event(self, events,"Right_Light_ON",cur_time)
-       if self.NIDAQ_AVAILABLE:   R_condition_Lt.sendDBit(True)
+       if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(True)
 
     else: # ON_OFF = False
        log_event(self, events,"Right_Light_OFF",cur_time)
-       if self.NIDAQ_AVAILABLE:   R_condition_Lt.sendDBit(False)
+       if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(False)
 
 def Food_Light_ONOFF(self, events,ON_OFF,cur_time):
     gray = (100,100,100)

@@ -136,8 +136,8 @@ class Vid:
                     self.text = 'freeze'
 
             # Write stuff on screen (need to add trial number and probably not time differential)
-            self.drawInfo(msg['cur_time'], msg['trial_num'], movingPxls, frame)
-            #self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, frame)
+            #self.drawInfo(msg['cur_time'], msg['trial_num'], movingPxls, frame)
+            self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, frame)
             # draw trial start circle
 
             if msg['STATE'] == 'REC':
@@ -288,7 +288,7 @@ class Vid:
         return int(hours)*60*60*1000 + int(minutes)*60*1000 + int(seconds)*1000 + int(milliseconds)
 
 def runVid(q, back_q):
-    vid = Vid('/home/ephys/Documents/groom.avi', q ,back_q)
+    vid = Vid(0, q ,back_q)
 
     if not vid.capError:
         vid.run()

@@ -40,7 +40,7 @@ def setGlobals(self):
         #INPUTS
         self.L_nose_poke = daqAPI.leftNoseInputSetup()
         self.R_nose_poke = daqAPI.rightNoseInputSetup()
-        self.checkPressLeft, checkPressRight = daqAPI.leverInputSetup()
+        self.checkPressLeft, self.checkPressRight = daqAPI.leverInputSetup()
         self.eaten = daqAPI.foodEatInputSetup()
     ##################
     # DATA
