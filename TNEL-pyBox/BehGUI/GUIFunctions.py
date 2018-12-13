@@ -4,7 +4,7 @@ import whiskerTouchZMQ
 import time
 from RESOURCES.GUI_elements_by_flav import play_sound
 import sys
-import freezeAlg
+import video_function
 
 def FAN_ON_OFF(self, events, FAN_ON, cur_time):
     if FAN_ON:
@@ -142,7 +142,7 @@ def StartTouchScreen(self):
         self.TOUCH_TRHEAD_STARTED = True
 
 def MyVideo(self):
-      vid_thread = threading.Thread(target=freezeAlg.runVid, args=(self.VIDq,self.VIDBack_q,))
+      vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q,))
       vid_thread.daemon = True
       self.VIDq.append(self.vidDict)
       vid_thread.start()

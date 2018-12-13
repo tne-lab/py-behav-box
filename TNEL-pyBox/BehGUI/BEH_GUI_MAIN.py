@@ -250,7 +250,9 @@ class BEH_GUI():
               if (cur_time - self.TONE_TIME) > float(self.Tone1_Duration): # seconds
                   print("TONE OFF")
                   self.TONE_ON = False
-                  GUIFunctions.log_event(self, self.events,"Tone_OFF",cur_time)
+                  GUIFunctions.
+
+                  log_event(self, self.events,"Tone_OFF",cur_time)
 
         # DRAW LIGHTNING
         self.shock = GUIFunctions.draw_lighting(self.myscreen, self.SHOCK_ON, 228,150,1,(255,255,0),2)
