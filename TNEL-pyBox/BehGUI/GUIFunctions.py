@@ -113,8 +113,18 @@ def FOOD_REWARD(self, events, text,cur_time):
     log_event(self, events,text,cur_time)
     self.num_pellets +=1
     if self.NIDAQ_AVAILABLE:
-        self.give_food.sendDBit(True)
-        self.give_food.sendDBit(False)
+        print(self.NIDAQ_AVAILABLE)
+        self.give_food.sendDBit(True) # Note:  Needs a delay (1 sec works)
+                                      #  prior to high bit. But we don't want to
+                                      #  pause program. self.give_food.sendDBit(False)
+                                      #  is now sent by FOOD_REWARD_RESET()
+        #time.sleep(1.0)
+        #self.give_food.sendDBit(False)
+
+def FOOD_REWARD_RESET(self):
+    if self.NIDAQ_AVAILABLE:
+       self.give_food.sendDBit(False) 
+
 
 def log_event(self, event_lst, event, cur_time, other=''):
     #print("Log file: ", self.log_file_path_name)

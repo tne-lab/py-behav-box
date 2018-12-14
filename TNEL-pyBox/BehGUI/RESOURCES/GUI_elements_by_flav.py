@@ -3,7 +3,7 @@ import pygame, os, sys, time,copy, string
 from pygame.locals import *
 from pygame.sprite import Sprite
 from random import randint, choice,randrange
-import math 
+import math
 import numpy
 from array import *
 import threading
@@ -66,7 +66,7 @@ def convertString(s):
         return val
 
     return val
-    
+
 def play_sound(frequency, volume, duration):
     '''
     Play a frequency at a given volume
@@ -106,7 +106,7 @@ def play_sound(frequency, volume, duration):
     playTime = int(int(duration)*1000)
     print("playtime: ",playTime)
     sound.play(loops = -1,maxtime=playTime) # - 1 = forever
-        
+
 def play_sound_file(music_file, volume=0.8):
     '''
     stream music with mixer.music module in a blocking manner
@@ -138,27 +138,27 @@ def play_sound_file(music_file, volume=0.8):
 ##def get_keyboard_input(screen,x,y):
 ##        text_input = ""
 ##        NEED_USER_INFO = True
-##        
+##
 ##        while NEED_USER_INFO: #Just getting user physPinID
 ##            question= 'Enter Desired Label'
 ##            pygame.font.init()
 ##            font = pygame.font.Font(None, 18)
 ##            # INPUT AREA
-##            
+##
 ####            RIM_REC = Rect(USER_INPUT_AREA.left-5,USER_INPUT_AREA.top-5,
 ####                           USER_INPUT_AREA.width+10,USER_INPUT_AREA.height+10)
 ##            RIM_REC = Rect(x,y+40,210,60)
 ##            USER_INPUT_AREA = Rect(x+5,y+45,200,50)
-##            
+##
 ##            pygame.draw.rect(screen, (255, 255, 255), USER_INPUT_AREA, 0) #(0=fill)
 ##            pygame.draw.rect(screen, (255,0,0), RIM_REC, 5) #(1=outline)
 ##            # Write msg
 ##            my_font1 = pygame.font.SysFont('arial', 40)
-##            
+##
 ##            start_msg = my_font1.render('Enter label', True, Color('white'))
 ##            msgHt1 = start_msg.get_height()
 ##            screen.blit(start_msg, (x+5,y+50,40,40)) #(x,y,w,h)
-##            
+##
 ##            my_font2 = pygame.font.SysFont('arial', 20)
 ##            message = my_font2.render(text_input, True, Color('blue'))
 ##            msgHt2 =message.get_height()
@@ -166,7 +166,7 @@ def play_sound_file(music_file, volume=0.8):
 ##            for sys_event in pygame.event.get():
 ##                if sys_event.type == pygame.QUIT:
 ##                    exit_game()
-##                    
+##
 ##                elif sys_event.type == pygame.KEYDOWN:
 ##                    if sys_event.key == K_BACKSPACE:
 ##                        text_input = text_input[0:-1]
@@ -175,16 +175,16 @@ def play_sound_file(music_file, volume=0.8):
 ##                        NEED_USER_INFO = False
 ##                        return text_input
 ##                        break
-##                    
+##
 ##                    else: #COLLECT ENTERRED CHARACTERS
 ##                        try:
 ##                            text_input += chr(sys_event.key)
 ##                            message = my_font2.render(text_input, True, Color('blue'))
 ##                        except:
 ##                            pass
-##                        
+##
 ##            screen.blit(message, USER_INPUT_AREA.move(20,  msgHt2/2))
-##            pygame.display.flip()            
+##            pygame.display.flip()
 
 
 def await_any_key(screen,SCREEN_WIDTH,SCREEN_HEIGHT,msg1,msg2 = 'PRESS ANY KEY TO CONTINUE.'):
@@ -197,26 +197,26 @@ def await_any_key(screen,SCREEN_WIDTH,SCREEN_HEIGHT,msg1,msg2 = 'PRESS ANY KEY T
         message1 = my_font1.render(msg1, True, Color('white'))
         msgHt =message1.get_height()
         msgWd =message1.get_width()
-        screen.blit(message1,(ctr_x-msgWd/2,ctr_y-2*msgHt))  
-        
+        screen.blit(message1,(ctr_x-msgWd/2,ctr_y-2*msgHt))
+
         message2 = my_font1.render(msg2, True, Color('white'))
         msgHt =message2.get_height()
         msgWd =message2.get_width()
-        screen.blit(message2,(ctr_x-msgWd/2,ctr_y+msgHt))  
-        
+        screen.blit(message2,(ctr_x-msgWd/2,ctr_y+msgHt))
+
         AWAITING_INPUT = True
         while AWAITING_INPUT: #Just getting user physPinID
             for sys_event in pygame.event.get():
                 if sys_event.type == pygame.QUIT:
                     exit_game()
-                    
+
                 elif sys_event.type == pygame.KEYDOWN:
                     AWAITING_INPUT = False
                     return True
 
             pygame.display.flip()
 
-            
+
 def draw_cue(screen, rect, cue,mphysPinID_x,mphysPinID_y):
     my_font = pygame.font.SysFont('arial', 20)
     cue_sf = my_font.render(cue, True, Color('yellow'))
@@ -226,7 +226,7 @@ def draw_cue(screen, rect, cue,mphysPinID_x,mphysPinID_y):
     #screen.blit(cue_sf, rect.move(mphysPinID_x-lblWt/2, mphysPinID_y))  #move within game area
 
 
-## Draws the right-hand sphysPinIDebar with score, etc.    
+## Draws the right-hand sphysPinIDebar with score, etc.
 class MyHorizSlphysPinIDer:
     def __init__(self,surface,x, y,slphysPinIDerX,slotL, bw, bh, fsize = 12):
         #(x,y) = where on page
@@ -235,7 +235,7 @@ class MyHorizSlphysPinIDer:
         self.y = y
         self.slphysPinIDerX = slphysPinIDerX + x - 0.5*bw    # location of slphysPinIDer
         self.slotL = slotL                # lenght of slot
-        
+
         self.bw = bw # width of slphysPinIDer button
         self.bh = bh # Height of slphysPinIDer button
         #slphysPinIDer button
@@ -244,7 +244,7 @@ class MyHorizSlphysPinIDer:
 
         self.face_color = (150,150,150)
         self.surface = surface
-        
+
     def draw(self):
         surface = self.surface
         x = self.x
@@ -254,18 +254,18 @@ class MyHorizSlphysPinIDer:
         bw = self.bw
         bh = self.bh
         self.percent = (slphysPinIDerX - x)/float(self.slotL) # percent of motion (between 0 and 1.0)
-        
+
         #draw SlphysPinIDe Chanel
         sy = y + 0.5* bh    # vertical location of slphysPinIDer slot line
         slotL = self.slotL # length of slot
-        pygame.draw.line(surface, (0, 0, 0), (x,sy), (x+slotL,sy),3) 
+        pygame.draw.line(surface, (0, 0, 0), (x,sy), (x+slotL,sy),3)
         pygame.draw.line(surface, (255, 255, 255), (x, sy+1), (x+slotL,  sy+1),1)
 
         #draw slphysPinIDer button
         self.rect = Rect(slphysPinIDerX-.5*bw,y, bw,bh)
         face_color = self.face_color
         pygame.draw.rect(surface, face_color, self.rect)
-        
+
         #Highlight
         self.pt1 = slphysPinIDerX - .5*bw, y
         self.pt2 = slphysPinIDerX + .5*bw, y   #(pt1,pt2 = top white line)
@@ -277,12 +277,12 @@ class MyHorizSlphysPinIDer:
         pygame.draw.line(surface, (100, 100, 100), (self.pt1), (self.pt4))#bot gray line
         pygame.draw.line(surface, (100, 100, 100), (self.pt4), (self.pt3))#left gray line
 
-    
+
 class MyButton:
     """
-    MyButton class 
+    MyButton class
     button_state = "UP" or "DN"
-    """         
+    """
     def __init__(self, surface, index, x, y, w, h, text,fsize = 18):
         self.UP_DN = "UP"
         self.surface = surface
@@ -291,19 +291,19 @@ class MyButton:
         self.y = y
         self.w = w
         self.h = h
-        
+
         self.text=text
         self.fsize = fsize
         self.rect = pygame.Rect(x-3,y-3,w+6,h+6) # Expand Rect
-        
+
         self.face = Rect(x,y,w,h)
         self.pt1 = x,y
         self.pt2 = x+w,y
         self.pt3 = x+w,y+h
         self.pt4 = x,y+h
-        
+
         self.face_color = (150,150,150)
-        
+
     def draw(self):
 
         self.face = Rect(self.x,self.y,self.w,self.h)
@@ -316,7 +316,7 @@ class MyButton:
         if self.UP_DN == "UP":
             self.draw_up()
         elif self.UP_DN == "DN":
-            self.draw_down()            
+            self.draw_down()
 
     def draw_up(self):
         self.UP_DN = "UP"
@@ -340,7 +340,7 @@ class MyButton:
         msgX = (self.rect.width - msgWd)/2
         msgY = (self.rect.height - msgHt)/2
         surface.blit(msg_in_font, self.rect.move(msgX,  msgY))
-        
+
     def draw_down(self):
         self.UP_DN = "DN"
         surface = self.surface
@@ -363,11 +363,11 @@ class MyButton:
         msgX = (self.rect.width - msgWd)/2
         msgY = (self.rect.height - msgHt)/2
         surface.blit(msg_in_font, self.rect.move(msgX-1,  msgY+2))
-        
+
 class MyLever:
     """
-   
-    """         
+
+    """
     def __init__(self, surface, index, x, y, w, h, text,fsize = 18):
         self.STATE = "IN" # IN, OUT, or DN.  Use these for GUI display only
         self.PRESSED = False # USE FOR LOGGING AND CONTROLS, NOT THE GUI!
@@ -377,19 +377,19 @@ class MyLever:
         self.y = y
         self.w = w
         self.h = h
-        
+
         self.text=text
         self.fsize = fsize
         self.rect = pygame.Rect(x-3,y-3,w+6,h+6) # Expand Rect
-        
+
         self.face = Rect(x,y,w,h)
         self.pt1 = x,y
         self.pt2 = x+w,y
         self.pt3 = x+w,y+h
         self.pt4 = x,y+h
-        
+
         self.face_color = (150,150,150)
-        
+
     def draw(self):
         self.face = Rect(self.x,self.y,self.w,self.h)
         self.pt1 = self.x, self.y
@@ -399,12 +399,12 @@ class MyLever:
         self.rect = Rect(self.x - 2, self.y - 2,
                          self.w + 4, self.h + 4)
         if self.STATE == "IN":    # Retracted
-            self.draw_in() 
+            self.draw_in()
         elif self.STATE == "OUT": # Extended
-            self.draw_out()            
+            self.draw_out()
         elif self.STATE == "DN":  # Pressed or "DN"
             self.draw_down()
-            
+
     def draw_in(self):
         surface = self.surface
         face_color = self.face_color
@@ -429,10 +429,10 @@ class MyLever:
 
     def draw_out(self):
         pt1 = self.x -2 , self.y +2
-        pt2 = self.x + self.w-2, self.y +2 
-        pt3 = self.x + self.w-2, self.y + self.h +2 
+        pt2 = self.x + self.w-2, self.y +2
+        pt3 = self.x + self.w-2, self.y + self.h +2
         pt4 = self.x -2, self.y + self.h +2
-        
+
         surface = self.surface
         face_color = self.face_color
         ln_color=Color('black')
@@ -458,12 +458,12 @@ class MyLever:
         msgWd = msg_in_font.get_width()
         msgX = (self.rect.width - msgWd)/2
         msgY = (self.rect.height - msgHt)/2
-        surface.blit(msg_in_font, self.rect.move(msgX-2,  msgY+2))        
+        surface.blit(msg_in_font, self.rect.move(msgX-2,  msgY+2))
 
     def draw_down(self):
             pt1 = self.x -2 , self.y +5
-            pt2 = self.x + self.w-2, self.y +5 
-            pt3 = self.x + self.w-2, self.y + self.h +5 
+            pt2 = self.x + self.w-2, self.y +5
+            pt3 = self.x + self.w-2, self.y + self.h +5
             pt4 = self.x -2, self.y + self.h +5
 
             surface = self.surface
@@ -492,12 +492,12 @@ class MyLever:
             msgX = (self.rect.width - msgWd)/2
             msgY = (self.rect.height - msgHt)/2
             surface.blit(msg_in_font, self.rect.move(msgX-2,  msgY+5))
-        
+
 class MyToggle:
     """
-    MyButton class 
+    MyButton class
     button_state = "LEFT" or "RIGHT"
-    """         
+    """
     def __init__(self, surface, physPinID,  x, y, w, h,visible, LR, text,fsize = 8):
         self.visible = visible
         self.LEFT_RIGHT = LR
@@ -507,11 +507,11 @@ class MyToggle:
         self.y = y
         self.w = w
         self.h = h
-        
+
         self.text=text
         self.fsize = fsize
         self.rect = Rect(x,y,w,h)
-        
+
     def draw(self):
         if self.visible == 'T':
             myscreen = self.myscreen
@@ -550,7 +550,7 @@ class MyToggle:
 class MyButton2:
     """Button class based on the
     Command pattern."""
-    
+
     def __init__(self, x, y, w, h, text):
         lw = 4 #line_width
         bw = 2
@@ -563,13 +563,13 @@ class MyButton2:
         self.pt3 = x+w,y+h
         self.pt4 = x,y+h
         self.button_pos = "UP"
-        
+
     def draw(self,surface):
         if self.button_pos == "UP":
             self.draw_up(surface)
         else:
             self.draw_down(surface)
-            
+
     def draw_up(self, surface):
         # You could of course use pictures here.
         # This method could also be implemented
@@ -593,7 +593,7 @@ class MyButton2:
         msgX = (self.rect.width - msgWd)/2
         msgY = (self.rect.height - msgHt)/2
         surface.blit(msg_in_font, self.rect.move(msgX,  msgY))
-        
+
     def draw_down(self, surface):
         face_color = (150,150,150)
         ln_color=Color('black')
@@ -613,9 +613,9 @@ class MyButton2:
         msgWd = msg_in_font.get_width()
         msgX = (self.rect.width - msgWd)/2
         msgY = (self.rect.height - msgHt)/2
-        surface.blit(msg_in_font, self.rect.move(msgX,  msgY+1))        
-        
-        
+        surface.blit(msg_in_font, self.rect.move(msgX,  msgY+1))
+
+
 def DISPLAY_LEVEL(screen, rect,level):
     my_font = pygame.font.SysFont('arial', 100)
     lvl = 'Level '+str(level)
@@ -624,10 +624,10 @@ def DISPLAY_LEVEL(screen, rect,level):
     screen.blit(level_sf, rect.move(-450, lvlHt +30))  #move score to play area
 
 class MyLED:
-    def __init__(self,screen,index, x,y,radius, ONOFF, on_color, background_color):
+    def __init__(self,screen,index, x,y,radius, ONOFF, on_color, background_color, clickable = True):
         self.screen = screen
         self.index = index
-        self.x = x 
+        self.x = x
         self.y = y
         self.radius = radius
         diam = radius * 2
@@ -637,8 +637,9 @@ class MyLED:
         #self.visible = VIS
         self.on_color = on_color
         self.background_color = background_color
-        self.off_color = (int(on_color[0]*.4),int(on_color[1]*.4),int(on_color[2]*.4))
-    
+        self.off_color = (int(on_color[0]*.2),int(on_color[1]*.2),int(on_color[2]*.2))
+        self.clickable = clickable
+
     def draw(self):
             screen = self.screen
             ONOFF = self.ONOFF
@@ -655,7 +656,7 @@ class MyLED:
             on_color = self.on_color
             off_color = self.off_color
             background_color = self.background_color
-            
+
             if ONOFF == "ON":
                 #circle(Surface, color, pos, radius, width=0) -> Rect
                 #diam = diam + 10
@@ -667,7 +668,7 @@ class MyLED:
                 off_color = self.off_color
                 pygame.draw.circle(screen,off_color,(cx,cy),radius,0) #MAIN BULB
                 pygame.draw.circle(screen,(200,200,200),(cx+int(.5*radius),cy-int(.5*radius)),int(.1*radius),0) #SPARKLE
-                
+
                 pi = 3.141592
                 shaddow_color = (int(off_color[0]*.8),int(off_color[1]*.8),int(off_color[2]*.8))
                 shadow_w = int(0.5*radius)
@@ -675,13 +676,13 @@ class MyLED:
                     shadow_w = 15
                 shadow_rect = rect
                 #shadow_rect = shadow_rect.inflate(3,3)
-                pygame.draw.arc(screen, shaddow_color, shadow_rect, 190*pi/180, 270*pi/180, shadow_w) # SHADOW       
+                pygame.draw.arc(screen, shaddow_color, shadow_rect, 190*pi/180, 270*pi/180, shadow_w) # SHADOW
                 pygame.draw.circle(screen,(0,0,0),(cx,cy), radius + 2,3) # Black circle
 class MyLabel:
     """Label class based on the
     Types: label, display, default = button
     Command pattern."""
-    
+
     def __init__(self, surface,  x, y, w, h, text, fsize = 20):
         self.surface = surface
         self.x = x
@@ -691,7 +692,7 @@ class MyLabel:
         self.text=text
         self.fsize = fsize
         self.rect = Rect(x,y,w,h)
-                
+
     def draw(self):
         x=self.x
         y=self.y
@@ -700,7 +701,7 @@ class MyLabel:
         surface = self.surface
         txt_color = (0,0,0)
         self.rect = Rect(x-2, y-2, w+4, h+4)
-        
+
         # WRITE LABEL text
         msg_font = pygame.font.SysFont('arial', self.fsize)
         msg_in_font = msg_font.render(self.text, True, txt_color)
@@ -710,7 +711,7 @@ class MyLabel:
         msgY = (self.rect.height - msgHt)/2
         #pygame.draw.rect(surface, txt_color, self.rect,1)
         surface.blit(msg_in_font, self.rect.move(msgX,  msgY+1))
-        
+
 
 class InfoBox:
     """
@@ -732,7 +733,7 @@ class InfoBox:
         self.pt2 = x+w,y
         self.pt3 = x+w,y+h
         self.pt4 = x,y+h
-                    
+
     def draw(self):
         surface = self.surface
         #Draw Box
@@ -741,7 +742,7 @@ class InfoBox:
         txt_color = (0,0,0)
         lw = 1 #Line width
         fsize = self.fsize
-        
+
         # WRITE LABEL
         my_font = pygame.font.SysFont('arial', 14,bold=True)
         lbl_in_font = my_font.render(self.label, True, (0,0,0))
@@ -751,23 +752,23 @@ class InfoBox:
             lblX = (self.rect.width - lblWd)/2 #Center in box
             lblY =  + 20 # Below Box
             #lblY = (self.face.y - lblHt)/2 + 20
-            
+
         elif self.label_pos == 'TOP':
             lblX = (self.rect.width - lblWd)/2 #Center in box
             lblY =  - 20 #Above box
             #lblY = (self.face.y - lblHt)/2 - 20
-            
+
         elif self.label_pos == 'LEFT':
-            lblX = self.w - msgWd -5
+            lblX = - lblWd -5
             lblY = (self.rect.height - lblHt)/2
-            
+
         elif self.label_pos == 'RIGHT':
             #msgX = (self.rect.width - msgWd)/2 + msgWd +10
             lblX =  self.w +5
-            lblY = (self.rect.height - lblHt)/2 
-            
+            lblY = (self.rect.height - lblHt)/2
+
         surface.blit(lbl_in_font, self.rect.move(lblX,  lblY+1))
-        
+
         # WRITE TEXT
         lines_in_txt = len(self.text)
         my_font = pygame.font.SysFont('arial', fsize)
@@ -777,7 +778,7 @@ class InfoBox:
         if lines_in_txt <= 1:
             msgX = (self.rect.width - msgWd)/2 # Center in box
         else: msgX = +5 # Indent 5 pixels from box left
-        
+
         ln_count = 0
         for line in self.text:
             msg_in_font = my_font.render(line, True, txt_color)
@@ -805,7 +806,7 @@ class get_user_input:
         self.pt2 = x+w,y   #Top right
         self.pt3 = x+w,y+h #bottom right
         self.pt4 = x,y+h   #bottom left
-        
+
     def draw(self):
         surface = self.surface
         #text_input = self.text
@@ -815,7 +816,7 @@ class get_user_input:
         txt_color = (0,0,0)
         lw = 1 #Line width
         fsize = self.fsize
-        
+
         # WRITE LABEL
         my_font = pygame.font.SysFont('arial', 14,bold=True)
         lbl_in_font = my_font.render(self.label, True, (0,0,0))
@@ -832,9 +833,9 @@ class get_user_input:
             lblY = (self.rect.height - lblHt)/2
         elif self.label_pos == 'RIGHT':
             lblX =  self.w +5
-            lblY = (self.h - lblHt)/2 
+            lblY = (self.h - lblHt)/2
         surface.blit(lbl_in_font, self.rect.move(lblX,  lblY+1))
-        
+
         # WRITE TEXT
         my_font2 = pygame.font.SysFont('arial', fsize, bold=True)
         txt_in_font = my_font2.render(self.text, True, Color('black'))
@@ -844,7 +845,7 @@ class get_user_input:
         self.surface.blit(txt_in_font, self.rect.move(txtX,  -1))
 
     # Get user keyboard input
-        
+
     def get_key_input(self):
         surface = self.surface
         fsize = self.fsize
@@ -863,7 +864,7 @@ class get_user_input:
 
             #txt_in = input(self.txt)
             #print (txt_in)
-            
+
             for sys_event in pygame.event.get():
                 if (sys_event.type == pygame.MOUSEBUTTONDOWN ): #Mouse Clicked
                         # NOTE: LIKE PRESSING RETURN KEY
@@ -878,13 +879,13 @@ class get_user_input:
                     print(char)
                     if sys_event.key == K_BACKSPACE:
                         text_input = text_input[0:-1] #REMOVE LAST CHAR
-                        
+
                     elif sys_event.key == K_RETURN:
                         NEED_USER_INFO = False
                         self.text = text_input
                         self.TEXT_CHANGED = True
                         break
-                    
+
                     else: #COLLECT ENTERRED CHARACTERS
                         try:
                             text_input += char
@@ -899,13 +900,13 @@ class get_user_input:
 ##                    #print(sys.event.key)
 ##                    if sys_event.key == K_BACKSPACE:
 ##                        text_input = text_input[0:-1] #REMOVE LAST CHAR
-##                        
+##
 ##                    elif sys_event.key == K_RETURN: # also K_ESCAPE, K_UP, K_DOWN, K_LEFT,K_SPACE, K_n
 ##                        NEED_USER_INFO = False
 ##                        self.text = text_input
 ##                        self.TEXT_CHANGED = True
 ##                        break
-##                    
+##
 ##                    else: #COLLECT ENTERRED CHARACTERS
 ##                        try:
 ##                            text_input += chr(sys_event.key)
@@ -914,7 +915,7 @@ class get_user_input:
 ##                        except:
 ##                            pass
                 #######################################
-            pygame.draw.rect(surface, (255,255,255), self.rect)            
+            pygame.draw.rect(surface, (255,255,255), self.rect)
             txt_in_font = my_font2.render(text_input, True, Color('blue'))
             txtX = (self.rect.width - txtWd)/2 #Center in box
             self.surface.blit(txt_in_font,self.rect.move(txtX,-1))#, self.rect.move(txtWd/2,  txtHt/2 - 10))
@@ -935,9 +936,9 @@ class My_Rimmed_Box:
         self.w = int(w)
         self.h = int(h)
         self.rect = pygame.Rect(x, y, w, h)
-        
+
     def draw(self):
-        """ Draw a rimmed box on the given surface. 
+        """ Draw a rimmed box on the given surface.
         """
         myscreen = self.surface
         x = self.x
@@ -945,7 +946,7 @@ class My_Rimmed_Box:
         self.rect = Rect(x,y,self.w,self.h)
         pygame.draw.rect(myscreen, self.fill_color , self.rect,  0) #(0=fill, 1=outline line thickness))
         pygame.draw.rect(myscreen, self.line_color , self.rect,  1)
-        
+
 class My_Rimmed_Circle:
     def __init__(self, surface,physPinID,x, y, radius, fill_color,line_color=(0,0,0)):
         self.surface = surface
@@ -959,10 +960,10 @@ class My_Rimmed_Circle:
         self.radius = radius
         self.diam = 2*radius
         self.rect = Rect(x,y,self.diam,self.diam)
-        
+
     def draw(self):
 
-        """ Draw a rimmed box on the given surface. 
+        """ Draw a rimmed box on the given surface.
         """
         myscreen = self.surface
         x = self.x
@@ -973,8 +974,6 @@ class My_Rimmed_Circle:
         diam = 2*radius
         rect = Rect(x, y, diam, diam)
         self.rect = rect
-        
+
         pygame.draw.circle(myscreen, self.fill_color, (cx,cy), radius,0) #(0=fill, 1=outline)
         pygame.draw.circle(myscreen, self.line_color, (cx,cy), radius,2) #(0=fill, 1=outline)
-
-

@@ -1,5 +1,4 @@
 from RESOURCES.GUI_elements_by_flav import *
-import pygame
 import zmqClasses
 from queue import Queue
 import eventRECV
@@ -24,8 +23,8 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
 
     buttons.append(MyButton(myscreen,4,205,500,50,20,"FEED",12))     # 4
     buttons.append(MyButton(myscreen,6,215, 280, 30,20,"REC",12))    # 6
-    buttons.append(MyButton(myscreen,7,360, 545, 75,70,"START EXPT",12))    # 6
-    buttons.append(MyButton(myscreen,8,195, 585, 70,30,"LOAD FILE",12))    # 6
+    buttons.append(MyButton(myscreen,7,360, 525, 75,70,"START EXPT",12))  # 7
+    buttons.append(MyButton(myscreen,8,195, 585, 70,30,"LOAD FILE",12))   # 8
 
 
     # LEVERS
@@ -47,6 +46,8 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
 
     LEDs.append(MyLED(myscreen,4,170,395,10,"OFF", self.white, self.lightgray)) # FEEDER BOX
     LEDs.append(MyLED(myscreen,5,270,395,10,"OFF", self.white, self.lightgray)) # FEEDER BOX
+
+    LEDs.append(MyLED(myscreen,6,390,495,10,"OFF", self.green, self.lightgray,False)) # EXPERIMENT STARTED
     #LEDs.append(MyLED(myscreen,187,421,15,"OFF", self.red, gray))
     #LEDs.append(MyLED(myscreen,186,479,15,"OFF", self.red, gray))
 
@@ -70,7 +71,9 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     info_boxes.append(InfoBox( myscreen,205,455,50,15,"PELLETS",'BOTTOM','0'))
     info_boxes.append(InfoBox( myscreen,20,730,420,250,"EVENT LOG",'TOP'," "))
     info_boxes.append(InfoBox( myscreen,20,600,70,17,"DATE",'RIGHT'," "))
+    info_boxes.append(InfoBox( myscreen,360,600,75,17,"TIME",'LEFT',"0.0"))
 
+    #buttons.append(MyButton(myscreen,7,360, 525, 75,70,"START EXPT",12))  # 7
     # USER INPUT BOXES
     user_inputs = []
     #def __init__(self, surface,x, y, w, h, label_name,label_pos, text ,fsize = 12):

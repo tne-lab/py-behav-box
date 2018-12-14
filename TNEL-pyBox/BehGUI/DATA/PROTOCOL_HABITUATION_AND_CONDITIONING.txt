@@ -8,7 +8,7 @@ OPEN_EPHYS_PATH = C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\Vi
 [TONE1] # Need TONE1, TONE2
 Duration(s) 	= 30
 Freq(Hz)	= 1800
-Volume(0-1)	= 0.6
+Volume(0.0-1.0)	= 1.0
 
 [SHOCK]
 Duration(s) 	= 0.5

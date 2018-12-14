@@ -131,7 +131,7 @@ def conditioningLightsRightSetup():
 Returns a new food task
 '''
 def giveFoodSetup():
-    foodAddress = dev + '/port1/line4'
+    foodAddress = dev + '/port1/line4' #Output line 5
     food = InterfaceOut(foodAddress)
     food.startTask()
     return food

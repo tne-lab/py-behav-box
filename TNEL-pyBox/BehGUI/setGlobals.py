@@ -121,3 +121,5 @@ def setGlobals(self):
     self.BAR_PRESS_INDEPENDENT_PROTOCOL = False
 
     self.open_ephys_started = False
+    self.Experiment_Start_time = 0.0
+    self.cur_time = 0.0

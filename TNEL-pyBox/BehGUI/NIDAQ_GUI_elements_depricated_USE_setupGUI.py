@@ -35,49 +35,46 @@ def NIDAQ_GUI_ELEMENTS(myscreen, buttons, levers, boxes, circles, LEDs, toggles,
     #                      (myscreen,ID, x, y, w, h,"text"    , font size)
     buttons.append(MyButton(myscreen,0,10,5,50,20,"CABIN LT",12))  # 0
     buttons.append(MyButton(myscreen,5,10,32,50,20,"FAN",12))         # 5
-    
-    buttons.append(MyButton(myscreen,1,193,320,75,30,"EXTEND",12))  # 1 BOTH LEVERS  
+
+    buttons.append(MyButton(myscreen,1,193,320,75,30,"EXTEND",12))  # 1 BOTH LEVERS
     buttons.append(MyButton(myscreen,9,160,320,30,30,"L",12))  # 1 BOTH LEVERS
     buttons.append(MyButton(myscreen,10,270,320,30,30,"R",12))  # 1 BOTH LEVERS
 
 
     buttons.append(MyButton(myscreen,4,205,500,50,20,"FEED",12))     # 4
     buttons.append(MyButton(myscreen,6,215, 280, 30,20,"REC",12))    # 6
-    buttons.append(MyButton(myscreen,7,360, 545, 75,70,"START EXPT",12))    # 6
+    buttons.append(MyButton(myscreen,7,360, 525, 75,70,"START EXPT",12))    # 6
     buttons.append(MyButton(myscreen,8,195, 585, 70,30,"LOAD FILE",12))    # 6
 
-    
+
     # LEVERS
     #def __init__(self, surface, index, x, y, w, h, text,fsize = 18):
     levers = []
     levers.append(MyLever(myscreen,0,50,340,50,20,"L LEVER",12))   # left
-    levers.append(MyLever(myscreen,1,365,340,50,20,"R LEVER",12))   # right    
+    levers.append(MyLever(myscreen,1,365,340,50,20,"R LEVER",12))   # right
 
     # CIRCLES (IF ANY)
     circles = []
-    
+
     # LEDS (LIGHTS AND NOSE POKES)
     LEDs = []
     LEDs.append(MyLED(myscreen,0,45,70,30,"OFF", lightgray, darkgray)) # L LIGHTS
     LEDs.append(MyLED(myscreen,1,360,70,30,"OFF", lightgray, darkgray))# R LIGHTS
-    
+
     LEDs.append(MyLED(myscreen,2,45,200,30,"OFF", lightpurple, darkpurple)) # NOSE POKES
     LEDs.append(MyLED(myscreen,3,360,200,30,"OFF", lightpurple, darkpurple))# NOSE POKES
-    
+
     LEDs.append(MyLED(myscreen,4,170,395,10,"OFF", white, lightgray)) # FEEDER BOX
     LEDs.append(MyLED(myscreen,5,270,395,10,"OFF", white, lightgray)) # FEEDER BOX
+
+    LEDs.append(MyLED(myscreen,6,400,500,10,"OFF", green, lightgray,False)) # EXPERIMENT STARTED
+
     #LEDs.append(MyLED(myscreen,187,421,15,"OFF", red, gray))
     #LEDs.append(MyLED(myscreen,186,479,15,"OFF", red, gray))
 
     labels = []
     #labels.append(MyLabel(myscreen,108,290,50,20,"Label1",14))
     #labels.append(MyLabel(myscreen,242,289,50,20,"Label2",14))
-    #labels.append(MyLabel(myscreen,245,369,50,20,"Label3",14))
-    #labels.append(MyLabel(myscreen,107,369,50,20,"Label4",14))
-    #labels.append(MyLabel(myscreen,43,318,50,20,"Label5",14))
-    #labels.append(MyLabel(myscreen,237,422,50,20,"Label6",14))
-    #labels.append(MyLabel(myscreen,236,480,50,20,"Label7",14))
-    #labels.append(MyLabel(myscreen,235,539,50,20,"Label8",14))
 
     info_boxes = []
     #def __init__(self, surface,x, y, w, h, label_name,label_pos, text ,fsize = 12):
@@ -88,7 +85,7 @@ def NIDAQ_GUI_ELEMENTS(myscreen, buttons, levers, boxes, circles, LEDs, toggles,
     info_boxes.append(InfoBox( myscreen,205,400,50,15,"EATEN",'BOTTOM','0'))
     info_boxes.append(InfoBox( myscreen,205,455,50,15,"PELLETS",'BOTTOM','0'))
     info_boxes.append(InfoBox( myscreen,20,730,420,250,"EVENT LOG",'TOP'," "))
-    info_boxes.append(InfoBox( myscreen,20,600,70,17,"DATE",'RIGHT'," "))    
+    info_boxes.append(InfoBox( myscreen,20,600,70,17,"DATE",'RIGHT'," "))
 
     # USER INPUT BOXES
     user_inputs = []
@@ -96,21 +93,20 @@ def NIDAQ_GUI_ELEMENTS(myscreen, buttons, levers, boxes, circles, LEDs, toggles,
     user_inputs.append(get_user_input( myscreen,170,25,20,15,"Spk(S)",'TOP','0'))
     user_inputs.append(get_user_input( myscreen,210,25,40,15,"Freq(Hz)",'TOP','0'))
     user_inputs.append(get_user_input( myscreen,270,25,20,15,"Vol(0-1)",'TOP','0'))
-    
+
     user_inputs.append(get_user_input(myscreen,190,195,20,15,"Shck(S)",'BOTTOM','0'))
     user_inputs.append(get_user_input(myscreen,220,195,20,15,"V",'BOTTOM','0'))
     user_inputs.append(get_user_input(myscreen,250,195,20,15,"Amps",'BOTTOM','0'))
 
-    
+
     user_inputs.append(get_user_input( myscreen,20,525,70,17,"EXPT",'RIGHT'," "))
     user_inputs.append(get_user_input( myscreen,20,550,70,17,"SUBJECT",'RIGHT'," "))
     user_inputs.append(get_user_input( myscreen,20,575,70,17,"TRIAL",'RIGHT'," "))
 
-    
+
     user_inputs.append(get_user_input( myscreen,20,650,420,15,"EXPT PATH",'TOP'," "))
-    user_inputs.append(get_user_input( myscreen,20,690,420,15,"EXPT FILE NAME",'TOP'," "))    
+    user_inputs.append(get_user_input( myscreen,20,690,420,15,"EXPT FILE NAME",'TOP'," "))
     # TOGGLES
     toggles = []
-    
-    return buttons, levers, boxes, circles, LEDs, toggles, sliders, info_boxes, user_inputs, labels
 
+    return buttons, levers, boxes, circles, LEDs, toggles, sliders, info_boxes, user_inputs, labels
