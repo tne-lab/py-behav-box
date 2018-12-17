@@ -219,8 +219,10 @@ class BEH_GUI():
                 lines_in_txt = len(self.events)
                 
                 if lines_in_txt > 14: # 14 lines fit in window
-                      
-                    # SLIDER # NOTE only 14 text lines fit inside window
+                    ##########################################################  
+                    # SLIDER:
+                    #               NOTE only 14 text lines fit inside window
+                    ##########################################################
                     slider_Button_ht = int((14.0/float(lines_in_txt)) * self.sliders[0].slotL) # portion of SlotL
                     if slider_Button_ht <= 14:
                         self.sliders[0].bh = 14
@@ -238,21 +240,6 @@ class BEH_GUI():
                 else: info.text = self.events
 
             info.draw()
-
-
-            # SLIDER
-##            print("sliderY: ",self.sliders[0].sliderY)
-##            self.sliders[0].bh = int((14.0/float(lines_in_txt)) * self.sliders[0].slotL)
-##            y_per_line = self.sliders[0].slotL / 14.0 # 14 is total num lines that wll fit in window
-##            num_line_to_display = int(self.sliders[0].sliderY / y_per_line)
-##            self.sliders[0].draw()
-##            ######################################################
-##                      slider_move_y = self.sliders[0].slotL/14
-##                      self.sliders[0].bh = (lines_in_txt/14) * self.sliders[0].slotL
-##                      self.sliders[0].slotL
-##                      self.sliders[0].sliderY:
-##                        sld.draw()
-##           ######################################################
 
         # USER INPUTS
         for user_input in self.user_inputs:
@@ -455,7 +442,9 @@ class BEH_GUI():
                                         if len(self.setup) > 0:
                                             self.RUN_SETUP = True
                                             self.setup_ln_num = 0
-
+                                    for LED in self.LEDs: # Look for EXPT STARTED LED
+                                          if LED.index == 6: # Expt Started light
+                                              LED.ONOFF = "OFF"
                                     else:
                                         print("HUMPH!")
                                         GUIFunctions.log_event(self, self.events,"Expt File name or path DOES NOT EXIST",self.cur_time)
@@ -1040,7 +1029,7 @@ class BEH_GUI():
                self.TOUCHSCREEN_USED = False
 
 ######################################################################################################
-    def runConditions(self, protocolDict):
+    def runConditions(self, protocolDict, cur_time):
         '''
         RUNS CONDITIONS
         '''

@@ -348,17 +348,17 @@ def load_expt_file(self):
     if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
     new_sub_dir = os.path.join(new_sub_dir,self.exptTime)
     if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
-    self.datapath = new_sub_dir
+    self.newdatapath = new_sub_dir
     expt_file_name_COPY = self.expt_file_name[:-4] + '_COPY.txt' # Removes the '.txt' from original name and adds 'COPY.txt'
-    self.expt_file_path_name_COPY = os.path.join(self.datapath,expt_file_name_COPY)
+    self.expt_file_path_name_COPY = os.path.join(self.newdatapath,expt_file_name_COPY)
     print(self.expt_file_path_name_COPY)
 
     log_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-LOG_file'  + '.txt'
-    self.log_file_path_name = os.path.join(self.datapath,log_file_name)
+    self.log_file_path_name = os.path.join(self.newdatapath,log_file_name)
     print(self.log_file_path_name)
 
     video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
-    self.video_file_path_name = os.path.join(self.datapath,video_file_name)
+    self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
     print(self.video_file_path_name)
 
     # COPY EXPT FILE TO EXPT FILE DATAPATH
@@ -381,7 +381,7 @@ def load_expt_file(self):
         try:
             path,name = os.path.split(self.VIs_file_path)
             VIs_file_path_COPY = name[:-4] + '_copy.txt'
-            VIs_file_path_COPY = os.path.join(self.datapath,VIs_file_path_COPY)
+            VIs_file_path_COPY = os.path.join(self.newdatapath,VIs_file_path_COPY)
             f = open(self.VIs_file_path,'r')
             fw = open(VIs_file_path_COPY,'w')
                 # Read Line by line
