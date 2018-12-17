@@ -136,7 +136,7 @@ class BEH_GUI():
         # DRAW SCREEN AND GUI ELEMENTS
         #######################
         self.myscreen.fill(self.Background_color)
-        self.myscreen.blit(self.TNElogo,(380,5))
+        self.myscreen.blit(self.TNElogo,(400,5))
         for button in self.buttons:
             button.draw()
 
@@ -192,8 +192,7 @@ class BEH_GUI():
 ##        for tog in self.toggles:
 ##            tog.draw()
 
-##        for sld in self.sliders:
-##            sld.draw()
+
 
         for lbl in self.labels: # Last so on top
             lbl.draw()
@@ -217,12 +216,43 @@ class BEH_GUI():
                 if self.START_EXPT: info.text = [str(round(self.cur_time,3))]
                 else: info.text = ['0.000']
             elif info.label == "EVENT LOG":
-                  lines_in_txt = len(self.events)
-                  if lines_in_txt > 14:
-                      info.text = self.events[-14:]
-                  else: info.text = self.events
+                lines_in_txt = len(self.events)
+                
+                if lines_in_txt > 14: # 14 lines fit in window
+                      
+                    # SLIDER # NOTE only 14 text lines fit inside window
+                    slider_Button_ht = int((14.0/float(lines_in_txt)) * self.sliders[0].slotL) # portion of SlotL
+                    if slider_Button_ht <= 14:
+                        self.sliders[0].bh = 14
+                    else:
+                        self.sliders[0].bh = slider_Button_ht
+ 
+                    self.sliders[0].sliderY = self.new_slider_y #+ self.start_line * self.y_per_line
+                    #self.sliders[0].sliderY = self.new_slider_y + (self.sliders[0].slotL - self.sliders[0].bh) - self.start_line * self.y_per_line
+
+                    
+                    if self.sliders[0].sliderY >= self.sliders[0].slotL - self.sliders[0].bh:
+                       self.sliders[0].sliderY = self.sliders[0].slotL - self.sliders[0].bh
+                    self.sliders[0].draw()
+                    info.text = self.events[self.start_line:self.start_line+14]
+                else: info.text = self.events
 
             info.draw()
+
+
+            # SLIDER
+##            print("sliderY: ",self.sliders[0].sliderY)
+##            self.sliders[0].bh = int((14.0/float(lines_in_txt)) * self.sliders[0].slotL)
+##            y_per_line = self.sliders[0].slotL / 14.0 # 14 is total num lines that wll fit in window
+##            num_line_to_display = int(self.sliders[0].sliderY / y_per_line)
+##            self.sliders[0].draw()
+##            ######################################################
+##                      slider_move_y = self.sliders[0].slotL/14
+##                      self.sliders[0].bh = (lines_in_txt/14) * self.sliders[0].slotL
+##                      self.sliders[0].slotL
+##                      self.sliders[0].sliderY:
+##                        sld.draw()
+##           ######################################################
 
         # USER INPUTS
         for user_input in self.user_inputs:
@@ -253,7 +283,7 @@ class BEH_GUI():
 
 
         # DRAW SPEEKER
-        self.speeker = GUIFunctions.draw_speeker(self.myscreen,230,85,self.TONE_ON) #TONE_ON is T/F
+        self.speeker = GUIFunctions.draw_speeker(self.myscreen,250,85,self.TONE_ON) #TONE_ON is T/F
 
         if self.TONE_ON:
               if (self.cur_time - self.TONE_TIME) > float(self.Tone1_Duration): # seconds
@@ -262,7 +292,7 @@ class BEH_GUI():
                   GUIFunctions.log_event(self, self.events,"Tone_OFF",self.cur_time)
 
         # DRAW SHOCK LIGHTNING
-        self.shock = GUIFunctions.draw_lighting(self.myscreen, self.SHOCK_ON, 228,150,1,(255,255,0),2)
+        self.shock = GUIFunctions.draw_lighting(self.myscreen, self.SHOCK_ON, 248,150,1,(255,255,0),2)
         if self.SHOCK_ON:
               if (self.cur_time - self.SHOCK_TIME) <= self.Shock_Duration: # seconds
                   self.apply_shock.sendDBit(True)
@@ -275,7 +305,7 @@ class BEH_GUI():
 
         # DRAW CAMERA
         #    Note:                 draw_camera(self.myscreen,fill_color, ON_OFF, REC, x, y, w,h, linew)
-        self.camera = GUIFunctions.draw_camera(self.myscreen, (100,100,100),self.CAMERA_ON,self.RECORDING,215, 255, 30,20, 2)
+        self.camera = GUIFunctions.draw_camera(self.myscreen, (100,100,100),self.CAMERA_ON,self.RECORDING,235, 255, 30,20, 2)
 ###########################################################################################################
 #  HANDLE GUI EVENTS
 ###########################################################################################################
@@ -287,34 +317,48 @@ class BEH_GUI():
             if event.type == QUIT:
                 GUIFunctions.exit_game(self)
 
-            ###########
+            ##############################################################
             #  MOUSE EVENTS (always active independent of game mode)
-            ###########
+            ##############################################################
+            #--------------------------------------------------
             # MOUSE MOVE
             elif (event.type == pygame.MOUSEMOTION):#
                 cur_x,cur_y = pygame.mouse.get_pos()
-                if self.SLIDER_SELECTED:
-                    cur_slider.sliderX = cur_x
-                    # The following limits the slider to the slot.
-                    if cur_slider.sliderX < cur_slider.x:
-                        cur_slider.sliderX = cur_slider.x
-                    if cur_slider.sliderX > cur_slider.x + cur_slider.slotL:
-                        cur_slider.sliderX = cur_slider.x + cur_slider.slotL
-                    cur_slider.percent = cur_slider.x / cur_slider.slotL
+                
+                if self.LEFT_MOUSE_DOWN:   
+                    if self.SLIDER_SELECTED:
+                        new_slider_y = cur_y - self.cur_Vslider.y # relative to top of slider slot
+                        if new_slider_y <= 0:
+                           new_slider_y = 0
+                        if new_slider_y >= self.cur_Vslider.slotL - self.cur_Vslider.bh:
+                           new_slider_y = self.cur_Vslider.slotL - self.cur_Vslider.bh 
+
+                        self.cur_Vslider.sliderY = new_slider_y # relative to top of slider slot
+                        self.new_slider_y = new_slider_y
+                        self.start_line = int(new_slider_y/self.y_per_line)
+                        print("new_slider_y: ",new_slider_y, "start_line: ",self.start_line)
+
             # ----------------------------------------
             # MOUSE DOWN
             elif (event.type == pygame.MOUSEBUTTONDOWN ):#Mouse Clicked
-                LEFT_MOUSE_DOWN = False
-                RIGHT_MOUSE_DOWN = False
+                self.LEFT_MOUSE_DOWN = False
+                self.RIGHT_MOUSE_DOWN = False
                 cur_x,cur_y = pygame.mouse.get_pos()
+                #print("MOUSE_Button ",event.button, "pressed!", cur_x,cur_y)
                 if event.button == 1:
-                    LEFT_MOUSE_DOWN = True
+                    self.LEFT_MOUSE_DOWN = True
                 elif event.button == 3:
-                    RIGHT_MOUSE_DOWN = True
+                    self.RIGHT_MOUSE_DOWN = True
                 # BUTTONS
-                if LEFT_MOUSE_DOWN:
-                    print("MOUSE_Button ",event.button, "pressed!")
-                    #cur_time = time.perf_counter()
+                if self.LEFT_MOUSE_DOWN:
+                    
+                    # SLIDERS
+                    for slider in self.sliders: # Check for collision with EXISTING buttons
+                        if slider.button_rect.collidepoint(cur_x,cur_y):
+                            #print("SLIDER SELECTED", slider)
+                            self.SLIDER_SELECTED = True
+                            self.cur_Vslider = slider
+                    
                     # BUTTONS
                     for button in self.buttons: # Check for collision with EXISTING buttons
                         if button.rect.collidepoint(cur_x,cur_y):
@@ -601,7 +645,7 @@ class BEH_GUI():
                                  self.Shock_V = float(user_input.text)
                             elif "Amps" in user_input.label:
                                  self.Shock_Amp = float(user_input.text)
-
+                                 
 
            # MOUSE UP
             elif (event.type == pygame.MOUSEBUTTONUP ):
@@ -632,6 +676,7 @@ class BEH_GUI():
 
                     else: # ALL OTHER BUTTONS, NOT REC BUTTON
                         button.UP_DN = "UP"
+                        
 
 ###########################################################################################################
 #  HANDLE BEHAVIORAL CHAMBER EVENTS

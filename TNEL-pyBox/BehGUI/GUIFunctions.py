@@ -123,10 +123,11 @@ def FOOD_REWARD(self, events, text,cur_time):
 
 def FOOD_REWARD_RESET(self):
     if self.NIDAQ_AVAILABLE:
-       self.give_food.sendDBit(False) 
+       self.give_food.sendDBit(False)
 
 
 def log_event(self, event_lst, event, cur_time, other=''):
+
     #print("Log file: ", self.log_file_path_name)
     event_string = str(cur_time) + ',  ' + event
     #print (event_string, other)
@@ -136,6 +137,7 @@ def log_event(self, event_lst, event, cur_time, other=''):
         event_other = event_other + ",  " +  str(item)
 
     event_lst.append(event_string+event_other) # To Display on GUI
+    if len(event_lst) > 14:  self.start_line = len(event_lst) -14
     try:
         #print(self.log_file_path_name)
         log_file = open(self.log_file_path_name,'a')         # OPEN LOG FILE

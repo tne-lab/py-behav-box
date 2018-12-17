@@ -8,7 +8,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
 
     # BOXES
     boxes = []
-    boxes.append(My_Rimmed_Box(myscreen,180,360,100,90,self.black,self.darkgray)) # FEEDER
+    boxes.append(My_Rimmed_Box(myscreen,200,360,100,90,self.black,self.darkgray)) # FEEDER
 
     # BUTTONS
     buttons = []
@@ -16,22 +16,22 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     buttons.append(MyButton(myscreen,0,10,5,50,20,"CABIN LT",12))  # 0
     buttons.append(MyButton(myscreen,5,10,32,50,20,"FAN",12))         # 5
 
-    buttons.append(MyButton(myscreen,1,193,320,75,30,"EXTEND",12))  # 1 BOTH LEVERS
-    buttons.append(MyButton(myscreen,9,160,320,30,30,"L",12))  # 1 BOTH LEVERS
-    buttons.append(MyButton(myscreen,10,270,320,30,30,"R",12))  # 1 BOTH LEVERS
+    buttons.append(MyButton(myscreen,1,213,320,75,30,"EXTEND",12))  # 1 BOTH LEVERS
+    buttons.append(MyButton(myscreen,9,180,320,30,30,"L",12))  # 1 BOTH LEVERS
+    buttons.append(MyButton(myscreen,10,290,320,30,30,"R",12))  # 1 BOTH LEVERS
 
 
-    buttons.append(MyButton(myscreen,4,205,500,50,20,"FEED",12))     # 4
-    buttons.append(MyButton(myscreen,6,215, 280, 30,20,"REC",12))    # 6
-    buttons.append(MyButton(myscreen,7,360, 525, 75,70,"START EXPT",12))  # 7
-    buttons.append(MyButton(myscreen,8,195, 585, 70,30,"LOAD FILE",12))   # 8
+    buttons.append(MyButton(myscreen,4,225,500,50,20,"FEED",12))     # 4
+    buttons.append(MyButton(myscreen,6,235, 280, 30,20,"REC",12))    # 6
+    buttons.append(MyButton(myscreen,7,400, 560, 75,50,"START EXPT",12))  # 7
+    buttons.append(MyButton(myscreen,8,215, 600, 70,30,"LOAD FILE",12))   # 8
 
 
     # LEVERS
     #def __init__(self, surface, index, x, y, w, h, text,fsize = 18):
     levers = []
-    levers.append(MyLever(myscreen,0,50,340,50,20,"L LEVER",12))   # left
-    levers.append(MyLever(myscreen,1,365,340,50,20,"R LEVER",12))   # right
+    levers.append(MyLever(myscreen,0,50,300,50,20,"L LEVER",12))   # left
+    levers.append(MyLever(myscreen,1,405,300,50,20,"R LEVER",12))   # right
 
     # CIRCLES (IF ANY)
     circles = []
@@ -39,15 +39,15 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     # LEDS (LIGHTS AND NOSE POKES)
     LEDs = []
     LEDs.append(MyLED(myscreen,0,45,70,30,"OFF", self.lightgray, self.darkgray)) # L LIGHTS
-    LEDs.append(MyLED(myscreen,1,360,70,30,"OFF", self.lightgray, self.darkgray))# R LIGHTS
+    LEDs.append(MyLED(myscreen,1,400,70,30,"OFF", self.lightgray, self.darkgray))# R LIGHTS
 
-    LEDs.append(MyLED(myscreen,2,45,200,30,"OFF", self.lightpurple, self.darkpurple)) # NOSE POKES
-    LEDs.append(MyLED(myscreen,3,360,200,30,"OFF", self.lightpurple, self.darkpurple))# NOSE POKES
+    LEDs.append(MyLED(myscreen,2,45,160,30,"OFF", self.lightpurple, self.darkpurple)) # NOSE POKES
+    LEDs.append(MyLED(myscreen,3,400,160,30,"OFF", self.lightpurple, self.darkpurple))# NOSE POKES
 
-    LEDs.append(MyLED(myscreen,4,170,395,10,"OFF", self.white, self.lightgray)) # FEEDER BOX
-    LEDs.append(MyLED(myscreen,5,270,395,10,"OFF", self.white, self.lightgray)) # FEEDER BOX
+    LEDs.append(MyLED(myscreen,4,190,395,10,"OFF", self.white, self.lightgray)) # FEEDER BOX
+    LEDs.append(MyLED(myscreen,5,290,395,10,"OFF", self.white, self.lightgray)) # FEEDER BOX
 
-    LEDs.append(MyLED(myscreen,6,390,495,10,"OFF", self.green, self.lightgray,False)) # EXPERIMENT STARTED
+    LEDs.append(MyLED(myscreen,6,430,530,10,"OFF", self.green, self.lightgray,False)) # EXPERIMENT STARTED
     #LEDs.append(MyLED(myscreen,187,421,15,"OFF", self.red, gray))
     #LEDs.append(MyLED(myscreen,186,479,15,"OFF", self.red, gray))
 
@@ -63,51 +63,55 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
 
     info_boxes = []
     #def __init__(self, surface,x, y, w, h, label_name,label_pos, text ,fsize = 12):
-    info_boxes.append(InfoBox( myscreen,50,265,50,15,"L NOSE POKES",'BOTTOM','0'))
-    info_boxes.append(InfoBox( myscreen,365,265,50,15,"R NOSE POKES",'BOTTOM','0'))
-    info_boxes.append(InfoBox( myscreen,50,370,50,15,"L PRESSES",'BOTTOM','0'))
-    info_boxes.append(InfoBox( myscreen,365,370,50,15,"R PRESSES",'BOTTOM','0'))
-    info_boxes.append(InfoBox( myscreen,205,400,50,15,"EATEN",'BOTTOM','0'))
-    info_boxes.append(InfoBox( myscreen,205,455,50,15,"PELLETS",'BOTTOM','0'))
-    info_boxes.append(InfoBox( myscreen,20,730,420,250,"EVENT LOG",'TOP'," "))
-    info_boxes.append(InfoBox( myscreen,20,600,70,17,"DATE",'RIGHT'," "))
-    info_boxes.append(InfoBox( myscreen,360,600,75,17,"TIME",'LEFT',"0.0"))
+    info_boxes.append(InfoBox( myscreen,50,225,50,15,"L NOSE POKES",'BOTTOM','0'))
+    info_boxes.append(InfoBox( myscreen,405,225,50,15,"R NOSE POKES",'BOTTOM','0'))
+    info_boxes.append(InfoBox( myscreen,50,330,50,15,"L PRESSES",'BOTTOM','0'))
+    info_boxes.append(InfoBox( myscreen,405,330,50,15,"R PRESSES",'BOTTOM','0'))
+    info_boxes.append(InfoBox( myscreen,225,400,50,15,"EATEN",'BOTTOM','0'))
+    info_boxes.append(InfoBox( myscreen,225,455,50,15,"PELLETS",'BOTTOM','0'))
+    info_boxes.append(InfoBox( myscreen,20,730,460,250,"EVENT LOG",'TOP'," "))
+    info_boxes.append(InfoBox( myscreen,20,620,70,17,"DATE",'RIGHT'," "))
+    info_boxes.append(InfoBox( myscreen,401,620,75,17,"TIME",'LEFT',"0.0"))
 
     #buttons.append(MyButton(myscreen,7,360, 525, 75,70,"START EXPT",12))  # 7
     # USER INPUT BOXES
     user_inputs = []
     #def __init__(self, surface,x, y, w, h, label_name,label_pos, text ,fsize = 12):
-    user_inputs.append(get_user_input( myscreen,170,25,20,15,"Spk(S)",'TOP','0'))
-    user_inputs.append(get_user_input( myscreen,210,25,40,15,"Freq(Hz)",'TOP','0'))
-    user_inputs.append(get_user_input( myscreen,270,25,20,15,"Vol(0-1)",'TOP','0'))
+    user_inputs.append(get_user_input( myscreen,190,25,30,17,"Spk(S)",'TOP','0'))
+    user_inputs.append(get_user_input( myscreen,230,25,45,17,"Freq(Hz)",'TOP','0'))
+    user_inputs.append(get_user_input( myscreen,290,25,30,17,"Vol(0-1)",'TOP','0'))
 
-    user_inputs.append(get_user_input(myscreen,190,195,20,15,"Shck(S)",'BOTTOM','0'))
-    user_inputs.append(get_user_input(myscreen,220,195,20,15,"V",'BOTTOM','0'))
-    user_inputs.append(get_user_input(myscreen,250,195,20,15,"Amps",'BOTTOM','0'))
-
-
-    user_inputs.append(get_user_input( myscreen,20,525,70,17,"EXPT",'RIGHT'," "))
-    user_inputs.append(get_user_input( myscreen,20,550,70,17,"SUBJECT",'RIGHT'," "))
-    user_inputs.append(get_user_input( myscreen,20,575,70,17,"TRIAL",'RIGHT'," "))
+    user_inputs.append(get_user_input(myscreen,200,195,30,17,"Shck(S)",'BOTTOM','0'))
+    user_inputs.append(get_user_input(myscreen,235,195,30,17,"V",'BOTTOM','0'))
+    user_inputs.append(get_user_input(myscreen,270,195,30,17,"Amps",'BOTTOM','0'))
 
 
-    user_inputs.append(get_user_input( myscreen,20,650,420,15,"EXPT PATH",'TOP'," "))
-    user_inputs.append(get_user_input( myscreen,20,690,420,15,"EXPT FILE NAME",'TOP'," "))
+    user_inputs.append(get_user_input( myscreen,20,545,70,17,"EXPT",'RIGHT'," "))
+    user_inputs.append(get_user_input( myscreen,20,570,70,17,"SUBJECT",'RIGHT'," "))
+    user_inputs.append(get_user_input( myscreen,20,595,70,17,"TRIAL",'RIGHT'," "))
+
+
+    user_inputs.append(get_user_input( myscreen,20,650,460,17,"EXPT PATH",'TOP'," "))
+    user_inputs.append(get_user_input( myscreen,20,690,460,17,"EXPT FILE NAME",'TOP'," "))
     # TOGGLES
     toggles = []
+    # SLIDERS
+    sliders = []
+    sliders.append( MyVerticalSlider(myscreen,490,730,0,250, 18, 10))
+    20,730,460,250
+    #class class MyVerticalSlider:  def __init__(self,surface,x, y, sliderYpos,slotL, bw, bh, fsize = 12):
 
-    return buttons, levers, boxes, circles, LEDs, toggles, info_boxes, user_inputs, labels
+    return buttons, levers, boxes, circles, LEDs, toggles, info_boxes, user_inputs, labels, sliders
 
 
 def setupGUI(self):
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (20,40)
-    self.myscreen = pygame.display.set_mode((460,990),pygame.RESIZABLE,32)
+    self.myscreen = pygame.display.set_mode((500,990),pygame.RESIZABLE,32)
     self.UMNlogo = pygame.image.load(r'.\RESOURCES\UMNlogo.PNG')
     pygame.display.set_icon(self.UMNlogo)
     self.TNElogo = pygame.image.load(r'.\RESOURCES\TNE logo.jpg')
     self.TNElogo = pygame.transform.scale(self.TNElogo, (70, 50))
     pygame.display.set_caption('Behavioral Chamber Control 1.0 by F. da Silva and M. Shatza Oct. 30, 2018') # Enter your window caption here
-    #by Flavio J.K. da Silva and Mark Shatza Oct. 30, 2018') #
     pygame.init()
 
     #############
@@ -144,7 +148,7 @@ def setupGUI(self):
 
     self.events = []
 
-    self.buttons,self.levers,self.boxes,self.circles,self.LEDs,self.toggles,self.info_boxes,self.user_inputs,self.labels = NIDAQ_GUI_ELEMENT(self, self.myscreen )
+    self.buttons,self.levers,self.boxes,self.circles,self.LEDs,self.toggles,self.info_boxes,self.user_inputs,self.labels,self.sliders = NIDAQ_GUI_ELEMENT(self, self.myscreen )
     self.feederBox = self.boxes[0]
     print(len(self.buttons), " buttons")
     print(len(self.levers), " levers")
@@ -181,6 +185,9 @@ def setupGUI(self):
              user_input.text = str(self.Shock_Amp)
 
     # MAIN LOOP
+    self.start_line = len(self.events)
+    self.y_per_line = int(self.sliders[0].slotL / 14.0)
+    self.new_slider_y = 0
     self.clk_time_start = time.perf_counter()
     self.FAN_0N = False
     self.CAB_LIGHT_ON = False

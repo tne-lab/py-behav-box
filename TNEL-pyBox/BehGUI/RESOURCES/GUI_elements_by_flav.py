@@ -225,22 +225,20 @@ def draw_cue(screen, rect, cue,mphysPinID_x,mphysPinID_y):
     screen.blit(cue_sf, rect.move(mphysPinID_x-lblWt/2, mphysPinID_y-lblHt/2))  #move within game area
     #screen.blit(cue_sf, rect.move(mphysPinID_x-lblWt/2, mphysPinID_y))  #move within game area
 
-
-## Draws the right-hand sphysPinIDebar with score, etc.
-class MyHorizSlphysPinIDer:
-    def __init__(self,surface,x, y,slphysPinIDerX,slotL, bw, bh, fsize = 12):
+class MyHorizSlider:
+    def __init__(self,surface,x, y, sliderXpos,slotL, bw, bh, fsize = 12):
         #(x,y) = where on page
-        #(slphysPinIDerX,slphysPinIDerL)location of slphysPinIDer along line, length of line
+        #(sliderX,slotL)location of slider along line, length of slot
         self.x = x
         self.y = y
-        self.slphysPinIDerX = slphysPinIDerX + x - 0.5*bw    # location of slphysPinIDer
+        self.sliderX = sliderXpos - 0.5*bw    # location of slider
         self.slotL = slotL                # lenght of slot
 
-        self.bw = bw # width of slphysPinIDer button
-        self.bh = bh # Height of slphysPinIDer button
-        #slphysPinIDer button
-        self.rect = Rect(slphysPinIDerX,y, bw,bh) # SlphysPinIDer button face
-        self.percent = (slphysPinIDerX - self.x)/float(slotL) # percent (between 0 and 1.0)
+        self.bw = bw # width of slider button
+        self.bh = bh # Height of slider button
+        #slider button
+        self.rect = Rect(sliderXpos+x,y, bw,bh) # slider button face
+        self.percent = (self.sliderX - self.x)/float(slotL) # percent (between 0 and 1.0)
 
         self.face_color = (150,150,150)
         self.surface = surface
@@ -248,32 +246,94 @@ class MyHorizSlphysPinIDer:
     def draw(self):
         surface = self.surface
         x = self.x
-        slphysPinIDerX = self.slphysPinIDerX
+        sliderX = self.sliderX
         bw = self.bw
         y = self.y
         bw = self.bw
         bh = self.bh
-        self.percent = (slphysPinIDerX - x)/float(self.slotL) # percent of motion (between 0 and 1.0)
+        self.percent = (sliderX - x)/float(self.slotL) # percent of motion (between 0 and 1.0)
 
-        #draw SlphysPinIDe Chanel
-        sy = y + 0.5* bh    # vertical location of slphysPinIDer slot line
+        #draw Slider Chanel
+        sy = y + 0.5* bh    # vertical location of slider slot line
         slotL = self.slotL # length of slot
         pygame.draw.line(surface, (0, 0, 0), (x,sy), (x+slotL,sy),3)
         pygame.draw.line(surface, (255, 255, 255), (x, sy+1), (x+slotL,  sy+1),1)
 
-        #draw slphysPinIDer button
-        self.rect = Rect(slphysPinIDerX-.5*bw,y, bw,bh)
+        #draw slider button
+        self.rect = Rect(x+sliderX-.5*bw,y, bw,bh)
         face_color = self.face_color
         pygame.draw.rect(surface, face_color, self.rect)
 
         #Highlight
-        self.pt1 = slphysPinIDerX - .5*bw, y
-        self.pt2 = slphysPinIDerX + .5*bw, y   #(pt1,pt2 = top white line)
-        self.pt3 = slphysPinIDerX + .5*bw, y+bh #(pt2,pt3 = right white line)
-        self.pt4 = slphysPinIDerX - .5*bw, y+bh
+        self.pt1 = x+sliderX - .5*bw, y
+        self.pt2 = x+sliderX + .5*bw, y   #(pt1,pt2 = top white line)
+        self.pt3 = x+sliderX + .5*bw, y+bh #(pt2,pt3 = right white line)
+        self.pt4 = x+sliderX - .5*bw, y+bh
 
         pygame.draw.line(surface, (255, 255, 255), (self.pt1), (self.pt2))#top white line
         pygame.draw.line(surface, (255, 255, 255), (self.pt2), (self.pt3))#right white line
+        pygame.draw.line(surface, (100, 100, 100), (self.pt1), (self.pt4))#bot gray line
+        pygame.draw.line(surface, (100, 100, 100), (self.pt4), (self.pt3))#left gray line
+
+
+
+class MyVerticalSlider:
+    def __init__(self,surface,x, y, sliderY, slotL, bw, bh):
+        #(x,y) = where on page
+        #(sliderY,slotL)location of slider along line, length of slot
+        self.x = x
+        self.y = y
+        self.sliderY = sliderY #- 0.5*bh    # location of slider
+        self.slotL = slotL                # lenght of slot
+
+        self.bw = bw # width of slider button
+        self.bh = bh # Height of slider button
+        #slider button
+        self.button_rect = Rect(x-0.5*bw, y+self.sliderY, bw,bh)
+        #self.percent = (self.sliderY - self.y)/float(slotL) # percent (between 0 and 1.0)
+
+        self.face_color = (150,150,150)
+        self.surface = surface
+        self.y_range = slotL - bh
+
+    def draw(self):
+        surface = self.surface
+        x = self.x
+        y = self.y
+        bw = self.bw
+        bh = self.bh
+        #y_range = self.slotL - bh
+        ############
+        #if self.sliderY - 0.5*bh  <= 0:
+        #    sliderY = 0.5*bh
+        #elif self.sliderY + 0.5*bh > self.slotL:
+        #    sliderY = self.slotL - 0.5*bh
+        #else: sliderY = self.sliderY
+        #print("sliderY: ",sliderY)
+        ###########
+        sliderY = self.sliderY
+        #self.percent = (sliderY - y)/float(self.slotL) # percent of motion (between 0 and 1.0)
+        self.button_rect = Rect(x-0.5*bw, y+self.sliderY, bw,bh)
+
+        #draw Slider Chanel
+        slotL = self.slotL # length of slot
+        pygame.draw.line(surface, (0, 0, 0), (x,y), (x, y+slotL),3)
+        pygame.draw.line(surface, (255, 255, 255), (x+1, y), (x+1,y+slotL),1)
+
+        #draw slider button
+
+        self.button_rect = Rect(int(x-0.5*bw), int(y + sliderY ) , bw, bh)
+        face_color = self.face_color
+        pygame.draw.rect(surface, face_color, self.button_rect)
+
+        #Button Highlight
+        self.pt1 = int(x-0.5*bw),  int(y+sliderY )
+        self.pt2 = int(x+0.5*bw),  int(y+sliderY )
+        self.pt3 = int(x+0.5*bw),  int(y+sliderY + bh)
+        self.pt4 = int(x-0.5*bw),  int(y+sliderY + bh)
+
+        pygame.draw.line(surface, (255, 255, 255), (self.pt1), (self.pt2))#top white line            p1    p2
+        pygame.draw.line(surface, (255, 255, 255), (self.pt2), (self.pt3))#right white line          p4    p3
         pygame.draw.line(surface, (100, 100, 100), (self.pt1), (self.pt4))#bot gray line
         pygame.draw.line(surface, (100, 100, 100), (self.pt4), (self.pt3))#left gray line
 
@@ -296,7 +356,7 @@ class MyButton:
         self.fsize = fsize
         self.rect = pygame.Rect(x-3,y-3,w+6,h+6) # Expand Rect
 
-        self.face = Rect(x,y,w,h)
+        self.face = pygame.Rect(x,y,w,h)
         self.pt1 = x,y
         self.pt2 = x+w,y
         self.pt3 = x+w,y+h
@@ -306,7 +366,7 @@ class MyButton:
 
     def draw(self):
 
-        self.face = Rect(self.x,self.y,self.w,self.h)
+        self.face = pygame.Rect(self.x,self.y,self.w,self.h)
         self.pt1 = self.x, self.y
         self.pt2 = self.x + self.w, self.y
         self.pt3 = self.x + self.w, self.y + self.h
