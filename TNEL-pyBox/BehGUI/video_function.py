@@ -29,6 +29,7 @@ class Vid:
             cv2.createTrackbar('threshold', 'vid', 0, 30,
             lambda thresh: self.changeThresh(thresh))
             # Init some stuff
+            self.exptStarted = False
             self.initROIFrames()
             self.back_q.put('vid ready')
         else:
@@ -102,6 +103,8 @@ class Vid:
                 msg = self.q.pop()
                 time_from_GUI = msg['cur_time']
                 STATE = msg['STATE']
+                if STATE in 'START':
+                    self.exptStarted = True
                 msg['time_diff'] = vid_cur_time - time_from_GUI
                 msg['vid_time'] = vid_cur_time
                 if msg['PATH_FILE'] != self.outPath:
@@ -136,8 +139,8 @@ class Vid:
                     self.text = 'freeze'
 
             # Write stuff on screen (need to add trial number and probably not time differential)
-            #self.drawInfo(msg['cur_time'], msg['trial_num'], movingPxls, frame)
-            self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, frame)
+            self.drawInfo(msg['cur_time'], str(msg['trial_num']), movingPxls, frame)
+            #self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, frame)
             # draw trial start circle
 
             if msg['STATE'] == 'REC':
@@ -195,12 +198,13 @@ class Vid:
 
     # Update screen info
     def drawInfo(self, time_from_GUI, trial_num, movingPxls, frame):
-        #cv2.circle(frame, (x,y), 15, (255,0,0))
+        if self.exptStarted:
+            cv2.circle(frame, (30,455), 20, (0,255,0) ,thickness = -1)
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame,"NIDAQ time = " + str(time_from_GUI),(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
         cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
         cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(self.prevThresh, "Trial Number = " + str(trial_num), (100, 50),font, .5, (255, 255, 255), 2)
+        cv2.putText(frame, "Trial Number = " + str(trial_num), (20, 425),font, .5, (255, 255, 255), 2,cv2.LINE_AA)
 
     # Wrtie a ton of stuff on frames...
     def writeStuff(self, time_from_GUI, vid_time, time_diff, movingPxls, frame):
@@ -235,7 +239,7 @@ class Vid:
     # Create Region of Interest coordinates
     def genROI(self, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.7,(255,255,255),2,cv2.LINE_AA)        
+        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.9,(255,255,255),2,cv2.LINE_AA)
         self.r = cv2.selectROI(frame)
         cv2.destroyWindow("ROI selector")
 

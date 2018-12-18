@@ -133,7 +133,6 @@ def log_event(self, event_lst, event, cur_time, other=''):
     #print (event_string, other)
     event_other = ''
     for item in other:
-        print (item)
         event_other = event_other + ",  " +  str(item)
 
     event_lst.append(event_string+event_other) # To Display on GUI

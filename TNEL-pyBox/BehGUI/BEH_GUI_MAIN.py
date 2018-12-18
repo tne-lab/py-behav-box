@@ -127,6 +127,7 @@ class BEH_GUI():
             #   UPDATE VIDEO
             ######################################
             self.vidDict['cur_time'] = self.cur_time
+            self.vidDict['trial_num'] = self.trial_num
             self.VIDq.append(self.vidDict)
 ########################################################################################
     def drawScreen(self):
@@ -468,6 +469,7 @@ class BEH_GUI():
                                         self.START_EXPT = True
                                         self.snd.send(self.snd.START_ACQ) # Press play on Open Ephys GUI
                                         self.snd.send(self.snd.START_REC) # Press RECORD on Open Ephys GUI
+                                        self.vidDict['STATE'] = 'START'
 
                                         self.Experiment_Start_time = time.perf_counter()
                                         self.cur_time = self.cur_time-self.Experiment_Start_time
