@@ -217,7 +217,7 @@ class BEH_GUI():
                 else: info.text = ['0.000']
             elif info.label == "EVENT LOG":
                 lines_in_txt = len(self.events)
-                
+                y_per_line = int(self.sliders[0].slotL / 14.0) #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 if lines_in_txt > 14: # 14 lines fit in window
                     ##########################################################  
                     # SLIDER:
@@ -435,6 +435,7 @@ class BEH_GUI():
 
                                elif button.text == "LOAD FILE":
                                     button.UP_DN = "DN"
+                                    self.events = []
                                     print(self.expt_file_path_name)
                                     if self.load_expt_file():
                                         self.EXPT_FILE_LOADED = True
@@ -1017,6 +1018,9 @@ class BEH_GUI():
            self.Protocol_ln_num = 0
            self.LEDs[0].ONOFF = "OFF"
            self.LEDs[1].ONOFF = "OFF"
+           for LED in self.LEDs: # Look for EXPT STARTED LED
+               if LED.index == 6: # Expt Started light
+                  LED.ONOFF = "OFF"
            GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
            GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
 

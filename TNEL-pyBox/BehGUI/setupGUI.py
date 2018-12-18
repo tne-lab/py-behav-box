@@ -186,7 +186,7 @@ def setupGUI(self):
 
     # MAIN LOOP
     self.start_line = len(self.events)
-    self.y_per_line = int(self.sliders[0].slotL / 14.0)
+    #self.y_per_line = int(self.sliders[0].slotL / 14.0)
     self.new_slider_y = 0
     self.clk_time_start = time.perf_counter()
     self.FAN_0N = False

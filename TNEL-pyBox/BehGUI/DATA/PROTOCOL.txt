@@ -3,6 +3,7 @@ EXPT_NAME = TESTING
 SUBJECT = RAT
 EXPT_PATH 	= C:\Users\ephys-2\Desktop\BehChamGUI\DATA
 
+
 [TONE1] # Need TONE1, TONE2
 Duration(s) 	= 2
 Freq(Hz)	= 1800
@@ -24,15 +25,15 @@ CAB_LIGHT=True
 CAMERA=True
 REC=True
 FOOD_LIGHT=True
+	
+[PROTOCOL] #Note: CONDITIONS cand be "RANDOM","SEQUENTIAL"(in the order they are listed below in [CONDITIONS]), or a NUMBER starting at 1 
 
-[PROTOCOL] #Note: CONDITIONS cand be "RANDOM","SEQUENTIAL"(in the order they are listed below in [CONDITIONS]), or a NUMBER starting at 1
-START_LOOP = 4
-  PAUSE = 3
+START_LOOP = 2
+  PAUSE = 2
   EXTEND_LEVERS=True
   CONDITIONS=RANDOM
   EXTEND_LEVERS=False
 END_LOOP
-
 FOOD_LIGHT=False
 REC=False
 CAMERA= False
@@ -40,7 +41,8 @@ CAB_LIGHT=False
 FAN_ON=False
 [END PROTOCOL]
 
-[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS.
+[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS. 
 MAX_TIME, RESET,          L_CONDITION_LT, R_CONDITION_LT, DES_L_LEVER_PRESS, DES_R_LEVER_PRESS, CORRECT, WRONG, NO_ACTION
-5,      ON_RESPONSE,	  1,		  0,		  1,		     0,		        PELLET,	 TONE1,  SHOCK
-5,      ON_RESPONSE,	  0,		  1,		  0,		     1,		        PELLET,	 TONE1,  SHOCK
+2,      ON_RESPONSE,	  1,		  0,		  1,		     0,		        PELLET,	 TONE1,  SHOCK
+2,      ON_RESPONSE,	  0,		  1,		  0,		     1,		        PELLET,	 TONE1,  SHOCK
+
