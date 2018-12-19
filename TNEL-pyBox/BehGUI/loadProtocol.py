@@ -7,7 +7,7 @@ def load_expt_file(self):
     print("LOADING: ", self.expt_file_path_name)
     self.protocol = []
     self.conditions = []
-    lines = []
+    self.exptFileLines = []
 
 
     try:
@@ -19,7 +19,7 @@ def load_expt_file(self):
             if not 'HAB_COND_EXT_AND_RECALL_VIs' in line:
                 line = line.upper()
             print(line)
-            lines.append(line)
+            self.exptFileLines.append(line)
             if line != "":
                 condition={}
 
@@ -340,37 +340,6 @@ def load_expt_file(self):
         print("NO SUCH FILE!!!!",self.expt_file_path_name)
         return False
 
-    # DATA PATH + FILES
-    #try:
-    new_dir = os.path.join(self.datapath,self.Expt_Name)
-    if not os.path.exists(new_dir ):  os.mkdir(new_dir)
-    new_sub_dir = os.path.join(new_dir,self.date)
-    if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
-    new_sub_dir = os.path.join(new_sub_dir,self.exptTime)
-    if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
-    self.newdatapath = new_sub_dir
-    expt_file_name_COPY = self.expt_file_name[:-4] + '_COPY.txt' # Removes the '.txt' from original name and adds 'COPY.txt'
-    self.expt_file_path_name_COPY = os.path.join(self.newdatapath,expt_file_name_COPY)
-    print(self.expt_file_path_name_COPY)
-
-    log_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-LOG_file'  + '.txt'
-    self.log_file_path_name = os.path.join(self.newdatapath,log_file_name)
-    print(self.log_file_path_name)
-
-    video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
-    self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
-    print(self.video_file_path_name)
-
-    # COPY EXPT FILE TO EXPT FILE DATAPATH
-    try:
-        exf = open(self.expt_file_path_name_COPY,'w')
-        for l in lines:
-            #print(l)
-            exf.write(l+"\n")
-        exf.close()
-    except:
-        print("could not write copy of EXPT file",self.expt_file_path_name_COPY)
-
     print("PROTOCOL LOADED]")
     print (self.protocol)
     for dct in self.protocol:
@@ -379,14 +348,15 @@ def load_expt_file(self):
 
     if self.VIs_file_path != "":
         try:
-            path,name = os.path.split(self.VIs_file_path)
-            VIs_file_path_COPY = name[:-4] + '_copy.txt'
-            VIs_file_path_COPY = os.path.join(self.newdatapath,VIs_file_path_COPY)
+            #path,name = os.path.split(self.VIs_file_path)
+            #VIs_file_path_COPY = name[:-4] + '_copy.txt'
+            #VIs_file_path_COPY = os.path.join(self.newdatapath,VIs_file_path_COPY)
             f = open(self.VIs_file_path,'r')
-            fw = open(VIs_file_path_COPY,'w')
-                # Read Line by line
+            #fw = open(VIs_file_path_COPY,'w')
+            # Read Line by line
             for line in f:
-                fw.write(line)
+                #fw.write(line)
+                self.VIFileLines.append(line)
                 line = line.strip() # Remove leading and trailoing blanks and \n
                 line = line.upper()
                 print(line)
@@ -426,8 +396,90 @@ def load_expt_file(self):
                         num = items.strip()
                         print(num)
                         self.recall_vi_times.append(int(num))
+                print("VI FILE LOADED",self.VIs_file_path)
         except OSError:
             print("Could not open ",self.VIs_file_path)
             return False
-
     return True
+
+def create_files(self):
+    # DATA PATH + FILES
+
+    #try:
+    new_dir = os.path.join(self.datapath,self.Expt_Name)
+    if not os.path.exists(new_dir ):  os.mkdir(new_dir)
+    new_sub_dir = os.path.join(new_dir,self.date)
+    if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
+    new_sub_dir = os.path.join(new_sub_dir,self.exptTime)
+    if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
+    self.newdatapath = new_sub_dir
+    expt_file_name_COPY = self.expt_file_name[:-4] + '_COPY.txt' # Removes the '.txt' from original name and adds 'COPY.txt'
+    self.expt_file_path_name_COPY = os.path.join(self.newdatapath,expt_file_name_COPY)
+    print(self.expt_file_path_name_COPY)
+
+    log_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-LOG_file'  + '.csv'
+    self.log_file_path_name = os.path.join(self.newdatapath,log_file_name)
+    print(self.log_file_path_name)
+
+    video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
+    self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
+    print(self.video_file_path_name)
+
+    # COPY EXPT FILE TO EXPT FILE DATAPATH
+    print("....................................\n")
+    print("COPYING EXPT FILE", self.expt_file_path_name_COPY)
+    try:
+        exptfl = open(self.expt_file_path_name_COPY,'w')
+    except:
+        print("XXXXXX 1 could NOT copy of EXPT file",self.expt_file_path_name_COPY)
+    try:
+        for ln in self.exptFileLines:
+            print (ln)
+            if "EXPT_NAME" in ln:
+                newln = "EXPT_NAME = " + self.Expt_Name
+
+            if "SUBJECT" in ln:
+                newln = "SUBJECT = " + self.Subject
+
+            exptfl.write(newln+"\n")
+        print("EXPT file copied",self.expt_file_path_name_COPY)
+        exptfl.close()
+    except:
+        print("could NOT copy of EXPT file",self.expt_file_path_name_COPY)
+
+    if self.VIs_file_path != "":
+        try:
+            path,name = os.path.split(self.VIs_file_path)
+            VIs_file_path_COPY = name[:-4] + '_copy.txt'
+            VIs_file_path_COPY = os.path.join(self.newdatapath,VIs_file_path_COPY)
+            #f = open(self.VIs_file_path,'r')
+            fw = open(VIs_file_path_COPY,'w')
+            # w Line by line
+            for ln in self.VIFileLines:
+                fw.write(ln+"\n")
+        except:
+            print("COULD NOT WRITE VI FILE COPY", VIs_file_path_COPY)
+
+def update_expt_file_copy(self):
+    import fileinput
+    print("....................................\n")
+    print("UPDATING EXPT FILE", self.expt_file_path_name_COPY)
+    try:
+        exptfl = open(self.expt_file_path_name_COPY,'r+')
+
+        for ln in exptfl:
+            print (ln)
+            if "EXPT_NAME" in ln:
+                ln = "EXPT_NAME = " + self.Expt_Name + "\nSUBJECT = " + self.Subject
+                prev_ln = ln
+                exptfl.write(ln+"\n")
+            if "SUBJECT" in ln:
+                if ln == prev_ln: pass
+                else:  ln = "SUBJECT = " + self.Subject
+                break
+            exptfl.write(ln+"\n")
+        exptfl.close()
+        return True
+    except:
+        print("COULD NOT UPDATE EXPT FILE", self.expt_file_path_name_COPY)
+        return False

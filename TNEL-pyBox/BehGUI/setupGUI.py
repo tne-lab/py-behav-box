@@ -54,12 +54,6 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     labels = []
     #labels.append(MyLabel(myscreen,108,290,50,20,"Label1",14))
     #labels.append(MyLabel(myscreen,242,289,50,20,"Label2",14))
-    #labels.append(MyLabel(myscreen,245,369,50,20,"Label3",14))
-    #labels.append(MyLabel(myscreen,107,369,50,20,"Label4",14))
-    #labels.append(MyLabel(myscreen,43,318,50,20,"Label5",14))
-    #labels.append(MyLabel(myscreen,237,422,50,20,"Label6",14))
-    #labels.append(MyLabel(myscreen,236,480,50,20,"Label7",14))
-    #labels.append(MyLabel(myscreen,235,539,50,20,"Label8",14))
 
     info_boxes = []
     #def __init__(self, surface,x, y, w, h, label_name,label_pos, text ,fsize = 12):
@@ -106,7 +100,8 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
 
 def setupGUI(self):
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (20,40)
-    self.myscreen = pygame.display.set_mode((500,990),pygame.RESIZABLE,32)
+    #self.myscreen = pygame.display.set_mode((500,990),pygame.RESIZABLE,32)
+    self.myscreen = pygame.display.set_mode((500,990),32)
     self.UMNlogo = pygame.image.load(r'.\RESOURCES\UMNlogo.PNG')
     pygame.display.set_icon(self.UMNlogo)
     self.TNElogo = pygame.image.load(r'.\RESOURCES\TNE logo.jpg')
@@ -150,15 +145,15 @@ def setupGUI(self):
 
     self.buttons,self.levers,self.boxes,self.circles,self.LEDs,self.toggles,self.info_boxes,self.user_inputs,self.labels,self.sliders = NIDAQ_GUI_ELEMENT(self, self.myscreen )
     self.feederBox = self.boxes[0]
-    print(len(self.buttons), " buttons")
-    print(len(self.levers), " levers")
-    print(len(self.boxes), " boxes")
-    print(len(self.circles), " circles")
-    print(len(self.LEDs), " LEDs")
-    print(len(self.toggles), " toggles" )
-    print(len(self.labels), " labels")
-    print(len(self.info_boxes), " info_boxes")
-    print(len(self.info_boxes), " user_imputs")
+##    print(len(self.buttons), " buttons")
+##    print(len(self.levers), " levers")
+##    print(len(self.boxes), " boxes")
+##    print(len(self.circles), " circles")
+##    print(len(self.LEDs), " LEDs")
+##    print(len(self.toggles), " toggles" )
+##    print(len(self.labels), " labels")
+##    print(len(self.info_boxes), " info_boxes")
+##    print(len(self.info_boxes), " user_imputs")
     # USER INPUTS DEFAULT VALUES
     for user_input in self.user_inputs:
         if user_input.label == "EXPT":
