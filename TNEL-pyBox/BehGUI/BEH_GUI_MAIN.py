@@ -62,22 +62,37 @@ def choose_file():
 
     return filename
 
-def lookForWhisker(hwnd, args):
+def lookForProgram(hwnd, programName):
     global IsWhiskerRunning, IsOpenEphysRunning
-    if 'WhiskerServer' in win32gui.GetWindowText(hwnd):
+    if programName in win32gui.GetWindowText(hwnd):
         win32gui.CloseWindow(hwnd) # Minimize Window
-        IsWhiskerRunning = True
+        if 'Whisker' in programName:
+            IsWhiskerRunning = True
+        if 'Ephys' in programName:
+            IsOpenEphysRunning = True
 
-def openWhisker():
+def openWhiskerEphys():
     global IsWhiskerRunning, IsOpenEphysRunning
-    win32gui.EnumWindows(lookForWhisker, None)
+    win32gui.EnumWindows(lookForProgram, 'Open Ephys GUI')
+    if not IsOpenEphysRunning:
+        programName = 'Open Ephys GUI'
+        try:
+            oe = r'C:\Users\Ephys\Documents\Github\OE\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe'
+            window = subprocess.Popen(oe)# # doesn't capture output
+            time.sleep(2)
+            win32gui.EnumWindows(lookForProgram, programName)
+        except:
+            print("Could not start Open Ephys")
+    else: print("Open Ephysis already RUNNING")
+    print(".............................................")
+    win32gui.EnumWindows(lookForProgram, 'WhiskerServer')
     if not IsWhiskerRunning:
         try:
-            ws = "C:\Program Files (x86)\WhiskerControl\WhiskerServer.exe"
+            ws = r"C:\Program Files (x86)\WhiskerControl\WhiskerServer.exe"
             window = subprocess.Popen(ws)# # doesn't capture output
             time.sleep(2)
             print("WHISKER server started", window)
-            win32gui.EnumWindows(lookForWhisker, None)
+            win32gui.EnumWindows(lookForProgram, None)
         except:
             print("Could not start WHISKER server")
     else: print("Whisker server is already RUNNING")
@@ -474,37 +489,6 @@ class BEH_GUI():
                                     button.UP_DN = "DN"
                                     self.Expt_Count +=1
                                     if self.EXPT_FILE_LOADED:
-<<<<<<< HEAD
-                                        self.trial_num = 0
-                                        if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
-                                        for user_input in self.user_inputs:
-                                            if user_input.label == "EXPT":
-                                                user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
-                                        if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
-                                        # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
-                                            self.VI_start = 0.0 #self.cur_time
-                                            self.VI = random.randint(0,int(self.var_interval_reward*2))
-                                            print("VI.......................", self.VI)
-                                        GUIFunctions.log_event(self, self.events,"EXPT STARTED",self.cur_time)
-                                        self.START_EXPT = True
-                                        self.snd.send(self.snd.START_ACQ) # Press play on Open Ephys GUI
-                                        self.snd.send(self.snd.START_REC) # Press RECORD on Open Ephys GUI
-                                        self.vidDict['STATE'] = 'START'
-
-                                        self.Experiment_Start_time = time.perf_counter()
-                                        self.cur_time = self.cur_time-self.Experiment_Start_time
-                                        print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
-                                        for LED in self.LEDs: # Look for EXPT STARTED LED
-                                              if LED.index == 6: # Expt Started light
-                                                  LED.ONOFF = "ON"
-                                        ###############################################################
-                                        #
-                                        # ?????????????????????????????????????????
-                                        # SEND BIT TO OPEND EPHYS TO INDICATE EXPT STARTED.
-                                        # CAN RECORD SIGNAL BE THE START EVENT?????
-                                        #
-                                        ################################################################
-=======
                                         if self.NAME_OR_SUBJ_CHANGED:
                                             self.create_files()
                                             if self.update_expt_file_copy(): #Fix copy of expt file
@@ -553,9 +537,6 @@ class BEH_GUI():
                                                 elif user_input.label == "SUBJECT":
                                                      user_input.border_color = (255,0,0)
 
-                                            
-
->>>>>>> beh-gui-1.0
                                     else:
                                         GUIFunctions.log_event(self, self.events,"EXPT FILE NOT LOADED!!!!",self.cur_time)
 
@@ -872,6 +853,8 @@ class BEH_GUI():
         elif key == "REC":
             print ("recording")
             self.RECORDING = True
+            self.snd.send(self.snd.STOP_ACQ)
+            self.snd.send(self.snd.STOP_REC)
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
@@ -1120,8 +1103,7 @@ class BEH_GUI():
            GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
 
            # TEll open ephys to stop acquistion and recording?
-           self.snd.send(self.snd.STOP_ACQ)
-           self.snd.send(self.snd.STOP_REC)
+
 
            if self.TOUCHSCREEN_USED:
                self.TSq.put('')
@@ -1338,6 +1320,6 @@ class BEH_GUI():
                self.Protocol_ln_num +=1
 
 if __name__ == "__main__":
-    openWhisker()
+    openWhiskerEphys()
     beh = BEH_GUI(NIDAQ_AVAILABLE)
     beh.BehavioralChamber()
