@@ -15,6 +15,8 @@ Developed by Flavio J.K. da Silva and  Mark Schatza Nov. 31, 2018
 """
 
 #from win32api import GetSystemMetrics
+import tkinter as Tk #Note: "Tkinter" in python 2 (capital T)
+from tkinter.filedialog import askopenfilename
 import os
 import sys, time
 import pygame
@@ -48,6 +50,18 @@ import win32gui, win32con
 IsWhiskerRunning = False
 IsOpenEphysRunning = False
 # Add open ephys here possibly?
+def closeWindow(hwnd, windowName):
+    if windowName in win32gui.GetWindowText(hwnd):
+        win32gui.CloseWindow(hwnd) # Minimize Window
+
+def choose_file():
+    #Tk.withdraw() # we don't want a full GUI, so keep the root window from appearing
+    chosenFileName = askopenfilename() # show an "Open" dialog box and return the path to the selected file
+    filename = os.path.basename(chosenFileName)
+    win32gui.EnumWindows(closeWindow, 'tk')
+
+    return filename
+
 def lookForWhisker(hwnd, args):
     global IsWhiskerRunning, IsOpenEphysRunning
     if 'WhiskerServer' in win32gui.GetWindowText(hwnd):
@@ -75,11 +89,11 @@ class BEH_GUI():
         self.NIDAQ_AVAILABLE = NIDAQ_AVAILABLE
         self.setGlobals()
         random.seed()
-        self.load_expt_file()
+        #self.load_expt_file()
         self.setupGUI()
 
     from setGlobals import setGlobals
-    from loadProtocol import load_expt_file
+    from loadProtocol import load_expt_file, update_expt_file_copy, create_files
     import GUIFunctions
     from setupGUI import setupGUI
 
@@ -218,9 +232,9 @@ class BEH_GUI():
                 else: info.text = ['0.000']
             elif info.label == "EVENT LOG":
                 lines_in_txt = len(self.events)
-                
+                y_per_line = int(self.sliders[0].slotL / 14.0) 
                 if lines_in_txt > 14: # 14 lines fit in window
-                    ##########################################################  
+                    ##########################################################
                     # SLIDER:
                     #               NOTE only 14 text lines fit inside window
                     ##########################################################
@@ -229,11 +243,11 @@ class BEH_GUI():
                         self.sliders[0].bh = 14
                     else:
                         self.sliders[0].bh = slider_Button_ht
- 
+
                     self.sliders[0].sliderY = self.new_slider_y #+ self.start_line * self.y_per_line
                     #self.sliders[0].sliderY = self.new_slider_y + (self.sliders[0].slotL - self.sliders[0].bh) - self.start_line * self.y_per_line
 
-                    
+
                     if self.sliders[0].sliderY >= self.sliders[0].slotL - self.sliders[0].bh:
                        self.sliders[0].sliderY = self.sliders[0].slotL - self.sliders[0].bh
                     self.sliders[0].draw()
@@ -312,14 +326,14 @@ class BEH_GUI():
             # MOUSE MOVE
             elif (event.type == pygame.MOUSEMOTION):#
                 cur_x,cur_y = pygame.mouse.get_pos()
-                
-                if self.LEFT_MOUSE_DOWN:   
+
+                if self.LEFT_MOUSE_DOWN:
                     if self.SLIDER_SELECTED:
                         new_slider_y = cur_y - self.cur_Vslider.y # relative to top of slider slot
                         if new_slider_y <= 0:
                            new_slider_y = 0
                         if new_slider_y >= self.cur_Vslider.slotL - self.cur_Vslider.bh:
-                           new_slider_y = self.cur_Vslider.slotL - self.cur_Vslider.bh 
+                           new_slider_y = self.cur_Vslider.slotL - self.cur_Vslider.bh
 
                         self.cur_Vslider.sliderY = new_slider_y # relative to top of slider slot
                         self.new_slider_y = new_slider_y
@@ -339,14 +353,14 @@ class BEH_GUI():
                     self.RIGHT_MOUSE_DOWN = True
                 # BUTTONS
                 if self.LEFT_MOUSE_DOWN:
-                    
+
                     # SLIDERS
                     for slider in self.sliders: # Check for collision with EXISTING buttons
                         if slider.button_rect.collidepoint(cur_x,cur_y):
                             #print("SLIDER SELECTED", slider)
                             self.SLIDER_SELECTED = True
                             self.cur_Vslider = slider
-                    
+
                     # BUTTONS
                     for button in self.buttons: # Check for collision with EXISTING buttons
                         if button.rect.collidepoint(cur_x,cur_y):
@@ -436,6 +450,7 @@ class BEH_GUI():
 
                                elif button.text == "LOAD FILE":
                                     button.UP_DN = "DN"
+                                    self.events = []
                                     print(self.expt_file_path_name)
                                     if self.load_expt_file():
                                         self.EXPT_FILE_LOADED = True
@@ -443,18 +458,23 @@ class BEH_GUI():
                                         if len(self.setup) > 0:
                                             self.RUN_SETUP = True
                                             self.setup_ln_num = 0
+                                    else:
+                                        self.EXPT_FILE_LOADED = False
+                                        print("HUMPH! COULD NOT LOAD EXPT FILE (on button press)")
+                                        GUIFunctions.log_event(self, self.events,"Expt File name or path DOES NOT EXIST",self.cur_time)
                                     for LED in self.LEDs: # Look for EXPT STARTED LED
                                           if LED.index == 6: # Expt Started light
                                               LED.ONOFF = "OFF"
-                                    else:
-                                        print("HUMPH!")
-                                        GUIFunctions.log_event(self, self.events,"Expt File name or path DOES NOT EXIST",self.cur_time)
-
+                                              
                                elif button.text == "START EXPT":
-                                    print("EXPT STARTED!")
+                                    self.cur_time = time.perf_counter()
+                                    self.Experiment_Start_time = self.cur_time
+                                    self.cur_time = self.cur_time-self.Experiment_Start_time
+                                    self.events = []
                                     button.UP_DN = "DN"
                                     self.Expt_Count +=1
                                     if self.EXPT_FILE_LOADED:
+<<<<<<< HEAD
                                         self.trial_num = 0
                                         if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
                                         for user_input in self.user_inputs:
@@ -484,6 +504,58 @@ class BEH_GUI():
                                         # CAN RECORD SIGNAL BE THE START EVENT?????
                                         #
                                         ################################################################
+=======
+                                        if self.NAME_OR_SUBJ_CHANGED:
+                                            self.create_files()
+                                            if self.update_expt_file_copy(): #Fix copy of expt file
+                                                self.NAME_OR_SUBJ_CHANGED = False
+                                                print("EXPT FILE COPY UPDATED!!!!")
+                                                # GOOD TO GO!
+                                                print("EXPT STARTED!")
+                                                self.trial_num = 0
+                                                if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
+                                                for user_input in self.user_inputs:
+                                                    if user_input.label == "EXPT":
+                                                        user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
+                                                if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
+                                                # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
+                                                    self.VI_start = 0.0 #self.cur_time
+                                                    self.VI = random.randint(0,int(self.var_interval_reward*2))
+                                                    print("VI.......................", self.VI)
+                                                    
+                                                GUIFunctions.log_event(self, self.events,"EXPT STARTED",self.cur_time)
+                                                self.START_EXPT = True
+                                                self.snd.send(self.snd.START_ACQ) # Press play on Open Ephys GUI
+                                                self.snd.send(self.snd.START_REC) # Press RECORD on Open Ephys GUI
+
+
+                                                print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
+                                                for LED in self.LEDs: # Look for EXPT STARTED LED
+                                                      if LED.index == 6: # Expt Started light
+                                                          LED.ONOFF = "ON"
+                                                ###############################################################
+                                                #
+                                                # ?????????????????????????????????????????
+                                                # SEND BIT TO OPEND EPHYS TO INDICATE EXPT STARTED.
+                                                # CAN RECORD SIGNAL BE THE START EVENT?????
+                                                #
+                                                ################################################################
+                                                
+                                            else:
+                                                print("UNABLE TO UPDATE EXPT FILE COPY!!!!")
+                                        elif self.Subject == "" or "?" in self.Subject:
+                                            GUIFunctions.log_event(self, self.events,"Check SUBJECT  and EXPT name!!!!",self.cur_time)
+                                            print('SUBJECT = "" or "?" or same as last time')
+                                            # HIGHLIGHT USER INPUT BOXES
+                                            for user_input in self.user_inputs:
+                                                if user_input.label == "EXPT":
+                                                     user_input.border_color = (255,0,0)
+                                                elif user_input.label == "SUBJECT":
+                                                     user_input.border_color = (255,0,0)
+
+                                            
+
+>>>>>>> beh-gui-1.0
                                     else:
                                         GUIFunctions.log_event(self, self.events,"EXPT FILE NOT LOADED!!!!",self.cur_time)
 
@@ -530,6 +602,8 @@ class BEH_GUI():
 
                                 # NOSE POKES
                                 elif LED.index == 2 or LED.index == 3: # NOSE POKES
+                                   if LED.index == 2: self.NOSE_POKED_L = True
+                                   elif LED.index == 3: self.NOSE_POKED_R = True
                                    self.NOSE_POKE_TIME = time.perf_counter()
                                    # NOTE:  We are redrawing here again (instead of just in main loop)
                                    #       because state will be reset ot actual machine state (which is what
@@ -613,15 +687,20 @@ class BEH_GUI():
                             user_input.get_key_input()
                             if user_input.label == "EXPT":
                                  self.Expt_Name=user_input.text
+                                 self.NAME_OR_SUBJ_CHANGED = True
                             elif user_input.label == "SUBJECT":
                                  self.Subject = user_input.text
+                                 self.NAME_OR_SUBJ_CHANGED = True
                             elif user_input.label == "TRIAL":
                                  self.trial_num =  user_input.text
                             elif user_input.label == "EXPT PATH":
                                  self.datapath = user_input.text
                             elif user_input.label == "EXPT FILE NAME":
-                                 self.expt_file_name = user_input.text
-                                 self.expt_file_path_name = os.path.join(self.datapath,self.expt_file_name )
+                                 self.expt_file_name = choose_file()
+                                 print ("File selected: ",self.expt_file_name)
+                                 if self.expt_file_name == '':
+                                     self.expt_file_name = user_input.text
+                                     self.expt_file_path_name = os.path.join(self.datapath,self.expt_file_name )
 
                             elif user_input.label == "Spk(S)":
                                  self.Tone1_Duration = float(user_input.text)
@@ -636,7 +715,7 @@ class BEH_GUI():
                                  self.Shock_V = float(user_input.text)
                             elif "Amps" in user_input.label:
                                  self.Shock_Amp = float(user_input.text)
-                                 
+
 
            # MOUSE UP
             elif (event.type == pygame.MOUSEBUTTONUP ):
@@ -667,7 +746,7 @@ class BEH_GUI():
 
                     else: # ALL OTHER BUTTONS, NOT REC BUTTON
                         button.UP_DN = "UP"
-                        
+
 
 ###########################################################################################################
 #  HANDLE BEHAVIORAL CHAMBER EVENTS
@@ -780,7 +859,7 @@ class BEH_GUI():
                 if not self.CAMERA_ON: # CAMERA WAS OFF
                     self.CAMERA_ON = True
                     GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
-                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':"FREEZE_DETECT", 'PATH_FILE':self.video_file_path_name}
                     GUIFunctions.MyVideo(self)
                 else: # CAMERA IS ALREADY ON
                     GUIFunctions.log_event(self, self.events,"Camera is ALREADY ON",self.cur_time)
@@ -1010,6 +1089,11 @@ class BEH_GUI():
         self.LEVER_PRESSED_R = False
         self.LEVER_PRESSED_L = False
 
+        #########################################################
+        #  PROTOCOL ENDED (Reset everything for next run
+        #########################################################
+
+        #xxxxxxxxxxxxxxxxxxxxxx
         if self.Protocol_ln_num >= len(self.protocol):
            print("Protocol_ln_num: ",self.Protocol_ln_num,"plength: ", len(self.protocol),"\n")
            print("PROTOCOL ENDED")
@@ -1017,8 +1101,12 @@ class BEH_GUI():
            GUIFunctions.log_event(self, self.events,"PROTOCOL ENDED",self.cur_time)
            self.START_EXPT = False
            self.Protocol_ln_num = 0
+           self.trial_num = 0
            self.LEDs[0].ONOFF = "OFF"
            self.LEDs[1].ONOFF = "OFF"
+           for LED in self.LEDs: # Look for EXPT STARTED LED
+               if LED.index == 6: # Expt Started light
+                  LED.ONOFF = "OFF"
            GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
            GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
 
@@ -1029,6 +1117,11 @@ class BEH_GUI():
            if self.TOUCHSCREEN_USED:
                self.TSq.put('')
                self.TOUCHSCREEN_USED = False
+
+           for user_input in self.user_inputs:
+              if user_input.label == "SUBJECT":
+                 self.Subject = ''
+                 self.prev_Subject = self.Subject
 
 ######################################################################################################
     def runConditions(self, protocolDict, cur_time):
@@ -1056,8 +1149,8 @@ class BEH_GUI():
             COND_MAX_TIME = float(self.cond["MAX_TIME"])
             reset = self.cond["RESET"]
 
-            print("\n\nCONDTION")
-            print(self.cond)
+            #print("\n\nCONDTION")
+            #print(self.cond)
             #condkey = list(condDict.keys())[0] # First key in condDict
 
 
@@ -1129,7 +1222,7 @@ class BEH_GUI():
            if self.LEVER_PRESSED_R: # RIGHT LEVER
                GUIFunctions.log_event(self, self.events,"Right_Lever_Pressed",self.cur_time)
                if not self.HAS_ALREADY_RESPONDED:# Prevents rewarding for multiple presses
-                   print("cond['DES_R_LEVER_PRESS']",self.cond['DES_R_LEVER_PRESS'])
+                   #print("cond['DES_R_LEVER_PRESS']",self.cond['DES_R_LEVER_PRESS'])
                    if self.cond['DES_R_LEVER_PRESS']:
                        GUIFunctions.log_event(self, self.events,"CORRECT Response",self.cur_time)
                        self.CORRECT = True

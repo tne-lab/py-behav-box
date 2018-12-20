@@ -1,0 +1,56 @@
+[EXPERIMENT]
+EXPT_NAME = TESTING
+SUBJECT = RAT
+EXPT_PATH 	= C:\Users\ephys-2\Desktop\BehChamGUI\DATA
+VI_TIMES_LIST_PATH	=  C:\Users\ephys-2\Desktop\BehChamGUI\DATA\HAB_COND_EXT_AND_RECALL_VIstest.txt
+OPEN_EPHYS_PATH = C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe
+
+[TONE1] # Need TONE1, TONE2
+Duration(s) 	= 5
+Freq(Hz)	= 1800
+Volume(0.0-1.0)	= 1.0
+
+[SHOCK]
+Duration(s) 	= 0.5
+Volts		= 5.5
+Amps(mA)	= 100
+
+[FREEZE]
+Min Duration(s)	= 2
+Min Moving Pix	= 5000
+Min Theshold = 26
+
+[SETUP]
+FAN_ON=True
+CAB_LIGHT=True
+CAMERA=True
+REC=True
+FOOD_LIGHT=True
+
+[BAR_PRESS] #NOTE: VI=15 is variable interval with meant time of 15.  PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
+VI=5
+
+[PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
+EXTEND_LEVERS=True
+
+START_LOOP1 = 5 #NOTE: HABITUATION
+  PAUSE = HABITUATION  #This will use VI on each line of file, one line per loop, COULD ALSO BE JUST A NUMBER
+  TONE1
+  PAUSE = 5
+END_LOOP
+
+START_LOOP2 = 7 #NOTE: CONDITIONING
+  PAUSE = CONDITIONING  #This will use VI on each line of file, one line per loop
+  TONE1
+  PAUSE = 4.5
+  SHOCK
+  PAUSE = 0.5
+END_LOOP
+
+EXTEND_LEVERS=False
+FOOD_LIGHT=False
+REC=False
+CAMERA= False
+CAB_LIGHT=False
+FAN_ON=False
+[END PROTOCOL]

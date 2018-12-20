@@ -95,6 +95,7 @@ class Vid:
 #######################################################################################
     # Call this every loop
     def run(self):
+        movingPxls = 0
         while(self.cap.isOpened()):
             vid_cur_time = time.perf_counter()
 
@@ -102,9 +103,13 @@ class Vid:
             try:
                 msg = self.q.pop()
                 time_from_GUI = msg['cur_time']
+<<<<<<< HEAD
                 STATE = msg['STATE']
                 if STATE in 'START':
                     self.exptStarted = True
+=======
+                STATE = msg['STATE']# "REC" "STOP" "FREEZE_DETECT"
+>>>>>>> beh-gui-1.0
                 msg['time_diff'] = vid_cur_time - time_from_GUI
                 msg['vid_time'] = vid_cur_time
                 if msg['PATH_FILE'] != self.outPath:
@@ -112,10 +117,12 @@ class Vid:
             except IndexError:
                 continue
             #Get frame
+            #if msg['STATE'] == "FREEZE_DETECT":
+            #self.initROIFrames()
             ret, frame = self.cap.read()
             if not ret:
-                print('error in getting read')
-                return
+                   print('error in getting read')
+                   return
             # Grab only ROI
             imgROI = frame[int(self.r[1]):int(self.r[1]+self.r[3]),int(self.r[0]):int(self.r[0] + self.r[2])]
             #Make gray and blur
@@ -139,8 +146,14 @@ class Vid:
                     self.text = 'freeze'
 
             # Write stuff on screen (need to add trial number and probably not time differential)
+<<<<<<< HEAD
             self.drawInfo(msg['cur_time'], str(msg['trial_num']), movingPxls, frame)
             #self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, frame)
+=======
+            #self.drawInfo(msg['cur_time'], msg['trial_num'], movingPxls, frame)
+            self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, msg['STATE'], frame)
+
+>>>>>>> beh-gui-1.0
             # draw trial start circle
 
             if msg['STATE'] == 'REC':
@@ -207,12 +220,13 @@ class Vid:
         cv2.putText(frame, "Trial Number = " + str(trial_num), (20, 425),font, .5, (255, 255, 255), 2,cv2.LINE_AA)
 
     # Wrtie a ton of stuff on frames...
-    def writeStuff(self, time_from_GUI, vid_time, time_diff, movingPxls, frame):
+    def writeStuff(self, time_from_GUI, vid_time, time_diff, movingPxls, state, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame,"NIDAQ time = " + str(time_from_GUI),(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
         cv2.putText(frame,"Video time = " + str(vid_time),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
         cv2.putText(frame,"time diff = " + str(time_diff),(20,455), font, 0.5,(255,255,255),2,cv2.LINE_AA)
         cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
+        #if state == "FREEZE_DETECT":
         cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
         cv2.putText(self.prevThresh, "Time frozen = " + str(self.timeFrozen), (100, 50),font, .5, (255, 255, 255), 2)
         cv2.putText(self.prevThresh, "Current frame = " + str(self.startFrame), (10,95), font, .5, (255,255,255),2)
@@ -239,7 +253,11 @@ class Vid:
     # Create Region of Interest coordinates
     def genROI(self, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
+<<<<<<< HEAD
         cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.9,(255,255,255),2,cv2.LINE_AA)
+=======
+        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.6,(255,255,255),2,cv2.LINE_AA)
+>>>>>>> beh-gui-1.0
         self.r = cv2.selectROI(frame)
         cv2.destroyWindow("ROI selector")
 

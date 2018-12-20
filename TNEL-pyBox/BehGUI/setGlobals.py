@@ -52,9 +52,12 @@ def setGlobals(self):
     print("....")
     print (self.datapath)
 
-    self.expt_file_name = 'PROTOCOL_HABITUATION_AND_CONDITIONING.txt'
+    self.expt_file_name = 'PROTOCOL.txt'
     self.expt_file_path_name = os.path.join(self.datapath,self.expt_file_name )
     print("EXPT FILE TO LOAD: ", self.expt_file_path_name)
+
+    self.exptFileLines = []
+    self.VIFileLines = []
 
     self.date = time.strftime("%b_%d_%y")#month-day-Year-H:M
     self.dateTm = time.strftime("%b_%d_%y-%H_%M")#month_day_Year-H:M
@@ -103,8 +106,10 @@ def setGlobals(self):
     self.Shock_V = 9.0
     self.Shock_Amp = 0.5
 
-    self.Expt_Name = '1'
-    self.Subject ='1'
+    self.Expt_Name = '?'
+    self.Subject =''
+    self.prev_Subject =''
+    self.NAME_OR_SUBJ_CHANGED = False
     self.trial_num = 0
     self.num_pellets = 0
     self.EXPT_FILE_LOADED = False

@@ -831,20 +831,23 @@ class InfoBox:
 
         # WRITE TEXT
         lines_in_txt = len(self.text)
-        my_font = pygame.font.SysFont('arial', fsize)
-        msg_in_font = my_font.render(self.text[0], True, (0,0,0))
-        msgHt = msg_in_font.get_height()
-        msgWd = msg_in_font.get_width()
-        if lines_in_txt <= 1:
-            msgX = (self.rect.width - msgWd)/2 # Center in box
-        else: msgX = +5 # Indent 5 pixels from box left
+        if lines_in_txt > 0: #NOT EMPTY BOX, No info_boxes
+            my_font = pygame.font.SysFont('arial', fsize)
+            msg_in_font = my_font.render(self.text[0], True, (0,0,0))
+            msgHt = msg_in_font.get_height()
+            msgWd = msg_in_font.get_width()
 
-        ln_count = 0
-        for line in self.text:
-            msg_in_font = my_font.render(line, True, txt_color)
-            msgY =  ln_count * msgHt - 2
-            surface.blit(msg_in_font, self.rect.move(msgX,  msgY+1))
-            ln_count +=1
+            if lines_in_txt == 1: # simple info box
+                msgX = (self.rect.width - msgWd)/2 # Center in box
+            else: # lines_in_txt > 1:
+                msgX = +5 # MULTIPLE LINE INFO BOX: Indent 5 pixels from box left
+
+            ln_count = 0
+            for line in self.text:
+                msg_in_font = my_font.render(line, True, txt_color)
+                msgY =  ln_count * msgHt - 2
+                surface.blit(msg_in_font, self.rect.move(msgX,  msgY+1))
+                ln_count +=1
 
 
 class get_user_input:
@@ -853,6 +856,7 @@ class get_user_input:
         self.surface = surface
         self.label_pos = label_pos # 'TOP','LEFT','RIGHT', or 'BOTTOM'
         self.surface_color = (255,255,255)
+        self.border_color = (0,0,0)
         lw = 1 #line_width
         self.bw = bw = 2
         self.x,self.y,self.w,self.h = (x, y, w, h)
@@ -871,8 +875,9 @@ class get_user_input:
         surface = self.surface
         #text_input = self.text
         #Draw Box
-        pygame.draw.rect(surface, (0,0,0), self.border)
-        pygame.draw.rect(surface, (255,255,255), self.rect)
+
+        pygame.draw.rect(surface, self.border_color, self.border)
+        pygame.draw.rect(surface, self.surface_color, self.rect)
         txt_color = (0,0,0)
         lw = 1 #Line width
         fsize = self.fsize
@@ -907,6 +912,7 @@ class get_user_input:
     # Get user keyboard input
 
     def get_key_input(self):
+        pygame.draw.rect(self.surface, (255,0,0), self.border)
         surface = self.surface
         fsize = self.fsize
         text_input = self.text
@@ -936,7 +942,7 @@ class get_user_input:
                 # NEW
                 if sys_event.type == pygame.KEYDOWN:
                     char = sys_event.unicode
-                    print(char)
+                    #print(char)
                     if sys_event.key == K_BACKSPACE:
                         text_input = text_input[0:-1] #REMOVE LAST CHAR
 
@@ -944,6 +950,7 @@ class get_user_input:
                         NEED_USER_INFO = False
                         self.text = text_input
                         self.TEXT_CHANGED = True
+                        self.border_color = (0,0,0)
                         break
 
                     else: #COLLECT ENTERRED CHARACTERS
