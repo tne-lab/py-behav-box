@@ -26,6 +26,8 @@ CAB_LIGHT=True
 CAMERA=True
 REC=True
 FOOD_LIGHT=True
+ROI=(712,55,505,437) #NOTE: (x,y,height,width?)
+FREEZE=True
 
 [BAR_PRESS] #NOTE: VI=15 is variable interval with meant time of 15.  PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
 VI=15

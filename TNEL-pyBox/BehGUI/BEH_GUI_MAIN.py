@@ -800,6 +800,16 @@ class BEH_GUI():
                 self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
             else:
                 self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+        elif key == 'ROI':
+            print('setting ROI')
+            self.setup_ln_num += 1
+            self.vidDict['ROI'] = setupDict[key].split('#')[0]
+        elif key == 'FREEZE':
+            print('adding freeze')
+            self.setup_ln_num += 1
+            val = str2bool(setupDict[key])
+            self.vidDict['FREEZE'] = val
+
         if self.setup_ln_num >= len(self.setup):
             self.RUN_SETUP = False
 
@@ -812,7 +822,6 @@ class BEH_GUI():
         '''
         GUIFunctions.FOOD_REWARD_RESET(self) #NOTE: THIS IS SO LOW BIT IS SENT TO FEEDER WITHOUT PAUSING THE PROGRAM
         protocolDict = self.protocol[self.Protocol_ln_num]
-        print(protocolDict)
         key = list(protocolDict.keys())[0] # First key in protocolDict
 
         # Tell open ephys to start acquisiton and recording?
