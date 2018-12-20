@@ -107,10 +107,10 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
 def setupGUI(self):
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (20,40)
     self.myscreen = pygame.display.set_mode((500,990),pygame.RESIZABLE,32)
-    self.UMNlogo = pygame.image.load(r'.\RESOURCES\UMNlogo.PNG')
-    pygame.display.set_icon(self.UMNlogo)
-    self.TNElogo = pygame.image.load(r'.\RESOURCES\TNE logo.jpg')
-    self.TNElogo = pygame.transform.scale(self.TNElogo, (70, 50))
+    #self.UMNlogo = pygame.image.load(r'.\RESOURCES\UMNlogo.PNG')
+    #pygame.display.set_icon(self.UMNlogo)
+    #self.TNElogo = pygame.image.load(r'.\RESOURCES\TNE logo.jpg')
+    #self.TNElogo = pygame.transform.scale(self.TNElogo, (70, 50))
     pygame.display.set_caption('Behavioral Chamber Control 1.0 by F. da Silva and M. Shatza Oct. 30, 2018') # Enter your window caption here
     pygame.init()
 
@@ -186,7 +186,7 @@ def setupGUI(self):
 
     # MAIN LOOP
     self.start_line = len(self.events)
-    self.y_per_line = int(self.sliders[0].slotL / 14.0)
+    #self.y_per_line = int(self.sliders[0].slotL / 14.0)
     self.new_slider_y = 0
     self.clk_time_start = time.perf_counter()
     self.FAN_0N = False

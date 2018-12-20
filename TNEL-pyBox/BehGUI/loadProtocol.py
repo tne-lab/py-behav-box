@@ -13,10 +13,10 @@ def load_expt_file(self):
     try:
         f = open(self.expt_file_path_name,'r')
         # Read Line by line
-
+        EXPERIMENT = False
         for line in f:
             line = line.strip() # Remove leading and trailoing blanks and \n
-            if not 'HAB_COND_EXT_AND_RECALL_VIs' in line:
+            if not EXPERIMENT:
                 line = line.upper()
             print(line)
             lines.append(line)
@@ -341,7 +341,6 @@ def load_expt_file(self):
         return False
 
     # DATA PATH + FILES
-    #try:
     new_dir = os.path.join(self.datapath,self.Expt_Name)
     if not os.path.exists(new_dir ):  os.mkdir(new_dir)
     new_sub_dir = os.path.join(new_dir,self.date)
@@ -360,7 +359,6 @@ def load_expt_file(self):
     video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
     self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
     print(self.video_file_path_name)
-
     # COPY EXPT FILE TO EXPT FILE DATAPATH
     try:
         exf = open(self.expt_file_path_name_COPY,'w')
