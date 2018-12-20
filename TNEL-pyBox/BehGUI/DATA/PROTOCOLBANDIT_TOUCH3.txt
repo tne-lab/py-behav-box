@@ -27,8 +27,9 @@ Min Theshold = 26
 
 [TOUCHSCREEN]
 IMAGES_PATH = D:\Desktop\BehChamGUI\RESOURCES
-IMG1= test.bmp,(100,500)
-IMG2= santa_fe.bmp,(700,500)
+COORDS=(100,500):(700,500)
+IMG1= test.bmp:(80,30,40,50,60,10,30,30,50,10)
+IMG2= santa_fe.bmp:(80,30,40,50,60,10,30,30,50,10)
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 FAN_ON=True
@@ -52,6 +53,6 @@ FAN_ON=False
 [END PROTOCOL]
 
 [CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS.
-MAX_TIME, RESET,        IMG1,           IMG2,        DES_IMG1_PRESSP, DES_IMG2_PRESSP, CORRECT, 	WRONG,     NO_ACTION
-3,      FIXED,	  1,		  0,		  1,		    0,	       PELLET80,	PELLET20,  TONE2
-5,      ON_RESPONSE,  	  0,		  1,		  0,		    1,	       PELLET80,	PELLET20,  TONE2
+MAX_TIME, RESET,        NO_ACTION
+3,      FIXED,	        TONE2
+5,      ON_RESPONSE,    TONE2

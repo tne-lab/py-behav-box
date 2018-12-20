@@ -1002,7 +1002,13 @@ class BEH_GUI():
 
         elif "DRAW_IMAGES" in key:
             if self.TOUCHSCREEN_USED:
-                self.TSq.put(self.touch_img_files)
+                placementList = random.sample(range(len(self.touchImgCoords)), len(self.touchImgCoords))
+                imgList = {}
+                i=0
+                for key in touchImgs.keys():
+                    imgList[key] = self.touchImgCoords[placementList[i]]
+                    i+=1
+                self.TSq.put(imgList)
                 self.Protocol_ln_num +=1
 
         elif "START_LOOP" in key:

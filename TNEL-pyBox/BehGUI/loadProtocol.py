@@ -226,9 +226,29 @@ def load_expt_file(self):
                         words = line.split('=')
                         self.TOUCH_IMG_PATH = words[1].strip()
                         self.TOUCHSCREEN_USED = True
+                    if 'COORDS' in line:
+                        words = line.split('=')
+                        imageCoords = words[1].split(':')
+                        for c in '()':
+                            #Remove parenthesis from (x,y)
+                            imageInfo[1] = imageInfo[1].replace(c, "")
+                        imageCoordsStr = imageInfo[1].split(",")
+                        self.touchImgCoords.append(int(imageCoordsStr[0]), int(imageCoordsStr[1]))
                     elif 'IMG' in line:
                         words = line.split('=')
-                        image_name = words[0].strip()
+                        imageName = words[0].strip()
+                        imageInfo = words[1].split(":")
+                        for c in '()':
+                            #Remove parenthesis from rewards
+                            imageInfo[1] = imageInfo[1].replace(c, "")
+                        imgRewards = []
+                        for probability in imageInfo[1].split(","):
+                            imgRewards.append(int(probability))
+                        self.touchImgs[imageName] = imgRewards
+
+                        self.touch_img_files.append(touch_image_dict)
+
+                        '''
                         image_file_name_coord = words[1].split(",")
                         img_file_name = image_file_name_coord[0].strip()
                         x = image_file_name_coord[1].strip()
@@ -237,6 +257,7 @@ def load_expt_file(self):
                         y = y.strip(")")
                         touch_image_dict[img_file_name] = (int(x),int(y))
                         self.touch_img_files.append(touch_image_dict)
+                        '''
                 elif BAR_PRESS:
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
                     if "VI" in line:
