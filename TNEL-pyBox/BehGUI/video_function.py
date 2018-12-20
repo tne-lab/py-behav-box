@@ -9,6 +9,8 @@ class Vid:
         self.back_q = back_q
         self.out = None
         self.outPath = 'NOT SET'
+        self.ROIenabled = False
+        self.freezeEnable = False
         cv2.namedWindow('vid')
         if self.cap.isOpened():
             if not self.vidOrLive(videoPath):
@@ -30,7 +32,7 @@ class Vid:
             lambda thresh: self.changeThresh(thresh))
             # Init some stuff
             self.exptStarted = False
-            self.initROIFrames()
+            #self.initROIFrames()
             self.back_q.put('vid ready')
         else:
             print('error opening vid')
@@ -78,7 +80,8 @@ class Vid:
         if not ret:
             print('frame read error')
             return
-        self.genROI(frame)
+        if not self.ROIenabled:
+            self.genROI(frame)
 
         # Gen prev frame and threshold (Use size of ROI)
         self.startFrame+=1
@@ -86,81 +89,91 @@ class Vid:
         if not ret:
             print('frame read error')
             return
-        frameROI = frame[int(self.r[1]):int(self.r[1]+self.r[3]),int(self.r[0]):int(self.r[0] + self.r[2])]
-        newFrameROI = newFrame[int(self.r[1]):int(self.r[1]+self.r[3]),int(self.r[0]):int(self.r[0] + self.r[2])]
+        frameROI = frame[int(self.ROI[1]):int(self.ROI[1]+self.ROI[3]),int(self.ROI[0]):int(self.ROI[0] + self.ROI[2])]
+        newFrameROI = newFrame[int(self.ROI[1]):int(self.ROI[1]+self.ROI[3]),int(self.ROI[0]):int(self.ROI[0] + self.ROI[2])]
         self.genPrev(newFrameROI, frameROI)
+        self.ROIenabled = True
 
 
 #######################################################################################
 #######################################################################################
     # Call this every loop
     def run(self):
-        movingPxls = 0
         while(self.cap.isOpened()):
             vid_cur_time = time.perf_counter()
-
+            #Get frame
+            ret, frame = self.cap.read()
             # Run video
             try:
                 msg = self.q.pop()
                 time_from_GUI = msg['cur_time']
-<<<<<<< HEAD
                 STATE = msg['STATE']
                 if STATE in 'START':
                     self.exptStarted = True
-=======
-                STATE = msg['STATE']# "REC" "STOP" "FREEZE_DETECT"
->>>>>>> beh-gui-1.0
+                if 'ROI' in msg and not self.ROIenabled:
+                    if msg['ROI'] in 'GENERATE':
+                        self.initROIFrames()
+                    else:
+                        #Remove first and last char
+                        ROIstr = msg['ROI'][1:-1]
+                        ROIlist = ROIstr.split(",")
+                        self.ROI = [int(x) for x in ROIlist]
+                        self.ROIenabled = True
+                        self.initROIFrames()
+
+                        self.ROIenabled = True
+                if 'FREEZE' in msg:
+                    if msg['FREEZE'] and self.ROIenabled:
+                        self.freezeEnable = True
+                    else:
+                        self.freezeEnable = False
+
                 msg['time_diff'] = vid_cur_time - time_from_GUI
                 msg['vid_time'] = vid_cur_time
                 if msg['PATH_FILE'] != self.outPath:
                     self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))
             except IndexError:
                 continue
-            #Get frame
-            #if msg['STATE'] == "FREEZE_DETECT":
-            #self.initROIFrames()
-            ret, frame = self.cap.read()
+
             if not ret:
-                   print('error in getting read')
-                   return
+                print('error in getting read')
+                return
             # Grab only ROI
-            imgROI = frame[int(self.r[1]):int(self.r[1]+self.r[3]),int(self.r[0]):int(self.r[0] + self.r[2])]
-            #Make gray and blur
-            gray = cv2.cvtColor(imgROI, cv2.COLOR_BGR2GRAY)
-            gray = cv2.GaussianBlur(gray, (21, 21), 0)
-            movingPxls = self.calcMovingPixels(gray)
+            if self.ROIenabled:
+                imgROI = frame[int(self.ROI[1]):int(self.ROI[1]+self.ROI[3]),int(self.ROI[0]):int(self.ROI[0] + self.ROI[2])]
+                #Make gray and blur
+                gray = cv2.cvtColor(imgROI, cv2.COLOR_BGR2GRAY)
+                gray = cv2.GaussianBlur(gray, (21, 21), 0)
 
-            # Moving or frozen?
-            if movingPxls > 70:
-                self.text = 'move'
-                self.timeFrozen = 0
-                if self.isFrozen:
-                    self.isFrozen = False
-                    self.freezeFile.write('end freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
-                    #back_q.put({'FREEZE' : False, 'TIME' : time_from_GUI})
-            else:
-                if self.checkFreeze() and not self.isFrozen:
-                    self.isFrozen = True
-                    self.freezeFile.write('freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
-                    #back_q.put({'FREEZE' : True, 'TIME' : time_from_GUI})
-                    self.text = 'freeze'
+            if self.freezeEnable:
+                movingPxls = self.calcMovingPixels(gray)
 
+                # Moving or frozen?
+                if movingPxls > 70:
+                    self.text = 'move'
+                    self.timeFrozen = 0
+                    if self.isFrozen:
+                        self.isFrozen = False
+                        self.freezeFile.write('end freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
+                        #back_q.put({'FREEZE' : False, 'TIME' : time_from_GUI})
+                else:
+                    if self.checkFreeze() and not self.isFrozen:
+                        self.isFrozen = True
+                        self.freezeFile.write('freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
+                        #back_q.put({'FREEZE' : True, 'TIME' : time_from_GUI})
+                        self.text = 'freeze'
+
+                cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,255,255),2,cv2.LINE_AA)
+                cv2.imshow('thresh',self.prevThresh)
             # Write stuff on screen (need to add trial number and probably not time differential)
-<<<<<<< HEAD
-            self.drawInfo(msg['cur_time'], str(msg['trial_num']), movingPxls, frame)
+            self.drawInfo(msg['cur_time'], str(msg['trial_num']), frame)
             #self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, frame)
-=======
-            #self.drawInfo(msg['cur_time'], msg['trial_num'], movingPxls, frame)
-            self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, msg['STATE'], frame)
-
->>>>>>> beh-gui-1.0
             # draw trial start circle
 
             if msg['STATE'] == 'REC':
                 self.out.write(frame)
 
             # Show the frames
-            cv2.imshow('thresh',self.prevThresh)
             cv2.imshow(self.winName,frame)
 
             # Create dict to send back to main GUI
@@ -210,23 +223,21 @@ class Vid:
 
 
     # Update screen info
-    def drawInfo(self, time_from_GUI, trial_num, movingPxls, frame):
+    def drawInfo(self, time_from_GUI, trial_num, frame):
         if self.exptStarted:
             cv2.circle(frame, (30,455), 20, (0,255,0) ,thickness = -1)
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame,"NIDAQ time = " + str(time_from_GUI),(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
         cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
-        cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
         cv2.putText(frame, "Trial Number = " + str(trial_num), (20, 425),font, .5, (255, 255, 255), 2,cv2.LINE_AA)
 
     # Wrtie a ton of stuff on frames...
-    def writeStuff(self, time_from_GUI, vid_time, time_diff, movingPxls, state, frame):
+    def writeStuff(self, time_from_GUI, vid_time, time_diff, movingPxls, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame,"NIDAQ time = " + str(time_from_GUI),(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
         cv2.putText(frame,"Video time = " + str(vid_time),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
         cv2.putText(frame,"time diff = " + str(time_diff),(20,455), font, 0.5,(255,255,255),2,cv2.LINE_AA)
         cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
-        #if state == "FREEZE_DETECT":
         cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
         cv2.putText(self.prevThresh, "Time frozen = " + str(self.timeFrozen), (100, 50),font, .5, (255, 255, 255), 2)
         cv2.putText(self.prevThresh, "Current frame = " + str(self.startFrame), (10,95), font, .5, (255,255,255),2)
@@ -253,13 +264,10 @@ class Vid:
     # Create Region of Interest coordinates
     def genROI(self, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
-<<<<<<< HEAD
         cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.9,(255,255,255),2,cv2.LINE_AA)
-=======
-        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.6,(255,255,255),2,cv2.LINE_AA)
->>>>>>> beh-gui-1.0
-        self.r = cv2.selectROI(frame)
+        self.ROI = cv2.selectROI(frame)
         cv2.destroyWindow("ROI selector")
+        print(self.ROI)
 
     # Create a previous frame and thresh to be used for comparison on first frames only
     def genPrev(self, frame, prevFrame):
