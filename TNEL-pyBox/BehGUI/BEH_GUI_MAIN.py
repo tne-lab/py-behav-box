@@ -247,7 +247,7 @@ class BEH_GUI():
                 else: info.text = ['0.000']
             elif info.label == "EVENT LOG":
                 lines_in_txt = len(self.events)
-                y_per_line = int(self.sliders[0].slotL / 14.0) 
+                y_per_line = int(self.sliders[0].slotL / 14.0)
                 if lines_in_txt > 14: # 14 lines fit in window
                     ##########################################################
                     # SLIDER:
@@ -480,7 +480,7 @@ class BEH_GUI():
                                     for LED in self.LEDs: # Look for EXPT STARTED LED
                                           if LED.index == 6: # Expt Started light
                                               LED.ONOFF = "OFF"
-                                              
+
                                elif button.text == "START EXPT":
                                     self.cur_time = time.perf_counter()
                                     self.Experiment_Start_time = self.cur_time
@@ -506,12 +506,9 @@ class BEH_GUI():
                                                     self.VI_start = 0.0 #self.cur_time
                                                     self.VI = random.randint(0,int(self.var_interval_reward*2))
                                                     print("VI.......................", self.VI)
-                                                    
+
                                                 GUIFunctions.log_event(self, self.events,"EXPT STARTED",self.cur_time)
                                                 self.START_EXPT = True
-                                                self.snd.send(self.snd.START_ACQ) # Press play on Open Ephys GUI
-                                                self.snd.send(self.snd.START_REC) # Press RECORD on Open Ephys GUI
-
 
                                                 print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
                                                 for LED in self.LEDs: # Look for EXPT STARTED LED
@@ -524,7 +521,7 @@ class BEH_GUI():
                                                 # CAN RECORD SIGNAL BE THE START EVENT?????
                                                 #
                                                 ################################################################
-                                                
+
                                             else:
                                                 print("UNABLE TO UPDATE EXPT FILE COPY!!!!")
                                         elif self.Subject == "" or "?" in self.Subject:
@@ -853,8 +850,8 @@ class BEH_GUI():
         elif key == "REC":
             print ("recording")
             self.RECORDING = True
-            self.snd.send(self.snd.STOP_ACQ)
-            self.snd.send(self.snd.STOP_REC)
+            self.snd.send(self.snd.START_ACQ)
+            self.snd.send(self.snd.START_REC)
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
@@ -1109,7 +1106,9 @@ class BEH_GUI():
            GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
 
            # TEll open ephys to stop acquistion and recording?
-
+           # Maybe we want to wait and continue getting data for awhile. Just send some sort of event
+           #self.snd.send(self.snd.STOP_ACQ)
+           #self.snd.send(self.snd.STOP_REC)
 
            if self.TOUCHSCREEN_USED:
                self.TSq.put('')
