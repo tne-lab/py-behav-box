@@ -217,13 +217,13 @@ class MyWhiskerTask(WhiskerTwistedTask):
     # Looks at the q for a message from GUI
     def RECVCMD(self):
         if not self.q.empty():
-            parseMsg(self.q.get())
+            self.parseMsg(self.q.get())
 
-    # Need to wait for first msg from GUI before proceeding 
+    # Need to wait for first msg from GUI before proceeding
     def RECVFIRST(self):
         while True:
             if not self.q.empty():
-                parseMsg(self.q.get())
+                self.parseMsg(self.q.get())
                 break
 
     # Parses JSON msg from GUI
@@ -232,14 +232,19 @@ class MyWhiskerTask(WhiskerTwistedTask):
             self.clearEvents()
             reactor.stop()
             return
-
-        for img, coords in msg:
-            print(im,coords)
-            pics.append(im)
-            XYarray.append(coords)
-
-        self.pics = pics
-        self.XYarray = XYarray
+        elif msg == '':
+            self.pics = []
+            self.XYarray = []
+        else:
+            pics = []
+            XYarray = []
+            for img, coords in msg.items():
+                print(img,coords)
+                pics.append(img)
+                XYarray.append(coords)
+            self.pics = pics
+            self.XYarray = XYarray
+            
         self.clearEvents()
         self.draw()
 

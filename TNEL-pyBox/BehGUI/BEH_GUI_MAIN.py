@@ -1002,10 +1002,10 @@ class BEH_GUI():
 
         elif "DRAW_IMAGES" in key:
             if self.TOUCHSCREEN_USED:
-                placementList = random.sample(range(len(self.touchImgCoords)), len(self.touchImgCoords))
+                placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords))
                 imgList = {}
                 i=0
-                for key in touchImgs.keys():
+                for key in self.touchImgs.keys():
                     imgList[key] = self.touchImgCoords[placementList[i]]
                     i+=1
                 self.TSq.put(imgList)
@@ -1243,7 +1243,7 @@ class BEH_GUI():
                    elif not self.HAS_ALREADY_RESPONDED:
                        self.HAS_ALREADY_RESPONDED = True
                        # Check probability for pic/trial
-                       for img, probabilityList in self.touchImgs:
+                       for img, probabilityList in self.touchImgs.items():
                            if touchMsg['picture'] == img:
                                #GUIFunctions.log_event(self,self.events, "Probability of pellet: " + probabilityList[self.trial_num],self.cur_time)
                                # Holds the probability for each trial
@@ -1292,15 +1292,15 @@ class BEH_GUI():
                    if len(outcome)<=6: # Just 'PELLET'
                        GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                    else: #"PELLET##"
-                       probability_of_reward = float(outcome[6:])
-                       if probability_of_reward in "VAR":
+                       probability_of_reward = outcome[6:]
+                       if "VAR" in probability_of_reward:
                            if random.random()*100 <= self.cur_probability:
                                GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(self.cur_probability)+ "% probability", self.cur_time)
                            else:
                                GUIFunctions.log_event(self, self.events,"Reward NOT given w " + str(self.cur_probability)+"% probability", self.cur_time)
 
                        else:
-                           if random.random()*100 <= probability_of_reward:
+                           if random.random()*100 <= float(probability_of_reward):
                                GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(probability_of_reward)+ "% probability", self.cur_time)
                            else:
                                GUIFunctions.log_event(self, self.events,"Reward NOT given w " + str(probability_of_reward)+"% probability", self.cur_time)

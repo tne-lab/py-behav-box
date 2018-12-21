@@ -53,5 +53,5 @@ FAN_ON=False
 
 [CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS.
 MAX_TIME, RESET,      CORRECT,        NO_ACTION
-3,      FIXED,      	PELLET_VAR        TONE2
-5,      ON_RESPONSE,  PELLET_VAR        TONE2
+3,      FIXED,      	PELLET_VAR,        TONE2
+5,      ON_RESPONSE,  PELLET_VAR,        TONE2

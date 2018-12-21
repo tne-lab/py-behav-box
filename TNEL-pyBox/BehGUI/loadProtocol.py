@@ -229,15 +229,16 @@ def load_expt_file(self):
                     if 'COORDS' in line:
                         words = line.split('=')
                         imageCoords = words[1].split(':')
-                        for c in '()':
-                            #Remove parenthesis from (x,y)
-                            imageInfo[1] = imageInfo[1].replace(c, "")
-                        imageCoordsStr = imageInfo[1].split(",")
-                        self.touchImgCoords.append(int(imageCoordsStr[0]), int(imageCoordsStr[1]))
+                        for i in range(len(imageCoords)):
+                            for c in '()':
+                                #Remove parenthesis from (x,y)
+                                imageCoords[i] = imageCoords[i].replace(c, "")
+                            imageCoordsStr = imageCoords[i].split(",")
+                            self.touchImgCoords.append((int(imageCoordsStr[0]), int(imageCoordsStr[1])))
                     elif 'IMG' in line:
                         words = line.split('=')
-                        imageName = words[0].strip()
                         imageInfo = words[1].split(":")
+                        imageName = imageInfo[0].strip()
                         for c in '()':
                             #Remove parenthesis from rewards
                             imageInfo[1] = imageInfo[1].replace(c, "")
