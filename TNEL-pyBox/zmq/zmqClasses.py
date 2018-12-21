@@ -48,7 +48,7 @@ class SNDEvent:
     # port default is 5556 for event rcver on OE
     # recordingDir changes the dir..
     # prependText and appendText add info to either the beginning or end of filename
-    def __init__(self, port, recordingDir = '', prependText = '', appendText = '', TTLChannel = 0):
+    def __init__(self, port, recordingDir = '', prependText = '', appendText = '', TTLChannel = 1):
         context = zmq.Context()
         #  Socket to talk to OE
         print("Connecting sender to Open Ephys \n")
