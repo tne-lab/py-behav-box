@@ -91,6 +91,9 @@ def setGlobals(self):
     self.TSq = Queue()
     self.TSBack_q = Queue()
     self.TOUCH_TRHEAD_STARTED = False
+
+    self.touchImgCoords = []
+    self.touchImgs = {}
     ################################################################
     # GENERAL GLOBALS
     ################################################################

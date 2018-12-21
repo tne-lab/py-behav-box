@@ -246,18 +246,6 @@ def load_expt_file(self):
                             imgRewards.append(int(probability))
                         self.touchImgs[imageName] = imgRewards
 
-                        self.touch_img_files.append(touch_image_dict)
-
-                        '''
-                        image_file_name_coord = words[1].split(",")
-                        img_file_name = image_file_name_coord[0].strip()
-                        x = image_file_name_coord[1].strip()
-                        x = x.strip("(")
-                        y = image_file_name_coord[2].strip()
-                        y = y.strip(")")
-                        touch_image_dict[img_file_name] = (int(x),int(y))
-                        self.touch_img_files.append(touch_image_dict)
-                        '''
                 elif BAR_PRESS:
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
                     if "VI" in line:

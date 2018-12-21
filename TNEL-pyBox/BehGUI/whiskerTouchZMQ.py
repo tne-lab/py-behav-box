@@ -213,54 +213,35 @@ class MyWhiskerTask(WhiskerTwistedTask):
                 #print('echingQ')
                 self.RECVCMD()
 
-    ######## zmq ############
+    ######## zmq ###############
+    # Looks at the q for a message from GUI
     def RECVCMD(self):
         if not self.q.empty():
-            msg = self.q.get()
-            #msg = json.loads(jsonStr)
-            if msg == 'STOP':
-                self.clearEvents()
-                reactor.stop()
-                return
+            parseMsg(self.q.get())
 
-            pics = []
-            XYarray = []
-            for img in msg:
-                    for im,coords in img.items():
-                        print(im,coords)
-                        pics.append(im)
-                        XYarray.append(coords)
-
-
-            self.pics = pics
-            self.XYarray = XYarray
-            self.clearEvents()
-            self.draw()
-
+    # Need to wait for first msg from GUI before proceeding 
     def RECVFIRST(self):
         while True:
             if not self.q.empty():
-                msg = self.q.get()
-                #msg = json.loads(jsonStr)
-                if msg == 'STOP':
-                    self.clearEvents()
-                    reactor.stop()
-                    return
-
-                pics = []
-                XYarray = []
-                for img in msg:
-                        for im,coords in img.items():
-                            print(im,coords)
-                            pics.append(im)
-                            XYarray.append(coords)
-
-
-                self.pics = pics
-                self.XYarray = XYarray
-                self.clearEvents()
-                self.draw()
+                parseMsg(self.q.get())
                 break
+
+    # Parses JSON msg from GUI
+    def parseMsg(self, msg):
+        if msg == 'STOP':
+            self.clearEvents()
+            reactor.stop()
+            return
+
+        for img, coords in msg:
+            print(im,coords)
+            pics.append(im)
+            XYarray.append(coords)
+
+        self.pics = pics
+        self.XYarray = XYarray
+        self.clearEvents()
+        self.draw()
 
 def main(back_q, q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA_DIR, port = DEFAULT_PORT):
     '''

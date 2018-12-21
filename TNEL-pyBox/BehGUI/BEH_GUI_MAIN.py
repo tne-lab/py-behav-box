@@ -1242,20 +1242,13 @@ class BEH_GUI():
                        print('missed')
                    elif not self.HAS_ALREADY_RESPONDED:
                        self.HAS_ALREADY_RESPONDED = True
-                       for i in range(len(self.touch_img_files)):
-                           for key in self.touch_img_files[i].keys():
-                               if key in touchMsg['picture']:
-                                   if i == 0 and self.cond["DES_IMG1_PRESSP"]:
-                                       GUIFunctions.log_event(self, self.events,"CORRECT Response",self.cur_time)
-                                       self.CORRECT = True
-                                       break
-                                   elif i == 1 and self.cond["DES_IMG2_PRESSP"]:
-                                       GUIFunctions.log_event(self, self.events,"CORRECT Response",self.cur_time)
-                                       self.CORRECT = True
-                                       break
-                       if not self.CORRECT:
-                           self.WRONG = True
-                           GUIFunctions.log_event(self, self.events,"WRONG Response",self.cur_time)
+                       # Check probability for pic/trial
+                       for img, probabilityList in self.touchImgs:
+                           if touchMsg['picture'] == img:
+                               #GUIFunctions.log_event(self,self.events, "Probability of pellet: " + probabilityList[self.trial_num],self.cur_time)
+                               # Holds the probability for each trial
+                               self.cur_probability = probabilityList[self.trial_num]
+                               self.CORRECT = True
 
            if self.cond["RESET"] == "FIXED":
                if cond_time_elapsed >= float(self.cond["MAX_TIME"]): # Time is up
@@ -1300,10 +1293,17 @@ class BEH_GUI():
                        GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                    else: #"PELLET##"
                        probability_of_reward = float(outcome[6:])
-                       if random.random()*100 <= probability_of_reward:
-                           GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(probability_of_reward)+ "% probability", self.cur_time)
+                       if probability_of_reward in "VAR":
+                           if random.random()*100 <= self.cur_probability:
+                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(self.cur_probability)+ "% probability", self.cur_time)
+                           else:
+                               GUIFunctions.log_event(self, self.events,"Reward NOT given w " + str(self.cur_probability)+"% probability", self.cur_time)
+
                        else:
-                           GUIFunctions.log_event(self, self.events,"Reward NOT given w " + str(probability_of_reward)+"% probability", self.cur_time)
+                           if random.random()*100 <= probability_of_reward:
+                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(probability_of_reward)+ "% probability", self.cur_time)
+                           else:
+                               GUIFunctions.log_event(self, self.events,"Reward NOT given w " + str(probability_of_reward)+"% probability", self.cur_time)
 
 
                elif 'TONE' in outcome:
