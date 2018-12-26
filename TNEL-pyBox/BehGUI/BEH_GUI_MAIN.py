@@ -202,8 +202,8 @@ class BEH_GUI():
                     #               NOTE only 14 text lines fit inside window
                     ##########################################################
                     slider_Button_ht = int((14.0/float(lines_in_txt)) * self.sliders[0].slotL) # portion of SlotL
-                    if slider_Button_ht <= 14:
-                        self.sliders[0].bh = 14
+                    if slider_Button_ht <= 10:
+                        self.sliders[0].bh = 10
                     else:
                         self.sliders[0].bh = slider_Button_ht
 
@@ -214,7 +214,14 @@ class BEH_GUI():
                     if self.sliders[0].sliderY >= self.sliders[0].slotL - self.sliders[0].bh:
                        self.sliders[0].sliderY = self.sliders[0].slotL - self.sliders[0].bh
                     self.sliders[0].draw()
+                    #info.text = self.events[self.start_line:self.start_line+14]
+                    # Proportion of events to display
+                    self.start_line = int(len(self.events) * (self.sliders[0].sliderY/(self.sliders[0].slotL  -  self.sliders[0].bh)))
+                    print("self.start_line: ",self.start_line, "len(self.events): ",len(self.events) )
+                    #self.start_line = int(len(self.events) * (self.sliders[0].sliderY-self.sliders[0].bh)/(self.sliders[0].slotL ))
                     info.text = self.events[self.start_line:self.start_line+14]
+
+
                 else: info.text = self.events
 
             info.draw()
@@ -300,8 +307,8 @@ class BEH_GUI():
 
                         self.cur_Vslider.sliderY = new_slider_y # relative to top of slider slot
                         self.new_slider_y = new_slider_y
-                        self.start_line = int(new_slider_y/self.y_per_line)
-                        print("new_slider_y: ",new_slider_y, "start_line: ",self.start_line)
+                        #self.start_line = int(new_slider_y/self.y_per_line)
+                        #print("new_slider_y: ",new_slider_y, "start_line: ",self.start_line)
 
             # ----------------------------------------
             # MOUSE DOWN
@@ -314,6 +321,17 @@ class BEH_GUI():
                     self.LEFT_MOUSE_DOWN = True
                 elif event.button == 3:
                     self.RIGHT_MOUSE_DOWN = True
+
+                elif event.button == 4:  #Wheel roll UP
+                     self.MOUSE_WHEEL_SCROLL_UP = True
+                     self.new_slider_y = self.sliders[0].sliderY -1
+                     print("SCROLLING DOWN",self.sliders[0].sliderY )
+                elif event.button == 5: #Wheel roll Down
+                     self.MOUSE_WHEEL_SCROLL_DN = True
+                     self.new_slider_y = self.sliders[0].sliderY +1
+                     print("SCROLLING DOWN",self.sliders[0].sliderY )
+
+
                 # BUTTONS
                 if self.LEFT_MOUSE_DOWN:
 
@@ -1274,6 +1292,6 @@ class BEH_GUI():
                self.Protocol_ln_num +=1
 
 if __name__ == "__main__":
-    GUIFunctions.openWhiskerEphys()
+    GUIFunctions.openWhiskerEphys(NIDAQ_AVAILABLE)
     beh = BEH_GUI(NIDAQ_AVAILABLE)
     beh.BehavioralChamber()

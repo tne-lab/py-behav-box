@@ -28,32 +28,33 @@ def lookForProgram(hwnd, programName):
         if 'Ephys' in programName:
             IsOpenEphysRunning = True
 
-def openWhiskerEphys():
-    global IsWhiskerRunning, IsOpenEphysRunning
-    win32gui.EnumWindows(lookForProgram, 'Open Ephys GUI')
-    if not IsOpenEphysRunning:
-        programName = 'Open Ephys GUI'
-        #try:
-        oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe'
-        window = subprocess.Popen(oe)# # doesn't capture output
-        time.sleep(2)
-        win32gui.EnumWindows(lookForProgram, programName)
-        #except:
-        #    print("Could not start Open Ephys")
-    else: print("Open Ephysis already RUNNING")
-    print(".............................................")
-    win32gui.EnumWindows(lookForProgram, 'WhiskerServer')
-    if not IsWhiskerRunning:
-        try:
-            ws = r"C:\Program Files (x86)\WhiskerControl\WhiskerServer.exe"
-            window = subprocess.Popen(ws)# # doesn't capture output
+def openWhiskerEphys(NIDAQ_AVAILABLE):
+    global IsWhiskerRunning, IsOpenEphysRunning #, self.NIDAQ_AVAILABLE
+    if NIDAQ_AVAILABLE:
+        win32gui.EnumWindows(lookForProgram, 'Open Ephys GUI')
+        if not IsOpenEphysRunning:
+            programName = 'Open Ephys GUI'
+            #try
+            oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe'
+            window = subprocess.Popen(oe)# # doesn't capture output
             time.sleep(2)
-            print("WHISKER server started", window)
-            win32gui.EnumWindows(lookForProgram, None)
-        except:
-            print("Could not start WHISKER server")
-    else: print("Whisker server is already RUNNING")
-    print(".............................................")
+            win32gui.EnumWindows(lookForProgram, programName)
+            #except:
+            #    print("Could not start Open Ephys")
+        else: print("Open Ephysis already RUNNING")
+        print(".............................................")
+        win32gui.EnumWindows(lookForProgram, 'WhiskerServer')
+        if not IsWhiskerRunning:
+            try:
+                ws = r"C:\Program Files (x86)\WhiskerControl\WhiskerServer.exe"
+                window = subprocess.Popen(ws)# # doesn't capture output
+                time.sleep(2)
+                print("WHISKER server started", window)
+                win32gui.EnumWindows(lookForProgram, None)
+            except:
+                print("Could not start WHISKER server")
+        else: print("Whisker server is already RUNNING")
+        print(".............................................")
 
 
 def choose_file():
