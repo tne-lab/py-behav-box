@@ -15,8 +15,6 @@ Developed by Flavio J.K. da Silva and  Mark Schatza Nov. 31, 2018
 """
 
 #from win32api import GetSystemMetrics
-import tkinter as Tk #Note: "Tkinter" in python 2 (capital T)
-from tkinter.filedialog import askopenfilename
 import os
 import sys, time
 import pygame
@@ -47,56 +45,6 @@ import subprocess
 import win32gui, win32con
 
 
-IsWhiskerRunning = False
-IsOpenEphysRunning = False
-# Add open ephys here possibly?
-def closeWindow(hwnd, windowName):
-    if windowName in win32gui.GetWindowText(hwnd):
-        win32gui.CloseWindow(hwnd) # Minimize Window
-
-def choose_file():
-    #Tk.withdraw() # we don't want a full GUI, so keep the root window from appearing
-    chosenFileName = askopenfilename() # show an "Open" dialog box and return the path to the selected file
-    filename = os.path.basename(chosenFileName)
-    win32gui.EnumWindows(closeWindow, 'tk')
-
-    return filename
-
-def lookForProgram(hwnd, programName):
-    global IsWhiskerRunning, IsOpenEphysRunning
-    if programName in win32gui.GetWindowText(hwnd):
-        win32gui.CloseWindow(hwnd) # Minimize Window
-        if 'Whisker' in programName:
-            IsWhiskerRunning = True
-        if 'Ephys' in programName:
-            IsOpenEphysRunning = True
-
-def openWhiskerEphys():
-    global IsWhiskerRunning, IsOpenEphysRunning
-    win32gui.EnumWindows(lookForProgram, 'Open Ephys GUI')
-    if not IsOpenEphysRunning:
-        programName = 'Open Ephys GUI'
-        try:
-            oe = r'C:\Users\Ephys\Documents\Github\OE\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe'
-            window = subprocess.Popen(oe)# # doesn't capture output
-            time.sleep(2)
-            win32gui.EnumWindows(lookForProgram, programName)
-        except:
-            print("Could not start Open Ephys")
-    else: print("Open Ephysis already RUNNING")
-    print(".............................................")
-    win32gui.EnumWindows(lookForProgram, 'WhiskerServer')
-    if not IsWhiskerRunning:
-        try:
-            ws = r"C:\Program Files (x86)\WhiskerControl\WhiskerServer.exe"
-            window = subprocess.Popen(ws)# # doesn't capture output
-            time.sleep(2)
-            print("WHISKER server started", window)
-            win32gui.EnumWindows(lookForProgram, None)
-        except:
-            print("Could not start WHISKER server")
-    else: print("Whisker server is already RUNNING")
-    print(".............................................")
 
 
 class BEH_GUI():
@@ -674,7 +622,8 @@ class BEH_GUI():
                             elif user_input.label == "EXPT PATH":
                                  self.datapath = user_input.text
                             elif user_input.label == "EXPT FILE NAME":
-                                 self.expt_file_name = choose_file()
+                                 self.expt_file_name = GUIFunctions.choose_file()
+                                 self.expt_file_path_name = os.path.join(self.datapath,self.expt_file_name )
                                  print ("File selected: ",self.expt_file_name)
                                  if self.expt_file_name == '':
                                      self.expt_file_name = user_input.text
@@ -1325,6 +1274,6 @@ class BEH_GUI():
                self.Protocol_ln_num +=1
 
 if __name__ == "__main__":
-    openWhiskerEphys()
+    GUIFunctions.openWhiskerEphys()
     beh = BEH_GUI(NIDAQ_AVAILABLE)
     beh.BehavioralChamber()

@@ -5,6 +5,64 @@ import time
 from RESOURCES.GUI_elements_by_flav import play_sound
 import sys
 import video_function
+import tkinter as Tk #Note: "Tkinter" in python 2 (capital T)
+from tkinter.filedialog import askopenfilename
+import os
+import win32gui
+import subprocess
+
+IsWhiskerRunning = False
+IsOpenEphysRunning = False
+# Add open ephys here possibly?
+def closeWindow(hwnd, windowName):
+    if windowName in win32gui.GetWindowText(hwnd):
+        win32gui.CloseWindow(hwnd) # Minimize Window
+
+
+def lookForProgram(hwnd, programName):
+    global IsWhiskerRunning, IsOpenEphysRunning
+    if programName in win32gui.GetWindowText(hwnd):
+        win32gui.CloseWindow(hwnd) # Minimize Window
+        if 'Whisker' in programName:
+            IsWhiskerRunning = True
+        if 'Ephys' in programName:
+            IsOpenEphysRunning = True
+
+def openWhiskerEphys():
+    global IsWhiskerRunning, IsOpenEphysRunning
+    win32gui.EnumWindows(lookForProgram, 'Open Ephys GUI')
+    if not IsOpenEphysRunning:
+        programName = 'Open Ephys GUI'
+        #try:
+        oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe'
+        window = subprocess.Popen(oe)# # doesn't capture output
+        time.sleep(2)
+        win32gui.EnumWindows(lookForProgram, programName)
+        #except:
+        #    print("Could not start Open Ephys")
+    else: print("Open Ephysis already RUNNING")
+    print(".............................................")
+    win32gui.EnumWindows(lookForProgram, 'WhiskerServer')
+    if not IsWhiskerRunning:
+        try:
+            ws = r"C:\Program Files (x86)\WhiskerControl\WhiskerServer.exe"
+            window = subprocess.Popen(ws)# # doesn't capture output
+            time.sleep(2)
+            print("WHISKER server started", window)
+            win32gui.EnumWindows(lookForProgram, None)
+        except:
+            print("Could not start WHISKER server")
+    else: print("Whisker server is already RUNNING")
+    print(".............................................")
+
+
+def choose_file():
+    #Tk.withdraw() # we don't want a full GUI, so keep the root window from appearing
+    chosenFileName = askopenfilename() # show an "Open" dialog box and return the path to the selected file
+    filename = os.path.basename(chosenFileName)
+    win32gui.EnumWindows(closeWindow, 'tk')
+
+    return filename
 
 def FAN_ON_OFF(self, events, FAN_ON, cur_time):
     if FAN_ON:

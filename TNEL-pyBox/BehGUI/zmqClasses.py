@@ -65,24 +65,24 @@ class SNDEvent:
 
 
         # Flag vars for case statement
-        self.INPUT = -1
-        self.START_ACQ = 0
-        self.STOP_ACQ = 1
-        self.GET_EXP_NUM = 2
-        self.START_REC = 3
-        self.STOP_REC = 4
-        self.TTL_ON = 5
-        self.TTL_OFF = 6
+        self.INPUT = '-1'
+        self.START_ACQ = '0'
+        self.STOP_ACQ = '1'
+        self.GET_EXP_NUM = '2'
+        self.START_REC = '3'
+        self.STOP_REC = '4'
+        self.TTL_ON = '5'
+        self.TTL_OFF = '6'
 
 # send on/off
 #send what bit to set
 
     # Asks what you want to send to OE
-    def send(self, case = -1):
-        if case == -1:
+    def send(self, case = '-1'):
+        if case == '-1':
             print('Choose an option...')
             control = input('0 : startAcquisition \n1 : stopAcquisition\n2 : getExperimentNumber\n3 : startRecord\n4 : stopRecord\n5 : TTLEventOn\n6 : TTLEventOff\nMy Input: ')
-        elif case <= 6:
+        elif int(case) <= 6:
             control = case
         else:
             print('case not created')
