@@ -101,7 +101,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
 def setupGUI(self):
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (20,40)
     self.myscreen = pygame.display.set_mode((500,990),pygame.RESIZABLE,32)
-    self.myscreen = pygame.display.set_mode((500,990),32)
+    #self.myscreen = pygame.display.set_mode((500,990),32)
     self.UMNlogo = pygame.image.load(r'.\RESOURCES\UMNlogo.PNG')
     pygame.display.set_icon(self.UMNlogo)
     self.TNElogo = pygame.image.load(r'.\RESOURCES\TNE logo.jpg')
