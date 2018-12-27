@@ -218,7 +218,7 @@ class BEH_GUI():
                     #info.text = self.events[self.start_line:self.start_line+14]
                     # Proportion of events to display
                     self.start_line = int(len(self.events) * (self.sliders[0].sliderY/(self.sliders[0].slotL  -  self.sliders[0].bh) ))
-                    print("self.start_line: ",self.start_line, "len(self.events): ",len(self.events) )
+                    #print("self.start_line: ",self.start_line, "len(self.events): ",len(self.events) )
                     #self.start_line = int(len(self.events) * (self.sliders[0].sliderY-self.sliders[0].bh)/(self.sliders[0].slotL ))
                     info.text = self.events[self.start_line:self.start_line+14]
 

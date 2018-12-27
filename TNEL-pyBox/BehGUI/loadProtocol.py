@@ -2,6 +2,7 @@ from RESOURCES.GUI_elements_by_flav import convertString
 import os
 import threading
 import subprocess
+import GUIFunctions
 def get_val_between_equal_sign_and_hash(line):
     try:
         Left_right = line.split('=')
@@ -31,7 +32,6 @@ def load_expt_file(self):
     self.protocol = []
     self.conditions = []
     self.exptFileLines = []
-
 
     try:
         f = open(self.expt_file_path_name,'r')
@@ -193,14 +193,36 @@ def load_expt_file(self):
 
                     elif 'EXPT_PATH' in line:
                         self.datapath = get_val_between_equal_sign_and_hash(line)
-                        print(self.datapath)
+                        if not os.path.isdir(self.datapath):
+                            print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                            print(self.datapath, " DOES NOT EXIST!!!!")
+                            print("Please correct the path in your protocol file!")
+                            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+                            GUIFunctions.log_event(self, self.events,self.datapath + " DOES NOT EXIST!!!!",self.cur_time)
+                            GUIFunctions.log_event(self, self.events,"PLEASE CHECK PATH IN PROTOCOL FILE",self.cur_time)
+                            return False
+                        else: print(self.datapath)
 
                     elif 'LOG_FILE_PATH' in line:
                         log_file_path = get_val_between_equal_sign_and_hash(line)
-                        print("Log File Path",log_file_path)
+                        if not os.path.isdir(log_file_path):
+                            print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                            print(log_file_path, " DOES NOT EXIST!!!!")
+                            print("Please correct the path in your protocol file!")
+                            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+                            GUIFunctions.log_event(self, self.events,log_file_path + " DOES NOT EXIST!!!!",self.cur_time)
+                            return False
+                        else: print("Log File Path",log_file_path)
 
                     elif 'VIDEO_FILE_PATH' in line:
                         video_file_path = get_val_between_equal_sign_and_hash(line)
+                        if not os.path.isdir(video_file_path):
+                            print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                            print(video_file_path, " DOES NOT EXIST!!!!")
+                            print("Please correct the path in your protocol file!")
+                            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+                            GUIFunctions.log_event(self, self.events,video_file_path + " DOES NOT EXIST!!!!",self.cur_time)
+                            return False
                         print(video_file_path)
 
                     elif 'OPEN_EPHYS_PATH' in line:
@@ -423,7 +445,7 @@ def load_expt_file(self):
         except OSError:
             print("Could not open ",self.VIs_file_path)
             return False
-    return True
+        return True
 
 def create_files(self):
     # DATA PATH + FILES

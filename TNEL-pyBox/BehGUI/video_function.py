@@ -126,8 +126,7 @@ class Vid:
 ##                if 'FREEZE' in msg:
 ##                    if msg['FREEZE'] and self.ROIenabled:
 ##                        self.freezeEnable = True
-                else:
-                    self.freezeEnable = False
+
 
                 msg['time_diff'] = vid_cur_time - time_from_GUI
                 msg['vid_time'] = vid_cur_time
