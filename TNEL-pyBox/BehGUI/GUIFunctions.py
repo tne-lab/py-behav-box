@@ -243,9 +243,8 @@ def exit_game(self):
       self.checkPressLeft.end()
       self.checkPressRight.end()
 
-    if self.vidDict['STATE'] == 'ON' or self.vidDict['STATE'] == 'REC':
-        self.vidDict['STATE'] = 'STOP'
-        self.VIDq.append(self.vidDict)
+    self.vidDict['STATE'] = 'STOP'
+    self.VIDq.append(self.vidDict)
     if self.TOUCH_TRHEAD_STARTED == True:
         self.TSq.put('STOP')
     self.openEphysQ.put('STOP')

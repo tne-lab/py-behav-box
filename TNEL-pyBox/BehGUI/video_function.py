@@ -120,14 +120,8 @@ class Vid:
                         self.ROI = [int(x) for x in ROIlist]
                         self.ROIenabled = True
                         self.initROIFrames()
-
                     self.ROIenabled = True
                     self.freezeEnable = True
-##                if 'FREEZE' in msg:
-##                    if msg['FREEZE'] and self.ROIenabled:
-##                        self.freezeEnable = True
-                else:
-                    self.freezeEnable = False
 
                 msg['time_diff'] = vid_cur_time - time_from_GUI
                 msg['vid_time'] = vid_cur_time

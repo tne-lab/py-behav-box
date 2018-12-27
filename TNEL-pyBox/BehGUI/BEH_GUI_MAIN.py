@@ -218,7 +218,6 @@ class BEH_GUI():
                     #info.text = self.events[self.start_line:self.start_line+14]
                     # Proportion of events to display
                     self.start_line = int(len(self.events) * (self.sliders[0].sliderY/(self.sliders[0].slotL  -  self.sliders[0].bh) ))
-                    print("self.start_line: ",self.start_line, "len(self.events): ",len(self.events) )
                     #self.start_line = int(len(self.events) * (self.sliders[0].sliderY-self.sliders[0].bh)/(self.sliders[0].slotL ))
                     info.text = self.events[self.start_line:self.start_line+14]
 
@@ -338,7 +337,7 @@ class BEH_GUI():
                      # Limit possible slider position
                      if self.new_slider_y >= self.sliders[0].slotL - self.sliders[0].bh:
                        self.new_slider_y = self.sliders[0].slotL - self.sliders[0].bh
-                     print("SCROLLING DOWN",self.sliders[0].sliderY )
+                     #print("SCROLLING DOWN",self.sliders[0].sliderY )
 
 
                 # BUTTONS
@@ -484,7 +483,7 @@ class BEH_GUI():
 
                                                 GUIFunctions.log_event(self, self.events,"EXPT STARTED",self.cur_time)
                                                 self.START_EXPT = True
-
+                                                self.vidDict['STATE'] = 'START'
                                                 print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
                                                 for LED in self.LEDs: # Look for EXPT STARTED LED
                                                       if LED.index == 6: # Expt Started light
@@ -841,12 +840,8 @@ class BEH_GUI():
             if "GENERATE" in self.vidDict['ROI']:
                 print(self.vidDict['ROI'], ": GET ROI COORDINATES FROM USER")
             else:
-                print("ROI COORDINATES: ",self.vidDict['ROI'])
-        #elif key == 'FREEZE':
+                print("ROI COORINATES: ",self.vidDict['ROI'])
             print('freeze detection assumed')
-            #self.setup_ln_num += 1
-            #val = str2bool(setupDict[key])
-            #self.vidDict['FREEZE'] = val
 
         if self.setup_ln_num >= len(self.setup):
             self.RUN_SETUP = False
@@ -955,13 +950,13 @@ class BEH_GUI():
                 self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
 
         elif "EXTEND_LEVERS" in key:
+            self.Protocol_ln_num +=1
             if protocolDict[key] == "L_LVR":
                    GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,False,self.cur_time)
             elif protocolDict[key] == "R_LVR":
                GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",False,True,self.cur_time)
             else:
                 val = str2bool(protocolDict[key])
-                self.Protocol_ln_num +=1
                 if val: # EXTEND_LEVERS == True
                    print ("EXTEND LEVERS")
                    GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,True,self.cur_time)
@@ -1009,13 +1004,50 @@ class BEH_GUI():
                     print("a,b: ", a,b)
                     self.NUM_LOOPS = random.randint(int(a), int(b))
                     self.LOOP_FIRST_PASS = False
+            elif 'CORRECT' in protocolDict[key]:
+                info = protocolDict[key].split('(')
+                percent, min, max = info[1].split(',')
+                self.percent = int(percent[:-1])
+                self.max = int(max[:-1])
+                self.NUM_LOOPS = int(min)
+                self.check_correct = True
+            elif 'WRONG' in protocolDict[key]:
+                info = protocolDict[key].split('(')
+                percent, min, max = info[1].split(',')
+                self.percent = int(percent[:-1])
+                self.max = int(max[:-1])
+                self.NUM_LOOPS = int(min)
+                self.check_wrong = True
+            elif 'NO_ACTION' in protocolDict[key]:
+                info = protocolDict[key].split('(')
+                percent, min, max = info[1].split(',')
+                self.percent = int(percent[:-1])
+                self.max = int(max[:-1])
+                self.NUM_LOOPS = int(min)
+                self.check_no_action = True
             else:  self.NUM_LOOPS = int(protocolDict[key])
             GUIFunctions.log_event(self, self.events,"LOOPING "+ str(self.NUM_LOOPS)+ " times, TRIAL "+str(self.trial_num),self.cur_time)
 
         elif "END_LOOP" in key:
             self.num_lines_in_loop = self.Protocol_ln_num - self.loop_start_line_num
-            if self.loop  < int(self.NUM_LOOPS):
-                self.Protocol_ln_num = self.Protocol_ln_num - self.num_lines_in_loop
+            if self.percent:
+                if int(self.NUM_LOOPS) > self.trial_num+1:
+                    self.Protocol_ln_num = self.loop_start_line_num
+                elif (self.max < self.trial_num + 1
+                        or (self.percent < self.correctPercentage and self.check_correct)
+                        or (self.percent < self.wrongPercentage and self.check_wrong)
+                        or (self.percent < self.no_actionPercentage and self.check_no_action)):
+                    self.Protocol_ln_num +=1
+                    GUIFunctions.log_event(self, self.events,"END_OF_LOOP",self.cur_time)
+                    self.loop = 0
+                    self.LOOP_FIRST_PASS = True
+                    self.VI_index = 0
+                    self.percent = False
+                else:
+                    self.Protocol_ln_num = self.loop_start_line_num
+            elif self.loop  < int(self.NUM_LOOPS):
+                #self.Protocol_ln_num = self.Protocol_ln_num - self.num_lines_in_loop
+                self.Protocol_ln_num = self.loop_start_line_num
                 self.VI_index += 1
             else:
                 self.Protocol_ln_num +=1
@@ -1257,14 +1289,19 @@ class BEH_GUI():
                # SET OUTCOMES
                if self.CORRECT:
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
+                  self.num_correct += 1
+                  self.correctPercentage = self.num_correct/self.trial_num
                   print("Correct")
                elif self.WRONG:
                   outcome = self.cond['WRONG'].upper()    # Outcome for wrong response(in Expt File)
+                  self.num_wrong += 1
+                  self.wrongPercentage = self.num_wrong/self.trial_num
                   print("Wrong")
                else:
                   print("No Action Taken")
                   outcome = self.cond['NO_ACTION'].upper()# Outcome for No_Action taken(in Expt File)
-
+                  self.num_no_action += 1
+                  self.no_actionPercentage = self.num_no_action/self.trial_num * 100
                # OUTCOMES
 
                if 'PELLET' in outcome:

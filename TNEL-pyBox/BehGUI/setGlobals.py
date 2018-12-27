@@ -53,7 +53,7 @@ def setGlobals(self):
     print("....")
     print (self.protocolpath)
 
-    self.expt_file_name = 'PROTOCOLBANDIT_TOUCH3.txt'
+    self.expt_file_name = 'PROTOCOL.txt'
     self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
     print("EXPT FILE TO LOAD: ", self.expt_file_path_name)
 
@@ -121,6 +121,17 @@ def setGlobals(self):
     self.setup = []
     self.protocol = []
     self.conditions = []
+
+    self.num_correct = 0
+    self.num_wrong = 0
+    self.num_no_action = 0
+    self.percent = False
+    self.wrongPercentage = 0
+    self.correctPercentage = 0
+    self.no_actionPercentage = 0
+    self.check_correct = False
+    self.check_wrong = False
+    self.check_no_action = False
 
     self.L_LEVER_EXTENDED = False
     self.R_LEVER_EXTENDED = False

@@ -320,9 +320,8 @@ def load_expt_file(self):
                             self.protocol.append({word1:word2})
                         except:
                             print("single word")
-                            self.protocol.append({word1:True}) # For lines without an '=' in them
+                            self.protocol.append({line:True}) # For lines without an '=' in them
                             #if line == 'END': self.protocol = False
-                        print({word1:word2})
                     else:
                         print("###################")
                         print("#    PROTOCOL     #")
