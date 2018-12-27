@@ -114,19 +114,20 @@ class Vid:
                     if msg['ROI'] in 'GENERATE':
                         self.initROIFrames()
                     else:
-                        #Remove first and last char
+                        #Remove first and last char "(" and ")" from (x,y,width,height)
                         ROIstr = msg['ROI'][1:-1]
                         ROIlist = ROIstr.split(",")
                         self.ROI = [int(x) for x in ROIlist]
                         self.ROIenabled = True
                         self.initROIFrames()
 
-                        self.ROIenabled = True
-                if 'FREEZE' in msg:
-                    if msg['FREEZE'] and self.ROIenabled:
-                        self.freezeEnable = True
-                    else:
-                        self.freezeEnable = False
+                    self.ROIenabled = True
+                    self.freezeEnable = True
+##                if 'FREEZE' in msg:
+##                    if msg['FREEZE'] and self.ROIenabled:
+##                        self.freezeEnable = True
+                else:
+                    self.freezeEnable = False
 
                 msg['time_diff'] = vid_cur_time - time_from_GUI
                 msg['vid_time'] = vid_cur_time

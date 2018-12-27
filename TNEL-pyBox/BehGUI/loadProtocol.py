@@ -2,6 +2,29 @@ from RESOURCES.GUI_elements_by_flav import convertString
 import os
 import threading
 import subprocess
+def get_val_between_equal_sign_and_hash(line):
+    try:
+        Left_right = line.split('=')
+        right = Left_right[1].strip()
+        Left_right = right.split('#') #IGNORES "#" FOLLOWED BY COMMENTS
+        val = Left_right[0].strip()  # comment = left_right[1].strip()
+        return val
+    except:
+        print("Could not parse line")
+        return False
+
+def get_all_before_hash(line):
+    try:
+        left_right = line.split('=')
+        left = left_right[0].strip()
+        right = left_right[1].strip()
+        new_left_right = right.split('#') #IGNORES "#" FOLLOWED BY COMMENTS
+        right = new_left_right[0].strip()  # comment = left_right[1].strip()
+        #if len(new_left_right) > 1: print("Comment: ",new_left_right[1] )
+        return left,right
+    except:
+        print("Could not parse line")
+        return left
 
 def load_expt_file(self):
     print("LOADING: ", self.expt_file_path_name)
@@ -127,7 +150,10 @@ def load_expt_file(self):
                     BAR_PRESS = False
                     SETUP = True
 
-                elif '[CONDITIONS' in line:
+                elif "[CONDITIONS" in line:
+                    print("#####################")
+                    print("#    CONDITIONS     #")
+                    print("#####################")
                     EXPERIMENT = False
                     TONE1 = False
                     TONE2 = False
@@ -153,82 +179,76 @@ def load_expt_file(self):
 
 
                 if EXPERIMENT:
+
                     if 'EXPT_NAME' in line:
-                        words = line.split('=')
-                        self.Expt_Name = words[1].strip()
-                        self.Expt_Name = self.Expt_Name.strip()
+                        print("#####################")
+                        print("#    EXPERIMENT     #")
+                        print("#####################")
+                        self.Expt_Name = get_val_between_equal_sign_and_hash(line)
                         print(self.Expt_Name)
 
                     elif 'SUBJECT' in line:
-                        words = line.split('=')
-                        self.Subject = words[1].strip()
-                        self.Subject = self.Subject.strip()
+                        self.Subject = get_val_between_equal_sign_and_hash(line)
                         print(self.Subject)
 
                     elif 'EXPT_PATH' in line:
-                        words = line.split('=')
-                        self.datapath = words[1].strip()
-                        self.datapath = self.datapath.strip()
+                        self.datapath = get_val_between_equal_sign_and_hash(line)
                         print(self.datapath)
+
                     elif 'LOG_FILE_PATH' in line:
-                        words = line.split('=')
-                        log_file_path = words[1].strip()
-                        log_file_path = log_file_path.strip()
-                        print("LFP",log_file_path)
+                        log_file_path = get_val_between_equal_sign_and_hash(line)
+                        print("Log File Path",log_file_path)
+
                     elif 'VIDEO_FILE_PATH' in line:
-                        words = line.split('=')
-                        video_file_path = words[1].strip()
-                        video_file_path = video_file_path.strip()
+                        video_file_path = get_val_between_equal_sign_and_hash(line)
                         print(video_file_path)
+
                     elif 'OPEN_EPHYS_PATH' in line:
                         if not self.open_ephys_started:
                             print('opening ephys')
                             self.open_ephys_started = True
-                            words = line.split('=')
-                            open_ephys_path = words[1].strip()
+                            open_ephys_path = get_val_between_equal_sign_and_hash(line)
                             subprocess.Popen(open_ephys_path)
+
                     elif 'VI_TIMES_LIST_PATH' in line:
-                        words = line.split('=')
-                        self.VIs_file_path = words[1].strip()
+                        self.VIs_file_path = get_val_between_equal_sign_and_hash(line)
                         print(self.VIs_file_path)
 
                 elif TONE1:#TONE1
                     if 'DURATION' in line:
-                        words = line.split('=')
-                        self.Tone1_Duration = float(words[1].strip())
+                        self.Tone1_Duration = float(get_val_between_equal_sign_and_hash(line))
                         print("self.Tone1_Duration",self.Tone1_Duration)
+
                     if 'FREQ' in line:
-                        words = line.split('=')
-                        self.Tone1_Freq = float(words[1].strip())
+                        self.Tone1_Freq = float(get_val_between_equal_sign_and_hash(line))
                         print("self.Tone1_Freq: ",self.Tone1_Freq)
+
                     if 'VOL' in line:
-                        words = line.split('=')
-                        self.Tone1_Vol = float(words[1].strip())
+                        self.Tone1_Vol = float(get_val_between_equal_sign_and_hash(line))
                         print("self.Tone1_Vol: ",self.Tone1_Vol)
 
                 elif TONE2:#TONE2
                     if 'DURATION' in line:
-                        words = line.split('=')
-                        self.Tone2_Duration = words[1].strip()
+                        self.Tone2_Duration = get_val_between_equal_sign_and_hash(line)
                         print("self.Tone2_Duration",self.Tone2_Duration)
+
                     if 'FREQ' in line:
-                        words = line.split('=')
-                        self.Tone2_Freq = float(words[1].strip())
+                        self.Tone2_Freq = float(get_val_between_equal_sign_and_hash(line))
                         print("self.Tone2_Freq: ",self.Tone2_Freq)
+
                     if 'VOL' in line:
-                        words = line.split('=')
-                        self.Tone2_Vol = float(words[1].strip())
+                        self.Tone2_Vol = float(get_val_between_equal_sign_and_hash(line))
                         print("self.Tone2_Vol: ",self.Tone2_Vol)
 
                 elif TOUCH:
                     touch_image_dict={}
                     if 'IMAGES_PATH' in line:
-                        words = line.split('=')
-                        self.TOUCH_IMG_PATH = words[1].strip()
+                        self.TOUCH_IMG_PATH = get_val_between_equal_sign_and_hash(line)
                         self.TOUCHSCREEN_USED = True
+
                     if 'COORDS' in line:
-                        words = line.split('=')
-                        imageCoords = words[1].split(':')
+                        words = get_val_between_equal_sign_and_hash(line)
+                        imageCoords = words.split(':')
                         for i in range(len(imageCoords)):
                             for c in '()':
                                 #Remove parenthesis from (x,y)
@@ -236,8 +256,8 @@ def load_expt_file(self):
                             imageCoordsStr = imageCoords[i].split(",")
                             self.touchImgCoords.append((int(imageCoordsStr[0]), int(imageCoordsStr[1])))
                     elif 'IMG' in line:
-                        words = line.split('=')
-                        imageInfo = words[1].split(":")
+                        words = get_val_between_equal_sign_and_hash(line)
+                        imageInfo = words.split(":")
                         imageName = imageInfo[0].strip()
                         for c in '()':
                             #Remove parenthesis from rewards
@@ -250,8 +270,7 @@ def load_expt_file(self):
                 elif BAR_PRESS:
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
                     if "VI" in line:
-                        words = line.split('=')
-                        VI = words[1].strip()
+                        VI = get_val_between_equal_sign_and_hash(line)
                         try:
                             self.var_interval_reward = int(VI)
                             print("var_interval_reward: ",self.var_interval_reward)
@@ -260,64 +279,58 @@ def load_expt_file(self):
 
                 elif SHOCK:
                     if 'DURATION' in line:
-                        words = line.split('=')
-                        SDuration = words[1].strip()
-                        self.Shock_Duration = float(SDuration.strip())
+                        self.Shock_Duration = float(get_val_between_equal_sign_and_hash(line))
                         print(self.Shock_Duration)
+
                     if 'VOLTS' in line:
-                        words = line.split('=')
-                        V = words[1].strip()
-                        self.Shock_V = float(V.strip())
+                        self.Shock_V = float(get_val_between_equal_sign_and_hash(line))
                         print(self.Shock_V)
+
                     if 'AMPS' in line:
-                        words = line.split('=')
-                        amps = words[1].strip()
-                        self.Shock_Amp = float(amps.strip())
+                        self.Shock_Amp = float(get_val_between_equal_sign_and_hash(line))
                         print(self.Shock_Amp)
 
                 elif FREEZE:
                     if 'DURATION' in line:
-                        words = line.split('=')
-                        Freeze_Duration = words[1].strip()
-                        Freeze_Duration = Freeze_Duration.strip()
+                        Freeze_Duration = get_val_between_equal_sign_and_hash(line)
                         #print(Freeze_Duration)
                     if 'PIX' in line:
-                        words = line.split('=')
-                        Min_Pixels = words[1].strip()
-                        Min_Pixels = Min_Pixels.strip()
+                        Min_Pixels = get_val_between_equal_sign_and_hash(line)
                         #print(Min_Pixels)
                 elif SETUP:
-                    if "SETUP" not in line:
+                    if "SETUP" not in line: # Skips [header] line
                         #print(line)
                         try:
-                            words = line.split('=')
-                            word1 = words[0].strip()
-                            word1 = word1.upper()
-                            word2 = words[1].strip() #Do NOT make this an upper() to retain True and False
-                            word2 = word2.split("#") #IGNORES "#" FOLLOWED BY COMMENTS
-                            word2 = word2[0].strip()
+                            word1,word2 = get_all_before_hash(line)
                             self.setup.append({word1:word2})
                         except:
                             self.setup.append({line:True}) # For lines without an '=' in them
                             #if line == 'END': PROTOCOL = False
+                        print({word1:word2})
+                    else:
+                        print("################")
+                        print("#    SETUP     #")
+                        print("################")
                 elif PROTOCOL:
-                    if "PROTOCOL" not in line:
+                    #print("self.protocol: ",line)
+                    if "PROTOCOL" not in line: # Skips [header] line
                         #print(line)
                         try:
-                            words = line.split('=')
-                            word1 = words[0].strip()
-                            word1 = word1.upper()
-                            word2 = words[1].strip() #Do NOT make this an upper() to retain True and False
-                            word2 = word2.split("#") #IGNORES "#" FOLLOWED BY COMMENTS
-                            word2 = word2[0].strip()
+                            word1,word2 = get_all_before_hash(line)
                             self.protocol.append({word1:word2})
                         except:
-                            self.protocol.append({line:True}) # For lines without an '=' in them
+                            print("single word")
+                            self.protocol.append({word1:True}) # For lines without an '=' in them
                             #if line == 'END': self.protocol = False
+                        print({word1:word2})
+                    else:
+                        print("###################")
+                        print("#    PROTOCOL     #")
+                        print("###################")
 
                 elif CONDITIONS:
-                    print("self.conditions: ",line)
-                    if "[CONDITIONS]" in line:
+                    #print("self.conditions: ",line)
+                    if "[CONDITIONS]" in line: # Condition header line
                         KEY_LINE = True
 
                     elif KEY_LINE: # CONDITION HEADING (i.e. all the KEYS)
@@ -337,7 +350,7 @@ def load_expt_file(self):
 
                             i+=1
                         self.conditions.append(condition)
-                        #print (condition)
+                        print (condition)
                 else:
                     END_PROTOCOL = True
             else:# line == ""
@@ -374,37 +387,37 @@ def load_expt_file(self):
                     words = line.split(':')
                     words = words[1].strip()
                     words = words.split(',')
-                    print("length of words: ",len(words))
+                    #print("length of words: ",len(words))
                     for items in words:
                         num = items.strip()
-                        print(num)
+                        #print(num)
                         self.habituation_vi_times.append(int(num))
                 if "CONDITIONING" in line:
                     words = line.split(':')
                     words = words[1].strip()
                     words = words.split(',')
-                    print("length of words: ",len(words))
+                    #print("length of words: ",len(words))
                     for items in words:
                         num = items.strip()
-                        print(num)
+                        #print(num)
                         self.conditioning_vi_times.append(int(num))
                 if "EXTINCTION" in line:
                     words = line.split(':')
                     words = words[1].strip()
                     words = words.split(',')
-                    print("length of words: ",len(words))
+                    #print("length of words: ",len(words))
                     for items in words:
                         num = items.strip()
-                        print(num)
+                        #print(num)
                         self.extinction_vi_times.append(int(num))
                 if "RECALL" in line:
                     words = line.split(':')
                     words = words[1].strip()
                     words = words.split(',')
-                    print("length of words: ",len(words))
+                    #print("length of words: ",len(words))
                     for items in words:
                         num = items.strip()
-                        print(num)
+                        #print(num)
                         self.recall_vi_times.append(int(num))
                 print("VI FILE LOADED",self.VIs_file_path)
         except OSError:

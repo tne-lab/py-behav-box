@@ -202,21 +202,22 @@ class BEH_GUI():
                     #               NOTE only 14 text lines fit inside window
                     ##########################################################
                     slider_Button_ht = int((14.0/float(lines_in_txt)) * self.sliders[0].slotL) # portion of SlotL
+                    # Prevent slider Button from getting too small
                     if slider_Button_ht <= 10:
                         self.sliders[0].bh = 10
                     else:
                         self.sliders[0].bh = slider_Button_ht
 
+                    # Set Slider location
                     self.sliders[0].sliderY = self.new_slider_y #+ self.start_line * self.y_per_line
                     #self.sliders[0].sliderY = self.new_slider_y + (self.sliders[0].slotL - self.sliders[0].bh) - self.start_line * self.y_per_line
 
 
-                    if self.sliders[0].sliderY >= self.sliders[0].slotL - self.sliders[0].bh:
-                       self.sliders[0].sliderY = self.sliders[0].slotL - self.sliders[0].bh
+
                     self.sliders[0].draw()
                     #info.text = self.events[self.start_line:self.start_line+14]
                     # Proportion of events to display
-                    self.start_line = int(len(self.events) * (self.sliders[0].sliderY/(self.sliders[0].slotL  -  self.sliders[0].bh)))
+                    self.start_line = int(len(self.events) * (self.sliders[0].sliderY/(self.sliders[0].slotL  -  self.sliders[0].bh) ))
                     print("self.start_line: ",self.start_line, "len(self.events): ",len(self.events) )
                     #self.start_line = int(len(self.events) * (self.sliders[0].sliderY-self.sliders[0].bh)/(self.sliders[0].slotL ))
                     info.text = self.events[self.start_line:self.start_line+14]
@@ -324,11 +325,19 @@ class BEH_GUI():
 
                 elif event.button == 4:  #Wheel roll UP
                      self.MOUSE_WHEEL_SCROLL_UP = True
-                     self.new_slider_y = self.sliders[0].sliderY -1
+                     self.new_slider_y = self.sliders[0].sliderY - (1 + int( self.sliders[0].slotL/self.sliders[0].bh))
+                     # Limit possible slider position
+                     if self.new_slider_y <= 0: self.new_slider_y = 0
+                     elif self.new_slider_y >= self.sliders[0].slotL-self.sliders[0].bh:
+                         self.new_slider_y = self.sliders[0].slotL-self.sliders[0].bh
                      print("SCROLLING DOWN",self.sliders[0].sliderY )
+
                 elif event.button == 5: #Wheel roll Down
                      self.MOUSE_WHEEL_SCROLL_DN = True
-                     self.new_slider_y = self.sliders[0].sliderY +1
+                     self.new_slider_y = self.sliders[0].sliderY + (1 + int( self.sliders[0].slotL/self.sliders[0].bh))
+                     # Limit possible slider position
+                     if self.new_slider_y >= self.sliders[0].slotL - self.sliders[0].bh:
+                       self.new_slider_y = self.sliders[0].slotL - self.sliders[0].bh
                      print("SCROLLING DOWN",self.sliders[0].sliderY )
 
 
@@ -641,7 +650,7 @@ class BEH_GUI():
                                  self.datapath = user_input.text
                             elif user_input.label == "EXPT FILE NAME":
                                  self.expt_file_name = GUIFunctions.choose_file()
-                                 self.expt_file_path_name = os.path.join(self.datapath,self.expt_file_name )
+                                 self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
                                  print ("File selected: ",self.expt_file_name)
                                  if self.expt_file_name == '':
                                      self.expt_file_name = user_input.text
@@ -817,23 +826,27 @@ class BEH_GUI():
         elif key == "REC":
             print ("recording")
             self.RECORDING = True
-            self.snd.send(self.snd.START_ACQ)
-            self.snd.send(self.snd.START_REC)
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
+                self.snd.send(self.snd.START_ACQ)
+                self.snd.send(self.snd.START_REC)
                 self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
             else:
                 self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
         elif key == 'ROI':
-            print('setting ROI')
+            print('setting ROI',setupDict[key])
             self.setup_ln_num += 1
             self.vidDict['ROI'] = setupDict[key].split('#')[0]
-        elif key == 'FREEZE':
-            print('adding freeze')
-            self.setup_ln_num += 1
-            val = str2bool(setupDict[key])
-            self.vidDict['FREEZE'] = val
+            if "GENERATE" in self.vidDict['ROI']:
+                print(self.vidDict['ROI'], ": GET ROI COORDINATES FROM USER")
+            else:
+                print("ROI COORDINATES: ",self.vidDict['ROI'])
+        #elif key == 'FREEZE':
+            print('freeze detection assumed')
+            #self.setup_ln_num += 1
+            #val = str2bool(setupDict[key])
+            #self.vidDict['FREEZE'] = val
 
         if self.setup_ln_num >= len(self.setup):
             self.RUN_SETUP = False

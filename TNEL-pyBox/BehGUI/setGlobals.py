@@ -49,11 +49,12 @@ def setGlobals(self):
     cwd = os.getcwd()
     print(cwd)
     self.datapath = os.path.join(cwd,'DATA' )
+    self.protocolpath = os.path.join(cwd,'DATA' )
     print("....")
-    print (self.datapath)
+    print (self.protocolpath)
 
     self.expt_file_name = 'PROTOCOLBANDIT_TOUCH3.txt'
-    self.expt_file_path_name = os.path.join(self.datapath,self.expt_file_name )
+    self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
     print("EXPT FILE TO LOAD: ", self.expt_file_path_name)
 
     self.exptFileLines = []

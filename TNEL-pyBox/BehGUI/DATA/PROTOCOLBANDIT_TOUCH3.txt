@@ -31,13 +31,15 @@ COORDS=(100,500):(700,500)
 IMG1= test.bmp:(80,30,40,50,60,10,30,30,50,10)
 IMG2= santa_fe.bmp:(80,30,40,50,60,10,30,30,50,10)
 
-[PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
-FAN_ON=True
-CAB_LIGHT=True
-CAMERA=True
-REC=True
-FOOD_LIGHT=True
+[SETUP]                 # Blah Blah
+FAN_ON=TRUE             # Blah Blah
+CAB_LIGHT=TRUE          # Blah Blah
+FOOD_LIGHT=TRUE         # Blah Blah
+CAMERA=TRUE             # Blah Blah
+REC=TRUE                # Blah Blah
+ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also starts FREEZE detection  FREEZE=TRUE             # Blah Blah
 
+[PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 START_LOOP1 = 5
   PAUSE = 1
   DRAW_IMAGES=True

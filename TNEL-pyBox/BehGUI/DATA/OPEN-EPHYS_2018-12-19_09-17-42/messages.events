@@ -1,6 +1,0 @@
-17 Software time: 17@3328378Hz
-0 stopAcquisition 
-4 stopRecord
-5 startAcquisition 
-7 startRecord RecDir=C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA prependText=OPEN-EPHYS appendText=
-640 Processor: File Reader Id: 100 subProcessor: 0 start time: 640@30000Hz
