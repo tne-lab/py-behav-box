@@ -37,7 +37,7 @@ CAB_LIGHT=TRUE          # Blah Blah
 FOOD_LIGHT=TRUE         # Blah Blah
 CAMERA=TRUE             # Blah Blah
 REC=TRUE                # Blah Blah
-ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also starts FREEZE detection  FREEZE=TRUE             # Blah Blah
+ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also starts FREEZE detection  FREEZE=TRUE
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 START_LOOP1 = 5

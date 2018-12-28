@@ -738,6 +738,123 @@ class MyLED:
                 #shadow_rect = shadow_rect.inflate(3,3)
                 pygame.draw.arc(screen, shaddow_color, shadow_rect, 190*pi/180, 270*pi/180, shadow_w) # SHADOW
                 pygame.draw.circle(screen,(0,0,0),(cx,cy), radius + 2,3) # Black circle
+
+class MyConditioningLights:
+    def __init__(self,screen,index, x,y,radius, ONOFF, on_color, background_color, clickable = True):
+        self.screen = screen
+        self.index = index
+        self.x = x
+        self.y = y
+        self.radius = radius
+        diam = radius * 2
+        self.diam = diam
+        self.rect = Rect(x, y,diam,diam)
+        self.ONOFF = ONOFF
+        #self.visible = VIS
+        self.on_color = on_color
+        self.background_color = background_color
+        self.off_color = (int(on_color[0]*.2),int(on_color[1]*.2),int(on_color[2]*.2))
+        self.clickable = clickable
+
+    def draw(self):
+            screen = self.screen
+            ONOFF = self.ONOFF
+            #self.ONOFF = ONOFF
+            x = self.x
+            y = self.y
+            #diam = self.diam
+            radius = self.radius
+            cx = x + radius #center x
+            cy = y + radius #center y
+            diam = 2*radius
+            rect = Rect(x, y, diam, diam)
+            self.rect = rect
+            on_color = self.on_color
+            off_color = self.off_color
+            background_color = self.background_color
+
+            if ONOFF == "ON":
+                #circle(Surface, color, pos, radius, width=0) -> Rect
+                #diam = diam + 10
+                pygame.draw.circle(screen,on_color,(cx,cy),radius,0)#MAIN BULB
+                pygame.draw.circle(screen,(255,255,255),(cx+int(.5*radius),cy+int(.5*radius)),int(.15*radius),0)#SPARKLE
+                pygame.draw.circle(screen,(255,255,255),(cx,cy), radius-2,1) # white circle
+                pygame.draw.circle(screen,(0,0,0),(cx,cy), radius + 2,4) # Black circle
+            elif  ONOFF == "OFF":
+                off_color = self.off_color
+                pygame.draw.circle(screen,off_color,(cx,cy),radius,0) #MAIN BULB
+                pygame.draw.circle(screen,(200,200,200),(cx+int(.5*radius),cy-int(.5*radius)),int(.1*radius),0) #SPARKLE
+
+                pi = 3.141592
+                shaddow_color = (int(off_color[0]*.8),int(off_color[1]*.8),int(off_color[2]*.8))
+                shadow_w = int(0.5*radius)
+                if shadow_w > 15:
+                    shadow_w = 15
+                shadow_rect = rect
+                #shadow_rect = shadow_rect.inflate(3,3)
+                pygame.draw.arc(screen, shaddow_color, shadow_rect, 190*pi/180, 270*pi/180, shadow_w) # SHADOW
+                pygame.draw.circle(screen,(0,0,0),(cx,cy), radius + 2,3) # Black circle
+
+
+
+class MyNosePokes:
+    def __init__(self,screen,index, x,y,radius, ONOFF, on_color, background_color, clickable = True):
+        self.screen = screen
+        self.index = index
+        self.x = x
+        self.y = y
+        self.radius = radius
+        diam = radius * 2
+        self.diam = diam
+        self.rect = Rect(x, y,diam,diam)
+        self.ONOFF = ONOFF
+        #self.visible = VIS
+        self.on_color = on_color
+        self.background_color = background_color
+        self.off_color = (int(on_color[0]*.2),int(on_color[1]*.2),int(on_color[2]*.2))
+        self.clickable = clickable
+
+    def draw(self):
+            screen = self.screen
+            ONOFF = self.ONOFF
+            #self.ONOFF = ONOFF
+            x = self.x
+            y = self.y
+            #diam = self.diam
+            radius = self.radius
+            cx = x + radius #center x
+            cy = y + radius #center y
+            diam = 2*radius
+            rect = Rect(x, y, diam, diam)
+            self.rect = rect
+            on_color = self.on_color
+            off_color = self.off_color
+            background_color = self.background_color
+
+            if ONOFF == "ON":
+                #circle(Surface, color, pos, radius, width=0) -> Rect
+                #diam = diam + 10
+                pygame.draw.circle(screen,on_color,(cx,cy),radius,0)#MAIN BULB
+                #pygame.draw.circle(screen,(255,255,255),(cx+int(.5*radius),cy+int(.5*radius)),int(.15*radius),0)#SPARKLE
+                pygame.draw.circle(screen,(255,255,255),(cx,cy), radius-2,1) # white circle
+                pygame.draw.circle(screen,(0,0,0),(cx,cy), radius + 2,4) # Black circle
+            elif  ONOFF == "OFF":
+                off_color = self.off_color
+                pygame.draw.circle(screen,off_color,(cx,cy),radius,0) #MAIN BULB
+                #pygame.draw.circle(screen,(200,200,200),(cx+int(.5*radius),cy-int(.5*radius)),int(.1*radius),0) #SPARKLE
+
+                pi = 3.141592
+                shaddow_color = (int(off_color[0]*.8),int(off_color[1]*.8),int(off_color[2]*.8))
+                shadow_w = int(0.5*radius)
+                if shadow_w > 15:
+                    shadow_w = 15
+                shadow_rect = rect
+                #shadow_rect = shadow_rect.inflate(3,3)
+                pygame.draw.arc(screen, shaddow_color, shadow_rect, 190*pi/180, 270*pi/180, shadow_w) # SHADOW
+                pygame.draw.circle(screen,(0,0,0),(cx,cy), radius + 2,3) # Black circle
+
+
+
 class MyLabel:
     """Label class based on the
     Types: label, display, default = button
@@ -957,7 +1074,7 @@ class get_user_input:
                         try:
                             text_input += char
 
-                            print (text_input)
+                            #print (text_input)
                         except:
                             pass
 

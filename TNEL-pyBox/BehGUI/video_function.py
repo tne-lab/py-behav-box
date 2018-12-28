@@ -158,7 +158,7 @@ class Vid:
                         #back_q.put({'FREEZE' : True, 'TIME' : time_from_GUI})
                         self.text = 'freeze'
 
-                cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,255,255),2,cv2.LINE_AA)
+                cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),2,cv2.LINE_AA)
                 cv2.imshow('thresh',self.prevThresh)
             # Write stuff on screen (need to add trial number and probably not time differential)
             self.drawInfo(msg['cur_time'], str(msg['trial_num']), frame)
@@ -222,21 +222,22 @@ class Vid:
         if self.exptStarted:
             cv2.circle(frame, (30,455), 20, (0,255,0) ,thickness = -1)
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"NIDAQ time = " + str(time_from_GUI),(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
+        #print("NIDAQ time = " + str(round(time_from_GUI,3) ))
+        cv2.putText(frame,"NIDAQ time = " + str(round(time_from_GUI,3)),(20,405), font, 0.5,( 255,0,0),2,cv2.LINE_AA)
         cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
-        cv2.putText(frame, "Trial Number = " + str(trial_num), (20, 425),font, .5, (255, 255, 255), 2,cv2.LINE_AA)
+        cv2.putText(frame, "Trial Number = " + str(trial_num), (20, 425),font, .5, ( 255, 0,0), 2,cv2.LINE_AA)
 
     # Wrtie a ton of stuff on frames...
     def writeStuff(self, time_from_GUI, vid_time, time_diff, movingPxls, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"NIDAQ time = " + str(time_from_GUI),(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(frame,"Video time = " + str(vid_time),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(frame,"time diff = " + str(time_diff),(20,455), font, 0.5,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(frame,"NIDAQ time = " + str(round(time_from_GUI,3)),(20,405), font, 0.5,(255,0,0),2,cv2.LINE_AA)
+        cv2.putText(frame,"Video time = " + str(round(vid_time,3)),(20,430), font, 0.5,(255,0,0),2,cv2.LINE_AA)
+        cv2.putText(frame,"time diff = " + str(time_diff),(20,455), font, 0.5,(255,0,0),2,cv2.LINE_AA)
         cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
-        cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(self.prevThresh, "Time frozen = " + str(self.timeFrozen), (100, 50),font, .5, (255, 255, 255), 2)
-        cv2.putText(self.prevThresh, "Current frame = " + str(self.startFrame), (10,95), font, .5, (255,255,255),2)
-        cv2.putText(self.prevThresh, "Number of frames = " + str(self.length), (10,110), font, .5, (255,255,255),2)
+        cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), font, 0.5,(255,0,0),2,cv2.LINE_AA)
+        cv2.putText(self.prevThresh, "Time frozen = " + str(self.timeFrozen), (100, 50),font, .5, ( 255,0,0), 2)
+        cv2.putText(self.prevThresh, "Current frame = " + str(self.startFrame), (10,95), font, .5,( 255,0,255),2)
+        cv2.putText(self.prevThresh, "Number of frames = " + str(self.length), (10,110), font, .5, ( 255,0,0),2)
 
     # Creates a trackbar to scroll through frames. Could use some work
     # to account for any trackbar
@@ -259,10 +260,10 @@ class Vid:
     # Create Region of Interest coordinates
     def genROI(self, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.9,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
         self.ROI = cv2.selectROI(frame)
         cv2.destroyWindow("ROI selector")
-        print(self.ROI)
+        print("ROI: ",self.ROI)
 
     # Create a previous frame and thresh to be used for comparison on first frames only
     def genPrev(self, frame, prevFrame):

@@ -384,13 +384,16 @@ def load_expt_file(self):
         print("NO SUCH FILE!!!!",self.expt_file_path_name)
         return False
 
-    print("PROTOCOL LOADED]")
-    print (self.protocol)
+    print("PROTOCOL LOADED!!!")
+    #print (self.protocol)
+
     for dct in self.protocol:
         for k,v in dct.items():
             print(str(k)+" = " + str(v))
+    print(".................................\n")
 
     if self.VIs_file_path != "":
+        print("Loading VIs ...")
         try:
             #path,name = os.path.split(self.VIs_file_path)
             #VIs_file_path_COPY = name[:-4] + '_copy.txt'
@@ -444,7 +447,7 @@ def load_expt_file(self):
         except OSError:
             print("Could not open ",self.VIs_file_path)
             return False
-        return True
+    return True
 
 def create_files(self):
     # DATA PATH + FILES
@@ -469,7 +472,8 @@ def create_files(self):
     self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
     print(self.video_file_path_name)
 
-    # COPY EXPT FILE TO EXPT FILE DATAPATH
+# COPY EXPT FILE TO EXPT FILE DATAPATH
+def create_expt_file_copy(self):
     print("....................................\n")
     print("COPYING EXPT FILE", self.expt_file_path_name_COPY)
     try:
@@ -480,12 +484,11 @@ def create_files(self):
         for ln in self.exptFileLines:
             print (ln)
             if "EXPT_NAME" in ln:
-                newln = "EXPT_NAME = " + self.Expt_Name
-
-            if "SUBJECT" in ln:
-                newln = "SUBJECT = " + self.Subject
-
-            exptfl.write(newln+"\n")
+                ln = "EXPT_NAME = " + self.Expt_Name
+                exptfl.write(ln+"\n")
+                newln =  "SUBJECT = " + self.Subject
+                exptfl.write(newln+"\n")
+            else:   exptfl.write(ln+"\n")
         print("EXPT file copied",self.expt_file_path_name_COPY)
         exptfl.close()
     except:
@@ -525,5 +528,5 @@ def update_expt_file_copy(self):
         exptfl.close()
         return True
     except:
-        print("COULD NOT UPDATE EXPT FILE", self.expt_file_path_name_COPY)
+        print("COULD NOT UPDATE EXPT FILE COPY WITH NEW SUBJECT NAME", self.expt_file_path_name_COPY)
         return False

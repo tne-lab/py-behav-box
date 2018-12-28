@@ -1,30 +1,30 @@
-[EXPERIMENT]            # Blah Blah
-EXPT_NAME = TESTING     #This is the name of your experiment
-SUBJECT = ""
-EXPT_PATH 	= C:\\ephys-2\Desktop\BehChamGUI\DATA
+[EXPERIMENT]
+EXPT_NAME = TESTING     # This is the name of your experiment
+EXPT_PATH 	= D:\Desktop\py-behav-box\TNEL-pyBox\BehGUI\DATA     # C:\\users\ephys-2\Desktop\BehChamGUI\DATA
 
 
 [TONE1] # NEED TONE1, TONE2
-DURATION(S) 	= 2  # Blah Blah
-FREQ(HZ)	= 1800   # Blah Blah
-VOLUME(0-1)	= 0.3    # Blah Blah
+DURATION(S) 	= 2  # In seconds
+FREQ(HZ)	= 1800   #
+VOLUME(0-1)	= 0.3    # 0.0 to 1.0
 
-[SHOCK]              # Blah Blah
-DURATION(S) = 1      # Blah Blah
-VOLTS		= 5.5    # Blah Blah
-AMPS(MA)	= 100    # Blah Blah
+[SHOCK]
+DURATION(S) = 1       # In seconds
+VOLTS		= 5.5         #
+AMPS(MA)	= 100       # In milliamps
 
 [FREEZE]
-MIN_DURATION(S)	= 2      # Blah Blah
-MIN_MOVING_PIX	= 5000   # Blah Blah
-MIN_THESHOLD = 26        # Blah Blah
+MIN_DURATION(S)	= 2      # In seconds
+MIN_MOVING_PIX	= 5000   # Min number of moving pixels to un freeze
+MIN_THESHOLD = 26        # gray level threshold (0-255)
 
-[SETUP]                 # Blah Blah
-FAN_ON=TRUE             # Blah Blah
-CAB_LIGHT=TRUE          # Blah Blah
-FOOD_LIGHT=TRUE         # Blah Blah
-CAMERA=TRUE             # Blah Blah
-ROI=(644, 10, 633, 485)
+[SETUP]
+FAN_ON=TRUE
+CAB_LIGHT=TRUE
+FOOD_LIGHT=TRUE
+CAMERA=TRUE
+
+ROI=Generate # Generate = asks user for ROI, or (x,y,w,h) ex: (644, 10, 633, 485).  This also starts FREEZE detection  FREEZE=TRUE  # NOTE:  REC=TRUE causes failure before or  AFTER ROI
 
 
 [PROTOCOL]

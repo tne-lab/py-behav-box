@@ -56,7 +56,7 @@ class BEH_GUI():
         self.setupGUI()
 
     from setGlobals import setGlobals
-    from loadProtocol import load_expt_file, update_expt_file_copy, create_files
+    from loadProtocol import load_expt_file, create_expt_file_copy, create_files
     import GUIFunctions
     from setupGUI import setupGUI
 
@@ -442,6 +442,9 @@ class BEH_GUI():
                                     self.events = []
                                     print(self.expt_file_path_name)
                                     if self.load_expt_file():
+                                        print("\n###########################")
+                                        print("#   EXPT FILE LOADED!!    #")       
+                                        print("###########################")
                                         self.EXPT_FILE_LOADED = True
                                         GUIFunctions.log_event(self, self.events,"EXPT FILE LOADED",self.cur_time)
                                         if len(self.setup) > 0:
@@ -463,42 +466,7 @@ class BEH_GUI():
                                     button.UP_DN = "DN"
                                     self.Expt_Count +=1
                                     if self.EXPT_FILE_LOADED:
-                                        if self.NAME_OR_SUBJ_CHANGED:
-                                            self.create_files()
-                                            if self.update_expt_file_copy(): #Fix copy of expt file
-                                                self.NAME_OR_SUBJ_CHANGED = False
-                                                print("EXPT FILE COPY UPDATED!!!!")
-                                                # GOOD TO GO!
-                                                print("EXPT STARTED!")
-                                                self.trial_num = 0
-                                                if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
-                                                for user_input in self.user_inputs:
-                                                    if user_input.label == "EXPT":
-                                                        user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
-                                                if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
-                                                # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
-                                                    self.VI_start = 0.0 #self.cur_time
-                                                    self.VI = random.randint(0,int(self.var_interval_reward*2))
-                                                    print("VI.......................", self.VI)
-
-                                                GUIFunctions.log_event(self, self.events,"EXPT STARTED",self.cur_time)
-                                                self.START_EXPT = True
-                                                self.vidDict['STATE'] = 'START'
-                                                print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
-                                                for LED in self.LEDs: # Look for EXPT STARTED LED
-                                                      if LED.index == 6: # Expt Started light
-                                                          LED.ONOFF = "ON"
-                                                ###############################################################
-                                                #
-                                                # ?????????????????????????????????????????
-                                                # SEND BIT TO OPEND EPHYS TO INDICATE EXPT STARTED.
-                                                # CAN RECORD SIGNAL BE THE START EVENT?????
-                                                #
-                                                ################################################################
-
-                                            else:
-                                                print("UNABLE TO UPDATE EXPT FILE COPY!!!!")
-                                        elif self.Subject == "" or "?" in self.Subject:
+                                        if self.Subject == "" or "?" in self.Subject or self.Subject == " " or len(self.Subject) == 0 :
                                             GUIFunctions.log_event(self, self.events,"Check SUBJECT  and EXPT name!!!!",self.cur_time)
                                             print('SUBJECT = "" or "?" or same as last time')
                                             # HIGHLIGHT USER INPUT BOXES
@@ -508,8 +476,58 @@ class BEH_GUI():
                                                 elif user_input.label == "SUBJECT":
                                                      user_input.border_color = (255,0,0)
 
+                                                     
+                                        if self.NAME_OR_SUBJ_CHANGED :  # READY TO GO!!!
+                                            self.create_files()
+                                            self.create_expt_file_copy()
+                                            self.NAME_OR_SUBJ_CHANGED = False
+                                            print("EXPT FILE COPY UPDATED!!!!")
+                                            # GOOD TO GO!
+                                            print("EXPT STARTED!")
+                                            self.trial_num = 0
+                                            if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
+
+
+                                            for user_input in self.user_inputs:
+                                                if user_input.label == "EXPT":
+                                                    user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
+
+
+
+                                            if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
+                                            # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
+                                                self.VI_start = 0.0 #self.cur_time
+                                                self.VI = random.randint(0,int(self.var_interval_reward*2))
+                                                print("VI.......................", self.VI)
+
+                                            GUIFunctions.log_event(self, self.events,"EXPT STARTED USING " + self.expt_file_path_name_COPY,self.cur_time)
+                                            self.START_EXPT = True
+                                            self.vidDict['STATE'] = 'START'
+                                            print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
+                                            for LED in self.LEDs: # Look for EXPT STARTED LED
+                                                  if LED.index == 6: # Expt Started light
+                                                      LED.ONOFF = "ON"
+                                            ###############################################################
+                                            #
+                                            # ?????????????????????????????????????????
+                                            # SEND BIT TO OPEND EPHYS TO INDICATE EXPT STARTED.
+                                            # CAN RECORD SIGNAL BE THE START EVENT?????
+                                            #
+                                            ################################################################
+
+
                                     else:
                                         GUIFunctions.log_event(self, self.events,"EXPT FILE NOT LOADED!!!!",self.cur_time)
+                               if not self.CAMERA_ON: # CAMERA WAS OFF
+                                    self.CAMERA_ON = True
+                                    GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
+                                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':"FREEZE_DETECT", 'PATH_FILE':self.video_file_path_name}
+                                    GUIFunctions.MyVideo(self)
+                               if not self.RECORDING:
+                                    self.RECORDING = True
+                                    button.UP_DN = "DN"
+                                    GUIFunctions.log_event(self, self.events,"START_RECORDING_by_GUI",self.cur_time)
+                                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
 
                                self.LEFT_MOUSE_DOWN = False
                                self.BUTTON_SELECTED = True
@@ -643,6 +661,8 @@ class BEH_GUI():
                             elif user_input.label == "SUBJECT":
                                  self.Subject = user_input.text
                                  self.NAME_OR_SUBJ_CHANGED = True
+                                 # RESET ROUGH EXPT START TIME FOR NEW DIRECTORY NAME
+                                 self.exptTime = time.strftime("%H-%M")
                             elif user_input.label == "TRIAL":
                                  self.trial_num =  user_input.text
                             elif user_input.label == "EXPT PATH":
@@ -1100,11 +1120,10 @@ class BEH_GUI():
         #  PROTOCOL ENDED (Reset everything for next run
         #########################################################
 
-        #xxxxxxxxxxxxxxxxxxxxxx
         if self.Protocol_ln_num >= len(self.protocol):
            print("Protocol_ln_num: ",self.Protocol_ln_num,"plength: ", len(self.protocol),"\n")
            print("PROTOCOL ENDED")
-           print(".................")
+           print("......END.....\n\n")
            GUIFunctions.log_event(self, self.events,"PROTOCOL ENDED",self.cur_time)
            self.START_EXPT = False
            self.Protocol_ln_num = 0
@@ -1117,7 +1136,7 @@ class BEH_GUI():
            GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
            GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
 
-           # TEll open ephys to stop acquistion and recording?
+           # Tell open ephys to stop acquistion and recording?
            # Maybe we want to wait and continue getting data for awhile. Just send some sort of event
            #self.snd.send(self.snd.STOP_ACQ)
            #self.snd.send(self.snd.STOP_REC)

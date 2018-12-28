@@ -282,8 +282,9 @@ def draw_camera( myscreen,fill_color, CAMERA_ON, RECORDING, x, y, w,h, linew):
         ptlist = [pt1,pt2,pt3]
         pygame.draw.polygon(myscreen, fill_color, ptlist, 0)#
         camera = pygame.draw.rect(myscreen,fill_color, (x, y, w,h), 0)
+
+        if CAMERA_ON: col = (0,255,0)
         if RECORDING:       col = (255,0,0)
-        elif CAMERA_ON: col = (0,255,0)
         else:           col = (0,0,0)
         pygame.draw.polygon(myscreen, col, ptlist, linew)#
         pygame.draw.rect(myscreen,col, (x, y, w,h), linew)
