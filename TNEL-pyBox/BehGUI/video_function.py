@@ -10,6 +10,7 @@ class Vid:
         self.out = None
         self.outPath = 'NOT SET'
         self.ROIenabled = False
+        #self.ROI = (0,0,0,0)
         self.freezeEnable = False
         cv2.namedWindow('vid')
         if self.cap.isOpened():
@@ -82,7 +83,6 @@ class Vid:
             return
         if not self.ROIenabled:
             self.genROI(frame)
-
         # Gen prev frame and threshold (Use size of ROI)
         self.startFrame+=1
         ret, newFrame = self.cap.read()
@@ -93,7 +93,7 @@ class Vid:
         newFrameROI = newFrame[int(self.ROI[1]):int(self.ROI[1]+self.ROI[3]),int(self.ROI[0]):int(self.ROI[0] + self.ROI[2])]
         self.genPrev(newFrameROI, frameROI)
         self.ROIenabled = True
-
+        self.freezeEnable = True
 
 #######################################################################################
 #######################################################################################
@@ -107,44 +107,44 @@ class Vid:
             try:
                 msg = self.q.pop()
                 time_from_GUI = msg['cur_time']
-                STATE = msg['STATE']
-                if STATE in 'START':
+                STATE = msg['STATE'] # NOTE: NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                if STATE in 'START_EXPT':
                     self.exptStarted = True
                 if 'ROI' in msg and not self.ROIenabled:
                     if msg['ROI'] in 'GENERATE':
                         self.initROIFrames()
-                    else:
-                        #Remove first and last char "(" and ")" from (x,y,width,height)
-                        ROIstr = msg['ROI'][1:-1]
+                    else: # NOTE: ROI sent from PROTOCOL file
+                        ROIstr = msg['ROI'][1:-1] #Remove first and last char "(" and ")" from (x,y,width,height)
                         ROIlist = ROIstr.split(",")
                         self.ROI = [int(x) for x in ROIlist]
-                        self.ROIenabled = True
                         self.initROIFrames()
-                    self.ROIenabled = True
-                    self.freezeEnable = True
+
 
                 msg['time_diff'] = vid_cur_time - time_from_GUI
                 msg['vid_time'] = vid_cur_time
                 if msg['PATH_FILE'] != self.outPath:
                     self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))
             except IndexError:
-                continue
+                #print("Error in run()")
+                pass
 
             if not ret:
                 print('error in getting read')
                 return
+
             # Grab only ROI
             if self.ROIenabled:
-                imgROI = frame[int(self.ROI[1]):int(self.ROI[1]+self.ROI[3]),int(self.ROI[0]):int(self.ROI[0] + self.ROI[2])]
+                imgWithinROI = frame[int(self.ROI[1]):int(self.ROI[1]+self.ROI[3]),int(self.ROI[0]):int(self.ROI[0] + self.ROI[2])]
                 #Make gray and blur
-                gray = cv2.cvtColor(imgROI, cv2.COLOR_BGR2GRAY)
+                gray = cv2.cvtColor(imgWithinROI, cv2.COLOR_BGR2GRAY)
                 gray = cv2.GaussianBlur(gray, (21, 21), 0)
 
-            if self.freezeEnable:
+            #if self.freezeEnable: if ROIenabled then Freeze is also enabled
                 movingPxls = self.calcMovingPixels(gray)
 
                 # Moving or frozen?
-                if movingPxls > 70:
+                ######!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FIX THIS
+                if movingPxls > 100: #NOTE:   THIS SHOULD BE VALUE SENT FROM CALIBRATION OR FROM PROTOCOL
                     self.text = 'move'
                     self.timeFrozen = 0
                     if self.isFrozen:
@@ -160,13 +160,19 @@ class Vid:
 
                 cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),2,cv2.LINE_AA)
                 cv2.imshow('thresh',self.prevThresh)
+
             # Write stuff on screen (need to add trial number and probably not time differential)
             self.drawInfo(msg['cur_time'], str(msg['trial_num']), frame)
             #self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, frame)
             # draw trial start circle
-
-            if msg['STATE'] == 'REC':
+            #print("STATE",msg['STATE'])
+            #if self.ROIenabled:  print("ROI: ", self.ROI)
+            if msg['STATE'] == 'REC_VID'or msg['STATE'] == 'START_EXPT': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                 self.out.write(frame)
+            if msg['STATE'] == 'REC_STOP': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                self.out.release() # CLOSE VIDEO FILE
+                self.freezeFile.close()
+
 
             # Show the frames
             cv2.imshow(self.winName,frame)
@@ -183,7 +189,7 @@ class Vid:
                 self.close()
                 return
 
-            if msg['STATE'] == 'STOP':
+            if msg['STATE'] == 'OFF': #  # NOTE: STATE = (ON,OFF,REC, START_EXPT,STOP_EXPT)
                 cv2.destroyAllWindows()
                 self.out.release()
                 self.close()
@@ -210,6 +216,7 @@ class Vid:
     def close(self):
         self.freezeFile.close()
         self.cap.release()
+        self.out.release()
         cv2.destroyAllWindows()
         for i in range(1,10):
             cv2.waitKey(1)
@@ -260,11 +267,13 @@ class Vid:
     # Create Region of Interest coordinates
     def genROI(self, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
-        self.ROI = cv2.selectROI(frame)
+        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.4,(0,255,255),2,cv2.LINE_AA)
+        ROI = cv2.selectROI(frame) #NOTE: NOT A STR, but tupple of 4 numbers: (x,y,w,h)
         cv2.destroyWindow("ROI selector")
-        print("ROI: ",self.ROI)
-
+        self.ROI = [int(x) for x in ROI]
+        #print("###############################")
+        #print("#    ROI: ",self.ROI,"          #")
+        #print("###############################")
     # Create a previous frame and thresh to be used for comparison on first frames only
     def genPrev(self, frame, prevFrame):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)

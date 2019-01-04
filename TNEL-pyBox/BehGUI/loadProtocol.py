@@ -3,6 +3,7 @@ import os
 import threading
 import subprocess
 import GUIFunctions
+
 def get_val_between_equal_sign_and_hash(line):
     try:
         Left_right = line.split('=')
@@ -39,12 +40,14 @@ def load_expt_file(self):
 
         for line in f:
             line = line.strip() # Remove leading and trailoing blanks and \n
-            if not 'HAB_COND_EXT_AND_RECALL_VIs' in line:
+
+            if not 'HAB_COND_EXT_AND_RECALL_VIs' in line: # What is this for?
                 line = line.upper()
-            print(line)
+            #print(line)
             self.exptFileLines.append(line)
-            if line != "":
-                condition={}
+
+            if line != "" and line[0] != "#" : #Skip Blank Lines and Skip lines that are just comments (but still copy them to new file)
+                #condition={} # Why is this here? Moved to line 362
 
                 if '[EXPERIMENT' in line:
                     EXPERIMENT = True
@@ -313,12 +316,25 @@ def load_expt_file(self):
                         print(self.Shock_Amp)
 
                 elif FREEZE:
+                    print("###################################")
+                    print("#    FREEZE DETECTION ENABLED     #")
+                    print("###################################")
+                    self.FREEZE_DETECTION_ENABLED = True
                     if 'DURATION' in line:
                         Freeze_Duration = get_val_between_equal_sign_and_hash(line)
                         #print(Freeze_Duration)
                     if 'PIX' in line:
                         Min_Pixels = get_val_between_equal_sign_and_hash(line)
                         #print(Min_Pixels)
+
+                    if 'ROI' in line:  #key == 'ROI':  # THIS SHOULD BE IN LOAD PROTOCOL ONLY WHEN and WHERE FREEZE INFO IS GIVEN
+                        self.ROI = get_val_between_equal_sign_and_hash(line)
+                        if "GENERATE" in self.ROI:
+                            print("ROI: ",self.ROI)
+                        else:
+                            print("ROI COORINATES: ",self.ROI)
+                            print('freeze detection assumed')
+
                 elif SETUP:
                     if "SETUP" not in line: # Skips [header] line
                         #print(line)
@@ -359,6 +375,7 @@ def load_expt_file(self):
                         #print ("KEYS: ", keys)
                         KEY_LINE = False
                     else: # Not a CONDITION heading line, (i.e. all the VALUES)
+                        condition={}
                         values = line.split(',')
                         #print ("VALUES: ",values)
 

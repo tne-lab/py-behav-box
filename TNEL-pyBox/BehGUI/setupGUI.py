@@ -209,6 +209,8 @@ def setupGUI(self):
     self.SHOCK_ON = False
     self.CAMERA_ON = False
     self.RECORDING = False
+    self.FREEZE_DETECTION_ENABLED = False
+    self.ROI = (0,0,0,0)
 
     self.events.append(("StartTime: " + str(START_TIME)))
 

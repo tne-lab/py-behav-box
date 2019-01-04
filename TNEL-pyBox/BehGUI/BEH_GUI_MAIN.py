@@ -329,7 +329,7 @@ class BEH_GUI():
                      if self.new_slider_y <= 0: self.new_slider_y = 0
                      elif self.new_slider_y >= self.sliders[0].slotL-self.sliders[0].bh:
                          self.new_slider_y = self.sliders[0].slotL-self.sliders[0].bh
-                     print("SCROLLING DOWN",self.sliders[0].sliderY )
+                     #print("SCROLLING UP",self.sliders[0].sliderY )
 
                 elif event.button == 5: #Wheel roll Down
                      self.MOUSE_WHEEL_SCROLL_DN = True
@@ -422,28 +422,33 @@ class BEH_GUI():
 
                                elif button.text == "REC":
                                     if self.CAMERA_ON:
-                                          if self.RECORDING: #STOP RECORDING BUT KEEP CAMERA ON
-                                                self.RECORDING = False
+                                          if self.RECORDING: #STOP RECORDING BUT KEEP CAMERA ON. # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                                                self.RECORDING = False  #KEEP CAMERA ON, JUST STOP RECORDING
                                                 GUIFunctions.log_event(self, self.events,"STOP_RECORDING_by_GUI",self.cur_time)
-                                                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+                                                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC_STOP', 'PATH_FILE':self.video_file_path_name}
                                                 button.UP_DN = "UP"
                                           else:
                                                 self.RECORDING = True
                                                 button.UP_DN = "DN"
                                                 GUIFunctions.log_event(self, self.events,"START_RECORDING_by_GUI",self.cur_time)
-                                                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
+                                                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC_VID', 'PATH_FILE':self.video_file_path_name}
 
 
                                     else:
                                           print("CAMERA NOT ON!")
-
+                                          
+                               #######################################
+                               #
+                               #   LOAD EXPERIMENTAL PROTOCOL FILE
+                               #
+                               #######################################
                                elif button.text == "LOAD FILE":
                                     button.UP_DN = "DN"
                                     self.events = []
                                     print(self.expt_file_path_name)
                                     if self.load_expt_file():
                                         print("\n###########################")
-                                        print("#   EXPT FILE LOADED!!    #")       
+                                        print("#   EXPT FILE LOADED!!    #")
                                         print("###########################")
                                         self.EXPT_FILE_LOADED = True
                                         GUIFunctions.log_event(self, self.events,"EXPT FILE LOADED",self.cur_time)
@@ -458,76 +463,82 @@ class BEH_GUI():
                                           if LED.index == 6: # Expt Started light
                                               LED.ONOFF = "OFF"
 
+                               #######################################
+                               #
+                               #   START EXPERIMENT
+                               #
+                               #######################################
                                elif button.text == "START EXPT":
-                                    self.cur_time = time.perf_counter()
-                                    self.Experiment_Start_time = self.cur_time
-                                    self.cur_time = self.cur_time-self.Experiment_Start_time
-                                    self.events = []
+
+                                    self.load_expt_file()
+                                    self.runSetup()
+
                                     button.UP_DN = "DN"
                                     self.Expt_Count +=1
-                                    if self.EXPT_FILE_LOADED:
-                                        if self.Subject == "" or "?" in self.Subject or self.Subject == " " or len(self.Subject) == 0 :
-                                            GUIFunctions.log_event(self, self.events,"Check SUBJECT  and EXPT name!!!!",self.cur_time)
-                                            print('SUBJECT = "" or "?" or same as last time')
-                                            # HIGHLIGHT USER INPUT BOXES
-                                            for user_input in self.user_inputs:
-                                                if user_input.label == "EXPT":
-                                                     user_input.border_color = (255,0,0)
-                                                elif user_input.label == "SUBJECT":
-                                                     user_input.border_color = (255,0,0)
+                                    #if self.EXPT_FILE_LOADED:
+                                    if self.Subject == "" or "?" in self.Subject or self.Subject == " " or len(self.Subject) == 0 :
+                                        GUIFunctions.log_event(self, self.events,"Check SUBJECT  and EXPT name!!!!",self.cur_time)
+                                        print('SUBJECT = "" or "?" or same as last time')
+                                        # HIGHLIGHT USER INPUT BOXES
+                                        for user_input in self.user_inputs:
+                                            if user_input.label == "EXPT":
+                                                 user_input.border_color = (255,0,0)
+                                            elif user_input.label == "SUBJECT":
+                                                 user_input.border_color = (255,0,0)
 
-                                                     
-                                        if self.NAME_OR_SUBJ_CHANGED :  # READY TO GO!!!
-                                            self.create_files()
-                                            self.create_expt_file_copy()
-                                            self.NAME_OR_SUBJ_CHANGED = False
-                                            print("EXPT FILE COPY UPDATED!!!!")
-                                            # GOOD TO GO!
-                                            print("EXPT STARTED!")
-                                            self.trial_num = 0
-                                            if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
+                                    # MAKE SURE CAMERA IS ON AND REOCRDING
+                                    if not self.CAMERA_ON: # CAMERA WAS OFF. Toggle ON
+                                        self.CAMERA_ON = True
+                                        GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
+                                        self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':"ON", 'PATH_FILE':self.video_file_path_name}
+                                        GUIFunctions.MyVideo(self)
+                                    if not self.RECORDING:  # WAS NOT RECORDING. TOGGLE ON
+                                        self.RECORDING = True
+                                        button.UP_DN = "DN"
+                                        GUIFunctions.log_event(self, self.events,"START_RECORDING when Expt Started",self.cur_time)
+                                        self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC_VID', 'PATH_FILE':self.video_file_path_name}
+
+                                    if self.NAME_OR_SUBJ_CHANGED :  # READY TO GO!!!
+                                        self.create_files()
+                                        self.create_expt_file_copy()
+                                        self.NAME_OR_SUBJ_CHANGED = False
+                                        print("EXPT FILE COPY UPDATED!!!!")
+                                        # GOOD TO GO!
+                                        print("EXPT STARTED!")
+                                        self.trial_num = 0
 
 
-                                            for user_input in self.user_inputs:
-                                                if user_input.label == "EXPT":
-                                                    user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
+                                        for user_input in self.user_inputs:
+                                            if user_input.label == "EXPT":
+                                                user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
+                                                
+                                        if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
 
-
-
-                                            if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
+                                        if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
                                             # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
-                                                self.VI_start = 0.0 #self.cur_time
-                                                self.VI = random.randint(0,int(self.var_interval_reward*2))
-                                                print("VI.......................", self.VI)
+                                            self.VI_start = 0.0 #self.cur_time
+                                            self.VI = random.randint(0,int(self.var_interval_reward*2))
+                                            print("VI.......................", self.VI)
 
-                                            GUIFunctions.log_event(self, self.events,"EXPT STARTED USING " + self.expt_file_path_name_COPY,self.cur_time)
-                                            self.START_EXPT = True
-                                            self.vidDict['STATE'] = 'START'
-                                            print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
-                                            for LED in self.LEDs: # Look for EXPT STARTED LED
-                                                  if LED.index == 6: # Expt Started light
-                                                      LED.ONOFF = "ON"
-                                            ###############################################################
-                                            #
-                                            # ?????????????????????????????????????????
-                                            # SEND BIT TO OPEND EPHYS TO INDICATE EXPT STARTED.
-                                            # CAN RECORD SIGNAL BE THE START EVENT?????
-                                            #
-                                            ################################################################
+                                        GUIFunctions.log_event(self, self.events,"EXPT STARTED USING " + self.expt_file_path_name_COPY,self.cur_time)
 
+                                        ##################################
+                                        #
+                                        # RESET EXPT TIMER
+                                        #
+                                        ##################################
+                                        #self.events = []
+                                        self.cur_time = time.perf_counter()
+                                        self.Experiment_Start_time = self.cur_time
+                                        self.cur_time = self.cur_time-self.Experiment_Start_time
 
-                                    else:
-                                        GUIFunctions.log_event(self, self.events,"EXPT FILE NOT LOADED!!!!",self.cur_time)
-                               if not self.CAMERA_ON: # CAMERA WAS OFF
-                                    self.CAMERA_ON = True
-                                    GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
-                                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':"FREEZE_DETECT", 'PATH_FILE':self.video_file_path_name}
-                                    GUIFunctions.MyVideo(self)
-                               if not self.RECORDING:
-                                    self.RECORDING = True
-                                    button.UP_DN = "DN"
-                                    GUIFunctions.log_event(self, self.events,"START_RECORDING_by_GUI",self.cur_time)
-                                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
+                                        self.START_EXPT = True
+                                        self.vidDict['STATE'] = 'START_EXPT'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                                        print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
+                                        for LED in self.LEDs: # Look for EXPT STARTED LED
+                                              if LED.index == 6: # Expt Started light
+                                                  LED.ONOFF = "ON"
+
 
                                self.LEFT_MOUSE_DOWN = False
                                self.BUTTON_SELECTED = True
@@ -637,14 +648,14 @@ class BEH_GUI():
 
                     # CAMERA PRESSED
                     if self.camera.collidepoint(cur_x,cur_y):
-                          if self.CAMERA_ON: #CAMERAL ALREWADY ON, TURN CAMERA OFF
+                          if self.CAMERA_ON: #CAMERAL ALREWADY ON, TURN CAMERA OFF.  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                                 self.CAMERA_ON = False
                                 self.RECORDING = False
                                 GUIFunctions.log_event(self, self.events,"Camera_OFF",self.cur_time)
                                 print("CAMERA OFF")
-                                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'STOP', 'PATH_FILE':self.video_file_path_name}
+                                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'OFF', 'PATH_FILE':self.video_file_path_name}
 
-                          else: #TURN CAMERA ON
+                          else: #TURN CAMERA ON # NOTE: STATE = (ON,OFF,REC, START_EXPT,STOP_EXPT)
                                 self.CAMERA_ON = True
                                 GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
                                 print("CAMERA ON")
@@ -826,13 +837,13 @@ class BEH_GUI():
             self.LEDs[5].ONOFF = LEDsONOFF
         elif key == "CAMERA":
             print("CAMERA")
-            val = str2bool(setupDict[key])
+            val = str2bool(setupDict["CAMERA"])
             self.setup_ln_num +=1
-            if val:  # TURN CAMERA ON
+            if val:  # TURN CAMERA ON.     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                 if not self.CAMERA_ON: # CAMERA WAS OFF
                     self.CAMERA_ON = True
                     GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
-                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':"FREEZE_DETECT", 'PATH_FILE':self.video_file_path_name}
+                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':"ON", 'PATH_FILE':self.video_file_path_name}
                     GUIFunctions.MyVideo(self)
                 else: # CAMERA IS ALREADY ON
                     GUIFunctions.log_event(self, self.events,"Camera is ALREADY ON",self.cur_time)
@@ -841,29 +852,41 @@ class BEH_GUI():
                     self.CAMERA_ON = False
                     self.RECORDING = False
                     GUIFunctions.log_event(self, self.events,"Camera_OFF",self.cur_time)
-                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'STOP', 'PATH_FILE':self.video_file_path_name}
+                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'OFF', 'PATH_FILE':self.video_file_path_name}
+
+
         elif key == "REC":
             print ("recording")
             self.RECORDING = True
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
-            if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
-                self.snd.send(self.snd.START_ACQ)
-                self.snd.send(self.snd.START_REC)
-                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
-            else:
-                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
-        elif key == 'ROI':
-            print('setting ROI',setupDict[key])
-            self.setup_ln_num += 1
-            self.vidDict['ROI'] = setupDict[key].split('#')[0]
-            if "GENERATE" in self.vidDict['ROI']:
-                print(self.vidDict['ROI'], ": GET ROI COORDINATES FROM USER")
-            else:
-                print("ROI COORINATES: ",self.vidDict['ROI'])
-            print('freeze detection assumed')
+            if val:  # REC == TRUE.  Remember Camera NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
+                self.snd.send(self.snd.START_REC) # OPEN_EPHYS
+                if self.FREEZE_DETECTION_ENABLED:
+                    print("\nFREEZE DETECTION ENABLED")
+                    print(self.ROI)
+                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC_VID', 'ROI':self.ROI, 'PATH_FILE':self.video_file_path_name}
+                    print("Slef.ROI: ",self.ROI,"\n")
+                else: # NO FREEZE DETECTION WANTED
+                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC_VID', 'PATH_FILE':self.video_file_path_name}
+                    print("\nSelf.ROI: ",self.ROI,"\n")
+            else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
+                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC_STOP', 'PATH_FILE':self.video_file_path_name} 
+                print("\nREC = False, Self.ROI: ",self.ROI,"\n")
+
+##        elif key == 'ROI':  # THIS SHOULD BE IN LOAD PROTOCOL ONLY WHEN and WHERE FREEZE INFO IS GIVEN
+##            print('setting ROI',setupDict[key])
+##            self.setup_ln_num += 1
+##            self.vidDict['ROI'] = setupDict[key].split('#')[0]
+##            if "GENERATE" in self.vidDict['ROI']:
+##                print(self.vidDict['ROI'], ": GET ROI COORDINATES FROM USER")
+##            else:
+##                print("ROI COORINATES: ",self.vidDict['ROI'])
+##            print('freeze detection assumed')
 
         if self.setup_ln_num >= len(self.setup):
+            self.setup_ln_num = 0
             self.RUN_SETUP = False
 
 ###########################################################################################################
@@ -948,6 +971,7 @@ class BEH_GUI():
                     self.CAMERA_ON = True
                     GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
                     self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+                                    # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                     GUIFunctions.MyVideo(self)
                 else: # CAMERA IS ALREADY ON
                     GUIFunctions.log_event(self, self.events,"Camera is ALREADY ON", self.cur_time)
@@ -956,18 +980,18 @@ class BEH_GUI():
                     self.CAMERA_ON = False
                     self.RECORDING = False
                     GUIFunctions.log_event(self, self.events,"Camera_OFF",self.cur_time)
-                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'STOP', 'PATH_FILE':self.video_file_path_name}
+                    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'OFF', 'PATH_FILE':self.video_file_path_name}
+                                                  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
 
-
-        elif key == "REC":
+        elif key == "REC": ## NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
             print ("rec")
             self.RECORDING = True
             val = str2bool(protocolDict[key])
             self.Protocol_ln_num +=1
-            if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC)
-                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC', 'PATH_FILE':self.video_file_path_name}
-            else:
-                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'ON', 'PATH_FILE':self.video_file_path_name}
+            if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC, START_EXPT,STOP_EXPT)
+                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC_VID', 'PATH_FILE':self.video_file_path_name}
+            else:  # KEEP CAMERA ON, JUST STOP RECORDING
+                self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC_STOP', 'PATH_FILE':self.video_file_path_name}
 
         elif "EXTEND_LEVERS" in key:
             self.Protocol_ln_num +=1
@@ -1122,8 +1146,9 @@ class BEH_GUI():
 
         if self.Protocol_ln_num >= len(self.protocol):
            print("Protocol_ln_num: ",self.Protocol_ln_num,"plength: ", len(self.protocol),"\n")
-           print("PROTOCOL ENDED")
-           print("......END.....\n\n")
+           print("\n\nPROTOCOL ENDED")
+           print("......END.....\n")
+           print("__________________________________________________________________________\n\n\n\n")
            GUIFunctions.log_event(self, self.events,"PROTOCOL ENDED",self.cur_time)
            self.START_EXPT = False
            self.Protocol_ln_num = 0
@@ -1135,6 +1160,8 @@ class BEH_GUI():
                   LED.ONOFF = "OFF"
            GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
            GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
+
+           
 
            # Tell open ephys to stop acquistion and recording?
            # Maybe we want to wait and continue getting data for awhile. Just send some sort of event

@@ -28,7 +28,7 @@ from collections import deque
 
 from multiprocessing import Process, Queue
 import threading
-#import subprocess # Subprocesses start new processes that are independent 
+#import subprocess # Subprocesses start new processes that are independent
 #import childVid #, parentVid3
 ##from datetime import datetime
 ################################################################
@@ -78,7 +78,7 @@ eaten = daqAPI.foodEatInputSetup()
 ##################
 cwd = os.getcwd()
 datapath = os.path.join(cwd,"DATA")
-date = time.strftime("%b-%d-%y")#month, day,Year, 
+date = time.strftime("%b-%d-%y")#month, day,Year,
 log_file_name = 'log_file-' + date + '.txt'
 log_file_path_name = os.path.join(datapath,log_file_name)
 print (log_file_name)
@@ -93,10 +93,10 @@ expt_file_path_name = os.path.join(datapath,expt_file_name )
 import childVid #, parentVid3
 
 def MyVideo():
-    global vidDict  
+    global vidDict
     #myDict = {'cur_time':'0', 'STATE' = STATE}
     q = deque(maxlen = 1)
-    if vidDict['STATE'] == 'START':
+    if vidDict['STATE'] == 'ON': #  STATE = (ON,OFF,REC)
           print("STATE: ",vidDict['STATE'])
           p = threading.Thread(target=childVid.vidCapture, args=(q,))
           print (p)
@@ -109,8 +109,8 @@ def MyVideo():
               q.append(vidDict)
           #print("argv[1] = ",STATE)
           #vidDict['STATE'] = "STOP"
-          q.append(vidDict)       
-            
+          q.append(vidDict)
+
 
 def exit_game():
 
@@ -127,14 +127,14 @@ def exit_game():
       sys.exit()
 
 
-      
+
 def log_event(event_lst,event,cur_time):
     global log_file_path_name
     log_file = open(log_file_path_name,'a')
     log_file.write(event+": "+str(cur_time)+'\n')
     event_lst.append(event+":" + str(cur_time))
     log_file.close()
-    
+
 def draw_speeker(myscreen, TONE_ON):
         if TONE_ON: col = (0,255,0)
         else:       col = (0,0,0)
@@ -147,7 +147,7 @@ def draw_speeker(myscreen, TONE_ON):
         for c in range (5):
               pygame.draw.circle(myscreen,col,(170+incr,40),5,1)
               incr += 15
-        incr = 0      
+        incr = 0
         for c in range (4):
               pygame.draw.circle(myscreen,col,(177+incr,55),5,1)
               incr += 15
@@ -168,7 +168,7 @@ def draw_camera(myscreen,fill_color, CAMERA_ON, REC, x, y, w,h, linew):
         pygame.draw.polygon(myscreen, col, ptlist, linew)#
         pygame.draw.rect(myscreen,col, (x, y, w,h), linew)
         return camera
-      
+
 def draw_lighting(surface, SHOCK_ON, x,y,scale,color,width):
         if SHOCK_ON: col = (255,0,0)
         else: col = (0,0,0)
@@ -178,7 +178,7 @@ def draw_lighting(surface, SHOCK_ON, x,y,scale,color,width):
         pt4 = (x-6,y+20)
         pt5 = (x-3,y+20)
         pt6 = (x-8,y+30)
-        
+
         pt7 = (x+2,y+20)
         pt8 = (x,y+20)
         pt9 = (x+7,y+10)
@@ -189,7 +189,7 @@ def draw_lighting(surface, SHOCK_ON, x,y,scale,color,width):
         pygame.draw.polygon(surface, (0,0,0), ptlist, 1)#top white line
         lightning = pygame.draw.circle(surface,col,(x+2,y+15),23,2)
         return lightning # Returns a Rect object.  Neede to see if mouse clicked on icon
-      
+
 def BehavioralChamber():
     global vidDict
     myscreen = pygame.display.set_mode((400,800),pygame.RESIZABLE,32)
@@ -202,7 +202,7 @@ def BehavioralChamber():
     #  Create Menu GUI elements
     #
     #############
-    
+
     red         = (255,0,0)
     green       = (0,255,0)
     blue        = (0,0,255)
@@ -215,7 +215,7 @@ def BehavioralChamber():
     lightpurple  = (160,12,75)
     darkpurple  = (51,5,25)
 
-    
+
     # FLAGS
     NEW_BUTTON = False
     LEFT_MOUSE_DOWN = False
@@ -225,10 +225,10 @@ def BehavioralChamber():
     BOX_SELECTED = False
     CIRC_SELECTED = False
     SLIDER_SELECTED = False
-    
+
     CORNER_SET = False
     DELETE_ITEM = False
-    
+
     buttons = []
     levers = []
     boxes = []
@@ -264,7 +264,7 @@ def BehavioralChamber():
     NOSE_POKE_TIME = START_TIME
     TONE_TIME = START_TIME
     SHOCK_TIME = START_TIME
-    
+
     num_L_nose_pokes = 0
     num_R_nose_pokes = 0
     num_L_lever_preses = 0
@@ -293,31 +293,31 @@ def BehavioralChamber():
 
         for button in buttons:
             button.draw()
-            
+
         for box in boxes: # Must draw before items that go on top
             box.draw()
 
-            
+
         for lever in levers:
             # Delay displaying lever state for visual purposes only (NOTE: PROGRAM IS NOT PAUSED!)
             if lever.index == 0: # LEFT LEVER
                if LEVER_PRESSED_L:
                   if (cur_time - LEVER_PRESS_TIME) > 0.5: #Leaves on for 0.5 sec
-                     lever.STATE = "OUT" 
+                     lever.STATE = "OUT"
                      LEVER_PRESSED_L = False
                   else:
                      lever.STATE = "DN"
-                   
+
             if lever.index == 1: # RIGHT LEVER
                if LEVER_PRESSED_R:
                   if (cur_time - LEVER_PRESS_TIME) > 0.5: #Leaves on for 0.5 sec
-                     lever.STATE= "OUT"  
+                     lever.STATE= "OUT"
                      LEVER_PRESSED_R = False
                   else:
                      lever.STATE = "DN"
-                     
+
             lever.draw()
-        
+
         for LED in LEDs:
             # Leaves nose poke LED ON for 1 sec so user can see it (NOTE: PROGRAM IS NOT PAUSED!)
             if LED.index == 2: #Left NOSE POKE
@@ -327,7 +327,7 @@ def BehavioralChamber():
                          NOSE_POKED_L = False
                    else:
                          LED.ONOFF = "ON"
-                         
+
             elif LED.index == 3: #Right NOSE POKE
                 if NOSE_POKED_R:
                    if (cur_time - NOSE_POKE_TIME) > 1.0:
@@ -337,16 +337,16 @@ def BehavioralChamber():
                          LED.ONOFF = "ON"
 
             LED.draw()
-                        
-        for tog in toggles: 
+
+        for tog in toggles:
             tog.draw()
 
         for sld in sliders:
             sld.draw()
-            
+
         for lbl in labels: # Last so on top
             lbl.draw()
-            
+
         for info in info_boxes: # Last so on top
             if info.label == "L NOSE POKES":
                   info.text = [str(num_L_nose_pokes)]
@@ -355,17 +355,17 @@ def BehavioralChamber():
             if info.label == "L PRESSES":
                   info.text = [str(num_L_lever_preses)]
             if info.label == "R PRESSES":
-                  info.text = [str(num_R_lever_preses) ]                                                    
+                  info.text = [str(num_R_lever_preses) ]
             if info.label == "PELLETS":
                   info.text = [str(num_pellets)]
             if info.label == "EATEN":
                   info.text = [str(num_eaten)]
-                  
+
             if info.label == "EXPT PATH":
                   info.text = [expt_file_path_name]
             if info.label == "LOG FILE DATA PATH":
                   info.text = [log_file_path_name]
-                  
+
             if info.label == "EVENTS":
                   lines_in_txt = len(events)
                   if lines_in_txt > 6:
@@ -375,7 +375,7 @@ def BehavioralChamber():
 
 ##        for event in user_inputs:
 ##            event.draw()
-            
+
         # DRAW SPEEKER
         speeker = draw_speeker(myscreen,SOUND_ON)
         if SOUND_ON:
@@ -384,11 +384,11 @@ def BehavioralChamber():
                   high_tone.sendDBit(False)
                   #low_tone.sendDByte(0)
                   print("SOUND OFF")
-                  
+
                   log_event(events,"Tone_OFF",cur_time)
               else:
-                  high_tone.sendDBit(False)  
-        
+                  high_tone.sendDBit(False)
+
         # DRAW LIGHTNING
         shock = draw_lighting(myscreen, SHOCK_ON, 198,95,1,(255,255,0),2)
         if SHOCK_ON:
@@ -400,23 +400,23 @@ def BehavioralChamber():
                   log_event(events,"Shock_OFF",cur_time)
               else:
                   pass
-                  #high_tone.sendDBit(False)               
+                  #high_tone.sendDBit(False)
 
 
         # DRAW CAMERA
-        # draw_camera(myscreen,fill_color, ON_OFF, REC, x, y, w,h, linew) 
+        # draw_camera(myscreen,fill_color, ON_OFF, REC, x, y, w,h, linew)
         camera = draw_camera(myscreen, (100,100,100),CAMERA_ON,RECORDING,185, 140, 30,20, 2)
 
         #########################################################
-        #  SYSTEM EVENTS 
-        #########################################################            
+        #  SYSTEM EVENTS
+        #########################################################
         for event in pygame.event.get():
             if event.type == QUIT:
                 exit_game()
             ########################################
             #  Keyboard Events
             ########################################
-            
+
             #########################################################
             #  MOUSE EVENTS (always active independent of game mode)
             #########################################################
@@ -430,7 +430,7 @@ def BehavioralChamber():
                         cur_slider.sliderX = cur_slider.x
                     if cur_slider.sliderX > cur_slider.x + cur_slider.slotL:
                         cur_slider.sliderX = cur_slider.x + cur_slider.slotL
-                    cur_slider.percent = cur_slider.x / cur_slider.slotL 
+                    cur_slider.percent = cur_slider.x / cur_slider.slotL
             # ----------------------------------------
             # MOUSE DOWN
             elif (event.type == pygame.MOUSEBUTTONDOWN ):#Mouse Clicked
@@ -449,7 +449,7 @@ def BehavioralChamber():
                                button.UP_DN = "DN"
                                #button.draw()
                                if button.text == "CABIN LT":
-                                    
+
                                     if BACKGROUND_LIT:
                                        events.append("Cabin Light OFF: " + str(cur_time))
                                        BACKGROUND_LIT = False
@@ -466,7 +466,7 @@ def BehavioralChamber():
                                     if FAN_0N:
                                        FAN_0N = False
                                        log_event(events,"Fan_OFF",cur_time)
-                                       #events.append("Fan OFF: " + str(cur_time))                                       FAN_0N = False
+                                       #events.append("Fan OFF: " + str(cur_time))
                                        fan.sendDBit(False)
                                        fan.end()
                                     else:
@@ -475,7 +475,7 @@ def BehavioralChamber():
                                        FAN_0N = True
                                        fan = daqAPI.fanSetup()
                                        fan.sendDBit(True)
-                                       
+
                                elif button.text == "FEED":
                                     button.UP_DN = "DN"
                                     FEED = True
@@ -484,7 +484,7 @@ def BehavioralChamber():
                                     num_pellets +=1
                                     give_food.sendDBit(True)
                                     give_food.sendDBit(False)
-                                    
+
                                elif button.text == "EXTEND" or button.text == "RETRACT":
                                     if LEVERS_EXTENDED: #Toggle
                                           button.UP_DN = "UP"
@@ -495,7 +495,7 @@ def BehavioralChamber():
                                           for lever in levers:
                                                 lever.STATE = "IN"
                                           leverOut.sendDByte(0)
-                                          
+
                                     else: # not extended
                                           button.UP_DN = "DN"
                                           button.text = "RETRACT"
@@ -506,7 +506,7 @@ def BehavioralChamber():
                                                 lever.STATE = "OUT"
                                           leverOut.sendDByte(3)
 
-                                          
+
                                LEFT_MOUSE_DOWN = False
                                BUTTON_SELECTED = True
                                dx = cur_x - button.x
@@ -525,11 +525,11 @@ def BehavioralChamber():
                                     # NOTE:  We are redrawing here again (instead of just in main loop)
                                     #       because state will be reset ot actual machine state (which is what
                                     #       really matters.  I you don't care about this, comment out next 3 lines.
-                                    lever.draw() 
+                                    lever.draw()
                                     pygame.display.flip()
                                     time.sleep(0.25) # sec
 
-                    # LEDS        
+                    # LEDS
                     for LED in LEDs: # Check for collision with EXISTING buttons
                         if LED.rect.collidepoint(cur_x,cur_y):
                             idx = LEDs.index(LED)
@@ -545,18 +545,18 @@ def BehavioralChamber():
                                     R_condition_Lt.sendDBit(True)
                                     #events.append("Right Light ON: " + str(cur_time))
                                     log_event(events,"Right_Light_ON",cur_time)
-                                    
-                                # NOSE POKES    
+
+                                # NOSE POKES
                                 elif LED.index == 2 or LED.index == 3: # NOSE POKES
                                    NOSE_POKE_TIME = time.perf_counter()
                                    # NOTE:  We are redrawing here again (instead of just in main loop)
                                    #       because state will be reset ot actual machine state (which is what
                                    #       really matters.  I you don't care about this, comment out next 3 lines.
-                                   LED.draw() 
+                                   LED.draw()
                                    pygame.display.flip()
                                    time.sleep(0.25) # sec
 
-                                   
+
                             else:                  # WAS ON
                                 LED.ONOFF = "OFF"  # NOW OFF
                                 LED.draw()
@@ -565,10 +565,10 @@ def BehavioralChamber():
                                     log_event(events,"Left_Light_OFF",cur_time)
                                     #events.append("Left Light OFF: " + str(cur_time))
                                 elif LED.index == 1: # RIGHT CONDITION LIGHT
-                                    R_condition_Lt.sendDBit(False)   
+                                    R_condition_Lt.sendDBit(False)
                                     #events.append("Right Light OFF: " + str(cur_time))
                                     log_event(events,"Right_Light_OFF",cur_time)
-                                    
+
                     for box in boxes: # Check for collision with EXISTING buttons
                         if box.rect.collidepoint(cur_x,cur_y):
                               if FEEDER_LT_ON:
@@ -588,7 +588,7 @@ def BehavioralChamber():
                                   log_event(events,"Feeder_Light_ON",cur_time)
                                   food_light.sendDBit(True)
                                   print("FEEDER PRESSED")
-                                  
+
                     # SPEEKER PRESSED
                     if speeker.collidepoint(cur_x,cur_y):
                           TONE_TIME = cur_time
@@ -596,7 +596,7 @@ def BehavioralChamber():
                                 SOUND_ON = False
                                 #events.append("Sound OFF: " + str(cur_time))
                                 log_event(events,"Tone_OFF",cur_time)
-                          else: 
+                          else:
                                 SOUND_ON = True
                                 # TONE TRUNED OFF IN GAME LOOP AFTER HALF A SEC
                                 #high_tone.sendDBit(True)
@@ -613,7 +613,7 @@ def BehavioralChamber():
                                 SHOCK_ON = False
                                 #events.append("Shock OFF: " + str(cur_time))
                                 log_event(events,"Shock_OFF",cur_time)
-                          else: 
+                          else:
                                 SHOCK_ON = True
                                 #events.append("Shock ON: " + str(cur_time))
                                 log_event(events,"Shock_ON",cur_time)
@@ -623,7 +623,7 @@ def BehavioralChamber():
                           #low_tone.sendDByte(128)
                           #high_tone.sendDBit(True)
                           print("SHOCK PRESSED")
-                          
+
                     # CAMERA PRESSED
                     if camera.collidepoint(cur_x,cur_y):
                           if CAMERA_ON:
@@ -631,21 +631,21 @@ def BehavioralChamber():
                                 #events.append("Camera OFF: " + str(cur_time))
                                 log_event(events,"Camera_OFF",cur_time)
                                 print("CAMERA OFF")
-                                vidDict = {'cur_time':cur_time, 'STATE' : 'START'}
-                                
+                                vidDict = {'cur_time':cur_time, 'STATE' : 'OFF'}
+
                           else:
-                                
+
                                 CAMERA_ON = True
                                 #events.append("Camera ON: " + str(cur_time))
                                 log_event(events,"Camera_ON",cur_time)
                                 print("CAMERA ON")
-                                vidDict = {'cur_time':cur_time, 'STATE' : 'START'}
+                                vidDict = {'cur_time':cur_time, 'STATE' : 'ON'}
                                 #q = Queue(1)
                                 #vid = os.system('python parentVid.py') #Works but does not do in parallel
                                 MyVideo()
                                 #print(vid)
 ##                    # TOGGLE BUTTONS
-                          
+
 ##                    for tog in toggles: # Check for collision with toggles
 ##                        if tog.rect.collidepoint(cur_x,cur_y):
 ##                            idx = toggles.index(tog)
@@ -653,18 +653,18 @@ def BehavioralChamber():
 ##                            if tog.LEFT_RIGHT == "LEFT":    # WAS INPUT
 ##                               tog.LEFT_RIGHT = "RIGHT"     # NOW OUTPUT
 ##                               tog.draw()
-##                               
+##
 ##                            elif tog.LEFT_RIGHT == "RIGHT": # WAS OUTPUT
 ##                               tog.LEFT_RIGHT = "LEFT"      # NOW INPUT
 ##                               tog.draw()
-                               
+
                     # SLIDERS
                     for sld in sliders: # Check for collision with SLIDERS
                         if sld.rect.collidepoint(cur_x,cur_y):
                             SLIDER_SELECTED = True
-                            cur_slider = sld               
-                                   
-           # MOUSE UP    
+                            cur_slider = sld
+
+           # MOUSE UP
             elif (event.type == pygame.MOUSEBUTTONUP ):
                 NEW_BUTTON = False
                 LEFT_MOUSE_DOWN = False
@@ -681,17 +681,17 @@ def BehavioralChamber():
                 for button in buttons: # Check for collision with EXISTING buttons
                     button.UP_DN = "UP"
                     #button.draw()
-                    
+
                 for lever in levers: # Check for collision with EXISTING buttons
                     if LEVERS_EXTENDED:
                           lever.STATE = "OUT"
                     else:
                           lever.STATE = "IN"
                     #lever.draw()
-                 
+
         ######################################
         #   CHECK INPUTS
-        ######################################               
+        ######################################
         # levers
         if LEVERS_EXTENDED:
               wasleverPressed = detectPress(checkPressLeft,checkPressRight)
@@ -705,7 +705,7 @@ def BehavioralChamber():
                     num_R_lever_preses += 1
                     levers[1].STATE = "DN"
               #else: levers[1].STATE = "OUT"
-              
+
               if  wasleverPressed == 'Left':
                     #events.append("Left Lever Pressed: " + str(cur_time))
                     log_event(events,"Lever_Pressed_L",cur_time)
@@ -713,9 +713,9 @@ def BehavioralChamber():
                     print("LEFT LEVER PRESSED")
                     num_L_lever_preses += 1
                     levers[0].STATE = "DN"
-              else: levers[0].STATE = "OUT"      
+              else: levers[0].STATE = "OUT"
 
-        # nose pokes              
+        # nose pokes
         was_nose_poked_L = checkLeftNosePoke(L_nose_poke)
         cur_time = time.perf_counter()
         if was_nose_poked_L:
@@ -732,7 +732,7 @@ def BehavioralChamber():
             for LED in LEDs:
                 if LED.index == 2: # R NOSE POKES
                       LED.ONOFF = "OFF"
-                      
+
         was_nose_poked_R = checkRightNosePoke(R_nose_poke)
         if was_nose_poked_R:
             print("Right Nose Poked")
@@ -759,17 +759,17 @@ def BehavioralChamber():
             num_eaten +=1
             #events.append("Food Eaten: " + str(cur_time))
             log_event(events,"Food_Eaten",cur_time)
-        
+
         ######################################
         #   UPDATE SCREEN
         ######################################
-        
+
         pygame.display.flip()
         #endT = time.time()
         #print("Main Loop t = ",(endT - startT))
 #########################################################################################
 
-def main():  
+def main():
     for arg in sys.argv[1:]:
         print (arg)
     BehavioralChamber()

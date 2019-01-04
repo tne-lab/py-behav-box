@@ -1,6 +1,6 @@
 [EXPERIMENT]
 EXPT_NAME = TESTING     # This is the name of your experiment
-EXPT_PATH 	= D:\Desktop\py-behav-box\TNEL-pyBox\BehGUI\DATA     # C:\\users\ephys-2\Desktop\BehChamGUI\DATA
+EXPT_PATH 	= C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA       #D:\Desktop\py-behav-box\TNEL-pyBox\BehGUI\DATA
 
 
 [TONE1] # NEED TONE1, TONE2
@@ -17,15 +17,16 @@ AMPS(MA)	= 100       # In milliamps
 MIN_DURATION(S)	= 2      # In seconds
 MIN_MOVING_PIX	= 5000   # Min number of moving pixels to un freeze
 MIN_THESHOLD = 26        # gray level threshold (0-255)
+ROI=Generate # Generate = asks user for ROI, or (x,y,w,h) ex: (644, 10, 633, 485).  This also starts FREEZE detection  FREEZE=TRUE  # NOTE:  REC=TRUE causes failure before or  AFTER ROI
+# Testing comments
+
 
 [SETUP]
 FAN_ON=TRUE
 CAB_LIGHT=TRUE
 FOOD_LIGHT=TRUE
 CAMERA=TRUE
-
-ROI=Generate # Generate = asks user for ROI, or (x,y,w,h) ex: (644, 10, 633, 485).  This also starts FREEZE detection  FREEZE=TRUE  # NOTE:  REC=TRUE causes failure before or  AFTER ROI
-
+REC=TRUE
 
 [PROTOCOL]
 START_LOOP = WRONG(50%,5,10)          # Loops are trials
