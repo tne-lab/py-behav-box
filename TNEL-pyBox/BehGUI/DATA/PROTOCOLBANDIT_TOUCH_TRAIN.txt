@@ -18,9 +18,10 @@ Amps(mA)	= 100
 [FREEZE]
 Min Duration(s)	= 2
 Min Moving Pix	= 5000
-Min Theshold = 
+Min Theshold =
+ROI=Generate # Generate = asks user for ROI, or (x,y,w,h) ex: (644, 10, 633, 485).  This also starts FREEZE detection  FREEZE=TRUE  # NOTE:  REC=TRUE causes failure before or  AFTER ROI
 	
-[PROTOCOL] #Note: CONDITIONS cand be "RANDOM","SEQUENTIAL"(in the order they are listed below in [CONDITIONS]), or a NUMBER starting at 1 
+[PROTOCOL] #Note: CONDITIONS cand be "RANDOM","SEQUENTIAL"(in the order they are listed below in [CONDITIONS]), or a NUMBER starting at 1
 FAN_ON=True
 CAB_LIGHT=True
 CAMERA=True
@@ -40,7 +41,7 @@ CAB_LIGHT=False
 FAN_ON=False
 [END PROTOCOL]
 
-[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS. 
+[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS.
 MAX_TIME, RESET,          IMG1,           IMG2,           L_CONDITION_LT, R_CONDITION_LT, DES_IMG1_PRESSP,   DES_IMG2_PRESSP,   CORRECT, WRONG, NO_ACTION
 3,       ON_RESPONSE,	  1,		  0,		  1,		  0,		  1,		     0,		        PELLET,  TONE1, SHOCK
 3,       ON_RESPONSE,	  0,		  1,		  0,		  1,		  0,		     1,		        PELLET,  TONE1, SHOCK

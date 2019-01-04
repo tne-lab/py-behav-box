@@ -10,7 +10,7 @@ class Vid:
         self.out = None
         self.outPath = 'NOT SET'
         self.ROIenabled = False
-        #self.ROI = (0,0,0,0)
+        self.ROIstr = ""
         self.freezeEnable = False
         cv2.namedWindow('vid')
         if self.cap.isOpened():
@@ -114,8 +114,9 @@ class Vid:
                     if msg['ROI'] in 'GENERATE':
                         self.initROIFrames()
                     else: # NOTE: ROI sent from PROTOCOL file
-                        ROIstr = msg['ROI'][1:-1] #Remove first and last char "(" and ")" from (x,y,width,height)
-                        ROIlist = ROIstr.split(",")
+                        self.ROIstr = msg['ROI']
+                        ROIstrped = self.ROIstr[1:-1]#Remove first and last char "(" and ")" from (x,y,width,height)
+                        ROIlist = ROIstrped.split(",")
                         self.ROI = [int(x) for x in ROIlist]
                         self.initROIFrames()
 
@@ -178,7 +179,10 @@ class Vid:
             cv2.imshow(self.winName,frame)
 
             # Create dict to send back to main GUI
-            backDict = {'vid_time':vid_cur_time, 'FROZEN':self.isFrozen, 'NIDAQ_time':time_from_GUI, 'Vid-NIDAQ':msg['time_diff']}
+            if self.ROIenabled:
+                backDict = {'vid_time':vid_cur_time, 'FROZEN':self.isFrozen, 'NIDAQ_time':time_from_GUI, 'Vid-NIDAQ':msg['time_diff'], 'ROI':self.ROIstr}
+            else:
+                backDict = {'vid_time':vid_cur_time, 'FROZEN':self.isFrozen, 'NIDAQ_time':time_from_GUI, 'Vid-NIDAQ':msg['time_diff']}
             self.back_q.put(backDict)
 
             # Get next frame and check if we are done
@@ -269,8 +273,11 @@ class Vid:
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.4,(0,255,255),2,cv2.LINE_AA)
         ROI = cv2.selectROI(frame) #NOTE: NOT A STR, but tupple of 4 numbers: (x,y,w,h)
+        self.ROIstr = str(ROI)
+        #print("ROI CONVERTED TO STR",self.ROIstr )
         cv2.destroyWindow("ROI selector")
         self.ROI = [int(x) for x in ROI]
+
         #print("###############################")
         #print("#    ROI: ",self.ROI,"          #")
         #print("###############################")

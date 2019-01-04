@@ -110,7 +110,7 @@ def setGlobals(self):
     self.Shock_V = 9.0
     self.Shock_Amp = 0.5
 
-    self.Expt_Name = '?'
+    self.Expt_Name = ''
     self.Subject =''
     self.prev_Subject =''
     self.NAME_OR_SUBJ_CHANGED = False

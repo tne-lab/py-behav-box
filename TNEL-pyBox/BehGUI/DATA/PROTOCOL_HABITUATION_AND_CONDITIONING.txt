@@ -19,6 +19,7 @@ Amps(mA)	= 100
 Min Duration(s)	= 2
 Min Moving Pix	= 5000
 Min Theshold = 26
+ROI=Generate # Generate = asks user for ROI, or (x,y,w,h) ex: (644, 10, 633, 485).  This also starts FREEZE detection  FREEZE=TRUE  # NOTE:  REC=TRUE causes failure before or  AFTER ROI
 
 [SETUP]
 FAN_ON=True

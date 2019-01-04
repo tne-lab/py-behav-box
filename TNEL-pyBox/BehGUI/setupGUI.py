@@ -210,7 +210,7 @@ def setupGUI(self):
     self.CAMERA_ON = False
     self.RECORDING = False
     self.FREEZE_DETECTION_ENABLED = False
-    self.ROI = (0,0,0,0)
+    self.ROIstr = ""
 
     self.events.append(("StartTime: " + str(START_TIME)))
 
@@ -236,7 +236,7 @@ def setupGUI(self):
     self.TOUCH_IMAGES_SENT = False
 
     # Open ephys stuff
-    self.snd = zmqClasses.SNDEvent(5556, recordingDir = self.datapath, prependText = 'OPEN-EPHYS') # subject number or something
+    self.snd = zmqClasses.SNDEvent(5556, prependText = 'OPEN-EPHYS') # subject number or something
 
     self.openEphysBack_q = Queue()
     self.openEphysQ = Queue()

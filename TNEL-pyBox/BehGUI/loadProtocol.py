@@ -187,7 +187,8 @@ def load_expt_file(self):
                         print("#####################")
                         print("#    EXPERIMENT     #")
                         print("#####################")
-                        self.Expt_Name = get_val_between_equal_sign_and_hash(line)
+                        if self.Expt_Name == "": #Change only if it does not already exist
+                            self.Expt_Name = get_val_between_equal_sign_and_hash(line)
                         print(self.Expt_Name)
 
                     elif 'SUBJECT' in line:
@@ -401,8 +402,9 @@ def load_expt_file(self):
         print("NO SUCH FILE!!!!",self.expt_file_path_name)
         return False
 
-    print("PROTOCOL LOADED!!!")
-    #print (self.protocol)
+    print("\n#########################")
+    print("#   EXPT FILE LOADED!!    #")
+    print("###########################")
 
     for dct in self.protocol:
         for k,v in dct.items():
@@ -481,6 +483,8 @@ def create_files(self):
     self.expt_file_path_name_COPY = os.path.join(self.newdatapath,expt_file_name_COPY)
     print(self.expt_file_path_name_COPY)
 
+    self.snd.changeVars( recordingDir = self.newdatapath)
+
     log_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-LOG_file'  + '.csv'
     self.log_file_path_name = os.path.join(self.newdatapath,log_file_name)
     print(self.log_file_path_name)
@@ -499,19 +503,25 @@ def create_expt_file_copy(self):
         print("XXXXXX 1 could NOT copy of EXPT file",self.expt_file_path_name_COPY)
     try:
         for ln in self.exptFileLines:
+            if "EXPT_NAME" in ln: #NOTE: SUBJECT not in original PROTOCOL files. It is added here
+                ln = "EXPT_NAME = " + self.Expt_Name + "\nSUBJECT = " + self.Subject
+                prev_ln = ln
+                #exptfl.write(ln+"\n")
+
+            if "ROI" in ln:
+                ln = "ROI = " + self.ROIstr
+
             print (ln)
-            if "EXPT_NAME" in ln:
-                ln = "EXPT_NAME = " + self.Expt_Name
-                exptfl.write(ln+"\n")
-                newln =  "SUBJECT = " + self.Subject
-                exptfl.write(newln+"\n")
-            else:   exptfl.write(ln+"\n")
+            exptfl.write(ln+"\n")
+
         print("EXPT file copied",self.expt_file_path_name_COPY)
         exptfl.close()
     except:
         print("could NOT copy of EXPT file",self.expt_file_path_name_COPY)
 
-    if self.VIs_file_path != "":
+    ########################################
+    #  if there is a VIs file, copy it too
+    if self.VIs_file_path != "": #if there is a VIs file, copy it too
         try:
             path,name = os.path.split(self.VIs_file_path)
             VIs_file_path_COPY = name[:-4] + '_copy.txt'
@@ -523,27 +533,3 @@ def create_expt_file_copy(self):
                 fw.write(ln+"\n")
         except:
             print("COULD NOT WRITE VI FILE COPY", VIs_file_path_COPY)
-
-def update_expt_file_copy(self):
-    import fileinput
-    print("....................................\n")
-    print("UPDATING EXPT FILE", self.expt_file_path_name_COPY)
-    try:
-        exptfl = open(self.expt_file_path_name_COPY,'r+')
-
-        for ln in exptfl:
-            print (ln)
-            if "EXPT_NAME" in ln:
-                ln = "EXPT_NAME = " + self.Expt_Name + "\nSUBJECT = " + self.Subject
-                prev_ln = ln
-                exptfl.write(ln+"\n")
-            if "SUBJECT" in ln:
-                if ln == prev_ln: pass
-                else:  ln = "SUBJECT = " + self.Subject
-                break
-            exptfl.write(ln+"\n")
-        exptfl.close()
-        return True
-    except:
-        print("COULD NOT UPDATE EXPT FILE COPY WITH NEW SUBJECT NAME", self.expt_file_path_name_COPY)
-        return False
