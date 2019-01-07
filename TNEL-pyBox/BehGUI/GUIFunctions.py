@@ -8,7 +8,11 @@ import video_function
 import tkinter as Tk #Note: "Tkinter" in python 2 (capital T)
 from tkinter.filedialog import askopenfilename
 import os
-import win32gui
+try:
+    import win32gui
+    LINUX = False
+except:
+    LINUX = True
 import subprocess
 
 IsWhiskerRunning = False

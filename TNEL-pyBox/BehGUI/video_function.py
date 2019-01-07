@@ -11,6 +11,8 @@ class Vid:
         self.outPath = 'NOT SET'
         self.ROIenabled = False
         self.ROIstr = ""
+        self.ROIGEN = True
+        #self.ROI = (0,0,0,0)
         self.freezeEnable = False
         cv2.namedWindow('vid')
         if self.cap.isOpened():
@@ -81,7 +83,7 @@ class Vid:
         if not ret:
             print('frame read error')
             return
-        if not self.ROIenabled:
+        if self.ROIGEN:
             self.genROI(frame)
         # Gen prev frame and threshold (Use size of ROI)
         self.startFrame+=1
@@ -108,16 +110,18 @@ class Vid:
                 msg = self.q.pop()
                 time_from_GUI = msg['cur_time']
                 STATE = msg['STATE'] # NOTE: NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                if STATE in 'START_EXPT':
+                if STATE == 'START_EXPT':
                     self.exptStarted = True
                 if 'ROI' in msg and not self.ROIenabled:
                     if msg['ROI'] in 'GENERATE':
+                        self.ROIGEN = True
                         self.initROIFrames()
                     else: # NOTE: ROI sent from PROTOCOL file
                         self.ROIstr = msg['ROI']
-                        ROIstrped = self.ROIstr[1:-1]#Remove first and last char "(" and ")" from (x,y,width,height)
-                        ROIlist = ROIstrped.split(",")
+                        ROIstr = msg['ROI'][1:-1] #Remove first and last char "(" and ")" from (x,y,width,height)
+                        ROIlist = ROIstr.split(",")
                         self.ROI = [int(x) for x in ROIlist]
+                        self.ROIGEN = False
                         self.initROIFrames()
 
 

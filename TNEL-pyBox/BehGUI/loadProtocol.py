@@ -37,13 +37,13 @@ def load_expt_file(self):
     try:
         f = open(self.expt_file_path_name,'r')
         # Read Line by line
-
+        EXPERIMENT = False
         for line in f:
             line = line.strip() # Remove leading and trailoing blanks and \n
 
-            if not 'HAB_COND_EXT_AND_RECALL_VIs' in line: # What is this for?
+            if not EXPERIMENT: # What is this for?
                 line = line.upper()
-            #print(line)
+            print(line)
             self.exptFileLines.append(line)
 
             if line != "" and line[0] != "#" : #Skip Blank Lines and Skip lines that are just comments (but still copy them to new file)
@@ -330,7 +330,8 @@ def load_expt_file(self):
 
                     if 'ROI' in line:  #key == 'ROI':  # THIS SHOULD BE IN LOAD PROTOCOL ONLY WHEN and WHERE FREEZE INFO IS GIVEN
                         self.ROI = get_val_between_equal_sign_and_hash(line)
-                        if "GENERATE" in self.ROI:
+                        self.vidDict['ROI'] = self.ROI
+                        if "GENERATE" in self.ROI:    
                             print("ROI: ",self.ROI)
                         else:
                             print("ROI COORINATES: ",self.ROI)

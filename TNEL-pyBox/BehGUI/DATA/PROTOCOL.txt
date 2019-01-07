@@ -29,7 +29,7 @@ CAMERA=TRUE
 REC=TRUE
 
 [PROTOCOL]
-START_LOOP = WRONG(50%,5,10)          # Loops are trials
+START_LOOP = 3           # Loops are trials ... WRONG(50%,5,10)
   PAUSE = 2             # in seconds
   EXTEND_LEVERS=TRUE
   CONDITIONS=RANDOM     #NOTE:  Can be chosen at "RANDOM","SEQUENTIAL"(IN THE ORDER THEY ARE LISTED BELOW IN CONDITIONS), OR A NUMBER STARTING AT 1
