@@ -112,7 +112,7 @@ class BEH_GUI():
             ######################################
             #   UPDATE VIDEO
             ######################################
-            self.updateVideoQ()
+            GUIFunctions.updateVideoQ(self)
 ########################################################################################
     def drawScreen(self):
         self.cur_time = time.perf_counter()-self.Experiment_Start_time
@@ -853,7 +853,7 @@ class BEH_GUI():
                     self.CAMERA_ON = True
                     GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
                     self.vidSTATE = 'ON'
-                    self.updateVideoQ()
+                    GUIFunctions.updateVideoQ(self)
                     GUIFunctions.MyVideo(self)
                 else: # CAMERA IS ALREADY ON
                     GUIFunctions.log_event(self, self.events,"Camera is ALREADY ON",self.cur_time)
@@ -1006,7 +1006,7 @@ class BEH_GUI():
                     self.CAMERA_ON = True
                     GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
                     self.vidSTATE = 'ON'
-                    self.updateVideoQ()
+                    GUIFunctions.updateVideoQ(self)
                                     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                     GUIFunctions.MyVideo(self)
                 else: # CAMERA IS ALREADY ON

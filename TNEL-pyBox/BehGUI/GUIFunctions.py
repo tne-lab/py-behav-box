@@ -211,7 +211,7 @@ def FOOD_REWARD_RESET(self):
 def log_event(self, event_lst, event, cur_time, other=''):
 
     #print("Log file: ", self.log_file_path_name)
-    event_string = str(cur_time) + ',  ' + event
+    event_string = str(round(cur_time,9)) + ',  ' + event
     #print (event_string, other)
     event_other = ''
     for item in other:
@@ -237,7 +237,8 @@ def StartTouchScreen(self):
 def MyVideo(self):
       vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q,))
       vid_thread.daemon = True
-      self.VIDq.append(self.vidDict)
+      self.VIDq.pop()
+      updateVideoQ(self)
       vid_thread.start()
 
       while True:
@@ -246,6 +247,7 @@ def MyVideo(self):
               msg = self.VIDBack_q.get()
               if msg == 'vid ready':
                   return
+                  
 def updateVideoQ(self):
     self.vidDict['cur_time'] = self.cur_time
     self.vidDict['trial_num'] = self.trial_num
@@ -271,7 +273,7 @@ def exit_game(self):
       self.checkPressLeft.end()
       self.checkPressRight.end()
 
-    self.vidDict['STATE'] = 'STOP'
+    self.vidDict['STATE'] = 'OFF'
     self.VIDq.append(self.vidDict)
     if self.TOUCH_TRHEAD_STARTED == True:
         self.TSq.put('STOP')
