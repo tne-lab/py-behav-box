@@ -522,15 +522,17 @@ class BEH_GUI():
                                         for user_input in self.user_inputs:
                                             if user_input.label == "EXPT":
                                                 user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
-                                                
+
                                         if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
 
                                         if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
                                             # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
-                                            self.VI_start = 0.0 #self.cur_time
-                                            self.VI = random.randint(0,int(self.var_interval_reward*2))
-                                            print("VI.......................", self.VI)
-
+                                            if self.VI_REWARDING:
+                                                self.VI_start = 0.0 #self.cur_time
+                                                self.VI = random.randint(0,int(self.var_interval_reward*2))
+                                                print("VI.......................", self.VI)
+                                            if self.BAR_PRESS_TRAINING:
+                                                pass
                                         GUIFunctions.log_event(self, self.events,"EXPT STARTED USING " + self.expt_file_path_name_COPY,self.cur_time)
 
                                         ##################################
@@ -640,8 +642,8 @@ class BEH_GUI():
                     # SPEEKER PRESSED
                     if self.speeker.collidepoint(cur_x,cur_y):
                           # NOTE: Tone_OFF logged while drawing speeker above in main loop
-                          self.GUIFunctions.PLAY_TONE(self, self.events,"TONE1",self.cur_time)
-
+                          self.GUIFunctions.PLAY_TONE(self, self.events,"TONE1",self.cur_time) #using competer speeker
+                          #self.GUIFunctions.PLAY_TONE_LAF(self, self.events,"TONE1",self.cur_time) #Using Lafayette
 
                     # SHOCK PRESSED
                     if self.shock.collidepoint(cur_x,cur_y):
@@ -888,6 +890,29 @@ class BEH_GUI():
                 self.vidSTATE = 'REC_STOP'
                 print("\nREC = False, Self.ROI: ",self.ROI,"\n")
 
+        elif "EXTEND_LEVERS" in key:
+            self.setup_ln_num +=1
+            if setupDict[key] == "L_LVR":
+                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,False,self.cur_time)
+            elif setupDict[key] == "R_LVR":
+               GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",False,True,self.cur_time)
+            else:
+                val = str2bool(setupDict[key])
+                if val: # EXTEND_LEVERS == True
+                   print ("EXTEND LEVERS")
+                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,True,self.cur_time)
+                   for lever in self.levers:
+                         lever.STATE = "OUT"
+                   for button in self.buttons:
+                        if button.text == "EXTEND": button.text = "RETRACT"
+                else: # RETRACT LEVERS (EXTEND_LEVERS == False)
+                   print ("RETRACT LEVERS")
+                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers_Retracted",False,False,self.cur_time)
+                   for lever in self.levers:
+                        lever.STATE = "IN"
+                   for button in self.buttons:
+                        if button.text == "RETRACT": button.text = "EXTEND"
+
 ##        elif key == 'ROI':  # THIS SHOULD BE IN LOAD PROTOCOL ONLY WHEN and WHERE FREEZE INFO IS GIVEN
 ##            print('setting ROI',setupDict[key])
 ##            self.setup_ln_num += 1
@@ -909,7 +934,7 @@ class BEH_GUI():
         '''
         RUN EXPERIMENTAL PROTOCOL IF START EXPT BUTTON PRESSED
         '''
-        GUIFunctions.FOOD_REWARD_RESET(self) #NOTE: THIS IS SO LOW BIT IS SENT TO FEEDER WITHOUT PAUSING THE PROGRAM
+       # GUIFunctions.FOOD_REWARD_RESET(self) #NOTE: THIS IS SO LOW BIT IS SENT TO FEEDER WITHOUT PAUSING THE PROGRAM
         protocolDict = self.protocol[self.Protocol_ln_num]
         key = list(protocolDict.keys())[0] # First key in protocolDict
 
@@ -1029,13 +1054,13 @@ class BEH_GUI():
                    for button in self.buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
 
-        elif "DRAW_IMAGES" in key:
+        elif "DRAW_IMAGES" in key: # IF USING TOUCHSCREEN
             if self.TOUCHSCREEN_USED:
-                placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords))
+                placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
                 imgList = {}
                 i=0
                 for key in self.touchImgs.keys():
-                    imgList[key] = self.touchImgCoords[placementList[i]]
+                    imgList[key] = self.touchImgCoords[placementList[i]] #places images
                     i+=1
                 self.TSq.put(imgList)
                 self.Protocol_ln_num +=1
@@ -1053,6 +1078,8 @@ class BEH_GUI():
 
             self.loop_start_line_num = self.Protocol_ln_num
             self.Protocol_ln_num +=1
+            # NUMBER OF LOOPS DEPENDS ON PERCENT CORRECT?
+            # START_LOOPS = RANDOM(5,10), Picks random number beteen 5, 10 inclusive (?)
             if "RANDOM" in protocolDict[key]:
                 if self.LOOP_FIRST_PASS:
                     intrange = protocolDict[key][7:len(protocolDict[key])-1]
@@ -1061,6 +1088,9 @@ class BEH_GUI():
                     print("a,b: ", a,b)
                     self.NUM_LOOPS = random.randint(int(a), int(b))
                     self.LOOP_FIRST_PASS = False
+
+            # NUMBER OF LOOPS DEPENDS ON PERCENT CORRECT?
+            # START_LOOPS = COORECT(50%,5,10), If CONDITION OUTCOMS are correct 50% of the time, end loop. Min loops = 5, max loops = 10
             elif 'CORRECT' in protocolDict[key]:
                 info = protocolDict[key].split('(')
                 percent, min, max = info[1].split(',')
@@ -1068,6 +1098,8 @@ class BEH_GUI():
                 self.max = int(max[:-1])
                 self.NUM_LOOPS = int(min)
                 self.check_correct = True
+            # NUMBER OF LOOPS DEPENDS ON PERCENT CORRECT?
+            # START_LOOPS = WRONG(50%,5,10), If CONDITION OUTCOMS are wrong 50% of the time, end loop. Min loops = 5, max loops = 10
             elif 'WRONG' in protocolDict[key]:
                 info = protocolDict[key].split('(')
                 percent, min, max = info[1].split(',')
@@ -1075,6 +1107,8 @@ class BEH_GUI():
                 self.max = int(max[:-1])
                 self.NUM_LOOPS = int(min)
                 self.check_wrong = True
+            # NUMBER OF LOOPS DEPENDS ON PERCENT CORRECT?
+            # START_LOOPS = NO_ACTION(50%,5,10), If CONDITION OUTCOMS are NO_ACTION 50% of the time, end loop. Min loops = 5, max loops = 10
             elif 'NO_ACTION' in protocolDict[key]:
                 info = protocolDict[key].split('(')
                 percent, min, max = info[1].split(',')
@@ -1082,12 +1116,13 @@ class BEH_GUI():
                 self.max = int(max[:-1])
                 self.NUM_LOOPS = int(min)
                 self.check_no_action = True
+
             else:  self.NUM_LOOPS = int(protocolDict[key])
             GUIFunctions.log_event(self, self.events,"LOOPING "+ str(self.NUM_LOOPS)+ " times, TRIAL "+str(self.trial_num),self.cur_time)
 
         elif "END_LOOP" in key:
             self.num_lines_in_loop = self.Protocol_ln_num - self.loop_start_line_num
-            if self.percent:
+            if self.percent: #if using percent based loops
                 if int(self.NUM_LOOPS) > self.trial_num+1:
                     self.Protocol_ln_num = self.loop_start_line_num
                 elif (self.max < self.trial_num + 1
@@ -1133,6 +1168,10 @@ class BEH_GUI():
                 if time_elapsed >= self.PAUSE_TIME:
                     self.Protocol_ln_num +=1 #Go to next protocol item
                     self.PAUSE_STARTED = False
+            if self.TOUCHSCREEN_USED:
+                if not self.TSBack_q.empty():
+                       touchMsg = self.TSBack_q.get()
+                       GUIFunctions.log_event(self, self.events, touchMsg['picture'] + " Pressed " + str(touchMsg['XY']) , self.cur_time)
 
         elif key == "CONDITIONS":
             self.runConditions(protocolDict, self.cur_time)
@@ -1140,14 +1179,50 @@ class BEH_GUI():
         else:
             print("PROTOCOL ITEM NOT RECOGNIZED",key)
 
+        #########################################################################################
+        # RUN BAR PRESS INDEPENDENT OF PROTOCOLS OR CONDTIONS
+        #########################################################################################
         if self.BAR_PRESS_INDEPENDENT_PROTOCOL: #Running independently of CONDITIONS. Used for conditioning, habituation, extinction, and recall
            #print (cur_time,"VI................", self.VI, (self.VI_start + self.VI))
-           if self.cur_time > (self.VI_start + self.VI):
-              if self.LEVER_PRESSED_R: # RIGHT LEVER
-                 self.VI_start = self.cur_time
-                 self.VI = random.randint(0,int(self.var_interval_reward*2))
-                 print("new vi", self.VI)
-                 GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
+           if self.VI_REWARDING:
+               if self.cur_time > (self.VI_start + self.VI):
+                  if self.LEVER_PRESSED_R: # RIGHT LEVER
+                     self.VI_start = self.cur_time
+                     self.VI = random.randint(0,int(self.var_interval_reward*2))
+                     print("new vi", self.VI)
+                     GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
+
+           elif self.BAR_PRESS_TRAINING:
+              if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # RIGHT LEVER or left lever pressed
+                  self.LEVER_PRESSED_R =  False #Reset Lever Pressed flag
+                  self.LEVER_PRESSED_L = False #Reset Lever Pressed flag
+                  if self.VR == 1:
+                      GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time) # Give reward on each bar press
+                      self.VRs_given +=1
+                      if self.VRs_given > 10:
+                          self.VRs_given = 0
+                          self.VR +=1 #VR = 2
+                  if self.VR == 2:
+                      VR_reward = random.randint(1,self.VR) # Give reward on average every 2 bar presses
+                      print("VR", self.VR, "rand num: ", VR_reward)
+                      if VR_reward == self.VR:
+                         GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
+                         self.VRs_given +=1
+                         if self.VRs_given > 10:
+                            self.VRs_given = 0
+                            self.VR +=3 #VR = 5
+                  if self.VR % 5 == 0:  # Will continue giving rewards on average 1 out of every N times(where n is divisible by 5, i.e. 5, 10, 15, 20 ...)
+                      VR_reward = random.randint(1,self.VR)
+                      print("VR", self.VR, "rand num: ", VR_reward)
+                      if VR_reward == self.VR:
+                         GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
+                         self.VRs_given +=1
+                         if self.VRs_given > 10:
+                            self.VRs_given = 0
+                            if self.VR < 35: #VR will stay at 30 and no more until END_LOOP is reached.
+                                self.VR +=5 #VR = 10, 15, 20, 25, 30
+
+
 
         # Clean up vars
         self.LEVER_PRESSED_R = False
@@ -1174,7 +1249,7 @@ class BEH_GUI():
            GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
            GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
 
-           
+
 
            # Tell open ephys to stop acquistion and recording?
            # Maybe we want to wait and continue getting data for awhile. Just send some sort of event
@@ -1308,18 +1383,44 @@ class BEH_GUI():
                if not self.TSBack_q.empty():
                    touchMsg = self.TSBack_q.get()
                    GUIFunctions.log_event(self, self.events,touchMsg['picture'] + " Pressed " + str(touchMsg['XY']) , self.cur_time)
-                   if touchMsg['picture'] == 'missed':
+                   
+                   if touchMsg['picture'] == 'missed': # Touched background
                        print('missed')
-                   elif not self.HAS_ALREADY_RESPONDED:
+                       if self.TOUCH_TRAINING:
+                          self.CORRECT = True
+                          if self.trial_num <= 10: # Reward if screen is touched, then gradually reduce probability of reward
+                               self.cur_probability = 100.0
+                          elif self.trial_num > 10 and self.trial_num <= 60:
+                               self.cur_probability = 100.0 - 2*self.trial_num
+                          else:
+                              self.cur_probability = 0.0
+                              
+                   elif not self.HAS_ALREADY_RESPONDED: # Screen touched
                        self.HAS_ALREADY_RESPONDED = True
                        # Check probability for pic/trial
-                       for img, probabilityList in self.touchImgs.items():
-                           if touchMsg['picture'] == img:
-                               #GUIFunctions.log_event(self,self.events, "Probability of pellet: " + probabilityList[self.trial_num],self.cur_time)
-                               # Holds the probability for each trial
-                               self.cur_probability = probabilityList[self.trial_num]
-                               self.CORRECT = True
-
+                       if self.TOUCH_BANDIT:
+                           for img, probabilityList in self.touchImgs.items():
+                               if touchMsg['picture'] == img:  # Touched an image
+                                   GUIFunctions.log_event(self,self.events, "Probability of pellet: " + str(probabilityList[self.trial_num]),self.cur_time)
+                                   # Holds the probability for each trial
+                                   self.cur_probability = probabilityList[self.trial_num]
+                                   self.CORRECT = True
+                                   
+                       elif self.TOUCH_TRAINING:
+                           for img in self.touchImgs.keys():
+                               if touchMsg['picture'] == img:  # Touched an image
+                                  self.CORRECT = True
+                                  
+                                  if self.trial_num <= 30: # Reward if screen is touched, then gradually reduce probability of reward
+                                       self.cur_probability = 100.0
+                                  elif self.trial_num > 30 and self.trial_num <= 50:  # 100% for first 30 hits, then slowly reduces to 50% 
+                                       self.cur_probability = 100.0 - self.trial_num
+                                  else:
+                                      self.cur_probability = 50.0
+                                  print("Cur probably: ", self.cur_probability, "\nCur trial: ", self.trial_num)
+                                
+                           
+                       
            if self.cond["RESET"] == "FIXED":
                if cond_time_elapsed >= float(self.cond["MAX_TIME"]): # Time is up
                   self.CONDITION_STARTED = False
@@ -1349,12 +1450,12 @@ class BEH_GUI():
                if self.CORRECT:
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
-                  self.correctPercentage = self.num_correct/self.trial_num
+                  self.correctPercentage = self.num_correct/self.trial_num * 100
                   print("Correct")
                elif self.WRONG:
                   outcome = self.cond['WRONG'].upper()    # Outcome for wrong response(in Expt File)
                   self.num_wrong += 1
-                  self.wrongPercentage = self.num_wrong/self.trial_num
+                  self.wrongPercentage = self.num_wrong/self.trial_num * 100
                   print("Wrong")
                else:
                   print("No Action Taken")
@@ -1369,12 +1470,16 @@ class BEH_GUI():
                    else: #"PELLET##"
                        probability_of_reward = outcome[6:]
                        if "VAR" in probability_of_reward:
-                           if random.random()*100 <= self.cur_probability:
+                           rand = random.random() * 100
+                           print("our random number", rand)
+                           if rand <= self.cur_probability:
+                               print("Food_Pellet w"+str(self.cur_probability)+ "% probability")
                                GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(self.cur_probability)+ "% probability", self.cur_time)
                            else:
+                               print("Reward NOT given w " + str(self.cur_probability)+"% probability")
                                GUIFunctions.log_event(self, self.events,"Reward NOT given w " + str(self.cur_probability)+"% probability", self.cur_time)
 
-                       else:
+                       else: # if PELLET80 or something like it 
                            if random.random()*100 <= float(probability_of_reward):
                                GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(probability_of_reward)+ "% probability", self.cur_time)
                            else:
@@ -1396,6 +1501,8 @@ class BEH_GUI():
                else: #outcome == 'NONE'
                    GUIFunctions.log_event(self, self.events,"NONE",self.cur_time)
                    print("Outcome = NONE")
+               if self.TOUCHSCREEN_USED:
+                   self.TSq.put('')
                self.TIME_IS_UP = False
                self.CONDITION_STARTED = False
                self.Protocol_ln_num +=1

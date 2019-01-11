@@ -32,7 +32,8 @@ def setGlobals(self):
         self.give_food = daqAPI.giveFoodSetup()
 
         self.apply_shock = daqAPI.shockerSetup()
-        self.high_tone = daqAPI.highToneSetup()
+        self.low_tone = daqAPI.lowToneSetup()
+        #self.high_tone = daqAPI.highToneSetup()
 
         self.L_condition_Lt = daqAPI.conditioningLightsLeftSetup()
         self.R_condition_Lt = daqAPI.conditioningLightsRightSetup()
@@ -49,11 +50,11 @@ def setGlobals(self):
     cwd = os.getcwd()
     print(cwd)
     self.datapath = os.path.join(cwd,'DATA' )
-    self.protocolpath = os.path.join(cwd,'DATA' )
+    self.protocolpath = os.path.join(cwd,'RESOURCES' )
     print("....")
     print (self.protocolpath)
 
-    self.expt_file_name = 'PROTOCOL.txt'
+    self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN.txt'
     self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
     print("EXPT FILE TO LOAD: ", self.expt_file_path_name)
 
@@ -92,15 +93,16 @@ def setGlobals(self):
     self.TSq = Queue()
     self.TSBack_q = Queue()
     self.TOUCH_TRHEAD_STARTED = False
-
+    self.TOUCH_TRAINING = False
+    self.TOUCH_BANDIT = False
     self.touchImgCoords = []
     self.touchImgs = {}
     ################################################################
     # GENERAL GLOBALS
     ################################################################
     self.globalsTone1_Duration = 1.0 # sec
-    self.Tone1_Duration = 1.0 # sec
-    self.Tone1_Freq = 450.0
+    self.Tone1_Duration = 5.0 # sec
+    self.Tone1_Freq = 800.0
     self.Tone1_Vol = 1.0
     self.Tone2_Duration = 1.0 # sec
     self.Tone2_Freq = 1800.0
@@ -137,8 +139,13 @@ def setGlobals(self):
     self.R_LEVER_EXTENDED = False
     self.LEVERS_EXTENDED = False
     self.TOUCHSCREEN_USED = False
-    self.var_interval_reward = 0.0
+
     self.BAR_PRESS_INDEPENDENT_PROTOCOL = False
+    self.VI_REWARDING = False
+    self.var_interval_reward = 0.0
+    self.BAR_PRESS_TRAINING = False
+    self.VRs_given = 0
+    self.VR = 1
 
     self.open_ephys_started = False
     self.Experiment_Start_time = 0.0

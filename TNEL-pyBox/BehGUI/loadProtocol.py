@@ -3,19 +3,20 @@ import os
 import threading
 import subprocess
 import GUIFunctions
+import time
 
 def get_val_between_equal_sign_and_hash(line):
     try:
         Left_right = line.split('=')
         right = Left_right[1].strip()
-        Left_right = right.split('#') #IGNORES "#" FOLLOWED BY COMMENTS
-        val = Left_right[0].strip()  # comment = left_right[1].strip()
+        new_Left_right = right.split('#') #IGNORES "#" FOLLOWED BY COMMENTS
+        val = new_Left_right[0].strip()  # comment = left_right[1].strip()
         return val
     except:
         print("Could not parse line")
         return False
 
-def get_all_before_hash(line):
+def get_LR_before_hash(line):
     try:
         left_right = line.split('=')
         left = left_right[0].strip()
@@ -27,7 +28,15 @@ def get_all_before_hash(line):
     except:
         print("Could not parse line")
         return left
-
+def get_before_hash(line):
+    try:
+        clean_line = line.strip()
+        left = clean_line.split('#') #IGNORES "#" FOLLOWED BY COMMENTS
+        new_left = left[0].strip()  # comment = left_right[1].strip()
+        return new_left
+    except:
+        print("Could not parse line")
+        return left
 def load_expt_file(self):
     print("LOADING: ", self.expt_file_path_name)
     self.protocol = []
@@ -273,6 +282,7 @@ def load_expt_file(self):
                         self.TOUCHSCREEN_USED = True
 
                     if 'COORDS' in line:
+                        self.touchImgCoords = []
                         words = get_val_between_equal_sign_and_hash(line)
                         imageCoords = words.split(':')
                         for i in range(len(imageCoords)):
@@ -285,23 +295,44 @@ def load_expt_file(self):
                         words = get_val_between_equal_sign_and_hash(line)
                         imageInfo = words.split(":")
                         imageName = imageInfo[0].strip()
-                        for c in '()':
-                            #Remove parenthesis from rewards
-                            imageInfo[1] = imageInfo[1].replace(c, "")
-                        imgRewards = []
-                        for probability in imageInfo[1].split(","):
-                            imgRewards.append(int(probability))
-                        self.touchImgs[imageName] = imgRewards
-
+                        if len(imageInfo)>1:
+                            for c in '()':
+                                #Remove parenthesis from rewards
+                                imageInfo[1] = imageInfo[1].replace(c, "")
+                            imgRewardsList = []
+                            for probability in imageInfo[1].split(","):
+                                imgRewardsList.append(int(probability))
+                            # Saving as dictionary with key as filename
+                            # and value as list of reward probability per trial
+                            self.touchImgs[imageName] = imgRewardsList
+                        else:
+                            # Saving as dictionary with key as filename
+                            # and this means we're training so reward probability is hard coded in BEH_GUI_MAIN
+                            self.touchImgs[imageName] = 0
+                    elif 'TRAIN_TOUCH' in line:
+                        self.TOUCH_TRAINING = True
+                    elif 'TOUCH_BANDIT' in line:
+                        self.TOUCH_BANDIT = True
                 elif BAR_PRESS:
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
-                    if "VI" in line:
-                        VI = get_val_between_equal_sign_and_hash(line)
+                    str_before_hash = get_before_hash(line)
+                    if "VI" in str_before_hash:
+                        self.VI_REWARDING = True
                         try:
                             self.var_interval_reward = int(VI)
                             print("var_interval_reward: ",self.var_interval_reward)
                         except:
-                            print ("!!!!!!!!!!!VI must = a number in EXP file!!!!!!!!!!!!!!", )
+                            print ("!!!!!!!!!!!VI must = a number in EXP PROOCOL file!!!!!!!!!!!!!!")
+                    if "BAR_PRESS_TRAIN" in line:
+                        self.BAR_PRESS_TRAINING = True
+                        self.VR=1
+##                        VR = get_val_between_equal_sign_and_hash(line)
+##                        # (10, 1,30,5) creates 10 variable ratio reward stating at every press (1, to random between (1,30) incremented by 5 every loop)
+##                        try:
+##                            self.var_ratio_reward = VR
+##                            print("var_RATIO_reward: ",self.var_ratio_reward)
+##                        except:
+##                            print ("!!!!!!!!!!!VR must have the form '(10, 1,30,5)' in EXP PROOCOL file!!!!!!!!!!!!!!")
 
                 elif SHOCK:
                     if 'DURATION' in line:
@@ -331,7 +362,7 @@ def load_expt_file(self):
                     if 'ROI' in line:  #key == 'ROI':  # THIS SHOULD BE IN LOAD PROTOCOL ONLY WHEN and WHERE FREEZE INFO IS GIVEN
                         self.ROI = get_val_between_equal_sign_and_hash(line)
                         self.vidDict['ROI'] = self.ROI
-                        if "GENERATE" in self.ROI:    
+                        if "GENERATE" in self.ROI:
                             print("ROI: ",self.ROI)
                         else:
                             print("ROI COORINATES: ",self.ROI)
@@ -341,7 +372,7 @@ def load_expt_file(self):
                     if "SETUP" not in line: # Skips [header] line
                         #print(line)
                         try:
-                            word1,word2 = get_all_before_hash(line)
+                            word1,word2 = get_LR_before_hash(line)
                             self.setup.append({word1:word2})
                         except:
                             self.setup.append({line:True}) # For lines without an '=' in them
@@ -356,7 +387,7 @@ def load_expt_file(self):
                     if "PROTOCOL" not in line: # Skips [header] line
                         #print(line)
                         try:
-                            word1,word2 = get_all_before_hash(line)
+                            word1,word2 = get_LR_before_hash(line)
                             self.protocol.append({word1:word2})
                         except:
                             print("single word")

@@ -46,13 +46,14 @@ socket.send(dict/string of stuff)
 """
 
 import argparse
-import logging
+#import logging
 import zmq
 import json
 import time
 from twisted.internet import reactor
 
 #from cardinal_pythonlib.logs import configure_logger_for_colour
+
 from whisker.api import (
     Pen,
     PenStyle,
@@ -117,7 +118,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
 
 
-    def fully_connected(self) -> None:
+    def fully_connected(self) -> None: # RUNS ONCE WHEN FULLY CONNECTED
         """
         Called when the server is fully connected. Sets up the "task".
         """
@@ -156,11 +157,14 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
             # Draw pictures
             for i in range(0,len(self.pics)):
+                print("picture" + str(i), "XY: ",self.XYarray[i], "filename: ",self.pics[i])
                 bit = self.whisker.display_add_obj_bitmap(
                     DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
-                    stretch = False, height = 100, width = 100)
+                    stretch = False , height = 240, width = 240) # Returns T or F
                 if not bit:
-                    print('failed drawing picture')
+                    print("##############################################")
+                    print('#  failed drawing picture', self.pics[i] )
+                    print("##############################################")
             self.whisker.display_send_to_back(DOC, "background")
             self.setEvents()
 
@@ -175,6 +179,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
         #self.whisker.display_set_event(DOC, "rectangle", "RectEndOfTask")
         self.whisker.display_set_event(DOC, "background", "missedClick")
         self.whisker.timer_set_event("checkZMQ", 5, -1)
+
     def clearEvents(self):
         # Clears events and DOC for all pictures to get ready for new ones
         for i in range(0,len(self.pics)):
@@ -184,8 +189,13 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.whisker.timer_clear_event("checkZMQ")
         #self.whisker.timer_clear_event("TmrEndOfTrial")
         self.whisker.display_delete_document(DOC)
-    #############################################
 
+
+
+
+    #############################################
+    # NOW WE WAIT FOR REACTOR TO SEND US AN EVENT.  WHEN
+    # When REACTOR sees an event, incoming_event runs
     # Handle event
     def incoming_event(self, event: str, timestamp: int = None) -> None:
         """
@@ -199,7 +209,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
                 sendDict = {'picture' : 'missed', 'XY' : (x,y)}
                 print(sendDict)
                 self.back_q.put(sendDict)
-                self.whisker.audio_play_wav(AUDIO, DEFAULT_WAV)
+                #self.whisker.audio_play_wav(AUDIO, DEFAULT_WAV)
             # Or a picture
             else:
                 for picName in self.pics:
@@ -220,7 +230,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             self.parseMsg(self.q.get())
 
     # Need to wait for first msg from GUI before proceeding
-    def RECVFIRST(self):
+    def RECVFIRST(self): # Note: runs once
         while True:
             if not self.q.empty():
                 self.parseMsg(self.q.get())
@@ -228,6 +238,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
     # Parses JSON msg from GUI
     def parseMsg(self, msg):
+        print("WHISKER TOUCH MSG: ", msg)
         if msg == 'STOP':
             self.clearEvents()
             reactor.stop()
@@ -244,7 +255,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
                 XYarray.append(coords)
             self.pics = pics
             self.XYarray = XYarray
-            
+
         self.clearEvents()
         self.draw()
 
@@ -259,7 +270,13 @@ def main(back_q, q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA
         q = q
     )
     w.connect('localhost', port)
-    reactor.run()
+
+    reactor.run() # starts Twisted and thus network processing
+    # Note: This is BAD programming in my opinion. The logical flow is interrupted.
+    # The Reactor is basically an event alarm. The program sits and waits until an event is
+    # geneated by the reactor.  When a event is received, the incoming_event() is run,
+    # but note that incomming event is not in any loop.  This is not a logical linear flow!
+    # We aplolgize for doing it this way, but it the way Twisted and Whisker server work.
 
 if __name__ == '__main__':
     main()

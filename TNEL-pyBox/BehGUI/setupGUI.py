@@ -80,7 +80,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     user_inputs.append(get_user_input(myscreen,270,195,30,17,"Amps",'BOTTOM','0'))
 
 
-    user_inputs.append(get_user_input( myscreen,20,545,70,17,"EXPT",'RIGHT'," "))
+    user_inputs.append(get_user_input( myscreen,20,545,120,17,"EXPT",'RIGHT'," "))
     user_inputs.append(get_user_input( myscreen,20,570,70,17,"SUBJECT",'RIGHT'," "))
     user_inputs.append(get_user_input( myscreen,20,595,70,17,"TRIAL",'RIGHT'," "))
 

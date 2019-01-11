@@ -194,11 +194,11 @@ def lowToneSetup():
 '''
 Returns a new high tone Task
 '''
-def highToneSetup():
-    highToneAddress = dev + '/port2/line5'
-    highTone = InterfaceOut(highToneAddress)
-    highTone.startTask()
-    return highTone
+#def highToneSetup():
+#    highToneAddress = dev + '/port2/line5'
+#    highTone = InterfaceOut(highToneAddress)
+#    highTone.startTask()
+#    return highTone
 
 ####################################################
 ##   Inputs
