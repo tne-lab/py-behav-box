@@ -16,15 +16,24 @@ class RCVEvent:
 
     def rcv(self):
         #Get raw input from socket
-        envelope, jsonStr = self.socket.recv_multipart()
-        print(envelope)
+        msg = self.socket.recv_multipart()
+        if len(msg) > 1:
+            envelope, jsonStr = msg
 
-        #Our actual json object (last part)
-        jsonStr = json.loads(jsonStr);
-        #print(self.parseJson(jsonStr))
-        print(jsonStr)
-        print('\n')
-        return jsonStr
+            print(envelope)
+
+            #Our actual json object (last part)
+            jsonStr = json.loads(jsonStr);
+            #print(self.prettyJson(jsonStr))
+            print(jsonStr)
+            print('\n')
+            return jsonStr
+
+        else:
+            print(msg)
+            return msg
+
+
 
     # First version of Json parser that breaks up the json object
     # Doesn't really do anything useful yet. Probably change this depending on how we want to do stuff
@@ -36,13 +45,13 @@ class RCVEvent:
             else:
                 print(key, ": ", convertString(jsonStr[key]))
     # And this prints it out pretty
-    def prettyJson(jsonStr, tab = ''):
+    def prettyJson(self, jsonStr, tab = ''):
         for key in jsonStr.keys():
             if type(jsonStr[key]) is dict:
-                print(key + "\n", end='')
-                prettyJson(jsonStr[key], tab + '\t')
+                print(key + "\n")
+                self.prettyJson(jsonStr[key], tab + '\t')
             else:
-                print(tab, key, ": ", convertString(jsonStr[key]))
+                print(tab, key, ": ", convertString(jsonStr[key]), '\ttype: ', type(jsonStr[key]))
 
 class SNDEvent:
     # port default is 5556 for event rcver on OE
