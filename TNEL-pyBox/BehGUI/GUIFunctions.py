@@ -246,7 +246,12 @@ def MyVideo(self):
               msg = self.VIDBack_q.get()
               if msg == 'vid ready':
                   return
-
+def updateVideoQ(self):
+    self.vidDict['cur_time'] = self.cur_time
+    self.vidDict['trial_num'] = self.trial_num
+    self.vidDict['STATE'] = self.vidSTATE
+    self.vidDict['PATH_FILE'] = self.video_file_path_name
+    self.VIDq.append(self.vidDict)
 
 def exit_game(self):
     if self.NIDAQ_AVAILABLE:

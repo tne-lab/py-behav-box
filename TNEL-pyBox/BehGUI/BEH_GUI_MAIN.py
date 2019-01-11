@@ -112,11 +112,7 @@ class BEH_GUI():
             ######################################
             #   UPDATE VIDEO
             ######################################
-            self.vidDict['cur_time'] = self.cur_time
-            self.vidDict['trial_num'] = self.trial_num
-            self.vidDict['STATE'] = self.vidSTATE
-            self.vidDict['PATH_FILE'] = self.video_file_path_name
-            self.VIDq.append(self.vidDict)
+            self.updateVideoQ()
 ########################################################################################
     def drawScreen(self):
         self.cur_time = time.perf_counter()-self.Experiment_Start_time
@@ -857,6 +853,7 @@ class BEH_GUI():
                     self.CAMERA_ON = True
                     GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
                     self.vidSTATE = 'ON'
+                    self.updateVideoQ()
                     GUIFunctions.MyVideo(self)
                 else: # CAMERA IS ALREADY ON
                     GUIFunctions.log_event(self, self.events,"Camera is ALREADY ON",self.cur_time)
@@ -1009,6 +1006,7 @@ class BEH_GUI():
                     self.CAMERA_ON = True
                     GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
                     self.vidSTATE = 'ON'
+                    self.updateVideoQ()
                                     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                     GUIFunctions.MyVideo(self)
                 else: # CAMERA IS ALREADY ON
@@ -1253,8 +1251,8 @@ class BEH_GUI():
 
            # Tell open ephys to stop acquistion and recording?
            # Maybe we want to wait and continue getting data for awhile. Just send some sort of event
-           #self.snd.send(self.snd.STOP_ACQ)
-           #self.snd.send(self.snd.STOP_REC)
+           self.snd.send(self.snd.STOP_ACQ)
+           self.snd.send(self.snd.STOP_REC)
 
            if self.TOUCHSCREEN_USED:
                self.TSq.put('')
@@ -1383,7 +1381,7 @@ class BEH_GUI():
                if not self.TSBack_q.empty():
                    touchMsg = self.TSBack_q.get()
                    GUIFunctions.log_event(self, self.events,touchMsg['picture'] + " Pressed " + str(touchMsg['XY']) , self.cur_time)
-                   
+
                    if touchMsg['picture'] == 'missed': # Touched background
                        print('missed')
                        if self.TOUCH_TRAINING:
@@ -1394,7 +1392,7 @@ class BEH_GUI():
                                self.cur_probability = 100.0 - 2*self.trial_num
                           else:
                               self.cur_probability = 0.0
-                              
+
                    elif not self.HAS_ALREADY_RESPONDED: # Screen touched
                        self.HAS_ALREADY_RESPONDED = True
                        # Check probability for pic/trial
@@ -1405,22 +1403,22 @@ class BEH_GUI():
                                    # Holds the probability for each trial
                                    self.cur_probability = probabilityList[self.trial_num]
                                    self.CORRECT = True
-                                   
+
                        elif self.TOUCH_TRAINING:
                            for img in self.touchImgs.keys():
                                if touchMsg['picture'] == img:  # Touched an image
                                   self.CORRECT = True
-                                  
+
                                   if self.trial_num <= 30: # Reward if screen is touched, then gradually reduce probability of reward
                                        self.cur_probability = 100.0
-                                  elif self.trial_num > 30 and self.trial_num <= 50:  # 100% for first 30 hits, then slowly reduces to 50% 
+                                  elif self.trial_num > 30 and self.trial_num <= 50:  # 100% for first 30 hits, then slowly reduces to 50%
                                        self.cur_probability = 100.0 - self.trial_num
                                   else:
                                       self.cur_probability = 50.0
                                   print("Cur probably: ", self.cur_probability, "\nCur trial: ", self.trial_num)
-                                
-                           
-                       
+
+
+
            if self.cond["RESET"] == "FIXED":
                if cond_time_elapsed >= float(self.cond["MAX_TIME"]): # Time is up
                   self.CONDITION_STARTED = False
@@ -1479,7 +1477,7 @@ class BEH_GUI():
                                print("Reward NOT given w " + str(self.cur_probability)+"% probability")
                                GUIFunctions.log_event(self, self.events,"Reward NOT given w " + str(self.cur_probability)+"% probability", self.cur_time)
 
-                       else: # if PELLET80 or something like it 
+                       else: # if PELLET80 or something like it
                            if random.random()*100 <= float(probability_of_reward):
                                GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(probability_of_reward)+ "% probability", self.cur_time)
                            else:
