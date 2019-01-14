@@ -79,7 +79,7 @@ Push levers out, needs task with both levers lines
 def leversOut(levers):
     # Set pins 0 and 1 to True
     levers.sendDByte(3)
-    daqAPI.enablePulse
+    daqAPI.enablePulse()
 
 '''
 Pull levers in, needs task with both levers lines

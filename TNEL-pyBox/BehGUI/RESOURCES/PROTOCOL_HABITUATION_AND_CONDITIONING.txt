@@ -1,8 +1,8 @@
 [EXPERIMENT]
 EXPT_NAME = TESTING
 SUBJECT = RAT
-EXPT_PATH 	= C:\Users\ephys-2\Desktop\BehChamGUI\DATA
-VI_TIMES_LIST_PATH	=  C:\Users\ephys-2\Desktop\BehChamGUI\DATA\HAB_COND_EXT_AND_RECALL_VIs.txt
+EXPT_PATH 	=  C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
+VI_TIMES_LIST_PATH	=  C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA\HAB_COND_EXT_AND_RECALL_VIs.txt
 OPEN_EPHYS_PATH = C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe
 
 [TONE1] # Need TONE1, TONE2
@@ -34,7 +34,7 @@ VI=15
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 EXTEND_LEVERS=True
 
-START_LOOP1 = 5 #NOTE: HABITUATION
+START_LOOP1 = 5 #NOTE: Possible Values: BAR_PRESS_HABITUATION, CONDITIONING,
   PAUSE = HABITUATION  #This will use VI on each line of file, one line per loop, COULD ALSO BE JUST A NUMBER
   TONE1
   PAUSE = 30

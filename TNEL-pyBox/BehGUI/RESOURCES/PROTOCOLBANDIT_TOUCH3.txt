@@ -1,9 +1,9 @@
 [EXPERIMENT]
-EXPT_NAME = TESTING
-SUBJECT = RAT
-EXPT_PATH 	= C:\\Users\ephys-2\Desktop\BehChamGUI\DATA
-LOG_FILE_PATH 	= C:\\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
-VIDEO_FILE_PATH	= C:\\Users\ephys-2\Desktop\BehChamGUI\DATA
+EXPT_NAME = Bandit-Touch
+
+EXPT_PATH 	= C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
+OPEN_EPHYS_PATH = C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe
+
 
 [TONE1] # Need TONE1, TONE2
 Duration(s) 	= 3
@@ -27,20 +27,21 @@ Min Theshold = 26
 ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also starts FREEZE detection  FREEZE=TRUE
 
 [TOUCHSCREEN]
-IMAGES_PATH = D:\Desktop\BehChamGUI\RESOURCES
-COORDS=(100,500):(700,500)
-IMG1= test.bmp:(80,30,40,50,60,10,30,30,50,10)
-IMG2= santa_fe.bmp:(80,30,40,50,60,10,30,30,50,10)
+IMAGES_PATH = C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
+COORDS=(100,500):(700,500)          # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+IMG1= santa_fe.bmp:(80,75,70,60,60,10,30,30,50,10)  # Image name: probability of reward on each trial
+IMG2= test.bmp:(80,75,70,60,60,10,30,30,50,10)
+TOUCH_BANDIT
 
-[SETUP]                 # Blah Blah
-FAN_ON=TRUE             # Blah Blah
-CAB_LIGHT=TRUE          # Blah Blah
-FOOD_LIGHT=TRUE         # Blah Blah
-CAMERA=TRUE             # Blah Blah
-REC=TRUE                # Blah Blah
+[SETUP]
+FAN_ON=TRUE
+CAB_LIGHT=TRUE
+FOOD_LIGHT=TRUE
+CAMERA=TRUE
+REC=TRUE
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
-START_LOOP1 = 5
+START_LOOP1 = 7
   PAUSE = 1
   DRAW_IMAGES=True
   CONDITIONS=0
@@ -55,5 +56,4 @@ FAN_ON=False
 
 [CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS.
 MAX_TIME, RESET,      CORRECT,        NO_ACTION
-3,      FIXED,      	PELLET_VAR,        TONE2
-5,      ON_RESPONSE,  PELLET_VAR,        TONE2
+3,      ON_RESPONSE,  PELLET_VAR,        NONE
