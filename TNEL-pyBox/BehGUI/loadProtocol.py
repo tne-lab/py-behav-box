@@ -515,8 +515,6 @@ def create_files(self):
     self.expt_file_path_name_COPY = os.path.join(self.newdatapath,expt_file_name_COPY)
     print(self.expt_file_path_name_COPY)
 
-    self.snd.changeVars( recordingDir = self.newdatapath)
-
     log_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-LOG_file'  + '.csv'
     self.log_file_path_name = os.path.join(self.newdatapath,log_file_name)
     print(self.log_file_path_name)
@@ -526,7 +524,9 @@ def create_files(self):
     print(self.video_file_path_name)
 
     # Change open ephys recoding dir
-    self.snd.changeVars(recordingDir = self.newdatapath)
+    self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.Subject)
+    self.snd.send(self.snd.START_REC)
+    time.sleep(3)
 
 # COPY EXPT FILE TO EXPT FILE DATAPATH
 def create_expt_file_copy(self):

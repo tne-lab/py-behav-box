@@ -238,7 +238,7 @@ def setupGUI(self):
     self.TOUCH_IMAGES_SENT = False
 
     # Open ephys stuff
-    self.snd = zmqClasses.SNDEvent(5556, prependText = 'OPEN-EPHYS') # subject number or something
+    self.snd = zmqClasses.SNDEvent(5556) # subject number or something
 
     self.openEphysBack_q = Queue()
     self.openEphysQ = Queue()

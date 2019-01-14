@@ -872,7 +872,7 @@ class BEH_GUI():
             self.setup_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                 self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
-                self.snd.send(self.snd.START_REC) # OPEN_EPHYS
+                #self.snd.send(self.snd.START_REC) # OPEN_EPHYS
                 self.vidSTATE = 'REC_VID'
                 if self.FREEZE_DETECTION_ENABLED:
                     print("\nFREEZE DETECTION ENABLED")
