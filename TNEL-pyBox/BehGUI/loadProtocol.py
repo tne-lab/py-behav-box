@@ -525,6 +525,9 @@ def create_files(self):
     self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
     print(self.video_file_path_name)
 
+    # Change open ephys recoding dir
+    self.snd.changeVars(recordingDir = self.newdatapath)
+
 # COPY EXPT FILE TO EXPT FILE DATAPATH
 def create_expt_file_copy(self):
     print("....................................\n")
