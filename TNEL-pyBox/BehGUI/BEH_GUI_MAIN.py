@@ -883,7 +883,7 @@ class BEH_GUI():
             self.setup_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                 self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
-                #self.snd.send(self.snd.START_REC) # OPEN_EPHYS
+                self.snd.send(self.snd.START_REC) # OPEN_EPHYS
                 self.vidSTATE = 'REC_VID'
                 if self.FREEZE_DETECTION_ENABLED:
                     print("\nFREEZE DETECTION ENABLED")
@@ -1208,6 +1208,7 @@ class BEH_GUI():
               if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # RIGHT LEVER or left lever pressed
                   self.LEVER_PRESSED_R =  False #Reset Lever Pressed flag
                   self.LEVER_PRESSED_L = False #Reset Lever Pressed flag
+                  
                   if self.VR == 1:
                       GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time) # Give reward on each bar press
                       self.VRs_given +=1
@@ -1247,16 +1248,18 @@ class BEH_GUI():
         if self.cur_time >= self.max_time * 60.0: # Limits the amout of time rat can be in chamber (self.max_time in PROTOCOL.txt file (in min) 
            GUIFunctions.log_event(self, self.events,"Exceeded MAX_TIME",self.cur_time)
            print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX TIME: ",self.max_time)
+           GUIFunctions.log_event(self, self.events,"PROTOCOL ENDED-max time exceeded",self.cur_time)
+           print("\nPROTOCOL ENDED-Max time exceeded")
            self.end_expt()
            
         if self.Protocol_ln_num >= len(self.protocol):
            GUIFunctions.log_event(self, self.events,"PROTOCOL ENDED",self.cur_time)
+           print("\nPROTOCOL ENDED")
            self.end_expt()
             
 
     def end_expt(self):
            print("Protocol_ln_num: ",self.Protocol_ln_num,"plength: ", len(self.protocol),"\n")
-           print("\n\nPROTOCOL ENDED")
            print("......END.....\n")
            print("__________________________________________________________________________\n\n\n\n")
            self.START_EXPT = False
@@ -1412,8 +1415,10 @@ class BEH_GUI():
                        print('missed')
                        if self.TOUCH_TRAINING:
                           self.CORRECT = True # NOTE: Must be set to True so that reward is given for touching backgrouns 
-                          if self.trial_num <= 5: # Reward if screen is touched, then gradually reduce probability of reward
-                               self.cur_probability = 100.0
+                          # Gradually ramp down rewards for touching background.
+                          # Reward if screen is touched, then gradually reduce probability of reward to 0% probability
+                          if self.trial_num <= 5:
+                              self.cur_probability = 100.0
                           elif self.trial_num > 5 and self.trial_num <= 15:
                                self.cur_probability = 100.0 - 2*self.trial_num
                           else:
@@ -1434,10 +1439,12 @@ class BEH_GUI():
                            for img in self.touchImgs.keys():
                                if touchMsg['picture'] == img:  # Touched an image
                                   self.CORRECT = True
-
-                                  if self.trial_num <= 10: # Reward if screen is touched, then gradually reduce probability of reward
-                                       self.cur_probability = 100.0
-                                  elif self.trial_num > 10 and self.trial_num <= 90:  # 100% for first 30 hits, then slowly reduces to 50%
+                                  # Gradually ramp down rewards for touching PICTURE.
+                                  # Reward if picture is touched, then gradually reduce probability of reward to 10%
+                                  # (0ne in 10 touches on avg for reward)
+                                  if self.trial_num <= 10:
+                                      self.cur_probability = 100.0
+                                  elif self.trial_num > 10 and self.trial_num <= 90:  # 100% for first 10 hits, then slowly reduces to 10%
                                        self.cur_probability = 100.0 - self.trial_num
                                   else:
                                       self.cur_probability = 10.0

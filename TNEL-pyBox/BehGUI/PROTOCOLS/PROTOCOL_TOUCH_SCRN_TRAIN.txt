@@ -10,7 +10,7 @@ IMG2= blank2.bmp
 TRAIN_TOUCH
 
 [SETUP]
-MAX_TIME = 30     # Generally 60 min max for rats
+MAX_TIME = 60     # Generally 60 min max for rats
 FAN_ON=TRUE
 CAB_LIGHT=TRUE
 CAMERA=TRUE
@@ -19,11 +19,11 @@ REC=TRUE
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 
 START_LOOP1 = 100  # Max trials should be no more than 100
-  PAUSE = 3  # Inter trial Interval (ITI) = 20 s
+  PAUSE = 10  # Inter trial Interval (ITI) = 20 s.  20s including 10 sec to eat
   FOOD_LIGHT=TRUE
   DRAW_IMAGES=True
   CONDITIONS=0    # NOTE: starts at 0
-  PAUSE = 3   # 5 s allow time to eat pellet
+  PAUSE = 10   # 5 s allow time to eat pellet
   FOOD_LIGHT=False
 END_LOOP
 
@@ -36,7 +36,7 @@ FAN_ON=False
 
 [CONDITIONS] #Note: reset = FIXED or ON_RESPONSE or AFTER_EATING.  Also, HERE WE NEED COMMAS.
 MAX_TIME, RESET,        CORRECT,        NO_ACTION
-10,       ON_RESPONSE,   PELLET_VAR,     NONE
+30,       ON_RESPONSE,   PELLET_VAR,     NONE
 
 # Max Time for stimulus presentation should be 30 s
 # For training:
