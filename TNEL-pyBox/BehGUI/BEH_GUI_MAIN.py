@@ -452,8 +452,10 @@ class BEH_GUI():
                                elif button.text == "LOAD FILE":
                                     button.UP_DN = "DN"
                                     self.events = []
-                                    print(self.expt_file_path_name)
-                                    if self.load_expt_file():
+                                    print("LOADING EXPT FILE: ", self.expt_file_path_name)
+                                    self.EXPT_FILE_LOADED = self.load_expt_file()
+                                    
+                                    if self.EXPT_FILE_LOADED:
                                         print("\n###########################")
                                         print("#   EXPT FILE LOADED!!    #")
                                         print("###########################")
@@ -462,6 +464,7 @@ class BEH_GUI():
                                         if len(self.setup) > 0:
                                             self.RUN_SETUP = True
                                             self.setup_ln_num = 0
+                                            
                                     else:
                                         self.EXPT_FILE_LOADED = False
                                         print("HUMPH! COULD NOT LOAD EXPT FILE (on button press)")
@@ -477,76 +480,84 @@ class BEH_GUI():
                                #######################################
                                elif button.text == "START EXPT":
 
-                                    self.load_expt_file()
-                                    self.runSetup()
+##                                    if not self.EXPT_FILE_LOADED:
+##                                        self.load_expt_file()
+                                        
+                                    if self.EXPT_FILE_LOADED:    
+                                        self.runSetup()
 
-                                    button.UP_DN = "DN"
-                                    self.Expt_Count +=1
-                                    #if self.EXPT_FILE_LOADED:
-                                    if self.Subject == "" or "?" in self.Subject or self.Subject == " " or len(self.Subject) == 0 :
-                                        GUIFunctions.log_event(self, self.events,"Check SUBJECT  and EXPT name!!!!",self.cur_time)
-                                        print('SUBJECT = "" or "?" or same as last time')
-                                        # HIGHLIGHT USER INPUT BOXES
-                                        for user_input in self.user_inputs:
-                                            if user_input.label == "EXPT":
-                                                 user_input.border_color = (255,0,0)
-                                            elif user_input.label == "SUBJECT":
-                                                 user_input.border_color = (255,0,0)
-
-                                    # MAKE SURE CAMERA IS ON AND REOCRDING
-                                    if not self.CAMERA_ON: # CAMERA WAS OFF. Toggle ON
-                                        self.CAMERA_ON = True
-                                        GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
-                                        self.vidSTATE = 'ON'
-                                        GUIFunctions.MyVideo(self)
-                                    if not self.RECORDING:  # WAS NOT RECORDING. TOGGLE ON
-                                        self.RECORDING = True
                                         button.UP_DN = "DN"
-                                        GUIFunctions.log_event(self, self.events,"START_RECORDING when Expt Started",self.cur_time)
-                                        self.vidSTATE = 'REC_VID'
+                                        self.Expt_Count +=1
+                                        #if self.EXPT_FILE_LOADED:
+                                        if self.Subject == "" or "?" in self.Subject or self.Subject == " " or len(self.Subject) == 0 :
+                                            GUIFunctions.log_event(self, self.events,"Check SUBJECT  and EXPT name!!!!",self.cur_time)
+                                            print('SUBJECT = "" or "?" or same as last time')
+                                            # HIGHLIGHT USER INPUT BOXES
+                                            for user_input in self.user_inputs:
+                                                if user_input.label == "EXPT":
+                                                     user_input.border_color = (255,0,0)
+                                                elif user_input.label == "SUBJECT":
+                                                     user_input.border_color = (255,0,0)
 
-                                    if self.NAME_OR_SUBJ_CHANGED :  # READY TO GO!!!
-                                        self.create_files()
-                                        self.create_expt_file_copy()
-                                        self.NAME_OR_SUBJ_CHANGED = False
-                                        print("EXPT FILE COPY UPDATED!!!!")
-                                        # GOOD TO GO!
-                                        print("EXPT STARTED!")
-                                        self.trial_num = 0
+                                        # MAKE SURE CAMERA IS ON AND REOCRDING
+                                        if not self.CAMERA_ON: # CAMERA WAS OFF. Toggle ON
+                                            self.CAMERA_ON = True
+                                            GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
+                                            self.vidSTATE = 'ON'
+                                            GUIFunctions.MyVideo(self)
+                                        if not self.RECORDING:  # WAS NOT RECORDING. TOGGLE ON
+                                            self.RECORDING = True
+                                            button.UP_DN = "DN"
+                                            GUIFunctions.log_event(self, self.events,"START_RECORDING when Expt Started",self.cur_time)
+                                            self.vidSTATE = 'REC_VID'
+
+                                        if self.NAME_OR_SUBJ_CHANGED :  # READY TO GO!!!
+                                            self.create_files()
+                                            self.create_expt_file_copy()
+                                            self.NAME_OR_SUBJ_CHANGED = False
+                                            print("EXPT FILE COPY UPDATED!!!!")
+                                            # GOOD TO GO!
+                                            print("EXPT STARTED!")
+                                            self.trial_num = 0
 
 
-                                        for user_input in self.user_inputs:
-                                            if user_input.label == "EXPT":
-                                                user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
+                                            for user_input in self.user_inputs:
+                                                if user_input.label == "EXPT":
+                                                    user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
 
-                                        if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
+                                            if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
 
-                                        if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
-                                            # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
-                                            if self.VI_REWARDING:
-                                                self.VI_start = 0.0 #self.cur_time
-                                                self.VI = random.randint(0,int(self.var_interval_reward*2))
-                                                print("VI.......................", self.VI)
-                                            if self.BAR_PRESS_TRAINING:
-                                                pass
-                                        GUIFunctions.log_event(self, self.events,"EXPT STARTED USING " + self.expt_file_path_name_COPY,self.cur_time)
+                                            if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
+                                                # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
+                                                if self.VI_REWARDING:
+                                                    self.VI_start = 0.0 #self.cur_time
+                                                    self.VI = random.randint(0,int(self.var_interval_reward*2))
+                                                    print("VI.......................", self.VI)
+                                                if self.BAR_PRESS_TRAINING:
+                                                    pass
+                                            GUIFunctions.log_event(self, self.events,"EXPT STARTED USING " + self.expt_file_path_name_COPY,self.cur_time)
 
-                                        ##################################
-                                        #
-                                        # RESET EXPT TIMER
-                                        #
-                                        ##################################
-                                        #self.events = []
-                                        self.cur_time = time.perf_counter()
-                                        self.Experiment_Start_time = self.cur_time
-                                        self.cur_time = self.cur_time-self.Experiment_Start_time
+                                            ##################################
+                                            #
+                                            # RESET EXPT TIMER
+                                            #
+                                            ##################################
+                                            #self.events = []
+                                            self.cur_time = time.perf_counter()
+                                            self.Experiment_Start_time = self.cur_time
+                                            self.cur_time = self.cur_time-self.Experiment_Start_time
 
-                                        self.START_EXPT = True
-                                        self.vidSTATE = 'START_EXPT'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                                        print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
-                                        for LED in self.LEDs: # Look for EXPT STARTED LED
-                                              if LED.index == 6: # Expt Started light
-                                                  LED.ONOFF = "ON"
+                                            self.START_EXPT = True
+                                            self.vidSTATE = 'START_EXPT'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                                            print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
+                                            for LED in self.LEDs: # Look for EXPT STARTED LED
+                                                  if LED.index == 6: # Expt Started light
+                                                      LED.ONOFF = "ON"
+
+                                    else:
+                                        self.EXPT_FILE_LOADED = False
+                                        print("HUMPH! COULD NOT LOAD EXPT FILE (on button press)")
+                                        GUIFunctions.log_event(self, self.events,"Expt File name or path DOES NOT EXIST",self.cur_time)
 
 
                                self.LEFT_MOUSE_DOWN = False
@@ -910,15 +921,11 @@ class BEH_GUI():
                    for button in self.buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
 
-##        elif key == 'ROI':  # THIS SHOULD BE IN LOAD PROTOCOL ONLY WHEN and WHERE FREEZE INFO IS GIVEN
-##            print('setting ROI',setupDict[key])
-##            self.setup_ln_num += 1
-##            self.vidDict['ROI'] = setupDict[key].split('#')[0]
-##            if "GENERATE" in self.vidDict['ROI']:
-##                print(self.vidDict['ROI'], ": GET ROI COORDINATES FROM USER")
-##            else:
-##                print("ROI COORINATES: ",self.vidDict['ROI'])
-##            print('freeze detection assumed')
+
+        elif "MAX_TIME" in key:
+            self.setup_ln_num +=1
+            self.max_time = float(setupDict["MAX_TIME"])
+            print("Max Expt Time :", self.max_time * 60.0, " sec")
 
         if self.setup_ln_num >= len(self.setup):
             self.setup_ln_num = 0
@@ -1058,6 +1065,7 @@ class BEH_GUI():
                 imgList = {}
                 i=0
                 for key in self.touchImgs.keys():
+                    print('key', key)
                     imgList[key] = self.touchImgCoords[placementList[i]] #places images
                     i+=1
                 self.TSq.put(imgList)
@@ -1135,10 +1143,13 @@ class BEH_GUI():
                     self.percent = False
                 else:
                     self.Protocol_ln_num = self.loop_start_line_num
+                    
             elif self.loop  < int(self.NUM_LOOPS):
                 #self.Protocol_ln_num = self.Protocol_ln_num - self.num_lines_in_loop
                 self.Protocol_ln_num = self.loop_start_line_num
                 self.VI_index += 1
+
+
             else:
                 self.Protocol_ln_num +=1
                 GUIFunctions.log_event(self, self.events,"END_OF_LOOP",self.cur_time)
@@ -1157,15 +1168,18 @@ class BEH_GUI():
                     self.PAUSE_TIME = self.habituation_vi_times[self.VI_index]
                 if "CONDITIONING" in protocolDict["PAUSE"]:
                     self.PAUSE_TIME = self.conditioning_vi_times[self.VI_index]
+                    
             if not self.PAUSE_STARTED:
                 GUIFunctions.log_event(self, self.events,"PAUSEING FOR "+str(self.PAUSE_TIME)+" sec",self.cur_time)
                 self.PAUSE_STARTED = True
                 self.pause_start_time = self.cur_time
+                
             else: #PAUSE_STARTED
                 time_elapsed = self.cur_time - self.pause_start_time
                 if time_elapsed >= self.PAUSE_TIME:
                     self.Protocol_ln_num +=1 #Go to next protocol item
                     self.PAUSE_STARTED = False
+                    
             if self.TOUCHSCREEN_USED:
                 if not self.TSBack_q.empty():
                        touchMsg = self.TSBack_q.get()
@@ -1229,13 +1243,22 @@ class BEH_GUI():
         #########################################################
         #  PROTOCOL ENDED (Reset everything for next run
         #########################################################
-
+        #print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.max_time * 60.0, " sec")
+        if self.cur_time >= self.max_time * 60.0: # Limits the amout of time rat can be in chamber (self.max_time in PROTOCOL.txt file (in min) 
+           GUIFunctions.log_event(self, self.events,"Exceeded MAX_TIME",self.cur_time)
+           print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX TIME: ",self.max_time)
+           self.end_expt()
+           
         if self.Protocol_ln_num >= len(self.protocol):
+           GUIFunctions.log_event(self, self.events,"PROTOCOL ENDED",self.cur_time)
+           self.end_expt()
+            
+
+    def end_expt(self):
            print("Protocol_ln_num: ",self.Protocol_ln_num,"plength: ", len(self.protocol),"\n")
            print("\n\nPROTOCOL ENDED")
            print("......END.....\n")
            print("__________________________________________________________________________\n\n\n\n")
-           GUIFunctions.log_event(self, self.events,"PROTOCOL ENDED",self.cur_time)
            self.START_EXPT = False
            self.Protocol_ln_num = 0
            self.trial_num = 0
@@ -1377,6 +1400,9 @@ class BEH_GUI():
                    GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
                    GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
 
+           ######################################
+           #     TOUCHSCREEN USED
+           ######################################
            if self.TOUCHSCREEN_USED:
                if not self.TSBack_q.empty():
                    touchMsg = self.TSBack_q.get()
@@ -1385,10 +1411,10 @@ class BEH_GUI():
                    if touchMsg['picture'] == 'missed': # Touched background
                        print('missed')
                        if self.TOUCH_TRAINING:
-                          self.CORRECT = True
-                          if self.trial_num <= 10: # Reward if screen is touched, then gradually reduce probability of reward
+                          self.CORRECT = True # NOTE: Must be set to True so that reward is given for touching backgrouns 
+                          if self.trial_num <= 5: # Reward if screen is touched, then gradually reduce probability of reward
                                self.cur_probability = 100.0
-                          elif self.trial_num > 10 and self.trial_num <= 60:
+                          elif self.trial_num > 5 and self.trial_num <= 15:
                                self.cur_probability = 100.0 - 2*self.trial_num
                           else:
                               self.cur_probability = 0.0
@@ -1409,12 +1435,12 @@ class BEH_GUI():
                                if touchMsg['picture'] == img:  # Touched an image
                                   self.CORRECT = True
 
-                                  if self.trial_num <= 30: # Reward if screen is touched, then gradually reduce probability of reward
+                                  if self.trial_num <= 10: # Reward if screen is touched, then gradually reduce probability of reward
                                        self.cur_probability = 100.0
-                                  elif self.trial_num > 30 and self.trial_num <= 50:  # 100% for first 30 hits, then slowly reduces to 50%
+                                  elif self.trial_num > 10 and self.trial_num <= 90:  # 100% for first 30 hits, then slowly reduces to 50%
                                        self.cur_probability = 100.0 - self.trial_num
                                   else:
-                                      self.cur_probability = 50.0
+                                      self.cur_probability = 10.0
                                   print("Cur probably: ", self.cur_probability, "\nCur trial: ", self.trial_num)
 
 
@@ -1443,7 +1469,7 @@ class BEH_GUI():
            if self.cond['RESET'] == "VI":
                pass
 
-           if self.TIME_IS_UP:
+           if self.TIME_IS_UP: # TIME IS UP FOR LOOP
                # SET OUTCOMES
                if self.CORRECT:
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
@@ -1466,13 +1492,16 @@ class BEH_GUI():
                    if len(outcome)<=6: # Just 'PELLET'
                        GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                    else: #"PELLET##"
-                       probability_of_reward = outcome[6:]
-                       if "VAR" in probability_of_reward:
+                       probability_of_reward = outcome[6:] 
+                       if "VAR" in probability_of_reward: # if "VAR" after "PELLET"
                            rand = random.random() * 100
                            print("our random number", rand)
                            if rand <= self.cur_probability:
                                print("Food_Pellet w"+str(self.cur_probability)+ "% probability")
                                GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(self.cur_probability)+ "% probability", self.cur_time)
+                               if self.CORRECT: # Give more rewards than if wrong
+                                   GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(self.cur_probability)+ "% probability", self.cur_time)
+                                   GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(self.cur_probability)+ "% probability", self.cur_time)
                            else:
                                print("Reward NOT given w " + str(self.cur_probability)+"% probability")
                                GUIFunctions.log_event(self, self.events,"Reward NOT given w " + str(self.cur_probability)+"% probability", self.cur_time)

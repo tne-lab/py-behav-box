@@ -108,7 +108,6 @@ class SNDEvent:
     # Changes the vars set at __init__
     def changeVars(self, recordingDir = 'NOCHANGE', prependText = 'NOCHANGE', appendText = 'NOCHANGE', TTLChannel = 'NOCHANGE'):
         if recordingDir != 'NOCHANGE':
-            print('CHANGING DIR\n\n\n\n')
             self.recordingDir = recordingDir.encode("utf-8")
         if prependText != 'NOCHANGE':
             self.prependText = prependText.encode("utf-8")

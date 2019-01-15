@@ -229,7 +229,7 @@ def log_event(self, event_lst, event, cur_time, other=''):
 
 def StartTouchScreen(self):
     if not self.TOUCH_TRHEAD_STARTED:
-        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(self.TSBack_q,self.TSq), kwargs={'media_dir' : self.TOUCH_IMG_PATH})
+        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(self.TSBack_q,self.TSq), kwargs={'media_dir' : self.resourcepath})
         whiskerThread.daemon = True
         whiskerThread.start()
         self.TOUCH_TRHEAD_STARTED = True
@@ -247,7 +247,7 @@ def MyVideo(self):
               msg = self.VIDBack_q.get()
               if msg == 'vid ready':
                   return
-                  
+
 def updateVideoQ(self):
     self.vidDict['cur_time'] = self.cur_time
     self.vidDict['trial_num'] = self.trial_num
@@ -267,7 +267,7 @@ def exit_game(self):
 
       self.L_condition_Lt.end()
       self.R_condition_Lt.end()
-      self.high_tone.end()
+      #self.high_tone.end()
       self.L_nose_poke.end()
       self.R_nose_poke.end()
       self.checkPressLeft.end()

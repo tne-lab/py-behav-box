@@ -50,9 +50,10 @@ def setGlobals(self):
     cwd = os.getcwd()
     print(cwd)
     self.datapath = os.path.join(cwd,'DATA' )
-    self.protocolpath = os.path.join(cwd,'RESOURCES' )
+    self.protocolpath = os.path.join(cwd,'PROTOCOLS' )
+    self.resourcepath = os.path.join(cwd, 'RESOURCES')
     print("....")
-    print (self.protocolpath)
+    print ("PROTOCOL PATH: ",self.protocolpath)
 
     self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN.txt'
     self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
@@ -150,3 +151,4 @@ def setGlobals(self):
     self.open_ephys_started = False
     self.Experiment_Start_time = 0.0
     self.cur_time = 0.0
+    self.max_time = 60 # in min

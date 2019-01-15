@@ -66,7 +66,8 @@ from whisker.constants import DEFAULT_PORT
 from whisker.twistedclient import WhiskerTwistedTask
 
 DEFAULT_DISPLAY_NUM = 0
-DEFAULT_MEDIA_DIR = r"C:\Program Files (x86)\WhiskerControl\Client Media"
+#DEFAULT_MEDIA_DIR = r"C:\Program Files (x86)\WhiskerControl\Client Media"
+DEFAULT_MEDIA_DIR = r"C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES"
 DEFAULT_WAV = "telephone.wav"
 
 DISPLAY = "display"
@@ -129,6 +130,10 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.whisker.claim_display(number=self.display_num, alias=DISPLAY)
         self.whisker.claim_audio(number=0, alias=AUDIO)
         self.whisker.set_media_directory(self.media_dir)
+        print("###################################################")
+        print("# IN Whisker")
+        print("# ",self.media_dir)
+        print("###################################################")
         self.display_size = self.whisker.display_get_size(DISPLAY)
         self.whisker.display_event_coords(True)
 
@@ -157,7 +162,9 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
             # Draw pictures
             for i in range(0,len(self.pics)):
-                print("picture" + str(i), "XY: ",self.XYarray[i], "filename: ",self.pics[i])
+                print("\n##############################################")
+                print("# picture" + str(i), "XY: ",self.XYarray[i], "filename: ",self.pics[i])
+                print("##############################################")
                 bit = self.whisker.display_add_obj_bitmap(
                     DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
                     stretch = False , height = 240, width = 240) # Returns T or F
