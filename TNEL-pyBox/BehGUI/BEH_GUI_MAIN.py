@@ -481,7 +481,7 @@ class BEH_GUI():
                                elif button.text == "START EXPT":
 
 ##                                    if not self.EXPT_FILE_LOADED:
-##                                        self.load_expt_file()
+                                    self.load_expt_file()
                                         
                                     if self.EXPT_FILE_LOADED:    
                                         self.runSetup()
@@ -1023,8 +1023,7 @@ class BEH_GUI():
                     self.CAMERA_ON = False
                     self.RECORDING = False
                     GUIFunctions.log_event(self, self.events,"Camera_OFF",self.cur_time)
-                    self.vidSTATE = 'OFF'
-                                                  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                    self.vidSTATE = 'OFF'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
 
         elif key == "REC": ## NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
             print ("rec")
@@ -1250,11 +1249,16 @@ class BEH_GUI():
            print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX TIME: ",self.max_time)
            GUIFunctions.log_event(self, self.events,"PROTOCOL ENDED-max time exceeded",self.cur_time)
            print("\nPROTOCOL ENDED-Max time exceeded")
+           self.RECORDING = False
+           GUIFunctions.log_event(self, self.events,"Camera_OFF",self.cur_time)
+           self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
            self.end_expt()
            
         if self.Protocol_ln_num >= len(self.protocol):
            GUIFunctions.log_event(self, self.events,"PROTOCOL ENDED",self.cur_time)
-           print("\nPROTOCOL ENDED")
+           print("\nPROTOCOL ENDED NORMALLY")
+           GUIFunctions.log_event(self, self.events,"Camera_OFF",self.cur_time)
+           self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
            self.end_expt()
             
 

@@ -1,0 +1,6 @@
+392680 Software time: 392680@3328388Hz
+391035 stopAcquisition 
+391343 stopRecord
+391563 startAcquisition 
+391782 startRecord RecDir= prependText= appendText=
+33173523 startRecord RecDir=C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA\Screen_Touch_training\Jan_15_19\08-15 prependText=OPEN-EPHYS-t1 appendText=

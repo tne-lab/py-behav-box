@@ -10,7 +10,7 @@ IMG2= blank2.bmp
 TRAIN_TOUCH
 
 [SETUP]
-MAX_TIME = 60     # Generally 60 min max for rats
+MAX_TIME = 60     # NOTE: In minutes.   Generally 60 min max for rats
 FAN_ON=TRUE
 CAB_LIGHT=TRUE
 CAMERA=TRUE
@@ -19,11 +19,11 @@ REC=TRUE
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 
 START_LOOP1 = 100  # Max trials should be no more than 100
-  PAUSE = 10  # Inter trial Interval (ITI) = 20 s.  20s including 10 sec to eat
+  PAUSE = 10  # Inter trial Interval (ITI) = 20 s.  20s including 10 sec to eat... Seems too long to me
   FOOD_LIGHT=TRUE
   DRAW_IMAGES=True
   CONDITIONS=0    # NOTE: starts at 0
-  PAUSE = 10   # 5 s allow time to eat pellet
+  PAUSE = 5   # 5 s allow time to eat pellet
   FOOD_LIGHT=False
 END_LOOP
 
