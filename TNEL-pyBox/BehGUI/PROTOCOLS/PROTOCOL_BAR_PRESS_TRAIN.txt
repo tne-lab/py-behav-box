@@ -10,7 +10,7 @@ REC=True
 FOOD_LIGHT=True
 EXTEND_LEVERS=TRUE
 
-[BAR_PRESS] #NOTE: VI=15 is variable interval with meant time of 15.  PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
+[BAR_PRESS] #NOTE: VI=15 is variable interval with mean time of 15.  PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
 # (10, 1,30,5) creates 10 variable ratio reward stating at every press (1, to random between (1,30) incremented by 5 every loop)
 BAR_PRESS_TRAIN
 

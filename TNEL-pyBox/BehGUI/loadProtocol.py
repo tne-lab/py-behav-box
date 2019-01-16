@@ -312,6 +312,7 @@ def load_expt_file(self):
                             self.touchImgs[imageName] = 0
                     elif 'TRAIN_TOUCH' in line:
                         self.TOUCH_TRAINING = True
+                        self.cur_probability = 100.0 # 100% To start. Reduced by 15% after 10 Presses/min for 10 min in BEH_GUI_MAIN 
                     elif 'TOUCH_BANDIT' in line:
                         self.TOUCH_BANDIT = True
                 elif BAR_PRESS:
