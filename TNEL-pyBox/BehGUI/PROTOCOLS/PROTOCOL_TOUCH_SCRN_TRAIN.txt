@@ -19,10 +19,10 @@ FOOD_LIGHT=TRUE
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 
-START_LOOP1 = 100  # Max trials should be no more than 100
+START_LOOP1 = 300  # Max trials should be no more than 100
   DRAW_IMAGES=True
   CONDITIONS=0    # NOTE: starts at 0
-  #PAUSE = 20   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet... 
+  #PAUSE = 20   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet...
 END_LOOP
 
 FOOD_LIGHT=False

@@ -198,7 +198,7 @@ class BEH_GUI():
             elif info.label == "DATE":
                   info.text = [str(self.date)]
             elif info.label == "TIME":
-                if self.START_EXPT: info.text = [str(round(self.cur_time,3))]
+                if self.START_EXPT: info.text = [str(round(self.cur_time/60.0,3))]
                 else: info.text = ['0.000']
             elif info.label == "EVENT LOG":
                 lines_in_txt = len(self.events)
@@ -1300,6 +1300,8 @@ class BEH_GUI():
            if self.TOUCHSCREEN_USED:
                self.TSq.put('')
                self.TOUCHSCREEN_USED = False
+               while not self.TSBack_q.empty():  # EMPTY TSBack_q between Expt Runs.
+                   touchMsg = self.TSBack_q.pop()
 
            for user_input in self.user_inputs:
               if user_input.label == "SUBJECT":
@@ -1387,7 +1389,7 @@ class BEH_GUI():
 
            if self.LEVER_PRESSED_L: # LEFT LEVER
                GUIFunctions.log_event(self, self.events,"Left_Lever_Pressed",self.cur_time)
-               if not self.HAS_ALREADY_RESPONDED:# Prevents rewarding for multiple presses
+               if not self.HAS_ALREADY_RESPONDED:# Prevents rewarding for multiple presses. Ensures max of one press per trial.
                    if self.cond['DES_L_LEVER_PRESS']:
                        GUIFunctions.log_event(self, self.events,"CORRECT Response",self.cur_time)
                        self.CORRECT = True
@@ -1500,11 +1502,16 @@ class BEH_GUI():
 
                       if self.meanTPM10 > 10: # Reduce probability of reward for touching background + self.any_image_touches
                             self.VI_background += 15.0
+                            GUIFunctions.log_event(self, self.events,"VI for BACKGROUND Touches: "+ str(self.VI_background),self.cur_time)
                       if self.meanTPM10imgs > 10: # Reduce probability of reward for touching images only
                             self.VI_images += 15.0
+                            GUIFunctions.log_event(self, self.events,"VI for IMG Touches: "+ str(self.VI_images),self.cur_time)
+
                             self.VI_background += 15.0
+                            GUIFunctions.log_event(self, self.events,"VI for BACKGROUND Touches: "+ str(self.VI_background),self.cur_time)
+
                       print("MeanTPM10: ", self.meanTPM10, "MeanTPM10imgs: ", self.meanTPM10imgs)
-                      print("\nVI_backgrouns: ", self.VI_background,"\nVI_images: ", self.VI_images)
+                      print("\nVI_background: ", self.VI_background,"\nVI_images ", self.VI_images)
 
 
            ################
@@ -1556,21 +1563,21 @@ class BEH_GUI():
                # OUTCOMES
                #########################
                if 'PELLET' in outcome:
-                   print ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Deciding on pellet !!!!!!!!!!!!!")
+                   #print ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Deciding on pellet !!!!!!!!!!!!!")
                    if len(outcome)<=6: # Just 'PELLET'
                        GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                    else: #"PELLET****" i.e. PELLET80 or PELLET_VAR or PELLET_TOUCHVI1 or PELLET_TOUCHVI2
                        left_of_outcome_str = outcome[6:]
-                       print(left_of_outcome_str)
+                       #print(left_of_outcome_str)
                        if "_TOUCHVI1" == left_of_outcome_str: # PELLET_TOUCHVI1: Touched image
                            if self.cur_time > (self.VI_start + self.cur_VI_images): # Give reward and reset VIs
                               # Give 2 Rewards
                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
-                              GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
+                              #GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                               # Reset VIs
                               self.VI_start = self.cur_time
                               self.cur_VI_images = random.randint(0,int(self.VI_images * 2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
-                              print("new vi", self.cur_VI_images, " (sec)")
+                              #print("new vi", self.cur_VI_images, " (sec)")
 
 
                        elif "TOUCHVI2" in left_of_outcome_str: # or PELLET_TOUCHVI2: Touched Background
@@ -1580,7 +1587,7 @@ class BEH_GUI():
                               # Reset VIs
                               self.VI_start = self.cur_time
                               self.cur_VI_background = random.randint(0,int(self.VI_background*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
-                              print("new backgroung vi", self.VI_background, " (sec)")
+                              #print("new backgroung vi", self.VI_background, " (sec)")
 
                            
                        elif "VAR" in left_of_outcome_str: # if "VAR" after "PELLET"

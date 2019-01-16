@@ -107,16 +107,20 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.back_q = back_q
         self.q = q
 
-        #Brushes + pens
+        #Brushes + pens: NOTE: colors are (BGR)
         self.brush1 = Brush(
             colour=(0, 0, 0), bg_colour=(0, 255, 0),
-            opaque=False)
+            opaque=False)   #BLACK BACKGROUND
+        self.brush2 = Brush(
+            colour=(100, 100, 100), bg_colour=(0, 255, 0),
+            opaque=False)   #Gray dead zone to prevent tail touches
         self.pen = Pen(width=3, colour=(255, 255, 150), style=PenStyle.solid)
         self.brush = Brush(
             colour=(255, 0, 0), bg_colour=(0, 255, 0),
             opaque=True, style=BrushStyle.hatched,
-            hatch_style=BrushHatchStyle.bdiagonal)
-
+            hatch_style=BrushHatchStyle.bdiagonal) #
+        self.background_ht = 0
+        self.dead_zone_ht = 100
 
 
     def fully_connected(self) -> None: # RUNS ONCE WHEN FULLY CONNECTED
@@ -156,9 +160,16 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.whisker.display_show_document(DISPLAY, DOC)
         with self.whisker.display_cache_wrapper(DOC):
             # Draw background
+            # Lock out botton 100 pixels of display to minimze tail Touches
+            self.background_ht = self.display_size[1]-self.dead_zone_ht
             self.whisker.display_add_obj_rectangle(DOC, "background",
-                Rectangle(left = 0, top = 0, width = self.display_size[0], height = self.display_size[1]),
+                Rectangle(left = 0, top = 0, width = self.display_size[0], height = self.background_ht),
                 self.pen, self.brush1)
+            # Draw dead zone at bottom of screen.
+            # Lock out botton 100 pixels of display to minimze tail Touches
+            self.whisker.display_add_obj_rectangle(DOC, "background",
+                Rectangle(left = 0, top = self.background_ht, width = self.display_size[0], height = self.dead_zone_ht),
+                self.pen, self.brush2)
 
             # Draw pictures
             for i in range(0,len(self.pics)):
@@ -213,9 +224,10 @@ class MyWhiskerTask(WhiskerTwistedTask):
             event, x, y = event.split(' ')
             # Clicked background
             if "missedClick" == event:
-                sendDict = {'picture' : 'missed', 'XY' : (x,y)}
-                print(sendDict)
-                self.back_q.put(sendDict)
+                if int(y) <= self.background_ht:
+                    sendDict = {'picture' : 'missed', 'XY' : (x,y)}
+                    print(sendDict)
+                    self.back_q.put(sendDict)
                 #self.whisker.audio_play_wav(AUDIO, DEFAULT_WAV)
             # Or a picture
             else:
