@@ -29,14 +29,14 @@ def get_LR_before_hash(line):
         print("Could not parse line")
         return left
 def get_before_hash(line):
+    clean_line = line.strip()
     try:
-        clean_line = line.strip()
         left = clean_line.split('#') #IGNORES "#" FOLLOWED BY COMMENTS
-        new_left = left[0].strip()  # comment = left_right[1].strip()
+        new_left = left[0].strip()  #  # Remove leading and trailoing blanks and \n
         return new_left
     except:
         print("Could not parse line")
-        return left
+        return clean_line
 def load_expt_file(self):
     print("LOADING: ", self.expt_file_path_name)
     self.setup = []
@@ -48,8 +48,8 @@ def load_expt_file(self):
         f = open(self.expt_file_path_name,'r')
         # Read Line by line
         EXPERIMENT = False
-        for line in f:
-            line = line.strip() # Remove leading and trailoing blanks and \n
+        for ln in f:
+            line = get_before_hash(ln)
 
             if not EXPERIMENT: # What is this for?
                 line = line.upper()
@@ -312,7 +312,15 @@ def load_expt_file(self):
                             self.touchImgs[imageName] = 0
                     elif 'TRAIN_TOUCH' in line:
                         self.TOUCH_TRAINING = True
-                        self.cur_probability = 100.0 # 100% To start. Reduced by 15% after 10 Presses/min for 10 min in BEH_GUI_MAIN 
+                        vis = get_val_between_equal_sign_and_hash(line)
+                        if len(vis) > 0:
+                            VIs = vis.split(",")
+                            self.VI_images = float(VIs[0].strip())
+                            self.cur_VI_images = self.VI_images
+                            self.VI_background = float(VIs[1].strip())
+                            self.cur_VI_background = self.VI_background
+
+                        #self.cur_probability = 100.0 # 100% To start. Reduced by 15% after 10 Presses/min for 10 min in BEH_GUI_MAIN
                     elif 'TOUCH_BANDIT' in line:
                         self.TOUCH_BANDIT = True
                 elif BAR_PRESS:
