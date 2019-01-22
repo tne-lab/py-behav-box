@@ -112,7 +112,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             colour=(0, 0, 0), bg_colour=(0, 255, 0),
             opaque=False)   #BLACK BACKGROUND
         self.brush2 = Brush(
-            colour=(10, 10, 10), bg_colour=(0, 255, 0),
+            colour=(5, 5, 5), bg_colour=(0, 255, 0),
             opaque=False)   #Gray dead zone to prevent tail touches
         self.pen = Pen(width=3, colour=(0, 0, 0), style=PenStyle.solid)
         self.brush = Brush(

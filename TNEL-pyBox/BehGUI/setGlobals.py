@@ -175,4 +175,4 @@ def setGlobals(self):
     self.open_ephys_started = False
     self.Experiment_Start_time = 0.0
     self.cur_time = 0.0
-    self.max_time = 60 # in min
+    self.MAX_EXPT_TIME = 60 # in min
