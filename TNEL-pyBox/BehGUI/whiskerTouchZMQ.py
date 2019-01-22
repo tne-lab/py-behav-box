@@ -112,15 +112,15 @@ class MyWhiskerTask(WhiskerTwistedTask):
             colour=(0, 0, 0), bg_colour=(0, 255, 0),
             opaque=False)   #BLACK BACKGROUND
         self.brush2 = Brush(
-            colour=(100, 100, 100), bg_colour=(0, 255, 0),
+            colour=(10, 10, 10), bg_colour=(0, 255, 0),
             opaque=False)   #Gray dead zone to prevent tail touches
-        self.pen = Pen(width=3, colour=(255, 255, 150), style=PenStyle.solid)
+        self.pen = Pen(width=3, colour=(0, 0, 0), style=PenStyle.solid)
         self.brush = Brush(
             colour=(255, 0, 0), bg_colour=(0, 255, 0),
             opaque=True, style=BrushStyle.hatched,
             hatch_style=BrushHatchStyle.bdiagonal) #
         self.background_ht = 0
-        self.dead_zone_ht = 100
+        self.dead_zone_ht = 250
 
 
     def fully_connected(self) -> None: # RUNS ONCE WHEN FULLY CONNECTED
