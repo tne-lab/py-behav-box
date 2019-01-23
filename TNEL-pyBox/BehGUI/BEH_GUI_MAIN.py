@@ -1200,7 +1200,7 @@ class BEH_GUI():
             if self.TOUCHSCREEN_USED:
                 if not self.TSBack_q.empty():
                        touchMsg = self.TSBack_q.get()
-                       GUIFunctions.log_event(self, self.events, touchMsg['picture'] + " Pressed " + str(touchMsg['XY']) , self.cur_time)
+                       GUIFunctions.log_event(self, self.events, touchMsg['picture'] + " Pressed " + str(touchMsg['XY'][0])+ ';' + str(touchMsg['XY'][1]) , self.cur_time)
 
         elif key == "CONDITIONS":
             self.runConditions(protocolDict, self.cur_time)
@@ -1439,7 +1439,7 @@ class BEH_GUI():
                ######################
                if not self.TSBack_q.empty():
                    touchMsg = self.TSBack_q.get()
-                   GUIFunctions.log_event(self, self.events,touchMsg['picture'] + " Pressed " + str(touchMsg['XY']) , self.cur_time)
+                   GUIFunctions.log_event(self, self.events,touchMsg['picture'] + " Pressed " + str(touchMsg['XY'][0])+';'+ str(touchMsg['XY'][1]) , self.cur_time)
 
                    ##########################################
                    #  BACKGROUND TOUCHED (image missed)
