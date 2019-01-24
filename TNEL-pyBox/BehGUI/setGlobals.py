@@ -88,6 +88,10 @@ def setGlobals(self):
     self.vidDict = {'STATE' : 'STOP'}
     self.VIDq = deque(maxlen = 1) # Most recent
     self.VIDBack_q = Queue()
+    # Simple VIDEO
+    self.SIMPLEVIDq = Queue()
+    simpleVidThread = threading.Thread(target=video_function.runSimpleVid, args=(self.SIMPLEVIDq,))
+    sipmleVidThread.start()
     ################################################################
     # TOUCH GLOBALS
     ################################################################

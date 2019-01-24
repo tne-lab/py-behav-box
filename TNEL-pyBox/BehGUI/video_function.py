@@ -194,14 +194,10 @@ class Vid:
             # Get next frame and check if we are done
             self.startFrame+=1
             if cv2.waitKey(self.mspf) & 0xFF == ord('q'):
-                cv2.destroyAllWindows()
-                self.out.release()
                 self.close()
                 return
 
             if msg['STATE'] == 'OFF': #  # NOTE: STATE = (ON,OFF,REC, START_EXPT,STOP_EXPT)
-                cv2.destroyAllWindows()
-                self.out.release()
                 self.close()
                 return
 
@@ -346,5 +342,41 @@ def runVid(q, back_q):
         return
     else:
         print('error opening video')
+
+def runSimpleVid(q):
+    simpleVid = SimpleVid(1,q)
+
+    if not simpleVid.capError:
+        simpleVid.run()
+        return
+
+class SimpleVid:
+    def __init__(self,path,q):
+        self.cap = self.cap = cv2.VideoCapture(path)
+        self.q = q
+        if not self.cap.isOpened():
+            print('error opening aux vid, probably doesn\'t exist')
+            self.capError = True
+
+    def run(self):
+        while(self.cap.isOpened()):
+            ret, frame = self.cap.read()
+            if not ret:
+                print('Error loading frame, probably last frame')
+                return
+            # Show the frames
+            cv2.imshow('Aux Camera', frame)
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                cv2.destroyAllWindows()
+                self.cap.release()
+                return
+
+            if not q.isEmpty():
+                msg = q.get()
+            if msg['STATE'] == 'OFF': 
+                cv2.destroyAllWindows()
+                self.cap.release()
+                return
 
 print('freezeAlg Loaded')

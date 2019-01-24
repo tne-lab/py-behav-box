@@ -275,6 +275,7 @@ def exit_game(self):
 
     self.vidDict['STATE'] = 'OFF'
     self.VIDq.append(self.vidDict)
+    self.SIMPLEVIDq.put({'STATE':'OFF'})
     if self.TOUCH_TRHEAD_STARTED == True:
         self.TSq.put('STOP')
     self.openEphysQ.put('STOP')
