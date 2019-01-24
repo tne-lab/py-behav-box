@@ -1,6 +1,5 @@
 [EXPERIMENT]
 EXPT_NAME = Bandit-Touch
-
 EXPT_PATH 	= C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
 
 [TONE1] # Need TONE1, TONE2
@@ -15,8 +14,8 @@ Volume(0-1)	= 0.6
 
 [SHOCK]
 Duration(s) 	= 3
-Volts		= 5.5
-Amps(mA)	= 100
+Volts		= 5.5  # NOTE:  only duration is controlled here.
+Amps(mA)	= 100  # V and amps are set manually on scrambled grid generator
 
 [FREEZE]
 Min Duration(s)	= 2
@@ -26,9 +25,10 @@ ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also
 
 [TOUCHSCREEN]
 IMAGES_PATH = C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
-COORDS=(100,500):(700,500)          # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
-IMG1= santa_fe.bmp:(80,75,70,60,60,10,30,30,50,10)  # Image name: probability of reward on each trial
-IMG2= test.bmp:(80,75,70,60,60,10,30,30,50,10)
+COORDS=(100,150):(684,150)          # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+# Image name: probability of reward on each trial
+IMG1= SPIDER.bmp:(20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,80,80,80,80,80)
+IMG2= FLOWER.bmp:(80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,20,20,20,20,20)
 TOUCH_BANDIT
 
 [SETUP]
