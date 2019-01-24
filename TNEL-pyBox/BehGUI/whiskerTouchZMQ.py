@@ -66,7 +66,8 @@ from whisker.constants import DEFAULT_PORT
 from whisker.twistedclient import WhiskerTwistedTask
 
 DEFAULT_DISPLAY_NUM = 0
-DEFAULT_MEDIA_DIR = r"C:\Program Files (x86)\WhiskerControl\Client Media"
+#DEFAULT_MEDIA_DIR = r"C:\Program Files (x86)\WhiskerControl\Client Media"
+DEFAULT_MEDIA_DIR = r"C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES"
 DEFAULT_WAV = "telephone.wav"
 
 DISPLAY = "display"
@@ -106,16 +107,20 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.back_q = back_q
         self.q = q
 
-        #Brushes + pens
+        #Brushes + pens: NOTE: colors are (BGR)
         self.brush1 = Brush(
             colour=(0, 0, 0), bg_colour=(0, 255, 0),
-            opaque=False)
-        self.pen = Pen(width=3, colour=(255, 255, 150), style=PenStyle.solid)
+            opaque=False)   #BLACK BACKGROUND
+        self.brush2 = Brush(
+            colour=(5, 5, 5), bg_colour=(0, 255, 0),
+            opaque=False)   #Gray dead zone to prevent tail touches
+        self.pen = Pen(width=3, colour=(0, 0, 0), style=PenStyle.solid)
         self.brush = Brush(
             colour=(255, 0, 0), bg_colour=(0, 255, 0),
             opaque=True, style=BrushStyle.hatched,
-            hatch_style=BrushHatchStyle.bdiagonal)
-
+            hatch_style=BrushHatchStyle.bdiagonal) #
+        self.background_ht = 0
+        self.dead_zone_ht = 250
 
 
     def fully_connected(self) -> None: # RUNS ONCE WHEN FULLY CONNECTED
@@ -129,6 +134,10 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.whisker.claim_display(number=self.display_num, alias=DISPLAY)
         self.whisker.claim_audio(number=0, alias=AUDIO)
         self.whisker.set_media_directory(self.media_dir)
+        print("###################################################")
+        print("# IN Whisker")
+        print("# ",self.media_dir)
+        print("###################################################")
         self.display_size = self.whisker.display_get_size(DISPLAY)
         self.whisker.display_event_coords(True)
 
@@ -151,13 +160,22 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.whisker.display_show_document(DISPLAY, DOC)
         with self.whisker.display_cache_wrapper(DOC):
             # Draw background
+            # Lock out botton 100 pixels of display to minimze tail Touches
+            self.background_ht = self.display_size[1]-self.dead_zone_ht
             self.whisker.display_add_obj_rectangle(DOC, "background",
-                Rectangle(left = 0, top = 0, width = self.display_size[0], height = self.display_size[1]),
+                Rectangle(left = 0, top = 0, width = self.display_size[0], height = self.background_ht),
                 self.pen, self.brush1)
+            # Draw dead zone at bottom of screen.
+            # Lock out botton 100 pixels of display to minimze tail Touches
+            self.whisker.display_add_obj_rectangle(DOC, "background",
+                Rectangle(left = 0, top = self.background_ht, width = self.display_size[0], height = self.dead_zone_ht),
+                self.pen, self.brush2)
 
             # Draw pictures
             for i in range(0,len(self.pics)):
-                print("picture" + str(i), "XY: ",self.XYarray[i], "filename: ",self.pics[i])
+                print("\n##############################################")
+                print("# picture" + str(i), "XY: ",self.XYarray[i], "filename: ",self.pics[i])
+                print("##############################################")
                 bit = self.whisker.display_add_obj_bitmap(
                     DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
                     stretch = False , height = 240, width = 240) # Returns T or F
@@ -206,9 +224,10 @@ class MyWhiskerTask(WhiskerTwistedTask):
             event, x, y = event.split(' ')
             # Clicked background
             if "missedClick" == event:
-                sendDict = {'picture' : 'missed', 'XY' : (x,y)}
-                print(sendDict)
-                self.back_q.put(sendDict)
+                if int(y) <= self.background_ht:
+                    sendDict = {'picture' : 'missed', 'XY' : (x,y)}
+                    print(sendDict)
+                    self.back_q.put(sendDict)
                 #self.whisker.audio_play_wav(AUDIO, DEFAULT_WAV)
             # Or a picture
             else:

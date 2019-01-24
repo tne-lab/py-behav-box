@@ -29,16 +29,17 @@ def get_LR_before_hash(line):
         print("Could not parse line")
         return left
 def get_before_hash(line):
+    clean_line = line.strip()
     try:
-        clean_line = line.strip()
         left = clean_line.split('#') #IGNORES "#" FOLLOWED BY COMMENTS
-        new_left = left[0].strip()  # comment = left_right[1].strip()
+        new_left = left[0].strip()  #  # Remove leading and trailoing blanks and \n
         return new_left
     except:
         print("Could not parse line")
-        return left
+        return clean_line
 def load_expt_file(self):
     print("LOADING: ", self.expt_file_path_name)
+    self.setup = []
     self.protocol = []
     self.conditions = []
     self.exptFileLines = []
@@ -47,12 +48,12 @@ def load_expt_file(self):
         f = open(self.expt_file_path_name,'r')
         # Read Line by line
         EXPERIMENT = False
-        for line in f:
-            line = line.strip() # Remove leading and trailoing blanks and \n
+        for ln in f:
+            line = get_before_hash(ln)
 
             if not EXPERIMENT: # What is this for?
                 line = line.upper()
-            print(line)
+            #print(line)
             self.exptFileLines.append(line)
 
             if line != "" and line[0] != "#" : #Skip Blank Lines and Skip lines that are just comments (but still copy them to new file)
@@ -280,7 +281,7 @@ def load_expt_file(self):
                     if 'IMAGES_PATH' in line:
                         self.TOUCH_IMG_PATH = get_val_between_equal_sign_and_hash(line)
                         self.TOUCHSCREEN_USED = True
-
+                        self.touchImgs = {}
                     if 'COORDS' in line:
                         self.touchImgCoords = []
                         words = get_val_between_equal_sign_and_hash(line)
@@ -311,6 +312,15 @@ def load_expt_file(self):
                             self.touchImgs[imageName] = 0
                     elif 'TRAIN_TOUCH' in line:
                         self.TOUCH_TRAINING = True
+                        vis = get_val_between_equal_sign_and_hash(line)
+                        if len(vis) > 0:
+                            VIs = vis.split(",")
+                            self.VI_images = float(VIs[0].strip())
+                            self.cur_VI_images = self.VI_images
+                            self.VI_background = float(VIs[1].strip())
+                            self.cur_VI_background = self.VI_background
+
+                        #self.cur_probability = 100.0 # 100% To start. Reduced by 15% after 10 Presses/min for 10 min in BEH_GUI_MAIN
                     elif 'TOUCH_BANDIT' in line:
                         self.TOUCH_BANDIT = True
                 elif BAR_PRESS:
@@ -377,7 +387,7 @@ def load_expt_file(self):
                         except:
                             self.setup.append({line:True}) # For lines without an '=' in them
                             #if line == 'END': PROTOCOL = False
-                        print({word1:word2})
+                        #print({word1:word2})
                     else:
                         print("################")
                         print("#    SETUP     #")
@@ -390,7 +400,7 @@ def load_expt_file(self):
                             word1,word2 = get_LR_before_hash(line)
                             self.protocol.append({word1:word2})
                         except:
-                            print("single word")
+                            #print("single word")
                             self.protocol.append({line:True}) # For lines without an '=' in them
                             #if line == 'END': self.protocol = False
                     else:
@@ -515,6 +525,7 @@ def create_files(self):
     self.expt_file_path_name_COPY = os.path.join(self.newdatapath,expt_file_name_COPY)
     print(self.expt_file_path_name_COPY)
 
+
     log_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-LOG_file'  + '.csv'
     self.log_file_path_name = os.path.join(self.newdatapath,log_file_name)
     print(self.log_file_path_name)
@@ -546,7 +557,7 @@ def create_expt_file_copy(self):
             if "ROI" in ln:
                 ln = "ROI = " + self.ROIstr
 
-            print (ln)
+            #print (ln)
             exptfl.write(ln+"\n")
 
         print("EXPT file copied",self.expt_file_path_name_COPY)

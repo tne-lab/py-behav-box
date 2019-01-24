@@ -50,9 +50,10 @@ def setGlobals(self):
     cwd = os.getcwd()
     print(cwd)
     self.datapath = os.path.join(cwd,'DATA' )
-    self.protocolpath = os.path.join(cwd,'RESOURCES' )
+    self.protocolpath = os.path.join(cwd,'PROTOCOLS' )
+    self.resourcepath = os.path.join(cwd, 'RESOURCES')
     print("....")
-    print (self.protocolpath)
+    print ("PROTOCOL PATH: ",self.protocolpath)
 
     self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN.txt'
     self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
@@ -143,10 +144,35 @@ def setGlobals(self):
     self.BAR_PRESS_INDEPENDENT_PROTOCOL = False
     self.VI_REWARDING = False
     self.var_interval_reward = 0.0
+    self.VI_start = 0.0
+    #################################
     self.BAR_PRESS_TRAINING = False
+    self.background_touches = 0  #Num touches to background
+    self.any_image_touches = 0
+    self.correct_image_touches = 0
+    self.TPM = 0.0   #Screen Touches per minute (background + image)
+    self.TPMs = []
+    self.TPMimg = 0.0   #Screen Touches per minute (touched images only)
+    self.TPMimgs = []
+    self.TPMcorrect_img = 0.0   #Screen Touches per minute (touched correct images only)
+    self.TPMcorrect_imgs = []
+
+    self.meanTPM10 = 0.0 #Running mean screen touches per min
+    self.meanTPM10imgs = 0.0
+    self.meanTPM10correct_imgs = 0.0
+    self.VI_images = 0.0                # Used for Touch Training
+    self.VI_background = 0.0            # Used for Touch Training
+    self.cur_VI_images = 0.0              # Used for Touch Training
+    self.cur_VI_background = 0.0        # Used for Touch Training
+
+    self.cur_probability = 0.0  # Used for PELLET_VAR
+    self.TPM_start_time = 0.0
+    self.VI = 1.0
+    ##################################
     self.VRs_given = 0
     self.VR = 1
 
     self.open_ephys_started = False
     self.Experiment_Start_time = 0.0
     self.cur_time = 0.0
+    self.MAX_EXPT_TIME = 60 # in min

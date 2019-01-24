@@ -112,6 +112,8 @@ class Vid:
                 STATE = msg['STATE'] # NOTE: NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                 if STATE == 'START_EXPT':
                     self.exptStarted = True
+                if STATE == 'REC_STOP':
+                    self.exptStarted = False
                 if 'ROI' in msg and not self.ROIenabled:
                     if msg['ROI'] in 'GENERATE':
                         self.ROIGEN = True
