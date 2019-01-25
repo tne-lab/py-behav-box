@@ -221,9 +221,10 @@ def log_event(self, event_lst, event, cur_time, other=''):
     if len(event_lst) > 14:  self.start_line = len(event_lst) -14
     try:
         #print(self.log_file_path_name)
-        log_file = open(self.log_file_path_name,'a')         # OPEN LOG FILE
+        log_file = open(self.log_file_path_name,'a')        # OPEN LOG FILE
         log_file.write(event_string + event_other + '\n')   # To WRITE TO FILE
-        log_file.close()                                #CLOSE LOG FILE
+        print(event_string + event_other)                   # print to display
+        log_file.close()                                    #CLOSE LOG FILE
     except:
         print ('Log file not created yet. Check EXPT PATH, then Press "LOAD EXPT FILE BUTTON"')
 

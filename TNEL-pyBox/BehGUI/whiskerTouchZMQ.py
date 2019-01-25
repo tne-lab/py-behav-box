@@ -83,7 +83,7 @@ def pair_server(serv_msg,socket):
     client_msg = json.loads(message)#loads JSON formated data from stream
     # Sleep to allow sockets to connect.
     #time.sleep(3)
-    print("client msg type: ",type(client_msg))
+    #print("client msg type: ",type(client_msg))
     return client_msg #message #
 
 #-----------------------------------------------------------------------
@@ -134,10 +134,10 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.whisker.claim_display(number=self.display_num, alias=DISPLAY)
         self.whisker.claim_audio(number=0, alias=AUDIO)
         self.whisker.set_media_directory(self.media_dir)
-        print("###################################################")
-        print("# IN Whisker")
-        print("# ",self.media_dir)
-        print("###################################################")
+        #print("###################################################")
+        #print("# IN Whisker")
+        #print("# ",self.media_dir)
+        #print("###################################################")
         self.display_size = self.whisker.display_get_size(DISPLAY)
         self.whisker.display_event_coords(True)
 
@@ -173,16 +173,17 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
             # Draw pictures
             for i in range(0,len(self.pics)):
-                print("\n##############################################")
-                print("# picture" + str(i), "XY: ",self.XYarray[i], "filename: ",self.pics[i])
-                print("##############################################")
+                #print("\n##############################################")
+                #print("# picture" + str(i), "XY: ",self.XYarray[i], "filename: ",self.pics[i])
+                #print("##############################################")
                 bit = self.whisker.display_add_obj_bitmap(
                     DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
                     stretch = False , height = 240, width = 240) # Returns T or F
                 if not bit:
-                    print("##############################################")
-                    print('#  failed drawing picture', self.pics[i] )
-                    print("##############################################")
+                    pass
+                    #print("##############################################")
+                    #print('#  failed drawing picture', self.pics[i] )
+                    #print("##############################################")
             self.whisker.display_send_to_back(DOC, "background")
             self.setEvents()
 
@@ -226,7 +227,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             if "missedClick" == event:
                 if int(y) <= self.background_ht:
                     sendDict = {'picture' : 'missed', 'XY' : (x,y)}
-                    print(sendDict)
+                    #print(sendDict)
                     self.back_q.put(sendDict)
                 #self.whisker.audio_play_wav(AUDIO, DEFAULT_WAV)
             # Or a picture
@@ -234,7 +235,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
                 for picName in self.pics:
                     if picName == event:
                         sendDict = {'picture' : picName, 'XY' : (x,y)}
-                        print(sendDict)
+                        #print(sendDict)
                         self.back_q.put(sendDict)
                         self.RECVCMD()
         except ValueError:
@@ -257,7 +258,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
     # Parses JSON msg from GUI
     def parseMsg(self, msg):
-        print("WHISKER TOUCH MSG: ", msg)
+        #print("WHISKER TOUCH MSG: ", msg)
         if msg == 'STOP':
             self.clearEvents()
             reactor.stop()
@@ -269,7 +270,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             pics = []
             XYarray = []
             for img, coords in msg.items():
-                print(img,coords)
+                #print(img,coords)
                 pics.append(img)
                 XYarray.append(coords)
             self.pics = pics
