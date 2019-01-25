@@ -9,6 +9,7 @@ import time
 from collections import deque
 from queue import Queue
 import video_function
+import threading
 
 def setGlobals(self):
     ################################################################
