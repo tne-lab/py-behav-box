@@ -266,7 +266,7 @@ class BEH_GUI():
 
         if self.TONE_ON:
               if (self.cur_time - self.TONE_TIME) > float(self.Tone1_Duration): # seconds
-                  print("TONE OFF")
+                  #print("TONE OFF")
                   self.TONE_ON = False
                   GUIFunctions.log_event(self, self.events,"Tone_OFF",self.cur_time)
 
@@ -278,7 +278,7 @@ class BEH_GUI():
               else:
                   self.SHOCK_ON = False
                   self.apply_shock.sendDBit(False)
-                  print("SHOCK OFF")
+                  #print("SHOCK OFF")
                   GUIFunctions.log_event(self, self.events,"Shock_OFF",self.cur_time)
 
 
@@ -454,7 +454,7 @@ class BEH_GUI():
                                     self.START_EXPT = False
                                     button.UP_DN = "DN"
                                     self.events = []
-                                    print("LOADING EXPT FILE: ", self.expt_file_path_name)
+                                    #print("LOADING EXPT FILE: ", self.expt_file_path_name)
                                     self.EXPT_FILE_LOADED = self.load_expt_file()
 
                                     if self.EXPT_FILE_LOADED:
@@ -534,7 +534,8 @@ class BEH_GUI():
                                                 if self.VI_REWARDING:
                                                     self.VI_start = 0.0 #self.cur_time
                                                     self.VI = random.randint(0,int(self.var_interval_reward*2))
-                                                    print("VI.......................", self.VI)
+                                                    GUIFunctions.log_event(self, self.events,"New VI: " + str(self.VI),self.cur_time)
+                                                    #print("VI.......................", self.VI)
                                                 if self.BAR_PRESS_TRAINING:
                                                     pass
                                             GUIFunctions.log_event(self, self.events,"EXPT STARTED USING " + self.expt_file_path_name_COPY,self.cur_time)
@@ -596,7 +597,7 @@ class BEH_GUI():
                       if LED.clickable: # Toggled On/Off when clicked
                         if LED.rect.collidepoint(cur_x,cur_y):
                             idx = self.LEDs.index(LED)
-                            print ("LED ID: ",idx)
+                            #print ("LED ID: ",idx)
                             if LED.ONOFF == "OFF": # WAS OFF
                                 LED.ONOFF = "ON"   # NOW ON
                                 if   LED.index == 0: # LEFT CONDITION LIGHT
@@ -667,7 +668,7 @@ class BEH_GUI():
                                 GUIFunctions.log_event(self, self.events,"Shock_ON",self.cur_time,("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
                                 # NOTE: SHOCK ALSO TURNED OFF IN GAME LOOP AFTER Shock_Duration (s)
 
-                          print("SHOCK PRESSED")
+                          #print("SHOCK PRESSED")
 
                     # CAMERA PRESSED
                     if self.camera.collidepoint(cur_x,cur_y):
@@ -675,13 +676,13 @@ class BEH_GUI():
                                 self.CAMERA_ON = False
                                 self.RECORDING = False
                                 GUIFunctions.log_event(self, self.events,"Camera_OFF",self.cur_time)
-                                print("CAMERA OFF")
+                                #print("CAMERA OFF")
                                 self.vidSTATE = 'OFF'
 
                           else: #TURN CAMERA ON # NOTE: STATE = (ON,OFF,REC, START_EXPT,STOP_EXPT)
                                 self.CAMERA_ON = True
                                 GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
-                                print("CAMERA ON")
+                                #print("CAMERA ON")
                                 self.vidSTATE = 'ON'
                                 GUIFunctions.MyVideo(self)
 
@@ -775,14 +776,14 @@ class BEH_GUI():
                   if  wasleverPressed == 'Right':
                         GUIFunctions.log_event(self, self.events,"Lever_Pressed_R",self.cur_time)
                         self.LEVER_PRESSED_R = True
-                        print("RIGHT LEVER PRESSED")
+                        #print("RIGHT LEVER PRESSED")
                         self.num_R_lever_preses += 1
                         self.levers[1].STATE = "DN"
 
                   if  wasleverPressed == 'Left':
                         GUIFunctions.log_event(self, self.events,"Lever_Pressed_L",self.cur_time)
                         self.LEVER_PRESSED_L = True
-                        print("LEFT LEVER PRESSED")
+                        #print("LEFT LEVER PRESSED")
                         self.num_L_lever_preses += 1
                         self.levers[0].STATE = "DN"
 
@@ -791,7 +792,7 @@ class BEH_GUI():
             was_nose_poked_L = daqHelper.checkLeftNosePoke(self.L_nose_poke)
 
             if was_nose_poked_L:
-                print("LEFT Nose Poked")
+                #print("LEFT Nose Poked")
                 self.NOSE_POKE_TIME = self.cur_time
                 #events.append("LEFT Nose Poke: " + str(cur_time))
                 GUIFunctions.log_event(self, self.events,"Nose_Poke_L",self.cur_time)
@@ -807,7 +808,7 @@ class BEH_GUI():
 
             was_nose_poked_R = daqHelper.checkRightNosePoke(self.R_nose_poke)
             if was_nose_poked_R:
-                print("Right Nose Poked")
+                #print("Right Nose Poked")
                 #events.append("RIGHT Nose Poke: " + str(cur_time))
                 GUIFunctions.log_event(self, self.events,"Nose_Poke_R",self.cur_time)
                 self.NOSE_POKE_TIME = time.perf_counter()
@@ -826,11 +827,11 @@ class BEH_GUI():
             foodEaten = daqHelper.checkFoodEaten(self.eaten)
 
             if foodEaten:
-                print("Yum!")
                 self.num_eaten +=1
                 #events.append("Food Eaten: " + str(cur_time))
                 GUIFunctions.log_event(self, self.events,"Food_Eaten",self.cur_time)
-
+                print("Yum!")
+                
 ###########################################################################################################
 #  SETUP EXPERIMENT
 ###########################################################################################################
@@ -842,29 +843,29 @@ class BEH_GUI():
         print("SETUPDICT:....................",self.setup,"length: ",len(self.setup),"linenum: ",self.setup_ln_num)
         setupDict = self.setup[self.setup_ln_num]
         key = list(setupDict.keys())[0] # First key in protocolDict
-        print ("KEY:.....................",key)
+        #print ("KEY:.....................",key)
         if key == "":
             self.setup_ln_num +=1
         elif key == "FAN_ON":
            val = str2bool(setupDict[key])
-           print("FAN")
+           #print("FAN")
            GUIFunctions.FAN_ON_OFF(self, self.events,val,self.cur_time) # {'FAN_ON': True} or {'FAN_ON': False}
            self.setup_ln_num +=1
         elif key == "CAB_LIGHT":
            val = str2bool(setupDict[key])
-           print("CAB_LIGHT")
+           #print("CAB_LIGHT")
            self.Background_color = GUIFunctions.CAB_LIGHT(self, self.events,val,self.cur_time)
            #CAB_LIGHT(events,val,cur_time)
            self.setup_ln_num +=1
         elif key == "FOOD_LIGHT":
-            print("FOOD LIGHT: ",setupDict["FOOD_LIGHT"])
+            #print("FOOD LIGHT: ",setupDict["FOOD_LIGHT"])
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
             self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF (self, self.events,val,self.cur_time)
             self.LEDs[4].ONOFF = LEDsONOFF
             self.LEDs[5].ONOFF = LEDsONOFF
         elif key == "CAMERA":
-            print("CAMERA\n")
+            #print("CAMERA\n")
             val = str2bool(setupDict["CAMERA"])
             self.setup_ln_num +=1
             if val:  # TURN CAMERA ON.     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
@@ -885,7 +886,7 @@ class BEH_GUI():
 
 
         elif key == "REC":
-            print ("recording")
+            print ("recording ....")
             self.RECORDING = True
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
@@ -915,14 +916,14 @@ class BEH_GUI():
             else:
                 val = str2bool(setupDict[key])
                 if val: # EXTEND_LEVERS == True
-                   print ("EXTEND LEVERS")
+                   #print ("EXTEND LEVERS")
                    GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,True,self.cur_time)
                    for lever in self.levers:
                          lever.STATE = "OUT"
                    for button in self.buttons:
                         if button.text == "EXTEND": button.text = "RETRACT"
                 else: # RETRACT LEVERS (EXTEND_LEVERS == False)
-                   print ("RETRACT LEVERS")
+                   #print ("RETRACT LEVERS")
                    GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers_Retracted",False,False,self.cur_time)
                    for lever in self.levers:
                         lever.STATE = "IN"
@@ -957,13 +958,13 @@ class BEH_GUI():
             self.Protocol_ln_num +=1
         elif key == "FAN_ON":
            val = str2bool(protocolDict[key])
-           print("FAN")
+           #print("FAN")
            GUIFunctions.FAN_ON_OFF(self, self.events,val,self.cur_time) # {'FAN_ON': True} or {'FAN_ON': False}
            self.Protocol_ln_num +=1
 
         elif key == "CAB_LIGHT":
            val = str2bool(protocolDict[key])
-           print("CAB_LIGHT")
+           #print("CAB_LIGHT")
            self.Background_color = GUIFunctions.CAB_LIGHT(self, self.events,val,self.cur_time)
            #CAB_LIGHT(events,val,cur_time)
            self.Protocol_ln_num +=1
@@ -971,7 +972,7 @@ class BEH_GUI():
         elif "TONE" in key:
             self.Protocol_ln_num +=1
             idx = key[4:]
-            print("TONE idx: ",idx)
+            #print("TONE idx: ",idx)
             if idx == '1':
                  GUIFunctions.PLAY_TONE(self, self.events,"TONE1", self.cur_time)
                  self.TONE_TIME = self.cur_time
@@ -1013,7 +1014,7 @@ class BEH_GUI():
                 self.LEDs[1].ONOFF = "OFF"
 
         elif key == "CAMERA":
-            print("CAMERA")
+            #print("CAMERA")
             val = str2bool(protocolDict[key])
             self.Protocol_ln_num +=1
             if val:  # TURN CAMERA ON
@@ -1034,7 +1035,7 @@ class BEH_GUI():
                     self.vidSTATE = 'OFF'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
 
         elif key == "REC": ## NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-            print ("rec")
+            #print ("rec")
             self.RECORDING = True
             val = str2bool(protocolDict[key])
             self.Protocol_ln_num +=1
@@ -1052,14 +1053,14 @@ class BEH_GUI():
             else:
                 val = str2bool(protocolDict[key])
                 if val: # EXTEND_LEVERS == True
-                   print ("EXTEND LEVERS")
+                   #print ("EXTEND LEVERS")
                    GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,True,self.cur_time)
                    for lever in self.levers:
                          lever.STATE = "OUT"
                    for button in self.buttons:
                         if button.text == "EXTEND": button.text = "RETRACT"
                 else: # RETRACT LEVERS (EXTEND_LEVERS == False)
-                   print ("RETRACT LEVERS")
+                   #print ("RETRACT LEVERS")
                    GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers_Retracted",False,False,self.cur_time)
                    for lever in self.levers:
                         lever.STATE = "IN"
@@ -1218,7 +1219,8 @@ class BEH_GUI():
                   if self.LEVER_PRESSED_R: # RIGHT LEVER
                      self.VI_start = self.cur_time
                      self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
-                     print("new vi", self.VI, " (sec)")
+                     #print("new vi", self.VI, " (sec)")
+                     GUIFunctions.log_event(self, self.events, "new vi: "+ str(self.VI) + " (sec)" , self.cur_time)
                      GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
 
            #### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1233,18 +1235,24 @@ class BEH_GUI():
                       if self.VRs_given > 10:
                           self.VRs_given = 0
                           self.VR +=1 #VR = 2
+                      GUIFunctions.log_event(self, self.events, "new vi: "+ str(self.VI) + " (sec)" , self.cur_time)
+                      
                   if self.VR == 2:
                       VR_reward = random.randint(1,self.VR) # Give reward on average every 2 bar presses
-                      print("VR", self.VR, "rand num: ", VR_reward)
+                      GUIFunctions.log_event(self, self.events, "VR reward: "+ str(VR_reward), self.cur_time)
+                      #print("VR", self.VR, "rand num: ", VR_reward)
                       if VR_reward == self.VR:
                          GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                          self.VRs_given +=1
                          if self.VRs_given > 10:
                             self.VRs_given = 0
                             self.VR +=3 #VR = 5
+                         
+                         
                   if self.VR % 5 == 0:  # Will continue giving rewards on average 1 out of every N times(where n is divisible by 5, i.e. 5, 10, 15, 20 ...)
                       VR_reward = random.randint(1,self.VR)
-                      print("VR", self.VR, "rand num: ", VR_reward)
+                      GUIFunctions.log_event(self, self.events, "VR reward: "+ str(VR_reward), self.cur_time)
+                      #print("VR", self.VR, "rand num: ", VR_reward)
                       if VR_reward == self.VR:
                          GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                          self.VRs_given +=1
@@ -1445,7 +1453,7 @@ class BEH_GUI():
                    #  BACKGROUND TOUCHED (image missed)
                    ##########################################
                    if touchMsg['picture'] == 'missed': # Touched background
-                       print('missed')
+                       #print('missed')
                        self.background_touches += 1
                        if self.TOUCH_TRAINING:
                           self.WRONG = True # When TOUCHSCREEN TRAING, ANY TOUCH RESULTS IN TRUE (??????????)
@@ -1577,7 +1585,7 @@ class BEH_GUI():
                        #print(left_of_outcome_str)
                        if "_TOUCHVI1" == left_of_outcome_str: # PELLET_TOUCHVI1: Touched image
                            if self.cur_time > (self.VI_start + self.cur_VI_images): # Give reward and reset VIs
-                              # Give 2 Rewards
+                              # Give Rewards
                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                               #GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                               # Reset VIs
@@ -1598,12 +1606,12 @@ class BEH_GUI():
 
                        elif "VAR" in left_of_outcome_str: # if "VAR" after "PELLET"
                            rand = random.random() * 100
-                           print("our random number", rand)
+                           #print("our random number", rand)
                            if rand <= self.cur_probability:
-                               print("Food_Pellet w"+str(self.cur_probability)+ "% probability")
+                               #print("Food_Pellet w"+str(self.cur_probability)+ "% probability")
                                GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(self.cur_probability)+ "% probability", self.cur_time)
                            else:
-                               print("Reward NOT given w " + str(self.cur_probability)+"% probability")
+                               #print("Reward NOT given w " + str(self.cur_probability)+"% probability")
                                GUIFunctions.log_event(self, self.events,"Reward NOT given w " + str(self.cur_probability)+"% probability", self.cur_time)
 
                        else: # if PELLET80 or something like it.  NOTE: PELLETXX, converts XX into probability
@@ -1627,7 +1635,7 @@ class BEH_GUI():
                     self.SHOCK_ON = True
                else: #outcome == 'NONE'
                    GUIFunctions.log_event(self, self.events,"NONE",self.cur_time)
-                   print("Outcome = NONE")
+                   #print("Outcome = NONE")
                if self.TOUCHSCREEN_USED:
                    self.TSq.put('')
 
