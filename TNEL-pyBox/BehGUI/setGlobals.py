@@ -8,6 +8,7 @@ import os
 import time
 from collections import deque
 from queue import Queue
+import video_function
 
 def setGlobals(self):
     ################################################################
