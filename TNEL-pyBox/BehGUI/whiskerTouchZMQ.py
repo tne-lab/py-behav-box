@@ -74,21 +74,6 @@ DISPLAY = "display"
 DOC = "doc"
 AUDIO = "audio"
 
-
-#-----------------------------------------------------------------------
-def pair_server(serv_msg,socket):
-    srvmsg = json.dumps(serv_msg)
-    socket.send_string(srvmsg)
-    message = socket.recv()
-    client_msg = json.loads(message)#loads JSON formated data from stream
-    # Sleep to allow sockets to connect.
-    #time.sleep(3)
-    #print("client msg type: ",type(client_msg))
-    return client_msg #message #
-
-#-----------------------------------------------------------------------
-
-
 class MyWhiskerTask(WhiskerTwistedTask):
     """
     Class deriving from :class:`whisker.twistedclient.WhiskerTwistedTask`
@@ -132,12 +117,8 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.whisker.timestamps(True)
         # BP
         self.whisker.claim_display(number=self.display_num, alias=DISPLAY)
-        self.whisker.claim_audio(number=0, alias=AUDIO)
+        #self.whisker.claim_audio(number=0, alias=AUDIO)
         self.whisker.set_media_directory(self.media_dir)
-        #print("###################################################")
-        #print("# IN Whisker")
-        #print("# ",self.media_dir)
-        #print("###################################################")
         self.display_size = self.whisker.display_get_size(DISPLAY)
         self.whisker.display_event_coords(True)
 
@@ -146,7 +127,6 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.whisker.display_blank(DISPLAY)
         # Draw stuff to finish up with setting up connection
         self.RECVFIRST()
-        #pair_server(serv_msg,socket):
 
 
     def draw(self):
@@ -173,29 +153,20 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
             # Draw pictures
             for i in range(0,len(self.pics)):
-                #print("\n##############################################")
-                #print("# picture" + str(i), "XY: ",self.XYarray[i], "filename: ",self.pics[i])
-                #print("##############################################")
                 bit = self.whisker.display_add_obj_bitmap(
                     DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
                     stretch = False , height = 240, width = 240) # Returns T or F
                 if not bit:
                     pass
-                    #print("##############################################")
-                    #print('#  failed drawing picture', self.pics[i] )
-                    #print("##############################################")
             self.whisker.display_send_to_back(DOC, "background")
             self.setEvents()
 
     # Handle creation/deletion of picture Events
     def setEvents(self):
-        # Set event for trial length
-        #self.whisker.timer_set_event("TmrEndOfTrial", self.trial_length*1000)
         # Set events for all pictures
         for i in range(0,len(self.pics)):
             self.whisker.display_set_event(DOC, "picture" + str(i), self.pics[i])
         # Set event for background and end of task
-        #self.whisker.display_set_event(DOC, "rectangle", "RectEndOfTask")
         self.whisker.display_set_event(DOC, "background", "missedClick")
         self.whisker.timer_set_event("checkZMQ", 5, -1)
 
@@ -203,10 +174,8 @@ class MyWhiskerTask(WhiskerTwistedTask):
         # Clears events and DOC for all pictures to get ready for new ones
         for i in range(0,len(self.pics)):
             self.whisker.display_clear_event(DOC, "picture" + str(i))
-        #self.whisker.display_clear_event(DOC, "rectangle")
         self.whisker.display_clear_event(DOC, "background")
         self.whisker.timer_clear_event("checkZMQ")
-        #self.whisker.timer_clear_event("TmrEndOfTrial")
         self.whisker.display_delete_document(DOC)
 
 
@@ -258,9 +227,11 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
     # Parses JSON msg from GUI
     def parseMsg(self, msg):
-        #print("WHISKER TOUCH MSG: ", msg)
+        # Clear events and then look for msg
+        self.clearEvents()
+
+        # Parse msg
         if msg == 'STOP':
-            self.clearEvents()
             reactor.stop()
             return
         elif msg == '':
@@ -276,7 +247,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             self.pics = pics
             self.XYarray = XYarray
 
-        self.clearEvents()
+        # Draw new screen
         self.draw()
 
 def main(back_q, q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA_DIR, port = DEFAULT_PORT):
