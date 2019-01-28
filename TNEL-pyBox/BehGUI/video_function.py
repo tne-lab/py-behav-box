@@ -354,6 +354,7 @@ class SimpleVid:
     def __init__(self,path,q):
         self.cap = self.cap = cv2.VideoCapture(path)
         self.q = q
+        self.capError = False
         if not self.cap.isOpened():
             print('error opening aux vid, probably doesn\'t exist')
             self.capError = True
@@ -372,11 +373,11 @@ class SimpleVid:
                 self.cap.release()
                 return
 
-            if not q.isEmpty():
-                msg = q.get()
-            if msg['STATE'] == 'OFF': 
-                cv2.destroyAllWindows()
-                self.cap.release()
-                return
+            if not self.q.empty():
+                msg = self.q.get()
+                if msg['STATE'] == 'OFF':
+                    cv2.destroyAllWindows()
+                    self.cap.release()
+                    return
 
 print('freezeAlg Loaded')

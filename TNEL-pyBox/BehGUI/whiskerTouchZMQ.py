@@ -215,7 +215,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
     #############################################
     # NOW WE WAIT FOR REACTOR TO SEND US AN EVENT.  WHEN
     # When REACTOR sees an event, incoming_event runs
-    # Handle event
+    # Handle event ***
     def incoming_event(self, event: str, timestamp: int = None) -> None:
         """
         Responds to incoming events from Whisker.
@@ -292,6 +292,7 @@ def main(back_q, q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA
     w.connect('localhost', port)
 
     reactor.run() # starts Twisted and thus network processing
+    # ***
     # Note: This is BAD programming in my opinion. The logical flow is interrupted.
     # The Reactor is basically an event alarm. The program sits and waits until an event is
     # geneated by the reactor.  When a event is received, the incoming_event() is run,

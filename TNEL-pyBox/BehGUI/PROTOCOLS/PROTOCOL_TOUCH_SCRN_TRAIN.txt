@@ -22,7 +22,7 @@ FOOD_LIGHT=TRUE
 START_LOOP1 = 600  # Max trials should be no more than 100
   DRAW_IMAGES=True
   CONDITIONS=0    # NOTE: starts at 0
-  #PAUSE = 5   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet...
+  PAUSE = 1   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet...
 END_LOOP
 
 FOOD_LIGHT=False

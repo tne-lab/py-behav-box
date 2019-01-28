@@ -9,7 +9,7 @@ import time
 from collections import deque
 from queue import Queue
 import video_function
-
+import threading
 def setGlobals(self):
     ################################################################
     # GUI GLOBALS
@@ -92,7 +92,7 @@ def setGlobals(self):
     # Simple VIDEO
     self.SIMPLEVIDq = Queue()
     simpleVidThread = threading.Thread(target=video_function.runSimpleVid, args=(self.SIMPLEVIDq,))
-    sipmleVidThread.start()
+    simpleVidThread.start()
     ################################################################
     # TOUCH GLOBALS
     ################################################################

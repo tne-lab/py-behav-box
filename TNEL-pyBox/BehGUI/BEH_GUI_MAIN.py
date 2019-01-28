@@ -1493,7 +1493,7 @@ class BEH_GUI():
                   print("TPM: ", self.TPM, "\nTPMimgs: ", self.TPMimg)
                   print("total touches: ", (self.background_touches + self.any_image_touches),"\nimages touches only: ", self.any_image_touches)
 
-                  self.TPMs.append(self.TPM)
+                  self.TPMs.append(self.TPM) # Add a TPM calcualtion to list every minute
                   self.TPMimgs.append(self.TPMimg)
 
                   # Reset for next minute  TPM_start_time
@@ -1503,13 +1503,13 @@ class BEH_GUI():
                   #self.correct_image_touches = 0
 
 
-                  if len(self.TPMs) >= 10: # after 10 minutes (10  one minute evaluations)
-                      self.meanTPM10 = sum(self.TPMs)/10.0             # Mean touches per minute over last 10 minutes (includes both screen and image touches)
-                      self.meanTPM10imgs = sum(self.TPMs)/10.0         # Mean touches per minute over last 10 minutes (includes only image touches)
+                  if len(self.TPMs)%10 == 0: # after every 10 minutes (10  one minute evaluations)
+                      self.meanTPM10 = sum(self.TPMs[-10:])/10.0             # Mean touches per minute over last 10 minutes (includes both screen and image touches)
+                      self.meanTPM10imgs = sum(self.TPMs[-10:])/10.0         # Mean touches per minute over last 10 minutes calculated every 10 min(includes only image touches)
                       #self.meanTPM10correct_imgs = sum(self.TPMs)/10.0 # Mean touches per minute over last 10 minutes (includes only correct image touches)
 
-                      self.TPMs.pop(0)              # Removes first item of list for running list
-                      self.TPMimgs.pop(0)           # Removes first item of list for running list
+                      #self.TPMs.pop(0)              # Removes first item of list for running list
+                      #self.TPMimgs.pop(0)           # Removes first item of list for running list
                       #self.TPMcorrect_imgs.pop(0)   # Removes first item of list for running list
 
                       #####################################
@@ -1519,6 +1519,7 @@ class BEH_GUI():
                             GUIFunctions.log_event(self, self.events,"VI for BACKGROUND Touches: "+ str(self.VI_background),self.cur_time)
                       if self.meanTPM10imgs > 10: # Reduce probability of reward for touching images only
                             self.VI_images += 15.0
+                            if self.VI_images >= 60.0: self.VI_images = 60.0 # Limits VI for images to 60!!!!
                             GUIFunctions.log_event(self, self.events,"VI for IMG Touches: "+ str(self.VI_images),self.cur_time)
 
                             self.VI_background += 15.0
