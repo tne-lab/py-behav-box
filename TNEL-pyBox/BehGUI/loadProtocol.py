@@ -531,11 +531,13 @@ def create_files(self):
     print(self.log_file_path_name)
 
     video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
-    aux_video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file_aux' + '.avi'
-
     self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
     print(self.video_file_path_name)
+<<<<<<< HEAD
     self.SIMPLEVIDq.put({'STATE':'ON','PATH_FILE':os.path.join(self.newdatapath,aux_video_file_name)})
+=======
+    self.SIMPLEVIDq.put({'STATE':'ON','PATH_FILE':self.video_file_path_name)
+>>>>>>> parent of 35a8014... New filename for aux camera
 
     # Change open ephys recoding dir
     self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.Subject)
