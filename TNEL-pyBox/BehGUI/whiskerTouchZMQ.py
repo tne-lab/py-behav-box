@@ -229,7 +229,6 @@ class MyWhiskerTask(WhiskerTwistedTask):
     # Parses JSON msg from GUI
     def parseMsg(self, msg):
         # Clear events and then look for msg
-        self.clearEvents()
 
         # Parse msg
         if msg == 'STOP':
@@ -247,6 +246,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
                 XYarray.append(coords)
             self.pics = pics
             self.XYarray = XYarray
+        self.clearEvents()
 
         # Draw new screen
         self.draw()

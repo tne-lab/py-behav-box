@@ -108,12 +108,12 @@ def setGlobals(self):
     # GENERAL GLOBALS
     ################################################################
     self.globalsTone1_Duration = 1.0 # sec
-    self.Tone1_Duration = 0.5 # sec
-    self.Tone1_Freq = 800.0
-    self.Tone1_Vol = 0.5
+    self.Tone1_Duration = 1.0 # sec
+    self.Tone1_Freq = 1800.0
+    self.Tone1_Vol = 1.0
     self.Tone2_Duration = 1.0 # sec
-    self.Tone2_Freq = 1800.0
-    self.Tone2_Vol = 0.5
+    self.Tone2_Freq = 1200.0
+    self.Tone2_Vol = 1.0
     self.TONE_ON = False
     self.Shock_Duration = 1.0
     self.Shock_V = 9.0
