@@ -355,6 +355,11 @@ class SimpleVid:
         self.cap = self.cap = cv2.VideoCapture(path)
         self.q = q
         self.capError = False
+<<<<<<< HEAD
+=======
+        self.outPath = 'NOT SET'
+        self.rec = False
+>>>>>>> ecc8aca7305673368e5d2d34ddae7e351455eec7
         if not self.cap.isOpened():
             print('error opening aux vid, probably doesn\'t exist')
             self.capError = True
@@ -365,8 +370,11 @@ class SimpleVid:
             if not ret:
                 print('Error loading frame, probably last frame')
                 return
-            # Show the frames
+            # Show the frame
             cv2.imshow('Aux Camera', frame)
+
+            if self.rec:
+                self.out.write(frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
@@ -379,5 +387,17 @@ class SimpleVid:
                     cv2.destroyAllWindows()
                     self.cap.release()
                     return
+<<<<<<< HEAD
+=======
+                if msg['PATH_FILE'] != self.outPath:
+                    self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))
+                    self.rec = True
+
+    def openOutfile(self, path, height, width):
+        self.outPath = path
+        fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
+        self.out = cv2.VideoWriter(path,fourcc, 30, (int(width),int(height)))
+        print("SAVING TO: ", path)
+>>>>>>> ecc8aca7305673368e5d2d34ddae7e351455eec7
 
 print('freezeAlg Loaded')
