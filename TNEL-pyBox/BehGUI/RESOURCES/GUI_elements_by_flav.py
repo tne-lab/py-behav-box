@@ -73,15 +73,10 @@ def play_sound(frequency, volume, duration):
     This is run a a sepoarate thread so calling program can keep running
     '''
     print ("freq: ",frequency, "vol: ",volume, "Duration: ",duration)
-    sample_rate = 44100 #Hz or samples per sec
-    # volume value 0.0 to 1.0
-    #pygame.mixer.set_volume(float(volume))
-    # Start
-    start_time = float(time.process_time())
-
+    sample_rate = 44100 #Hz or data points per sec
     bits = 16
 
-    pygame.mixer.pre_init(44100, -bits, 2)
+    pygame.mixer.pre_init(sample_rate, -bits, 2)
 
     #n_samples = int(round(float(duration)*sample_rate)) # Number of sample to generate
     n_samples = int(sample_rate) # Number of sample to generate
@@ -89,7 +84,7 @@ def play_sound(frequency, volume, duration):
     #setup our numpy array to handle 16 bit ints, which is what we set our mixer to expect with "bits" up above
     buf = numpy.zeros((n_samples, 2), dtype = numpy.int16)
     #max_sample = 2**(bits - 1) - 1
-    max_sample =1000.0
+    max_sample =100.0
     for s in range(n_samples):
         t = float(s)/sample_rate    # time in seconds
 
@@ -99,13 +94,11 @@ def play_sound(frequency, volume, duration):
 
     sound = pygame.sndarray.make_sound(buf)
     #play once, then loop until duration time has passed
-    cur_time = float(time.process_time())
-    print (cur_time, start_time)# , (cur_time - start_time))
-    elapsed_time = cur_time - start_time
-    sound.set_volume(float(volume))
-    playTime = int(int(duration)*1000)
-    print("playtime: ",playTime)
-    sound.play(loops = -1,maxtime=playTime) # - 1 = forever
+    sound.set_volume(float(volume)) # volume value 0.0 to 1.0
+    playTime = int(duration *1000)  # Duration in sec, need millisec
+    print("playtime: ",playTime, "millisec")
+    sound.play(loops = -1,maxtime=playTime) # - 1 = loops forever, maxtime in millisec
+
 
 def play_sound_file(music_file, volume=0.8):
     '''

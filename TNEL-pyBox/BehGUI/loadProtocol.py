@@ -535,7 +535,7 @@ def create_files(self):
 
     self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
     print(self.video_file_path_name)
-    self.SIMPLEVIDq.put({'STATE':'ON','PATH_FILE':aux_video_file_name)
+    self.SIMPLEVIDq.put({'STATE':'ON','PATH_FILE':os.path.join(self.newdatapath,aux_video_file_name)})
 
     # Change open ephys recoding dir
     self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.Subject)

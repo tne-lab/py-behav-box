@@ -103,13 +103,14 @@ def setGlobals(self):
     self.TOUCH_BANDIT = False
     self.touchImgCoords = []
     self.touchImgs = {}
+    self.touch_time = 0.0
     ################################################################
     # GENERAL GLOBALS
     ################################################################
     self.globalsTone1_Duration = 1.0 # sec
-    self.Tone1_Duration = 5.0 # sec
+    self.Tone1_Duration = 0.5 # sec
     self.Tone1_Freq = 800.0
-    self.Tone1_Vol = 1.0
+    self.Tone1_Vol = 0.5
     self.Tone2_Duration = 1.0 # sec
     self.Tone2_Freq = 1800.0
     self.Tone2_Vol = 0.5

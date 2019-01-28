@@ -653,7 +653,8 @@ class BEH_GUI():
                     # SPEEKER PRESSED
                     if self.speeker.collidepoint(cur_x,cur_y):
                           # NOTE: Tone_OFF logged while drawing speeker above in main loop
-                          self.GUIFunctions.PLAY_TONE(self, self.events,"TONE1",self.cur_time) #using competer speeker
+                          print("TONE1 DURATION: ", self.Tone1_Duration)
+                          self.GUIFunctions.PLAY_TONE(self, self.events,"TONE1",self.cur_time) #using computer speeker
                           #self.GUIFunctions.PLAY_TONE_LAF(self, self.events,"TONE1",self.cur_time) #Using Lafayette
 
                     # SHOCK PRESSED
@@ -831,7 +832,7 @@ class BEH_GUI():
                 #events.append("Food Eaten: " + str(cur_time))
                 GUIFunctions.log_event(self, self.events,"Food_Eaten",self.cur_time)
                 print("Yum!")
-                
+
 ###########################################################################################################
 #  SETUP EXPERIMENT
 ###########################################################################################################
@@ -1236,7 +1237,7 @@ class BEH_GUI():
                           self.VRs_given = 0
                           self.VR +=1 #VR = 2
                       GUIFunctions.log_event(self, self.events, "new vi: "+ str(self.VI) + " (sec)" , self.cur_time)
-                      
+
                   if self.VR == 2:
                       VR_reward = random.randint(1,self.VR) # Give reward on average every 2 bar presses
                       GUIFunctions.log_event(self, self.events, "VR reward: "+ str(VR_reward), self.cur_time)
@@ -1247,8 +1248,8 @@ class BEH_GUI():
                          if self.VRs_given > 10:
                             self.VRs_given = 0
                             self.VR +=3 #VR = 5
-                         
-                         
+
+
                   if self.VR % 5 == 0:  # Will continue giving rewards on average 1 out of every N times(where n is divisible by 5, i.e. 5, 10, 15, 20 ...)
                       VR_reward = random.randint(1,self.VR)
                       GUIFunctions.log_event(self, self.events, "VR reward: "+ str(VR_reward), self.cur_time)
@@ -1454,6 +1455,7 @@ class BEH_GUI():
                    ##########################################
                    if touchMsg['picture'] == 'missed': # Touched background
                        #print('missed')
+                       self.touch_time = cur_time
                        self.background_touches += 1
                        if self.TOUCH_TRAINING:
                           self.WRONG = True # When TOUCHSCREEN TRAING, ANY TOUCH RESULTS IN TRUE (??????????)
@@ -1462,6 +1464,7 @@ class BEH_GUI():
                    #  IMAGE TOUCHED
                    ###################
                    elif not self.HAS_ALREADY_RESPONDED: # Target touched
+                       self.touch_time = cur_time
                        self.HAS_ALREADY_RESPONDED = True
                        self.any_image_touches += 1
                        # Check probability for pic/trial
@@ -1556,9 +1559,16 @@ class BEH_GUI():
            if self.cond['RESET'] == "VI":
                pass
 
+                                
+           ################
+           #  TIME IS UP
+           ################
            if self.TIME_IS_UP: # TIME IS UP FOR LOOP
                # SET OUTCOMES
                if self.CORRECT:
+                  print("TONE1 DuRATION: ", self.Tone1_Duration)
+                  #self.TONE_ON = True
+                  self.GUIFunctions.PLAY_TONE(self, self.events,'TONE1',self.cur_time) #using competer speeker
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
                   self.correctPercentage = self.num_correct/self.trial_num * 100
@@ -1578,6 +1588,7 @@ class BEH_GUI():
                # OUTCOMES
                #########################
                if 'PELLET' in outcome:
+          
                    #print ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Deciding on pellet !!!!!!!!!!!!!")
                    if len(outcome)<=6: # Just 'PELLET'
                        GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
@@ -1638,8 +1649,11 @@ class BEH_GUI():
                    GUIFunctions.log_event(self, self.events,"NONE",self.cur_time)
                    #print("Outcome = NONE")
                if self.TOUCHSCREEN_USED:
+                   # Want to wait a second before blanking screen
+##                   if self.cur_time - self.touch_time > 1.0:
+##                       self.TSq.put('')
                    self.TSq.put('')
-
+                   
                self.TIME_IS_UP = False
                self.CONDITION_STARTED = False
                self.Protocol_ln_num +=1

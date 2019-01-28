@@ -334,7 +334,7 @@ class Vid:
         return int(hours)*60*60*1000 + int(minutes)*60*1000 + int(seconds)*1000 + int(milliseconds)
 
 def runVid(q, back_q):
-    vid = Vid(0, q ,back_q)
+    vid = Vid(1, q ,back_q)
 
     if not vid.capError:
         vid.run()
@@ -344,7 +344,7 @@ def runVid(q, back_q):
         print('error opening video')
 
 def runSimpleVid(q):
-    simpleVid = SimpleVid(1,q)
+    simpleVid = SimpleVid(0,q) # 0 is the camera number
 
     if not simpleVid.capError:
         simpleVid.run()
@@ -355,6 +355,8 @@ class SimpleVid:
         self.cap = self.cap = cv2.VideoCapture(path)
         self.q = q
         self.capError = False
+        self.outPath = 'NOT SET'
+        self.rec = False
         if not self.cap.isOpened():
             print('error opening aux vid, probably doesn\'t exist')
             self.capError = True
@@ -362,6 +364,7 @@ class SimpleVid:
     def run(self):
         while(self.cap.isOpened()):
             ret, frame = self.cap.read()
+            frame = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
             if not ret:
                 print('Error loading frame, probably last frame')
                 return
@@ -374,6 +377,7 @@ class SimpleVid:
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
                 self.cap.release()
+                self.out.release()
                 return
 
             if not self.q.empty():
@@ -381,6 +385,7 @@ class SimpleVid:
                 if msg['STATE'] == 'OFF':
                     cv2.destroyAllWindows()
                     self.cap.release()
+                    self.out.release()
                     return
                 if msg['PATH_FILE'] != self.outPath:
                     self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))
@@ -390,6 +395,6 @@ class SimpleVid:
         self.outPath = path
         fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
         self.out = cv2.VideoWriter(path,fourcc, 30, (int(width),int(height)))
-        print("SAVING TO: ", path)
+        print("SAVING TO ax:\n\n\n\n\n\n\n\n ", path)
 
 print('freezeAlg Loaded')

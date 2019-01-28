@@ -91,7 +91,8 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.media_dir = media_dir
         self.back_q = back_q
         self.q = q
-
+        self.pics = []
+        self.XYarray = []
         #Brushes + pens: NOTE: colors are (BGR)
         self.brush1 = Brush(
             colour=(0, 0, 0), bg_colour=(0, 255, 0),
