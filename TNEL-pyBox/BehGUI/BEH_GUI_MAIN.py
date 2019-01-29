@@ -1568,7 +1568,7 @@ class BEH_GUI():
                if self.CORRECT:
                   print("TONE1 DuRATION: ", self.Tone1_Duration)
                   #self.TONE_ON = True
-                  self.GUIFunctions.PLAY_TONE(self, self.events,'TONE1',self.cur_time) #using competer speeker
+                  self.GUIFunctions.PLAY_TONE(self, self.events,'TONE1',self.cur_time) #using computer speeker
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
                   self.correctPercentage = self.num_correct/self.trial_num * 100

@@ -98,17 +98,19 @@ def PLAY_TONE_LAF(self, events, TONE_ID, cur_time):  # Plays tone using lafayett
 def PLAY_TONE(self, events, TONE_ID, cur_time):  # Plays tone using computer speaker
     # NOTE: Tone_OFF logged while drawing speeker above in main loop
     if TONE_ID == 'TONE1':
-        log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
-
-        newThread = threading.Thread(target=play_sound, args=(self.Tone1_Freq, self.Tone1_Vol,self.Tone1_Duration))
-        print("freq: ",self.Tone1_Freq,"Vol: ", self.Tone1_Vol, "Duration: ",self.Tone1_Duration)
-        # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
+        if not self.TONE_ON:
+            log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
+            newThread = threading.Thread(target=play_sound, args=(self.Tone1_Freq, self.Tone1_Vol,self.Tone1_Duration))
+            print("freq: ",self.Tone1_Freq,"Vol: ", self.Tone1_Vol, "Duration: ",self.Tone1_Duration)
+            # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
+        else: log_event(self, events,"Could not play TONE (already on)",cur_time)
 
     elif TONE_ID == 'TONE2':
-        log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
-        newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration))
-        # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
-
+        if not self.TONE_ON:
+            log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
+            newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration))
+            # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
+        else: log_event(self, events,"Could not play TONE (already on)",cur_time)
     newThread.start()
     self.TONE_TIME = cur_time
     self.TONE_ON = True
