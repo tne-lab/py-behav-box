@@ -154,11 +154,23 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
             # Draw pictures
             for i in range(0,len(self.pics)):
-                bit = self.whisker.display_add_obj_bitmap(
-                    DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
-                    stretch = False , height = 240, width = 240) # Returns T or F
-                if not bit:
-                    pass
+                if self.RANDOM_IMG_COORDS:
+                    bit = self.whisker.display_add_obj_bitmap(
+                        DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
+                        stretch = True , height = 100, width = 100) # Returns T or F
+                    if not bit:
+                        pass
+
+                else: # Coordinates specified in protocol file
+                    # Note: Touchscreen is 1024 x 768. If we discount the deadzone, the
+                    #       screen is 1024 x 518.  For picture area to equal to active
+                    #       background area, picture must be 364 x 364
+
+                    bit = self.whisker.display_add_obj_bitmap(
+                        DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
+                        stretch = True , height = 364, width = 364) # Returns T or F
+                    if not bit:
+                        pass
             self.whisker.display_send_to_back(DOC, "background")
             self.setEvents()
 

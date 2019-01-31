@@ -163,6 +163,8 @@ def setGlobals(self):
     self.TPMcorrect_img = 0.0   #Screen Touches per minute (touched correct images only)
     self.TPMcorrect_imgs = []
 
+    self.RANDOM_IMG_COORDS = False
+
     self.meanTPM10 = 0.0 #Running mean screen touches per min
     self.meanTPM10imgs = 0.0
     self.meanTPM10correct_imgs = 0.0

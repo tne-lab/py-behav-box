@@ -282,16 +282,21 @@ def load_expt_file(self):
                         self.TOUCH_IMG_PATH = get_val_between_equal_sign_and_hash(line)
                         self.TOUCHSCREEN_USED = True
                         self.touchImgs = {}
+
                     if 'COORDS' in line:
                         self.touchImgCoords = []
                         words = get_val_between_equal_sign_and_hash(line)
-                        imageCoords = words.split(':')
-                        for i in range(len(imageCoords)):
-                            for c in '()':
-                                #Remove parenthesis from (x,y)
-                                imageCoords[i] = imageCoords[i].replace(c, "")
-                            imageCoordsStr = imageCoords[i].split(",")
-                            self.touchImgCoords.append((int(imageCoordsStr[0]), int(imageCoordsStr[1])))
+                        if "RANDOM" in words:
+                            self.RANDOM_IMG_COORDS = True
+                        else:
+                            imageCoords = words.split(':')
+                            for i in range(len(imageCoords)):
+                                for c in '()':
+                                    #Remove parenthesis from (x,y)
+                                    imageCoords[i] = imageCoords[i].replace(c, "")
+                                    imageCoordsStr = imageCoords[i].split(",")
+                                    self.touchImgCoords.append((int(imageCoordsStr[0]), int(imageCoordsStr[1])))
+
                     elif 'IMG' in line:
                         words = get_val_between_equal_sign_and_hash(line)
                         imageInfo = words.split(":")

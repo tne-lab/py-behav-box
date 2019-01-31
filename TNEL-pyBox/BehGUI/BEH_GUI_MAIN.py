@@ -265,6 +265,7 @@ class BEH_GUI():
         self.speeker = GUIFunctions.draw_speeker(self.myscreen,250,85,self.TONE_ON) #TONE_ON is T/F
 
         if self.TONE_ON:
+              # Note: This just draws the speeker on GUI. Tone turned on during GUI mousedown events.
               if (self.cur_time - self.TONE_TIME) > float(self.Tone1_Duration): # seconds
                   #print("TONE OFF")
                   self.TONE_ON = False
@@ -1072,15 +1073,26 @@ class BEH_GUI():
         ##############################
         elif "DRAW_IMAGES" in key: # IF USING TOUCHSCREEN
             if self.TOUCHSCREEN_USED:
-                placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
-                imgList = {}
-                i=0
-                for key in self.touchImgs.keys():
-                    print('key', key)
-                    imgList[key] = self.touchImgCoords[placementList[i]] #places images
-                    i+=1
-                self.TSq.put(imgList)
-                self.Protocol_ln_num +=1
+                if RANDOM_IMG_COORDS:
+                    placementList = (1) # 1 1mage, random locations
+                    self.touchImgCoords=[(random.randint(0,994),random.randint(0,668))]
+                    # NOTE: The above assumes pics are 100 x 100 and screen is 1024 x 768,
+                    #       hence  farthest bottom-right is 924 x 668 (1024-100 x 768-100)
+                else:
+
+                    placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
+                    # NOTE: random.sample(population, k)
+                    #       Returns a new list containing elements from the population while leaving
+                    #       the original population unchanged.
+                    #       Here: for 2 images, population = (0,2), k = 2.  returns (0,1) or (1,0)
+                    imgList = {}
+                    i=0
+                    for key in self.touchImgs.keys():
+                        print('key', key)
+                        imgList[key] = self.touchImgCoords[placementList[i]] #places images
+                        i+=1
+                        self.TSq.put(imgList)
+                        self.Protocol_ln_num +=1
 
         ###############################
         # START LOOP
@@ -1559,7 +1571,7 @@ class BEH_GUI():
            if self.cond['RESET'] == "VI":
                pass
 
-                                
+
            ################
            #  TIME IS UP
            ################
@@ -1588,7 +1600,7 @@ class BEH_GUI():
                # OUTCOMES
                #########################
                if 'PELLET' in outcome:
-          
+
                    #print ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Deciding on pellet !!!!!!!!!!!!!")
                    if len(outcome)<=6: # Just 'PELLET'
                        GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
@@ -1653,7 +1665,7 @@ class BEH_GUI():
 ##                   if self.cur_time - self.touch_time > 1.0:
 ##                       self.TSq.put('')
                    self.TSq.put('')
-                   
+
                self.TIME_IS_UP = False
                self.CONDITION_STARTED = False
                self.Protocol_ln_num +=1
