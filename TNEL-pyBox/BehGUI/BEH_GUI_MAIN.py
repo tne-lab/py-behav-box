@@ -1073,14 +1073,24 @@ class BEH_GUI():
         ##############################
         elif "DRAW_IMAGES" in key: # IF USING TOUCHSCREEN
             if self.TOUCHSCREEN_USED:
-                if RANDOM_IMG_COORDS:
-                    placementList = (1) # 1 1mage, random locations
-                    self.touchImgCoords=[(random.randint(0,994),random.randint(0,668))]
-                    # NOTE: The above assumes pics are 100 x 100 and screen is 1024 x 768,
-                    #       hence  farthest bottom-right is 924 x 668 (1024-100 x 768-100)
+                if self.RANDOM_IMG_COORDS:
+                    placementList = [1] # 1 1mage, random locations
+                    self.touchImgCoords=(random.randint(0,784),random.randint(0,278))
+                    print(placementList, self.touchImgCoords)
+                    # NOTE: The above assumes pics are 240 x 240 and screen is 1024 x (768 - deadzone) = 1024 x 518,
+                    #       hence  farthest bottom-right is 784 x 278 (1024-240 x 518-240)
+                    imgList = {}
+                    for key in self.touchImgs.keys():
+                        
+                        imgList[key] = self.touchImgCoords #places images
+                        print('ImgList', imgList)
+                        self.TSq.put(imgList)
+                        self.Protocol_ln_num +=1
+
                 else:
 
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
+                    print(placementList, self.touchImgCoords)
                     # NOTE: random.sample(population, k)
                     #       Returns a new list containing elements from the population while leaving
                     #       the original population unchanged.
@@ -1088,8 +1098,8 @@ class BEH_GUI():
                     imgList = {}
                     i=0
                     for key in self.touchImgs.keys():
-                        print('key', key)
                         imgList[key] = self.touchImgCoords[placementList[i]] #places images
+                        print('ImgList', imgList)
                         i+=1
                         self.TSq.put(imgList)
                         self.Protocol_ln_num +=1

@@ -288,14 +288,18 @@ def load_expt_file(self):
                         words = get_val_between_equal_sign_and_hash(line)
                         if "RANDOM" in words:
                             self.RANDOM_IMG_COORDS = True
+                            # self.touchImgCoords will be made radom in BehGUI.py
                         else:
+                            self.RANDOM_IMG_COORDS = False
                             imageCoords = words.split(':')
                             for i in range(len(imageCoords)):
                                 for c in '()':
                                     #Remove parenthesis from (x,y)
                                     imageCoords[i] = imageCoords[i].replace(c, "")
-                                    imageCoordsStr = imageCoords[i].split(",")
-                                    self.touchImgCoords.append((int(imageCoordsStr[0]), int(imageCoordsStr[1])))
+
+                                imageCoordsStr = imageCoords[i].split(",")
+                                print()
+                                self.touchImgCoords.append((int(imageCoordsStr[0]), int(imageCoordsStr[1])))
 
                     elif 'IMG' in line:
                         words = get_val_between_equal_sign_and_hash(line)
@@ -312,6 +316,7 @@ def load_expt_file(self):
                             # and value as list of reward probability per trial
                             self.touchImgs[imageName] = imgRewardsList
                         else:
+                            # TRAINING TO TOUCH
                             # Saving as dictionary with key as filename
                             # and this means we're training so reward probability is hard coded in BEH_GUI_MAIN
                             self.touchImgs[imageName] = 0
