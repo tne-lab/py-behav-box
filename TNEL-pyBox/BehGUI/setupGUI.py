@@ -8,21 +8,22 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
 
     # BOXES
     boxes = []
-    boxes.append(My_Rimmed_Box(myscreen,200,360,100,90,self.black,self.darkgray)) # FEEDER
-
+    boxes.append(My_Rimmed_Box(myscreen,395,380,80,62,self.black,self.darkgray)) # FEEDER
+    boxes.append(My_Rimmed_Box(myscreen,40,320,256,192,0,self.black)) # future touch screen
+    boxes.append(My_Rimmed_Box(myscreen,40,450,256,63,self.lightgray,self.black)) # future touch screen Dead zone
     # BUTTONS
     buttons = []
     #                      (myscreen,ID, x, y, w, h,"text"    , font size)
     buttons.append(MyButton(myscreen,0,10,5,50,20,"CABIN LT",12))  # 0
     buttons.append(MyButton(myscreen,5,10,32,50,20,"FAN",12))         # 5
 
-    buttons.append(MyButton(myscreen,1,213,320,75,30,"EXTEND",12))  # 1 BOTH LEVERS
-    buttons.append(MyButton(myscreen,9,180,320,30,30,"L",12))  # 1 BOTH LEVERS
-    buttons.append(MyButton(myscreen,10,290,320,30,30,"R",12))  # 1 BOTH LEVERS
+    #buttons.append(MyButton(myscreen,1,213,320,75,30,"EXTEND",12))  # 1 BOTH LEVERS
+    #buttons.append(MyButton(myscreen,9,180,320,30,30,"L",12))  # 1 BOTH LEVERS
+    #buttons.append(MyButton(myscreen,10,290,320,30,30,"R",12))  # 1 BOTH LEVERS
 
 
-    buttons.append(MyButton(myscreen,4,225,500,50,20,"FEED",12))     # 4
-    buttons.append(MyButton(myscreen,6,235, 280, 30,20,"REC",12))    # 6
+    buttons.append(MyButton(myscreen,4,315,390,50,20,"FEED",12))     # 4
+    buttons.append(MyButton(myscreen,6,235, 270, 30,20,"REC",12))    # 6
     buttons.append(MyButton(myscreen,7,400, 560, 75,50,"START EXPT",12))  # 7
     buttons.append(MyButton(myscreen,8,215, 600, 70,30,"LOAD FILE",12))   # 8
 
@@ -30,22 +31,22 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     # LEVERS
     #def __init__(self, surface, index, x, y, w, h, text,fsize = 18):
     levers = []
-    levers.append(MyLever(myscreen,0,50,300,50,20,"L LEVER",12))   # left
-    levers.append(MyLever(myscreen,1,405,300,50,20,"R LEVER",12))   # right
+    #levers.append(MyLever(myscreen,0,50,300,50,20,"L LEVER",12))   # left
+    #levers.append(MyLever(myscreen,1,405,300,50,20,"R LEVER",12))   # right
 
     # CIRCLES (IF ANY)
     circles = []
 
     # LEDS (LIGHTS AND NOSE POKES)
     LEDs = []
-    LEDs.append(MyLED(myscreen,0,45,70,30,"OFF", self.lightgray, self.darkgray)) # L LIGHTS
-    LEDs.append(MyLED(myscreen,1,400,70,30,"OFF", self.lightgray, self.darkgray))# R LIGHTS
+    LEDs.append(MyLED(myscreen,0,45,60,30,"OFF", self.lightgray, self.darkgray)) # L LIGHTS
+    LEDs.append(MyLED(myscreen,1,400,60,30,"OFF", self.lightgray, self.darkgray))# R LIGHTS
 
-    LEDs.append(MyLED(myscreen,2,45,160,30,"OFF", self.lightpurple, self.darkpurple)) # NOSE POKES
-    LEDs.append(MyLED(myscreen,3,400,160,30,"OFF", self.lightpurple, self.darkpurple))# NOSE POKES
+    LEDs.append(MyLED(myscreen,2,45,130,30,"OFF", self.lightpurple, self.darkpurple)) # NOSE POKES
+    LEDs.append(MyLED(myscreen,3,400,130,30,"OFF", self.lightpurple, self.darkpurple))# NOSE POKES
 
-    LEDs.append(MyLED(myscreen,4,190,395,10,"OFF", self.white, self.lightgray)) # FEEDER BOX
-    LEDs.append(MyLED(myscreen,5,290,395,10,"OFF", self.white, self.lightgray)) # FEEDER BOX
+    LEDs.append(MyLED(myscreen,4,385,400,10,"OFF", self.white, self.lightgray)) # FEEDER BOX
+    LEDs.append(MyLED(myscreen,5,465,400,10,"OFF", self.white, self.lightgray)) # FEEDER BOX
 
     LEDs.append(MyLED(myscreen,6,430,530,10,"OFF", self.green, self.lightgray,False)) # EXPERIMENT STARTED
     #LEDs.append(MyLED(myscreen,187,421,15,"OFF", self.red, gray))
@@ -57,12 +58,12 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
 
     info_boxes = []
     #def __init__(self, surface,x, y, w, h, label_name,label_pos, text ,fsize = 12):
-    info_boxes.append(InfoBox( myscreen,50,225,50,15,"L NOSE POKES",'BOTTOM','0'))
-    info_boxes.append(InfoBox( myscreen,405,225,50,15,"R NOSE POKES",'BOTTOM','0'))
-    info_boxes.append(InfoBox( myscreen,50,330,50,15,"L PRESSES",'BOTTOM','0'))
-    info_boxes.append(InfoBox( myscreen,405,330,50,15,"R PRESSES",'BOTTOM','0'))
-    info_boxes.append(InfoBox( myscreen,225,400,50,15,"EATEN",'BOTTOM','0'))
-    info_boxes.append(InfoBox( myscreen,225,455,50,15,"PELLETS",'BOTTOM','0'))
+    info_boxes.append(InfoBox( myscreen,50,200,50,15,"L NOSE POKES",'BOTTOM','0'))
+    info_boxes.append(InfoBox( myscreen,405,200,50,15,"R NOSE POKES",'BOTTOM','0'))
+    #info_boxes.append(InfoBox( myscreen,50,330,50,15,"L PRESSES",'BOTTOM','0'))
+    #info_boxes.append(InfoBox( myscreen,405,330,50,15,"R PRESSES",'BOTTOM','0'))
+    info_boxes.append(InfoBox( myscreen,415,420,40,15,"EATEN",'BOTTOM','0'))
+    info_boxes.append(InfoBox( myscreen,320,420,40,15,"PELLETS",'BOTTOM','0'))
     info_boxes.append(InfoBox( myscreen,20,730,460,250,"EVENT LOG",'TOP'," "))
     info_boxes.append(InfoBox( myscreen,20,620,70,17,"DATE",'RIGHT'," "))
     info_boxes.append(InfoBox( myscreen,401,620,75,17,"TIME",'LEFT',"0.0"))

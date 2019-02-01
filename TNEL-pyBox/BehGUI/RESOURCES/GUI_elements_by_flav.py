@@ -1121,7 +1121,8 @@ class My_Rimmed_Box:
         x = self.x
         y = self.y
         self.rect = Rect(x,y,self.w,self.h)
-        pygame.draw.rect(myscreen, self.fill_color , self.rect,  0) #(0=fill, 1=outline line thickness))
+        if self.fill_color != 0:
+            pygame.draw.rect(myscreen, self.fill_color , self.rect,  0) #(0=fill, 1=outline line thickness))
         pygame.draw.rect(myscreen, self.line_color , self.rect,  1)
 
 class My_Rimmed_Circle:

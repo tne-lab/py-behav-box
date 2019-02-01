@@ -285,7 +285,7 @@ class BEH_GUI():
 
         # DRAW CAMERA
         #    Note:                 draw_camera(self.myscreen,fill_color, ON_OFF, REC, x, y, w,h, linew)
-        self.camera = GUIFunctions.draw_camera(self.myscreen, (100,100,100),self.CAMERA_ON,self.RECORDING,235, 255, 30,20, 2)
+        self.camera = GUIFunctions.draw_camera(self.myscreen, (100,100,100),self.CAMERA_ON,self.RECORDING,235, 245, 30,20, 2)
 ###########################################################################################################
 #  HANDLE GUI EVENTS
 ###########################################################################################################
@@ -1087,9 +1087,14 @@ class BEH_GUI():
                         print('ImgList', imgList)
                         self.TSq.put(imgList)
                         self.Protocol_ln_num +=1
-                        
-                    GUIFunctions.log_event(self, self.events,str(imgList), self.cur_time)
-                    
+
+                    log_string = str(imgList)
+                    log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
+                    log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
+                    log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
+                    log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                   
+                    GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
                 else:
 
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
@@ -1108,7 +1113,13 @@ class BEH_GUI():
                         self.TSq.put(imgList)
                         self.Protocol_ln_num +=1
                         
-                    GUIFunctions.log_event(self, self.events,str(imgList), self.cur_time)
+                    log_string = str(imgList)
+                    log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
+                    log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
+                    log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
+                    log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                        
+                    GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
         ###############################
         # START LOOP
         ###############################
