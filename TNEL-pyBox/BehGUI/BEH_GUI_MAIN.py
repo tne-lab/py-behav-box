@@ -1077,6 +1077,7 @@ class BEH_GUI():
                     placementList = [1] # 1 1mage, random locations
                     self.touchImgCoords=(random.randint(0,784),random.randint(0,278))
                     print(placementList, self.touchImgCoords)
+                    
                     # NOTE: The above assumes pics are 240 x 240 and screen is 1024 x (768 - deadzone) = 1024 x 518,
                     #       hence  farthest bottom-right is 784 x 278 (1024-240 x 518-240)
                     imgList = {}
@@ -1086,11 +1087,14 @@ class BEH_GUI():
                         print('ImgList', imgList)
                         self.TSq.put(imgList)
                         self.Protocol_ln_num +=1
-
+                        
+                    GUIFunctions.log_event(self, self.events,str(imgList), self.cur_time)
+                    
                 else:
 
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
                     print(placementList, self.touchImgCoords)
+                    
                     # NOTE: random.sample(population, k)
                     #       Returns a new list containing elements from the population while leaving
                     #       the original population unchanged.
@@ -1103,7 +1107,8 @@ class BEH_GUI():
                         i+=1
                         self.TSq.put(imgList)
                         self.Protocol_ln_num +=1
-
+                        
+                    GUIFunctions.log_event(self, self.events,str(imgList), self.cur_time)
         ###############################
         # START LOOP
         ###############################
@@ -1512,7 +1517,7 @@ class BEH_GUI():
 
 
                # CALCULATE TOUCHES PER MINUTE (TPMs)
-               if TPM_time_interval > 60.0: #Calculate TPM every minute (60 sec)
+               if TPM_time_interval > 60.0: #60.0: #Calculate TPM every minute (60 sec)
                   self.TPM = self.background_touches + self.any_image_touches
                   self.TPMimg = self.any_image_touches
                   print("TPM: ", self.TPM, "\nTPMimgs: ", self.TPMimg)
@@ -1528,22 +1533,21 @@ class BEH_GUI():
                   #self.correct_image_touches = 0
 
 
-                  if len(self.TPMs)%10 == 0: # after every 10 minutes (10  one minute evaluations)
+                  #if len(self.TPMs)%10 == 0: # after every 10 minutes (That is, 10 one minute evaluations)
+                  if len(self.TPMs)> 10:#10: # after every 10 minutes (That is, 10 one minute evaluations convolved every minute)
                       self.meanTPM10 = sum(self.TPMs[-10:])/10.0             # Mean touches per minute over last 10 minutes (includes both screen and image touches)
                       self.meanTPM10imgs = sum(self.TPMs[-10:])/10.0         # Mean touches per minute over last 10 minutes calculated every 10 min(includes only image touches)
-                      #self.meanTPM10correct_imgs = sum(self.TPMs)/10.0 # Mean touches per minute over last 10 minutes (includes only correct image touches)
 
-                      #self.TPMs.pop(0)              # Removes first item of list for running list
-                      #self.TPMimgs.pop(0)           # Removes first item of list for running list
-                      #self.TPMcorrect_imgs.pop(0)   # Removes first item of list for running list
+                      self.TPMs.pop(0)              # Removes first item of list for running list
+                      self.TPMimgs.pop(0)           # Removes first item of list for running list
 
                       #####################################
 
-                      if self.meanTPM10 > 10: # Reduce probability of reward for touching background + self.any_image_touches
+                      if self.meanTPM10 > 10:# 10: # Reduce probability of reward for touching background + self.any_image_touches
                             self.VI_background += 15.0
                             GUIFunctions.log_event(self, self.events,"VI for BACKGROUND Touches: "+ str(self.VI_background),self.cur_time)
-                      if self.meanTPM10imgs > 10: # Reduce probability of reward for touching images only
-                            self.VI_images += 15.0
+                      if self.meanTPM10imgs > 10:# 10: # Reduce probability of reward for touching images only
+                            self.VI_images += 1.0
                             if self.VI_images >= 60.0: self.VI_images = 60.0 # Limits VI for images to 60!!!!
                             GUIFunctions.log_event(self, self.events,"VI for IMG Touches: "+ str(self.VI_images),self.cur_time)
 

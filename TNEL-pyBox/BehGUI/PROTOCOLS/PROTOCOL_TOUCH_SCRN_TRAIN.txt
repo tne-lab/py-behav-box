@@ -7,7 +7,8 @@ IMAGES_PATH = C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\R
 # Note: Touchscreen is 1024 x 768. If we discount the deadzone, the
 #       screen is 1024 x 518.  For picture area to equal to active
 #       background area, picture must be 364 x 364
-
+#       For picture area to equal to active background area, picture must be 364 x 364
+#       Image size is controlled in whiskerTouchZMQ.py
 COORDS=(98,100):(560,100)          # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 IMG1= FLOWER_REAL.bmp  # Image name
 IMG2= SPIDER_REAL.bmp
