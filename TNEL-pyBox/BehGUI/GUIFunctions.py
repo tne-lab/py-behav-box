@@ -8,7 +8,12 @@ import video_function
 import tkinter as Tk #Note: "Tkinter" in python 2 (capital T)
 from tkinter.filedialog import askopenfilename
 import os
-import win32gui
+import giveFood
+try:
+    import win32gui
+    LINUX = False
+except:
+    LINUX = True
 import subprocess
 
 IsWhiskerRunning = False
@@ -28,32 +33,33 @@ def lookForProgram(hwnd, programName):
         if 'Ephys' in programName:
             IsOpenEphysRunning = True
 
-def openWhiskerEphys():
-    global IsWhiskerRunning, IsOpenEphysRunning
-    win32gui.EnumWindows(lookForProgram, 'Open Ephys GUI')
-    if not IsOpenEphysRunning:
-        programName = 'Open Ephys GUI'
-        #try:
-        oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe'
-        window = subprocess.Popen(oe)# # doesn't capture output
-        time.sleep(2)
-        win32gui.EnumWindows(lookForProgram, programName)
-        #except:
-        #    print("Could not start Open Ephys")
-    else: print("Open Ephysis already RUNNING")
-    print(".............................................")
-    win32gui.EnumWindows(lookForProgram, 'WhiskerServer')
-    if not IsWhiskerRunning:
-        try:
-            ws = r"C:\Program Files (x86)\WhiskerControl\WhiskerServer.exe"
-            window = subprocess.Popen(ws)# # doesn't capture output
+def openWhiskerEphys(NIDAQ_AVAILABLE):
+    global IsWhiskerRunning, IsOpenEphysRunning #, self.NIDAQ_AVAILABLE
+    if NIDAQ_AVAILABLE:
+        win32gui.EnumWindows(lookForProgram, 'Open Ephys GUI')
+        if not IsOpenEphysRunning:
+            programName = 'Open Ephys GUI'
+            #try
+            oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe'
+            window = subprocess.Popen(oe)# # doesn't capture output
             time.sleep(2)
-            print("WHISKER server started", window)
-            win32gui.EnumWindows(lookForProgram, None)
-        except:
-            print("Could not start WHISKER server")
-    else: print("Whisker server is already RUNNING")
-    print(".............................................")
+            win32gui.EnumWindows(lookForProgram, programName)
+            #except:
+            #    print("Could not start Open Ephys")
+        else: print("Open Ephysis already RUNNING")
+        print(".............................................")
+        win32gui.EnumWindows(lookForProgram, 'WhiskerServer')
+        if not IsWhiskerRunning:
+            try:
+                ws = r"C:\Program Files (x86)\WhiskerControl\WhiskerServer.exe"
+                window = subprocess.Popen(ws)# # doesn't capture output
+                time.sleep(2)
+                print("WHISKER server started", window)
+                win32gui.EnumWindows(lookForProgram, None)
+            except:
+                print("Could not start WHISKER server")
+        else: print("Whisker server is already RUNNING")
+        print(".............................................")
 
 
 def choose_file():
@@ -72,18 +78,39 @@ def FAN_ON_OFF(self, events, FAN_ON, cur_time):
         log_event(self, events,"Fan_OFF",cur_time)
         if self.NIDAQ_AVAILABLE:    self.fan.sendDBit(False)
         #self.fan.end()
-
-def PLAY_TONE(self, events, TONE_ID, cur_time):
+###################################################
+def PLAY_TONE_LAF(self, events, TONE_ID, cur_time):  # Plays tone using lafayette Tone generator
     # NOTE: Tone_OFF logged while drawing speeker above in main loop
     if TONE_ID == 'TONE1':
         log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
 
-        newThread = threading.Thread(target=play_sound, args=(self.Tone1_Freq, self.Tone1_Vol,self.Tone1_Duration))
+        if self.NIDAQ_AVAILABLE:  self.low_tone.sendDByte(4)
+
+#    elif TONE_ID == 'TONE2':
+#        log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
+#        newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration))
+#        # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
+
+#    newThread.start()
+    self.TONE_TIME = cur_time
+    self.TONE_ON = True
+###################################################
+def PLAY_TONE(self, events, TONE_ID, cur_time):  # Plays tone using computer speaker
+    # NOTE: Tone_OFF logged while drawing speeker above in main loop
+    if TONE_ID == 'TONE1':
+        if not self.TONE_ON:
+            log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
+            newThread = threading.Thread(target=play_sound, args=(self.Tone1_Freq, self.Tone1_Vol,self.Tone1_Duration))
+            print("freq: ",self.Tone1_Freq,"Vol: ", self.Tone1_Vol, "Duration: ",self.Tone1_Duration)
+            # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
+        else: log_event(self, events,"Could not play TONE (already on)",cur_time)
 
     elif TONE_ID == 'TONE2':
-        log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
-        newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration))
-
+        if not self.TONE_ON:
+            log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
+            newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration))
+            # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
+        else: log_event(self, events,"Could not play TONE (already on)",cur_time)
     newThread.start()
     self.TONE_TIME = cur_time
     self.TONE_ON = True
@@ -171,13 +198,12 @@ def FOOD_REWARD(self, events, text,cur_time):
     log_event(self, events,text,cur_time)
     self.num_pellets +=1
     if self.NIDAQ_AVAILABLE:
-        print(self.NIDAQ_AVAILABLE)
-        self.give_food.sendDBit(True) # Note:  Needs a delay (1 sec works)
+        #self.give_food.sendDBit(True) # Note:  Needs a delay (1 sec works)
                                       #  prior to high bit. But we don't want to
                                       #  pause program. self.give_food.sendDBit(False)
                                       #  is now sent by FOOD_REWARD_RESET()
-        #time.sleep(1.0)
-        #self.give_food.sendDBit(False)
+        foodThread = threading.Thread(target=giveFood.food, args=(self.give_food,))
+        foodThread.start()
 
 def FOOD_REWARD_RESET(self):
     if self.NIDAQ_AVAILABLE:
@@ -187,7 +213,7 @@ def FOOD_REWARD_RESET(self):
 def log_event(self, event_lst, event, cur_time, other=''):
 
     #print("Log file: ", self.log_file_path_name)
-    event_string = str(cur_time) + ',  ' + event
+    event_string = str(round(cur_time,9)) + ',  ' + event
     #print (event_string, other)
     event_other = ''
     for item in other:
@@ -197,15 +223,16 @@ def log_event(self, event_lst, event, cur_time, other=''):
     if len(event_lst) > 14:  self.start_line = len(event_lst) -14
     try:
         #print(self.log_file_path_name)
-        log_file = open(self.log_file_path_name,'a')         # OPEN LOG FILE
+        log_file = open(self.log_file_path_name,'a')        # OPEN LOG FILE
         log_file.write(event_string + event_other + '\n')   # To WRITE TO FILE
-        log_file.close()                                #CLOSE LOG FILE
+        print(event_string + event_other)                   # print to display
+        log_file.close()                                    #CLOSE LOG FILE
     except:
         print ('Log file not created yet. Check EXPT PATH, then Press "LOAD EXPT FILE BUTTON"')
 
 def StartTouchScreen(self):
     if not self.TOUCH_TRHEAD_STARTED:
-        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(self.TSBack_q,self.TSq))#, kwargs=({'media_dir' : self.TOUCH_IMG_PATH}))
+        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(self.TSBack_q,self.TSq), kwargs={'media_dir' : self.resourcepath})
         whiskerThread.daemon = True
         whiskerThread.start()
         self.TOUCH_TRHEAD_STARTED = True
@@ -213,7 +240,8 @@ def StartTouchScreen(self):
 def MyVideo(self):
       vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q,))
       vid_thread.daemon = True
-      self.VIDq.append(self.vidDict)
+      self.VIDq.pop()
+      updateVideoQ(self)
       vid_thread.start()
 
       while True:
@@ -223,6 +251,12 @@ def MyVideo(self):
               if msg == 'vid ready':
                   return
 
+def updateVideoQ(self):
+    self.vidDict['cur_time'] = self.cur_time
+    self.vidDict['trial_num'] = self.trial_num
+    self.vidDict['STATE'] = self.vidSTATE
+    self.vidDict['PATH_FILE'] = self.video_file_path_name
+    self.VIDq.append(self.vidDict)
 
 def exit_game(self):
     if self.NIDAQ_AVAILABLE:
@@ -236,15 +270,15 @@ def exit_game(self):
 
       self.L_condition_Lt.end()
       self.R_condition_Lt.end()
-      self.high_tone.end()
+      #self.high_tone.end()
       self.L_nose_poke.end()
       self.R_nose_poke.end()
       self.checkPressLeft.end()
       self.checkPressRight.end()
 
-    if self.vidDict['STATE'] == 'ON' or self.vidDict['STATE'] == 'REC':
-        self.vidDict['STATE'] = 'STOP'
-        self.VIDq.append(self.vidDict)
+    self.vidDict['STATE'] = 'OFF'
+    self.VIDq.append(self.vidDict)
+    self.SIMPLEVIDq.put({'STATE':'OFF'})
     if self.TOUCH_TRHEAD_STARTED == True:
         self.TSq.put('STOP')
     self.openEphysQ.put('STOP')
@@ -282,8 +316,9 @@ def draw_camera( myscreen,fill_color, CAMERA_ON, RECORDING, x, y, w,h, linew):
         ptlist = [pt1,pt2,pt3]
         pygame.draw.polygon(myscreen, fill_color, ptlist, 0)#
         camera = pygame.draw.rect(myscreen,fill_color, (x, y, w,h), 0)
+
+        if CAMERA_ON: col = (0,255,0)
         if RECORDING:       col = (255,0,0)
-        elif CAMERA_ON: col = (0,255,0)
         else:           col = (0,0,0)
         pygame.draw.polygon(myscreen, col, ptlist, linew)#
         pygame.draw.rect(myscreen,col, (x, y, w,h), linew)

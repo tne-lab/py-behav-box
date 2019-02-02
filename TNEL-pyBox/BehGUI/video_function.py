@@ -10,6 +10,9 @@ class Vid:
         self.out = None
         self.outPath = 'NOT SET'
         self.ROIenabled = False
+        self.ROIstr = ""
+        self.ROIGEN = True
+        #self.ROI = (0,0,0,0)
         self.freezeEnable = False
         cv2.namedWindow('vid')
         if self.cap.isOpened():
@@ -80,9 +83,8 @@ class Vid:
         if not ret:
             print('frame read error')
             return
-        if not self.ROIenabled:
+        if self.ROIGEN:
             self.genROI(frame)
-
         # Gen prev frame and threshold (Use size of ROI)
         self.startFrame+=1
         ret, newFrame = self.cap.read()
@@ -93,7 +95,7 @@ class Vid:
         newFrameROI = newFrame[int(self.ROI[1]):int(self.ROI[1]+self.ROI[3]),int(self.ROI[0]):int(self.ROI[0] + self.ROI[2])]
         self.genPrev(newFrameROI, frameROI)
         self.ROIenabled = True
-
+        self.freezeEnable = True
 
 #######################################################################################
 #######################################################################################
@@ -107,49 +109,49 @@ class Vid:
             try:
                 msg = self.q.pop()
                 time_from_GUI = msg['cur_time']
-                STATE = msg['STATE']
-                if STATE in 'START':
+                STATE = msg['STATE'] # NOTE: NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                if STATE == 'START_EXPT':
                     self.exptStarted = True
+                if STATE == 'REC_STOP':
+                    self.exptStarted = False
                 if 'ROI' in msg and not self.ROIenabled:
                     if msg['ROI'] in 'GENERATE':
+                        self.ROIGEN = True
                         self.initROIFrames()
-                    else:
-                        #Remove first and last char
-                        ROIstr = msg['ROI'][1:-1]
+                    else: # NOTE: ROI sent from PROTOCOL file
+                        self.ROIstr = msg['ROI']
+                        ROIstr = msg['ROI'][1:-1] #Remove first and last char "(" and ")" from (x,y,width,height)
                         ROIlist = ROIstr.split(",")
                         self.ROI = [int(x) for x in ROIlist]
-                        self.ROIenabled = True
+                        self.ROIGEN = False
                         self.initROIFrames()
 
-                        self.ROIenabled = True
-                if 'FREEZE' in msg:
-                    if msg['FREEZE'] and self.ROIenabled:
-                        self.freezeEnable = True
-                    else:
-                        self.freezeEnable = False
 
                 msg['time_diff'] = vid_cur_time - time_from_GUI
                 msg['vid_time'] = vid_cur_time
                 if msg['PATH_FILE'] != self.outPath:
                     self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))
             except IndexError:
-                continue
+                #print("Error in run()")
+                pass
 
             if not ret:
                 print('error in getting read')
                 return
+
             # Grab only ROI
             if self.ROIenabled:
-                imgROI = frame[int(self.ROI[1]):int(self.ROI[1]+self.ROI[3]),int(self.ROI[0]):int(self.ROI[0] + self.ROI[2])]
+                imgWithinROI = frame[int(self.ROI[1]):int(self.ROI[1]+self.ROI[3]),int(self.ROI[0]):int(self.ROI[0] + self.ROI[2])]
                 #Make gray and blur
-                gray = cv2.cvtColor(imgROI, cv2.COLOR_BGR2GRAY)
+                gray = cv2.cvtColor(imgWithinROI, cv2.COLOR_BGR2GRAY)
                 gray = cv2.GaussianBlur(gray, (21, 21), 0)
 
-            if self.freezeEnable:
+            #if self.freezeEnable: if ROIenabled then Freeze is also enabled
                 movingPxls = self.calcMovingPixels(gray)
 
                 # Moving or frozen?
-                if movingPxls > 70:
+                ######!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FIX THIS
+                if movingPxls > 100: #NOTE:   THIS SHOULD BE VALUE SENT FROM CALIBRATION OR FROM PROTOCOL
                     self.text = 'move'
                     self.timeFrozen = 0
                     if self.isFrozen:
@@ -163,34 +165,39 @@ class Vid:
                         #back_q.put({'FREEZE' : True, 'TIME' : time_from_GUI})
                         self.text = 'freeze'
 
-                cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,255,255),2,cv2.LINE_AA)
+                cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),2,cv2.LINE_AA)
                 cv2.imshow('thresh',self.prevThresh)
+
             # Write stuff on screen (need to add trial number and probably not time differential)
             self.drawInfo(msg['cur_time'], str(msg['trial_num']), frame)
             #self.writeStuff(msg['cur_time'], msg['vid_time'], msg['time_diff'], movingPxls, frame)
             # draw trial start circle
-
-            if msg['STATE'] == 'REC':
+            #print("STATE",msg['STATE'])
+            #if self.ROIenabled:  print("ROI: ", self.ROI)
+            if msg['STATE'] == 'REC_VID'or msg['STATE'] == 'START_EXPT': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                 self.out.write(frame)
+            if msg['STATE'] == 'REC_STOP': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                self.out.release() # CLOSE VIDEO FILE
+                self.freezeFile.close()
+
 
             # Show the frames
             cv2.imshow(self.winName,frame)
 
             # Create dict to send back to main GUI
-            backDict = {'vid_time':vid_cur_time, 'FROZEN':self.isFrozen, 'NIDAQ_time':time_from_GUI, 'Vid-NIDAQ':msg['time_diff']}
+            if self.ROIenabled:
+                backDict = {'vid_time':vid_cur_time, 'FROZEN':self.isFrozen, 'NIDAQ_time':time_from_GUI, 'Vid-NIDAQ':msg['time_diff'], 'ROI':self.ROIstr}
+            else:
+                backDict = {'vid_time':vid_cur_time, 'FROZEN':self.isFrozen, 'NIDAQ_time':time_from_GUI, 'Vid-NIDAQ':msg['time_diff']}
             self.back_q.put(backDict)
 
             # Get next frame and check if we are done
             self.startFrame+=1
             if cv2.waitKey(self.mspf) & 0xFF == ord('q'):
-                cv2.destroyAllWindows()
-                self.out.release()
                 self.close()
                 return
 
-            if msg['STATE'] == 'STOP':
-                cv2.destroyAllWindows()
-                self.out.release()
+            if msg['STATE'] == 'OFF': #  # NOTE: STATE = (ON,OFF,REC, START_EXPT,STOP_EXPT)
                 self.close()
                 return
 
@@ -215,6 +222,7 @@ class Vid:
     def close(self):
         self.freezeFile.close()
         self.cap.release()
+        self.out.release()
         cv2.destroyAllWindows()
         for i in range(1,10):
             cv2.waitKey(1)
@@ -227,21 +235,22 @@ class Vid:
         if self.exptStarted:
             cv2.circle(frame, (30,455), 20, (0,255,0) ,thickness = -1)
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"NIDAQ time = " + str(time_from_GUI),(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
+        #print("NIDAQ time = " + str(round(time_from_GUI,3) ))
+        cv2.putText(frame,"NIDAQ time = " + str(round(time_from_GUI,3)),(20,405), font, 0.5,( 255,0,0),2,cv2.LINE_AA)
         cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
-        cv2.putText(frame, "Trial Number = " + str(trial_num), (20, 425),font, .5, (255, 255, 255), 2,cv2.LINE_AA)
+        cv2.putText(frame, "Trial Number = " + str(trial_num), (20, 425),font, .5, ( 255, 0,0), 2,cv2.LINE_AA)
 
     # Wrtie a ton of stuff on frames...
     def writeStuff(self, time_from_GUI, vid_time, time_diff, movingPxls, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"NIDAQ time = " + str(time_from_GUI),(20,405), font, 0.5,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(frame,"Video time = " + str(vid_time),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(frame,"time diff = " + str(time_diff),(20,455), font, 0.5,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(frame,"NIDAQ time = " + str(round(time_from_GUI,3)),(20,405), font, 0.5,(255,0,0),2,cv2.LINE_AA)
+        cv2.putText(frame,"Video time = " + str(round(vid_time,3)),(20,430), font, 0.5,(255,0,0),2,cv2.LINE_AA)
+        cv2.putText(frame,"time diff = " + str(time_diff),(20,455), font, 0.5,(255,0,0),2,cv2.LINE_AA)
         cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
-        cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), font, 0.5,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(self.prevThresh, "Time frozen = " + str(self.timeFrozen), (100, 50),font, .5, (255, 255, 255), 2)
-        cv2.putText(self.prevThresh, "Current frame = " + str(self.startFrame), (10,95), font, .5, (255,255,255),2)
-        cv2.putText(self.prevThresh, "Number of frames = " + str(self.length), (10,110), font, .5, (255,255,255),2)
+        cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), font, 0.5,(255,0,0),2,cv2.LINE_AA)
+        cv2.putText(self.prevThresh, "Time frozen = " + str(self.timeFrozen), (100, 50),font, .5, ( 255,0,0), 2)
+        cv2.putText(self.prevThresh, "Current frame = " + str(self.startFrame), (10,95), font, .5,( 255,0,255),2)
+        cv2.putText(self.prevThresh, "Number of frames = " + str(self.length), (10,110), font, .5, ( 255,0,0),2)
 
     # Creates a trackbar to scroll through frames. Could use some work
     # to account for any trackbar
@@ -264,11 +273,16 @@ class Vid:
     # Create Region of Interest coordinates
     def genROI(self, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.9,(255,255,255),2,cv2.LINE_AA)
-        self.ROI = cv2.selectROI(frame)
+        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.4,(0,255,255),2,cv2.LINE_AA)
+        ROI = cv2.selectROI(frame) #NOTE: NOT A STR, but tupple of 4 numbers: (x,y,w,h)
+        self.ROIstr = str(ROI)
+        #print("ROI CONVERTED TO STR",self.ROIstr )
         cv2.destroyWindow("ROI selector")
-        print(self.ROI)
+        self.ROI = [int(x) for x in ROI]
 
+        #print("###############################")
+        #print("#    ROI: ",self.ROI,"          #")
+        #print("###############################")
     # Create a previous frame and thresh to be used for comparison on first frames only
     def genPrev(self, frame, prevFrame):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -320,7 +334,7 @@ class Vid:
         return int(hours)*60*60*1000 + int(minutes)*60*1000 + int(seconds)*1000 + int(milliseconds)
 
 def runVid(q, back_q):
-    vid = Vid(0, q ,back_q)
+    vid = Vid(1, q ,back_q)
 
     if not vid.capError:
         vid.run()
@@ -328,5 +342,59 @@ def runVid(q, back_q):
         return
     else:
         print('error opening video')
+
+def runSimpleVid(q):
+    simpleVid = SimpleVid(0,q) # 0 is the camera number
+
+    if not simpleVid.capError:
+        simpleVid.run()
+        return
+
+class SimpleVid:
+    def __init__(self,path,q):
+        self.cap = self.cap = cv2.VideoCapture(path)
+        self.q = q
+        self.capError = False
+        self.outPath = 'NOT SET'
+        self.rec = False
+        if not self.cap.isOpened():
+            print('error opening aux vid, probably doesn\'t exist')
+            self.capError = True
+
+    def run(self):
+        while(self.cap.isOpened()):
+            ret, frame = self.cap.read()
+            frame = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
+            if not ret:
+                print('Error loading frame, probably last frame')
+                return
+            # Show the frame
+            cv2.imshow('Aux Camera', frame)
+
+            if self.rec:
+                self.out.write(frame)
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                cv2.destroyAllWindows()
+                self.cap.release()
+                self.out.release()
+                return
+
+            if not self.q.empty():
+                msg = self.q.get()
+                if msg['STATE'] == 'OFF':
+                    cv2.destroyAllWindows()
+                    self.cap.release()
+                    self.out.release()
+                    return
+                if msg['PATH_FILE'] != self.outPath:
+                    self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))
+                    self.rec = True
+
+    def openOutfile(self, path, height, width):
+        self.outPath = path
+        fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
+        self.out = cv2.VideoWriter(path,fourcc, 30, (int(width),int(height)))
+        print("SAVING TO ax:\n\n\n\n\n\n\n\n ", path)
 
 print('freezeAlg Loaded')

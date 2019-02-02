@@ -46,13 +46,14 @@ socket.send(dict/string of stuff)
 """
 
 import argparse
-import logging
+#import logging
 import zmq
 import json
 import time
 from twisted.internet import reactor
 
 #from cardinal_pythonlib.logs import configure_logger_for_colour
+
 from whisker.api import (
     Pen,
     PenStyle,
@@ -65,27 +66,13 @@ from whisker.constants import DEFAULT_PORT
 from whisker.twistedclient import WhiskerTwistedTask
 
 DEFAULT_DISPLAY_NUM = 0
-DEFAULT_MEDIA_DIR = r"C:\Program Files (x86)\WhiskerControl\Client Media"
+#DEFAULT_MEDIA_DIR = r"C:\Program Files (x86)\WhiskerControl\Client Media"
+DEFAULT_MEDIA_DIR = r"C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES"
 DEFAULT_WAV = "telephone.wav"
 
 DISPLAY = "display"
 DOC = "doc"
 AUDIO = "audio"
-
-
-#-----------------------------------------------------------------------
-def pair_server(serv_msg,socket):
-    srvmsg = json.dumps(serv_msg)
-    socket.send_string(srvmsg)
-    message = socket.recv()
-    client_msg = json.loads(message)#loads JSON formated data from stream
-    # Sleep to allow sockets to connect.
-    #time.sleep(3)
-    print("client msg type: ",type(client_msg))
-    return client_msg #message #
-
-#-----------------------------------------------------------------------
-
 
 class MyWhiskerTask(WhiskerTwistedTask):
     """
@@ -104,20 +91,25 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.media_dir = media_dir
         self.back_q = back_q
         self.q = q
-
-        #Brushes + pens
+        self.pics = []
+        self.XYarray = []
+        #Brushes + pens: NOTE: colors are (BGR)
         self.brush1 = Brush(
             colour=(0, 0, 0), bg_colour=(0, 255, 0),
-            opaque=False)
-        self.pen = Pen(width=3, colour=(255, 255, 150), style=PenStyle.solid)
+            opaque=False)   #BLACK BACKGROUND
+        self.brush2 = Brush(
+            colour=(5, 5, 5), bg_colour=(0, 255, 0),
+            opaque=False)   #Gray dead zone to prevent tail touches
+        self.pen = Pen(width=3, colour=(0, 0, 0), style=PenStyle.solid)
         self.brush = Brush(
             colour=(255, 0, 0), bg_colour=(0, 255, 0),
             opaque=True, style=BrushStyle.hatched,
-            hatch_style=BrushHatchStyle.bdiagonal)
+            hatch_style=BrushHatchStyle.bdiagonal) #
+        self.background_ht = 0
+        self.dead_zone_ht = 250
 
 
-
-    def fully_connected(self) -> None:
+    def fully_connected(self) -> None: # RUNS ONCE WHEN FULLY CONNECTED
         """
         Called when the server is fully connected. Sets up the "task".
         """
@@ -126,7 +118,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.whisker.timestamps(True)
         # BP
         self.whisker.claim_display(number=self.display_num, alias=DISPLAY)
-        self.whisker.claim_audio(number=0, alias=AUDIO)
+        #self.whisker.claim_audio(number=0, alias=AUDIO)
         self.whisker.set_media_directory(self.media_dir)
         self.display_size = self.whisker.display_get_size(DISPLAY)
         self.whisker.display_event_coords(True)
@@ -136,7 +128,6 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.whisker.display_blank(DISPLAY)
         # Draw stuff to finish up with setting up connection
         self.RECVFIRST()
-        #pair_server(serv_msg,socket):
 
 
     def draw(self):
@@ -150,43 +141,57 @@ class MyWhiskerTask(WhiskerTwistedTask):
         self.whisker.display_show_document(DISPLAY, DOC)
         with self.whisker.display_cache_wrapper(DOC):
             # Draw background
+            # Lock out botton 100 pixels of display to minimze tail Touches
+            self.background_ht = self.display_size[1]-self.dead_zone_ht
             self.whisker.display_add_obj_rectangle(DOC, "background",
-                Rectangle(left = 0, top = 0, width = self.display_size[0], height = self.display_size[1]),
+                Rectangle(left = 0, top = 0, width = self.display_size[0], height = self.background_ht),
                 self.pen, self.brush1)
+            # Draw dead zone at bottom of screen.
+            # Lock out botton 100 pixels of display to minimze tail Touches
+            self.whisker.display_add_obj_rectangle(DOC, "background",
+                Rectangle(left = 0, top = self.background_ht, width = self.display_size[0], height = self.dead_zone_ht),
+                self.pen, self.brush2)
 
             # Draw pictures
             for i in range(0,len(self.pics)):
+
+                # Coordinates specified in protocol file
+                # Note: Touchscreen is 1024 x (768-deadzone) = 1024 x 518. If we discount the deadzone, the
+                #       screen is 1024 x 518.  For picture area to equal to active
+                #       background area, picture must be 364 x 364
+
                 bit = self.whisker.display_add_obj_bitmap(
                     DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
-                    stretch = False, height = 100, width = 100)
+                    stretch = True , height =240, width = 240) # Returns T or F
                 if not bit:
-                    print('failed drawing picture')
+                    pass
             self.whisker.display_send_to_back(DOC, "background")
             self.setEvents()
 
     # Handle creation/deletion of picture Events
     def setEvents(self):
-        # Set event for trial length
-        #self.whisker.timer_set_event("TmrEndOfTrial", self.trial_length*1000)
         # Set events for all pictures
         for i in range(0,len(self.pics)):
             self.whisker.display_set_event(DOC, "picture" + str(i), self.pics[i])
         # Set event for background and end of task
-        #self.whisker.display_set_event(DOC, "rectangle", "RectEndOfTask")
         self.whisker.display_set_event(DOC, "background", "missedClick")
         self.whisker.timer_set_event("checkZMQ", 5, -1)
+
     def clearEvents(self):
         # Clears events and DOC for all pictures to get ready for new ones
         for i in range(0,len(self.pics)):
             self.whisker.display_clear_event(DOC, "picture" + str(i))
-        #self.whisker.display_clear_event(DOC, "rectangle")
         self.whisker.display_clear_event(DOC, "background")
         self.whisker.timer_clear_event("checkZMQ")
-        #self.whisker.timer_clear_event("TmrEndOfTrial")
         self.whisker.display_delete_document(DOC)
-    #############################################
 
-    # Handle event
+
+
+
+    #############################################
+    # NOW WE WAIT FOR REACTOR TO SEND US AN EVENT.  WHEN
+    # When REACTOR sees an event, incoming_event runs
+    # Handle event ***
     def incoming_event(self, event: str, timestamp: int = None) -> None:
         """
         Responds to incoming events from Whisker.
@@ -196,16 +201,17 @@ class MyWhiskerTask(WhiskerTwistedTask):
             event, x, y = event.split(' ')
             # Clicked background
             if "missedClick" == event:
-                sendDict = {'picture' : 'missed', 'XY' : (x,y)}
-                print(sendDict)
-                self.back_q.put(sendDict)
-                self.whisker.audio_play_wav(AUDIO, DEFAULT_WAV)
+                if int(y) <= self.background_ht:
+                    sendDict = {'picture' : 'missed', 'XY' : (x,y)}
+                    #print(sendDict)
+                    self.back_q.put(sendDict)
+                #self.whisker.audio_play_wav(AUDIO, DEFAULT_WAV)
             # Or a picture
             else:
                 for picName in self.pics:
                     if picName == event:
                         sendDict = {'picture' : picName, 'XY' : (x,y)}
-                        print(sendDict)
+                        #print(sendDict)
                         self.back_q.put(sendDict)
                         self.RECVCMD()
         except ValueError:
@@ -220,7 +226,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             self.parseMsg(self.q.get())
 
     # Need to wait for first msg from GUI before proceeding
-    def RECVFIRST(self):
+    def RECVFIRST(self): # Note: runs once
         while True:
             if not self.q.empty():
                 self.parseMsg(self.q.get())
@@ -228,8 +234,10 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
     # Parses JSON msg from GUI
     def parseMsg(self, msg):
+        # Clear events and then look for msg
+
+        # Parse msg
         if msg == 'STOP':
-            self.clearEvents()
             reactor.stop()
             return
         elif msg == '':
@@ -239,13 +247,14 @@ class MyWhiskerTask(WhiskerTwistedTask):
             pics = []
             XYarray = []
             for img, coords in msg.items():
-                print(img,coords)
+                #print(img,coords)
                 pics.append(img)
                 XYarray.append(coords)
             self.pics = pics
             self.XYarray = XYarray
-            
         self.clearEvents()
+
+        # Draw new screen
         self.draw()
 
 def main(back_q, q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA_DIR, port = DEFAULT_PORT):
@@ -259,7 +268,14 @@ def main(back_q, q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA
         q = q
     )
     w.connect('localhost', port)
-    reactor.run()
+
+    reactor.run() # starts Twisted and thus network processing
+    # ***
+    # Note: This is BAD programming in my opinion. The logical flow is interrupted.
+    # The Reactor is basically an event alarm. The program sits and waits until an event is
+    # geneated by the reactor.  When a event is received, the incoming_event() is run,
+    # but note that incomming event is not in any loop.  This is not a logical linear flow!
+    # We aplolgize for doing it this way, but it the way Twisted and Whisker server work.
 
 if __name__ == '__main__':
     main()

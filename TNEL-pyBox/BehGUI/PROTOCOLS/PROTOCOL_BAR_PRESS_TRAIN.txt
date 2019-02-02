@@ -1,0 +1,28 @@
+[EXPERIMENT]
+EXPT_NAME = BAR_PRESS_TRAIN
+EXPT_PATH 	=  C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
+
+[SETUP]
+FAN_ON=True
+CAB_LIGHT=True
+CAMERA=True
+REC=True
+FOOD_LIGHT=True
+EXTEND_LEVERS=TRUE
+
+[BAR_PRESS] #NOTE: VI=15 is variable interval with mean time of 15.  PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
+# (10, 1,30,5) creates 10 variable ratio reward stating at every press (1, to random between (1,30) incremented by 5 every loop)
+BAR_PRESS_TRAIN
+
+[PROTOCOL]
+START_LOOP = 1          # Loops are trials
+  PAUSE = 3600            #1 hour in seconds
+END_LOOP
+
+EXTEND_LEVERS=FALSE
+FOOD_LIGHT=FALSE
+REC=FALSE
+CAMERA= FALSE
+CAB_LIGHT=FALSE
+FAN_ON=FALSE
+[END PROTOCOL]

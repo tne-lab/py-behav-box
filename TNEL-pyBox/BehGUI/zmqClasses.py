@@ -17,13 +17,13 @@ class RCVEvent:
     def rcv(self):
         #Get raw input from socket
         envelope, jsonStr = self.socket.recv_multipart()
-        print(envelope)
+        #print(envelope)
 
         #Our actual json object (last part)
         jsonStr = json.loads(jsonStr);
         #print(self.parseJson(jsonStr))
-        print(jsonStr)
-        print('\n')
+        #print(jsonStr)
+        #print('\n')
         return jsonStr
 
     # First version of Json parser that breaks up the json object

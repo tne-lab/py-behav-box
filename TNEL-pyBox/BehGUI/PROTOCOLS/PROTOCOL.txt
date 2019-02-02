@@ -1,0 +1,48 @@
+[EXPERIMENT]
+EXPT_NAME = TESTING     # This is the name of your experiment
+EXPT_PATH 	= C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA       #D:\Desktop\py-behav-box\TNEL-pyBox\BehGUI\DATA
+
+
+[TONE1] # NEED TONE1, TONE2
+DURATION(S) 	= 2  # In seconds
+FREQ(HZ)	= 1800   #
+VOLUME(0-1)	= 0.3    # 0.0 to 1.0
+
+[SHOCK]
+DURATION(S) = 1       # In seconds
+VOLTS		= 5.5         #
+AMPS(MA)	= 100       # In milliamps
+
+[FREEZE]
+MIN_DURATION(S)	= 2      # In seconds
+MIN_MOVING_PIX	= 5000   # Min number of moving pixels to un freeze
+MIN_THESHOLD = 26        # gray level threshold (0-255)
+ROI=Generate # Generate = asks user for ROI, or (x,y,w,h) ex: (644, 10, 633, 485).  This also starts FREEZE detection  FREEZE=TRUE  # NOTE:  REC=TRUE causes failure before or  AFTER ROI
+# Testing comments
+
+
+[SETUP]
+FAN_ON=TRUE
+CAB_LIGHT=TRUE
+FOOD_LIGHT=TRUE
+CAMERA=TRUE
+REC=TRUE
+
+[PROTOCOL]
+START_LOOP = 3           # Loops are trials ... WRONG(50%,5,10)
+  PAUSE = 2             # in seconds
+  EXTEND_LEVERS=TRUE
+  CONDITIONS=RANDOM     #NOTE:  Can be chosen at "RANDOM","SEQUENTIAL"(IN THE ORDER THEY ARE LISTED BELOW IN CONDITIONS), OR A NUMBER STARTING AT 1
+  EXTEND_LEVERS=FALSE
+END_LOOP
+FOOD_LIGHT=FALSE
+REC=FALSE
+CAMERA= FALSE
+CAB_LIGHT=FALSE
+FAN_ON=FALSE
+[END PROTOCOL]
+
+[CONDITIONS] #NOTE: RESET = FIXED OR ON_RESPONSE.  ALSO, HERE WE NEED COMMAS.
+MAX_TIME, RESET,          L_CONDITION_LT, R_CONDITION_LT, DES_L_LEVER_PRESS, DES_R_LEVER_PRESS, CORRECT, WRONG, NO_ACTION
+2,      ON_RESPONSE,	  1,		  0,		  1,		     0,		        PELLET,	 TONE1,  TONE1
+2,      ON_RESPONSE,	  0,		  1,		  0,		     1,		        PELLET,	 TONE1,  TONE1

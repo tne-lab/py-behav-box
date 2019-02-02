@@ -72,40 +72,33 @@ def play_sound(frequency, volume, duration):
     Play a frequency at a given volume
     This is run a a sepoarate thread so calling program can keep running
     '''
-
-    sample_rate = 44100 #Hz or samples per sec
-    # volume value 0.0 to 1.0
-    pygame.mixer.music.set_volume(float(volume))
-    # Start
-    start_time = float(time.process_time())
-
+    print ("freq: ",frequency, "vol: ",volume, "Duration: ",duration)
+    sample_rate = 44100 #Hz or data points per sec
     bits = 16
 
-    pygame.mixer.pre_init(44100, -bits, 2)
+    pygame.mixer.pre_init(sample_rate, -bits, 2)
 
     #n_samples = int(round(float(duration)*sample_rate)) # Number of sample to generate
     n_samples = int(sample_rate) # Number of sample to generate
 
     #setup our numpy array to handle 16 bit ints, which is what we set our mixer to expect with "bits" up above
     buf = numpy.zeros((n_samples, 2), dtype = numpy.int16)
-    max_sample = 2**(bits - 1) - 1
-
+    #max_sample = 2**(bits - 1) - 1
+    max_sample =100.0
     for s in range(n_samples):
         t = float(s)/sample_rate    # time in seconds
 
         #grab the x-coordinate of the sine wave at a given time, while constraining the sample to what our mixer is set to with "bits"
         buf[s][0] = int(round(max_sample*math.sin(2*math.pi*float(frequency)*t)))        # left
-        buf[s][1] = int(round(max_sample*0.5*math.sin(2*math.pi*float(frequency)*t)))    # right
+        buf[s][1] = int(round(max_sample*math.sin(2*math.pi*float(frequency)*t)))    # right
 
     sound = pygame.sndarray.make_sound(buf)
     #play once, then loop until duration time has passed
-    cur_time = float(time.process_time())
-    print (cur_time, start_time)# , (cur_time - start_time))
-    elapsed_time = cur_time - start_time
-    sound.set_volume(float(volume))
-    playTime = int(int(duration)*1000)
-    print("playtime: ",playTime)
-    sound.play(loops = -1,maxtime=playTime) # - 1 = forever
+    sound.set_volume(float(volume)) # volume value 0.0 to 1.0
+    playTime = int(duration *1000)  # Duration in sec, need millisec
+    print("playtime: ",playTime, "millisec")
+    sound.play(loops = -1,maxtime=playTime) # - 1 = loops forever, maxtime in millisec
+
 
 def play_sound_file(music_file, volume=0.8):
     '''
@@ -738,6 +731,123 @@ class MyLED:
                 #shadow_rect = shadow_rect.inflate(3,3)
                 pygame.draw.arc(screen, shaddow_color, shadow_rect, 190*pi/180, 270*pi/180, shadow_w) # SHADOW
                 pygame.draw.circle(screen,(0,0,0),(cx,cy), radius + 2,3) # Black circle
+
+class MyConditioningLights:
+    def __init__(self,screen,index, x,y,radius, ONOFF, on_color, background_color, clickable = True):
+        self.screen = screen
+        self.index = index
+        self.x = x
+        self.y = y
+        self.radius = radius
+        diam = radius * 2
+        self.diam = diam
+        self.rect = Rect(x, y,diam,diam)
+        self.ONOFF = ONOFF
+        #self.visible = VIS
+        self.on_color = on_color
+        self.background_color = background_color
+        self.off_color = (int(on_color[0]*.2),int(on_color[1]*.2),int(on_color[2]*.2))
+        self.clickable = clickable
+
+    def draw(self):
+            screen = self.screen
+            ONOFF = self.ONOFF
+            #self.ONOFF = ONOFF
+            x = self.x
+            y = self.y
+            #diam = self.diam
+            radius = self.radius
+            cx = x + radius #center x
+            cy = y + radius #center y
+            diam = 2*radius
+            rect = Rect(x, y, diam, diam)
+            self.rect = rect
+            on_color = self.on_color
+            off_color = self.off_color
+            background_color = self.background_color
+
+            if ONOFF == "ON":
+                #circle(Surface, color, pos, radius, width=0) -> Rect
+                #diam = diam + 10
+                pygame.draw.circle(screen,on_color,(cx,cy),radius,0)#MAIN BULB
+                pygame.draw.circle(screen,(255,255,255),(cx+int(.5*radius),cy+int(.5*radius)),int(.15*radius),0)#SPARKLE
+                pygame.draw.circle(screen,(255,255,255),(cx,cy), radius-2,1) # white circle
+                pygame.draw.circle(screen,(0,0,0),(cx,cy), radius + 2,4) # Black circle
+            elif  ONOFF == "OFF":
+                off_color = self.off_color
+                pygame.draw.circle(screen,off_color,(cx,cy),radius,0) #MAIN BULB
+                pygame.draw.circle(screen,(200,200,200),(cx+int(.5*radius),cy-int(.5*radius)),int(.1*radius),0) #SPARKLE
+
+                pi = 3.141592
+                shaddow_color = (int(off_color[0]*.8),int(off_color[1]*.8),int(off_color[2]*.8))
+                shadow_w = int(0.5*radius)
+                if shadow_w > 15:
+                    shadow_w = 15
+                shadow_rect = rect
+                #shadow_rect = shadow_rect.inflate(3,3)
+                pygame.draw.arc(screen, shaddow_color, shadow_rect, 190*pi/180, 270*pi/180, shadow_w) # SHADOW
+                pygame.draw.circle(screen,(0,0,0),(cx,cy), radius + 2,3) # Black circle
+
+
+
+class MyNosePokes:
+    def __init__(self,screen,index, x,y,radius, ONOFF, on_color, background_color, clickable = True):
+        self.screen = screen
+        self.index = index
+        self.x = x
+        self.y = y
+        self.radius = radius
+        diam = radius * 2
+        self.diam = diam
+        self.rect = Rect(x, y,diam,diam)
+        self.ONOFF = ONOFF
+        #self.visible = VIS
+        self.on_color = on_color
+        self.background_color = background_color
+        self.off_color = (int(on_color[0]*.2),int(on_color[1]*.2),int(on_color[2]*.2))
+        self.clickable = clickable
+
+    def draw(self):
+            screen = self.screen
+            ONOFF = self.ONOFF
+            #self.ONOFF = ONOFF
+            x = self.x
+            y = self.y
+            #diam = self.diam
+            radius = self.radius
+            cx = x + radius #center x
+            cy = y + radius #center y
+            diam = 2*radius
+            rect = Rect(x, y, diam, diam)
+            self.rect = rect
+            on_color = self.on_color
+            off_color = self.off_color
+            background_color = self.background_color
+
+            if ONOFF == "ON":
+                #circle(Surface, color, pos, radius, width=0) -> Rect
+                #diam = diam + 10
+                pygame.draw.circle(screen,on_color,(cx,cy),radius,0)#MAIN BULB
+                #pygame.draw.circle(screen,(255,255,255),(cx+int(.5*radius),cy+int(.5*radius)),int(.15*radius),0)#SPARKLE
+                pygame.draw.circle(screen,(255,255,255),(cx,cy), radius-2,1) # white circle
+                pygame.draw.circle(screen,(0,0,0),(cx,cy), radius + 2,4) # Black circle
+            elif  ONOFF == "OFF":
+                off_color = self.off_color
+                pygame.draw.circle(screen,off_color,(cx,cy),radius,0) #MAIN BULB
+                #pygame.draw.circle(screen,(200,200,200),(cx+int(.5*radius),cy-int(.5*radius)),int(.1*radius),0) #SPARKLE
+
+                pi = 3.141592
+                shaddow_color = (int(off_color[0]*.8),int(off_color[1]*.8),int(off_color[2]*.8))
+                shadow_w = int(0.5*radius)
+                if shadow_w > 15:
+                    shadow_w = 15
+                shadow_rect = rect
+                #shadow_rect = shadow_rect.inflate(3,3)
+                pygame.draw.arc(screen, shaddow_color, shadow_rect, 190*pi/180, 270*pi/180, shadow_w) # SHADOW
+                pygame.draw.circle(screen,(0,0,0),(cx,cy), radius + 2,3) # Black circle
+
+
+
 class MyLabel:
     """Label class based on the
     Types: label, display, default = button
@@ -957,7 +1067,7 @@ class get_user_input:
                         try:
                             text_input += char
 
-                            print (text_input)
+                            #print (text_input)
                         except:
                             pass
 
@@ -1011,7 +1121,8 @@ class My_Rimmed_Box:
         x = self.x
         y = self.y
         self.rect = Rect(x,y,self.w,self.h)
-        pygame.draw.rect(myscreen, self.fill_color , self.rect,  0) #(0=fill, 1=outline line thickness))
+        if self.fill_color != 0:
+            pygame.draw.rect(myscreen, self.fill_color , self.rect,  0) #(0=fill, 1=outline line thickness))
         pygame.draw.rect(myscreen, self.line_color , self.rect,  1)
 
 class My_Rimmed_Circle:

@@ -19,6 +19,7 @@ NOTE: 1. Please Start Whisker server first
 import nidaqmx
 from nidaqmx.constants import (LineGrouping)
 import time
+import os
 dev = 'Dev2'
 
 '''
@@ -32,8 +33,7 @@ If using 1 line use sendDBit function to send info sendDBit(True)
 class InterfaceOut:
     def __init__(self, address):
         self.task = nidaqmx.Task()
-        self.task.do_channels.add_do_chan(
-            address,
+        self.task.do_channels.add_do_chan(address,
             line_grouping=LineGrouping.CHAN_FOR_ALL_LINES)
         self.address = address
 
@@ -88,9 +88,8 @@ def sendPulse(address,bits):
      while True:
          try:
             with nidaqmx.Task() as task:
-                task.do_channels.add_do_chan(
-                address,
-                line_grouping=LineGrouping.CHAN_FOR_ALL_LINES)
+                task.do_channels.add_do_chan(address,
+                     line_grouping=LineGrouping.CHAN_FOR_ALL_LINES)
 
                 #print(task.write(bits))
             break
@@ -140,7 +139,7 @@ def giveFoodSetup():
 Returns a new food light task
 '''
 def foodLightSetup():
-    foodLightAddress = dev + '/port1/line5'
+    foodLightAddress = dev + '/port1/line6' #Output line 7
     foodLight = InterfaceOut(foodLightAddress)
     foodLight.startTask()
     return foodLight
@@ -148,7 +147,18 @@ def foodLightSetup():
 Returns a SHOCKER task
 '''
 def shockerSetup():
-    shockerAddress = dev + '/port1/line6'
+    computer = os.environ['COMPUTERNAME']
+    print("USING ", computer, " Computer. ")
+    if 'EPHYS-2' in computer:
+        shockerAddress = dev + '/port1/line5'  # Flav's PC #Output line 6
+        print ("Be sure shocker connected to port1/Line6")
+    elif 'EPHYS-1' in computer:
+        shockerAddress = dev + '/port1/line5'  # Jean's PC
+        print ("Be sure shocker connected to port1/Line6") #Output line 6
+    else:
+        print("Unregistered computer!!!!!!!!!!  See daqAPI.py in current working directory.")
+
+
     shocker = InterfaceOut(shockerAddress)
     shocker.startTask()
     return shocker
@@ -184,11 +194,11 @@ def lowToneSetup():
 '''
 Returns a new high tone Task
 '''
-def highToneSetup():
-    highToneAddress = dev + '/port2/line5'
-    highTone = InterfaceOut(highToneAddress)
-    highTone.startTask()
-    return highTone
+#def highToneSetup():
+#    highToneAddress = dev + '/port2/line5'
+#    highTone = InterfaceOut(highToneAddress)
+#    highTone.startTask()
+#    return highTone
 
 ####################################################
 ##   Inputs
