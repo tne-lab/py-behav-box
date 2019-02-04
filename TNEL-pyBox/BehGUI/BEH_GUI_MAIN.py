@@ -1486,13 +1486,14 @@ class BEH_GUI():
                ######################
                if not self.TSBack_q.empty():
                    touchMsg = self.TSBack_q.get()
-                   GUIFunctions.log_event(self, self.events,touchMsg['picture'] + " Pressed " + str(touchMsg['XY'][0])+';'+ str(touchMsg['XY'][1]) , self.cur_time)
-
+   
                    ##########################################
                    #  BACKGROUND TOUCHED (image missed)
                    ##########################################
                    if touchMsg['picture'] == 'missed': # Touched background
                        #print('missed')
+                       GUIFunctions.log_event(self, self.events,touchMsg['picture'] + " MISSED " + str(touchMsg['XY'][0])+';'+ str(touchMsg['XY'][1]) , self.cur_time)
+
                        self.touch_time = cur_time
                        self.background_touches += 1
                        if self.TOUCH_TRAINING:
@@ -1513,10 +1514,15 @@ class BEH_GUI():
                            for img, probabilityList in self.touchImgs.items():
                                if touchMsg['picture'] == img:  # Touched an image
                                    GUIFunctions.log_event(self,self.events, "Probability of pellet: " + str(probabilityList[self.trial_num]),self.cur_time)
+                                   GUIFunctions.log_event(self, self.events,touchMsg['picture'] + " CORRECT IMG TOUCHED " + str(touchMsg['XY'][0])+';'+ str(touchMsg['XY'][1]) , self.cur_time)
+  
                                    # Holds the probability for each trial
                                    self.cur_probability = probabilityList[self.trial_num]
                                    self.CORRECT = True
                                    self.correct_image_touches += 1
+                                else:
+                                   GUIFunctions.log_event(self, self.events,touchMsg['picture'] + " WORNG IMG TOUCHED " + str(touchMsg['XY'][0])+';'+ str(touchMsg['XY'][1]) , self.cur_time)
+                                    
                        #################################
                        # TOUCH TRAINING
                        #################################
@@ -1525,7 +1531,8 @@ class BEH_GUI():
                                if touchMsg['picture'] == img:  # Touched an image
                                   self.correct_image_touches += 1
                                   self.CORRECT = True
-
+                                  GUIFunctions.log_event(self, self.events,touchMsg['picture'] + " IMG TOUCHED " + str(touchMsg['XY'][0])+';'+ str(touchMsg['XY'][1]) , self.cur_time)
+  
 
                # CALCULATE TOUCHES PER MINUTE (TPMs)
                if TPM_time_interval > 60.0: #60.0: #Calculate TPM every minute (60 sec)
