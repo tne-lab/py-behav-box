@@ -153,6 +153,10 @@ def setGlobals(self):
     self.VI_start = 0.0
     #################################
     self.BAR_PRESS_TRAINING = False
+
+    self.background_hits = []
+    self.wrong_img_hits = []
+    self.correct_img_hits = []
     self.background_touches = 0  #Num touches to background
     self.any_image_touches = 0
     self.correct_image_touches = 0

@@ -209,6 +209,9 @@ def await_any_key(screen,SCREEN_WIDTH,SCREEN_HEIGHT,msg1,msg2 = 'PRESS ANY KEY T
 
             pygame.display.flip()
 
+def draw_plus_sign(surface, x, y, w, color):# (x,y is at center, w is width/2)
+    pygame.draw.line(surface, color, (x-w, y), (x+w, y),1)
+    pygame.draw.line(surface, color, (x, y-w), (x,  y+w),1)
 
 def draw_cue(screen, rect, cue,mphysPinID_x,mphysPinID_y):
     my_font = pygame.font.SysFont('arial', 20)
