@@ -154,6 +154,7 @@ def setGlobals(self):
     #################################
     self.BAR_PRESS_TRAINING = False
 
+    self.touchMsg= []
     self.background_hits = []
     self.wrong_img_hits = []
     self.correct_img_hits = []

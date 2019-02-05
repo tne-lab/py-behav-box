@@ -20,6 +20,7 @@ import sys, time
 import pygame
 import pygame
 from pygame.locals import *
+import pygame
 
 import math, random
 import numpy as np
@@ -289,7 +290,7 @@ class BEH_GUI():
 
         # GUI TOUCH SCREEN 
         for x,y in self.background_hits:
-            print(x,y)
+            #print(x,y)
             draw_plus_sign(self.myscreen, x + 40, y +320, 5, (255,0,0) ) # (40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                      self.touch_time = cur_time
      
         for x,y in self.correct_img_hits:
@@ -298,6 +299,14 @@ class BEH_GUI():
         for x,y in self.wrong_img_hits:
             draw_plus_sign(self.myscreen, x + 40, y +320, 5, (0,0,255) ) # (40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                      self.touch_time = cur_time
 
+        try:
+            #print(self.touchImgCoords)
+            for coords in self.touchImgCoords:
+                #print (coords)
+                x,y = int(coords[0]/4 + 40), int(coords[1]/4 + 320)   # NOTE: 40,320 is top-left of gui touch representation. 1/4 is its scale     
+                pygame.draw.rect(self.myscreen, (0,0,255) , (x,y,60,60),  1)
+
+        except: pass
 ###########################################################################################################
 #  HANDLE GUI EVENTS
 ###########################################################################################################
@@ -1251,8 +1260,8 @@ class BEH_GUI():
 
             if self.TOUCHSCREEN_USED:
                 if not self.TSBack_q.empty():
-                       touchMsg = self.TSBack_q.get()
-                       GUIFunctions.log_event(self, self.events, touchMsg['picture'] + "Pressed BETWEEN trials, " + str(touchMsg['XY']) , self.cur_time)
+                       self.touchMsg = self.TSBack_q.get()
+                       GUIFunctions.log_event(self, self.events, self.touchMsg['picture'] + "Pressed BETWEEN trials, " + str(self.touchMsg['XY']) , self.cur_time)
 
         elif key == "CONDITIONS":
             self.runConditions(protocolDict, self.cur_time)
@@ -1366,7 +1375,7 @@ class BEH_GUI():
                self.TSq.put('')
                self.TOUCHSCREEN_USED = False
                while not self.TSBack_q.empty():  # EMPTY TSBack_q between Expt Runs.
-                   touchMsg = self.TSBack_q.get()
+                   self.touchMsg = self.TSBack_q.get()
 
            for user_input in self.user_inputs:
               if user_input.label == "SUBJECT":
@@ -1497,15 +1506,15 @@ class BEH_GUI():
                # SCREEN TOUCHED
                ######################
                if not self.TSBack_q.empty():
-                   touchMsg = self.TSBack_q.get()
-                   x = int(touchMsg['XY'][0])
-                   y = int(touchMsg['XY'][1])   
+                   self.touchMsg = self.TSBack_q.get()
+                   x = int(self.touchMsg['XY'][0])
+                   y = int(self.touchMsg['XY'][1])   
                    ##########################################
                    #  BACKGROUND TOUCHED (image missed)
                    ##########################################
-                   if touchMsg['picture'] == 'missed': # Touched background
+                   if self.touchMsg['picture'] == 'missed': # Touched background
 
-                       GUIFunctions.log_event(self, self.events," missed ," + touchMsg['XY'] , self.cur_time)
+                       GUIFunctions.log_event(self, self.events," missed ," + str(self.touchMsg['XY']) , self.cur_time)
                        self.background_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor 
                        self.background_touches += 1
                        if self.TOUCH_TRAINING:
@@ -1524,16 +1533,16 @@ class BEH_GUI():
                        ##################################
                        if self.TOUCH_BANDIT:
                            for img, probabilityList in self.touchImgs.items():
-                               if touchMsg['picture'] == img:  # Touched an image
+                               if self.touchMsg['picture'] == img:  # Touched an image
                                    GUIFunctions.log_event(self,self.events, "Probability of pellet: " + str(probabilityList[self.trial_num]),self.cur_time)
-                                   GUIFunctions.log_event(self, self.events,touchMsg['picture'] + " CORRECT IMG TOUCHED, " + touchMsg['XY'] , self.cur_time)
+                                   GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " CORRECT IMG TOUCHED, " + self.touchMsg['XY'] , self.cur_time)
                                    self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                   
                                    # Holds the probability for each trial
                                    self.cur_probability = probabilityList[self.trial_num]
                                    self.CORRECT = True
                                    self.correct_image_touches += 1
                                else:
-                                   GUIFunctions.log_event(self, self.events,touchMsg['picture'] + " WRONG IMG TOUCHED, " + touchMsg['XY'] , self.cur_time)
+                                   GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " WRONG IMG TOUCHED, " + self.touchMsg['XY'] , self.cur_time)
                                    self.wrong_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                   
                        #################################
                        # TOUCH TRAINING
@@ -1542,10 +1551,10 @@ class BEH_GUI():
                            self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                  
         
                            for img in self.touchImgs.keys():
-                               if touchMsg['picture'] == img:  # Touched an image
+                               if self.touchMsg['picture'] == img:  # Touched an image
                                   self.correct_image_touches += 1
                                   self.CORRECT = True
-                                  GUIFunctions.log_event(self, self.events,touchMsg['picture'] + " Pressed," + touchMsg['XY'] , self.cur_time)
+                                  GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " Pressed," + str(self.touchMsg['XY']) , self.cur_time)
 
                # CALCULATE TOUCHES PER MINUTE (TPMs)
                if TPM_time_interval > 60.0: #60.0: #Calculate TPM every minute (60 sec)
