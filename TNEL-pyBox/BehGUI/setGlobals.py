@@ -10,6 +10,7 @@ from collections import deque
 from queue import Queue
 import video_function
 import threading
+import stimmer
 def setGlobals(self):
     ################################################################
     # GUI GLOBALS
@@ -45,6 +46,11 @@ def setGlobals(self):
         self.R_nose_poke = daqAPI.rightNoseInputSetup()
         self.checkPressLeft, self.checkPressRight = daqAPI.leverInputSetup()
         self.eaten = daqAPI.foodEatInputSetup()
+
+        # Create stim thread
+        self.stimQ = Queue()
+        stimThread = threading.Thread(target=stimmer.Stim, args=(ADDRESS***, self.stimQ)) # NEED TO UPDATE ADDRESS
+
     ##################
     # DATA
     ##################

@@ -282,6 +282,7 @@ def exit_game(self):
     if self.TOUCH_TRHEAD_STARTED == True:
         self.TSq.put('STOP')
     self.openEphysQ.put('STOP')
+    self.stimQ.put('STOP')
     pygame.quit()
     sys.exit()
 

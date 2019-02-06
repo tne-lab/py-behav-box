@@ -6,7 +6,6 @@ import json
 class RCVEvent:
     # SUBSCRIBE can be a list of vars, need to be in byte string format => b'spike'
     def __init__(self, port, SUBSCRIBE):
-        print("Connecting recviever to Open Ephys \n")
         context = zmq.Context()
         self.socket = context.socket(zmq.SUB)
         self.socket.connect("tcp://localhost:" + str(port))
