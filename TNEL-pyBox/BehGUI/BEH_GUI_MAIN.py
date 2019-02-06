@@ -496,7 +496,7 @@ class BEH_GUI():
                                     for LED in self.LEDs: # Look for EXPT STARTED LED
                                           if LED.index == 6: # Expt Started light
                                               LED.ONOFF = "OFF"
-
+                                    self.setupGUI()
                                #######################################
                                #
                                #   START EXPERIMENT
@@ -1105,16 +1105,17 @@ class BEH_GUI():
                     for key in self.touchImgs.keys():
                         
                         imgList[key] = self.touchImgCoords #places images
-                        print('ImgList', imgList)
                         self.TSq.put(imgList)
                         self.Protocol_ln_num +=1
-
+                    print('ImgList', imgList)
+                    
                     log_string = str(imgList)
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
-                    log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
-                    log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
-                   
+                    log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
+                    log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                    
+                    print('log_string', log_string)
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
                 else:
 
@@ -1137,9 +1138,9 @@ class BEH_GUI():
                     log_string = str(imgList)
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
-                    log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
-                    log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
-                        
+                    log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
+                    log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                    print('log_string', log_string)    
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
         ###############################
         # START LOOP
@@ -1588,7 +1589,7 @@ class BEH_GUI():
                             GUIFunctions.log_event(self, self.events,"VI for BACKGROUND Touches: "+ str(self.VI_background),self.cur_time)
                       if self.meanTPM10imgs > 10:# 10: # Reduce probability of reward for touching images only
                             self.VI_images += 1.0
-                            if self.VI_images >= 60.0: self.VI_images = 60.0 # Limits VI for images to 60!!!!
+                            if self.VI_images >= 15.0: self.VI_images = 15.0 # Limits VI for images to 60!!!!
                             GUIFunctions.log_event(self, self.events,"VI for IMG Touches: "+ str(self.VI_images),self.cur_time)
 
                             self.VI_background += 15.0
