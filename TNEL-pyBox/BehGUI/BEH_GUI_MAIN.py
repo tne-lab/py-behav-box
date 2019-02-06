@@ -1012,8 +1012,8 @@ class BEH_GUI():
             self.LEDs[5].ONOFF = LEDsONOFF
 
         elif key  == 'SHOCK':
-                 log_event(self.events,"Shock_ON", self.cur_time,("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
-                 self.SHOCK_ON = True
+            GUIFunctions.log_event(self, self.events,"Shock_ON", self.cur_time,("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
+            self.SHOCK_ON = True
 
         elif key == "L_CONDITIONING_LIGHT":
             val = str2bool(protocolDict[key])
