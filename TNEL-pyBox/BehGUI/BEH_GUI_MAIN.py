@@ -1274,7 +1274,7 @@ class BEH_GUI():
         # RUN BAR PRESS INDEPENDENT OF PROTOCOLS OR CONDTIONS
         #########################################################################################
         if self.BAR_PRESS_INDEPENDENT_PROTOCOL: #Running independently of CONDITIONS. Used for conditioning, habituation, extinction, and recall
-           #print (cur_time,"VI................", self.VI, (self.VI_start + self.VI))
+           print (cur_time,"VI................", self.VI, (self.VI_start + self.VI))
            if self.VI_REWARDING:
                if self.cur_time > (self.VI_start + self.VI):
                   if self.LEVER_PRESSED_R: # RIGHT LEVER
