@@ -40,9 +40,12 @@ import threading
 import whiskerTouchZMQ
 import zmqClasses
 import eventRECV
+from win32 import win32gui #Jean's machine
+#from win32 import win32con #Jean's machine
+#import win32gui  #Flav's machine
+#import win32con  #Flav's machine
 import GUIFunctions
 import subprocess
-import win32gui, win32con
 
 
 

@@ -9,12 +9,13 @@ import tkinter as Tk #Note: "Tkinter" in python 2 (capital T)
 from tkinter.filedialog import askopenfilename
 import os
 import giveFood
-try:
-    import win32gui
-    LINUX = False
-except:
-    LINUX = True
-import subprocess
+from win32 import win32gui #Jean's machine
+##try:  #Flav's machine
+##    import win32gui
+##    LINUX = False
+##except:
+##    LINUX = True
+##import subprocess
 
 IsWhiskerRunning = False
 IsOpenEphysRunning = False

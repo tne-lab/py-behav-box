@@ -20,7 +20,9 @@ import nidaqmx
 from nidaqmx.constants import (LineGrouping)
 import time
 import os
-dev = 'Dev2'
+
+dev = 'Dev1' #Jean's machine
+#dev = 'Dev2' #Flav's machine
 
 '''
 Class for Digital Outputs. Can send (and maybe see what has been written. Hasn't been tested)
