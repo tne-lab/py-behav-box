@@ -12,6 +12,13 @@ import video_function
 import threading
 #import stimmer
 def setGlobals(self):
+
+    ###########################################################
+    self.computer = os.environ['COMPUTERNAME']
+##    if 'ephys-2' in self.computer:
+##        self.dev = 'Dev2'
+##    elif 'ephys-1' in self.computer:
+##        self.dev = 'Dev1'
     ################################################################
     # GUI GLOBALS
     ################################################################

@@ -20,8 +20,15 @@ import nidaqmx
 from nidaqmx.constants import (LineGrouping)
 import time
 import os
+self.computer = os.environ['COMPUTERNAME']
+print
+if 'EPHYS-2' in self.computer:
+        dev = 'Dev2'
+elif 'EPHYS-1' in self.computer:
+        dev = 'Dev1'
 #dev = 'Dev2' #Flav's PC ephys-2
-dev = 'Dev1' #Jean's PC ephys-1
+#dev = 'Dev1' #Jean's PC ephys-1
+
 '''
 Class for Digital Outputs. Can send (and maybe see what has been written. Hasn't been tested)
 Also holds task information.
@@ -148,11 +155,11 @@ Returns a SHOCKER task
 '''
 def shockerSetup():
     computer = os.environ['COMPUTERNAME']
-    print("USING ", computer, " Computer. ")
-    if 'EPHYS-2' in computer:
+    print("USING ", self.computer, " Computer. ")
+    if 'EPHYS-2' in self.computer:
         shockerAddress = dev + '/port1/line5'  # Flav's PC #Output line 6
         print ("Be sure shocker connected to port1/Line6")
-    elif 'EPHYS-1' in computer:
+    elif 'EPHYS-1' in self.computer:
         shockerAddress = dev + '/port1/line5'  # Jean's PC
         print ("Be sure shocker connected to port1/Line6") #Output line 6
     else:
@@ -167,7 +174,10 @@ def shockerSetup():
 Returns a new fan task
 '''
 def fanSetup():
-    fanAddress = dev + '/port2/line2'
+    if 'EPHYS-2' in self.computer:
+        fanAddress = dev + '/port2/line2'#
+    if 'EPHYS-1' in self.computer:
+        fanAddress = dev + '/port2/line2'#
     fan = InterfaceOut(fanAddress)
     fan.startTask()
     return fan

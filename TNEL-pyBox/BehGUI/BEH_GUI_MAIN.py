@@ -52,6 +52,7 @@ class BEH_GUI():
     def __init__(self, NIDAQ_AVAILABLE):
         self.NIDAQ_AVAILABLE = NIDAQ_AVAILABLE
         self.setGlobals()
+        self.computer = os.environ['COMPUTERNAME']
         random.seed()
         #self.load_expt_file()
         self.setupGUI()
@@ -288,11 +289,11 @@ class BEH_GUI():
         #    Note:                 draw_camera(self.myscreen,fill_color, ON_OFF, REC, x, y, w,h, linew)
         self.camera = GUIFunctions.draw_camera(self.myscreen, (100,100,100),self.CAMERA_ON,self.RECORDING,235, 245, 30,20, 2)
 
-        # GUI TOUCH SCREEN
+        # GUI TOUCH SCREEN 
         for x,y in self.background_hits:
             #print(x,y)
             draw_plus_sign(self.myscreen, x + 40, y +320, 5, (255,0,0) ) # (40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                      self.touch_time = cur_time
-
+     
         for x,y in self.correct_img_hits:
             draw_plus_sign(self.myscreen, x + 40, y +320, 5, (0,255,0) ) # (40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                      self.touch_time = cur_time
 
@@ -303,7 +304,7 @@ class BEH_GUI():
             #print(self.touchImgCoords)
             for coords in self.touchImgCoords:
                 #print (coords)
-                x,y = int(coords[0]/4 + 40), int(coords[1]/4 + 320)   # NOTE: 40,320 is top-left of gui touch representation. 1/4 is its scale
+                x,y = int(coords[0]/4 + 40), int(coords[1]/4 + 320)   # NOTE: 40,320 is top-left of gui touch representation. 1/4 is its scale     
                 pygame.draw.rect(self.myscreen, (0,0,255) , (x,y,60,60),  1)
 
         except: pass
@@ -491,7 +492,7 @@ class BEH_GUI():
 
                                     else:
                                         self.EXPT_FILE_LOADED = False
-                                        print("HUMPH! COULD NOT LOAD EXPT FILE (on load file press)")
+                                        print("HUMPH! COULD NOT LOAD EXPT FILE (on button press)")
                                         GUIFunctions.log_event(self, self.events,"Expt File name or path DOES NOT EXIST",self.cur_time)
                                     for LED in self.LEDs: # Look for EXPT STARTED LED
                                           if LED.index == 6: # Expt Started light
@@ -582,7 +583,7 @@ class BEH_GUI():
 
                                     else:
                                         self.EXPT_FILE_LOADED = False
-                                        print("HUMPH! COULD NOT LOAD EXPT FILE (on START EXPT)")
+                                        print("HUMPH! COULD NOT LOAD EXPT FILE (on button press)")
                                         GUIFunctions.log_event(self, self.events,"Expt File name or path DOES NOT EXIST",self.cur_time)
 
 
@@ -1098,30 +1099,30 @@ class BEH_GUI():
                     placementList = [1] # 1 1mage, random locations
                     self.touchImgCoords=(random.randint(0,784),random.randint(0,278))
                     print(placementList, self.touchImgCoords)
-
+                    
                     # NOTE: The above assumes pics are 240 x 240 and screen is 1024 x (768 - deadzone) = 1024 x 518,
                     #       hence  farthest bottom-right is 784 x 278 (1024-240 x 518-240)
                     imgList = {}
                     for key in self.touchImgs.keys():
-
+                        
                         imgList[key] = self.touchImgCoords #places images
                         self.TSq.put(imgList)
                         self.Protocol_ln_num +=1
                     print('ImgList', imgList)
-
+                    
                     log_string = str(imgList)
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
                     log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
-
+                    
                     print('log_string', log_string)
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
                 else:
 
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
                     print(placementList, self.touchImgCoords)
-
+                    
                     # NOTE: random.sample(population, k)
                     #       Returns a new list containing elements from the population while leaving
                     #       the original population unchanged.
@@ -1134,13 +1135,13 @@ class BEH_GUI():
                         i+=1
                         self.TSq.put(imgList)
                         self.Protocol_ln_num +=1
-
+                        
                     log_string = str(imgList)
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
                     log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
-                    print('log_string', log_string)
+                    print('log_string', log_string)    
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
         ###############################
         # START LOOP
@@ -1509,14 +1510,14 @@ class BEH_GUI():
                if not self.TSBack_q.empty():
                    self.touchMsg = self.TSBack_q.get()
                    x = int(self.touchMsg['XY'][0])
-                   y = int(self.touchMsg['XY'][1])
+                   y = int(self.touchMsg['XY'][1])   
                    ##########################################
                    #  BACKGROUND TOUCHED (image missed)
                    ##########################################
                    if self.touchMsg['picture'] == 'missed': # Touched background
 
                        GUIFunctions.log_event(self, self.events," missed ," + str(self.touchMsg['XY']) , self.cur_time)
-                       self.background_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+                       self.background_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor 
                        self.background_touches += 1
                        if self.TOUCH_TRAINING:
                           self.WRONG = True # When TOUCHSCREEN TRAING, ANY TOUCH RESULTS IN TRUE (??????????)
@@ -1537,20 +1538,20 @@ class BEH_GUI():
                                if self.touchMsg['picture'] == img:  # Touched an image
                                    GUIFunctions.log_event(self,self.events, "Probability of pellet: " + str(probabilityList[self.trial_num]),self.cur_time)
                                    GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " CORRECT IMG TOUCHED, " + self.touchMsg['XY'] , self.cur_time)
-                                   self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+                                   self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                   
                                    # Holds the probability for each trial
                                    self.cur_probability = probabilityList[self.trial_num]
                                    self.CORRECT = True
                                    self.correct_image_touches += 1
                                else:
                                    GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " WRONG IMG TOUCHED, " + self.touchMsg['XY'] , self.cur_time)
-                                   self.wrong_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+                                   self.wrong_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                   
                        #################################
                        # TOUCH TRAINING
                        #################################
                        elif self.TOUCH_TRAINING:
-                           self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
-
+                           self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                  
+        
                            for img in self.touchImgs.keys():
                                if self.touchMsg['picture'] == img:  # Touched an image
                                   self.correct_image_touches += 1
@@ -1726,6 +1727,7 @@ class BEH_GUI():
                self.Protocol_ln_num +=1
 
 if __name__ == "__main__":
+    
     GUIFunctions.openWhiskerEphys(NIDAQ_AVAILABLE)
     beh = BEH_GUI(NIDAQ_AVAILABLE)
     beh.BehavioralChamber()

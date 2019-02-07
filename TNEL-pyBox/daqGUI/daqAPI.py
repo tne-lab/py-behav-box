@@ -11,8 +11,16 @@ to control a behavioral box
 import nidaqmx
 from nidaqmx.constants import (LineGrouping)
 import time
-dev = 'Dev2'
 
+#############
+import os
+
+computer = os.environ['COMPUTERNAME']
+if 'EPHYS-2' in computer:
+    dev = 'Dev2'
+elif 'EPHYS-1' in computer:
+    dev = 'Dev1'
+#############
 '''
 Class for Digital Outputs. Can send (and maybe see what has been written. Hasn't been tested)
 Also holds task information.
@@ -212,7 +220,7 @@ def leftNoseInputSetup():
 Returns right nose poke input Task
 '''
 def rightNoseInputSetup():
-    rightNoseInputAddress = dev + '/port6/line4'
+    rightNoseInputAddress = self.dev + '/port6/line4'
     rightNose = InterfaceIn(rightNoseInputAddress)
     rightNose.startTask()
     return rightNose
