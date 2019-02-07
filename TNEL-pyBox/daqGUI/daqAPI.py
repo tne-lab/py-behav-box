@@ -220,7 +220,7 @@ def leftNoseInputSetup():
 Returns right nose poke input Task
 '''
 def rightNoseInputSetup():
-    rightNoseInputAddress = self.dev + '/port6/line4'
+    rightNoseInputAddress = dev + '/port6/line4'
     rightNose = InterfaceIn(rightNoseInputAddress)
     rightNose.startTask()
     return rightNose
