@@ -65,6 +65,8 @@ class Stim:
         self.task.timing(sr) # rate , can also change active_edge,
                                 #continuous or finite number of samples
 
+        self.waitForEvent()
+
 
     def sendStim():
         self.task.write(self.waveform, auto_start=True)
