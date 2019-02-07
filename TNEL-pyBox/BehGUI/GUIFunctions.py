@@ -39,9 +39,15 @@ def openWhiskerEphys(NIDAQ_AVAILABLE):
         win32gui.EnumWindows(lookForProgram, 'Open Ephys GUI')
         if not IsOpenEphysRunning:
             programName = 'Open Ephys GUI'
-            #try
-            oe = r'E:\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Jean's PC Ephys-1
-            # oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
+            self.computer = os.environ['COMPUTERNAME']
+            print("USING COMPUTER: ",self.computer)
+            oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
+#            if 'EPHYS-2' in self.computer:
+#                oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
+#            elif 'EPHYS-1' in self.computer:
+#                oe = r'E:\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Jean's PC Ephys-1
+
+
             window = subprocess.Popen(oe)# # doesn't capture output
             time.sleep(2)
             win32gui.EnumWindows(lookForProgram, programName)

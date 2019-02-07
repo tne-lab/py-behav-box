@@ -28,12 +28,15 @@ import zmq
 import json
 #from NIDAQ_GUI_elements import *
 from RESOURCES.GUI_elements_by_flav import *
-try:
-    import daqHelper
-    import daqAPI
-    NIDAQ_AVAILABLE = True
-except:
-    NIDAQ_AVAILABLE = False
+import daqHelper
+import daqAPI
+NIDAQ_AVAILABLE = True
+##try:
+##    import daqHelper
+##    import daqAPI
+##    NIDAQ_AVAILABLE = True
+##except:
+##    NIDAQ_AVAILABLE = False
 
 from collections import deque
 from multiprocessing import Process, Queue
@@ -1727,7 +1730,7 @@ class BEH_GUI():
                self.Protocol_ln_num +=1
 
 if __name__ == "__main__":
-    
+    print("NIDAQ_AVAILABLE: ", NIDAQ_AVAILABLE)
     GUIFunctions.openWhiskerEphys(NIDAQ_AVAILABLE)
     beh = BEH_GUI(NIDAQ_AVAILABLE)
     beh.BehavioralChamber()

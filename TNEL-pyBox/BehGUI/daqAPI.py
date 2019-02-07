@@ -21,11 +21,11 @@ from nidaqmx.constants import (LineGrouping)
 import time
 import os
 dev = 'Dev2'
-self.computer = os.environ['COMPUTERNAME']
-print("USING COMPUTER: "self.computer)
-if 'EPHYS-2' in self.computer:
+computer = os.environ['COMPUTERNAME']
+print("USING COMPUTER: ",computer)
+if 'EPHYS-2' in computer:
         dev = 'Dev2'
-elif 'EPHYS-1' in self.computer:
+elif 'EPHYS-1' in computer:
         dev = 'Dev1'
 #dev = 'Dev2' #Flav's PC ephys-2
 #dev = 'Dev1' #Jean's PC ephys-1
@@ -156,11 +156,11 @@ Returns a SHOCKER task
 '''
 def shockerSetup():
     computer = os.environ['COMPUTERNAME']
-    print("USING ", self.computer, " Computer. ")
-    if 'EPHYS-2' in self.computer:
+    print("USING ", computer, " Computer. ")
+    if 'EPHYS-2' in computer:
         shockerAddress = dev + '/port1/line5'  # Flav's PC #Output line 6
         print ("Be sure shocker connected to port1/Line6")
-    elif 'EPHYS-1' in self.computer:
+    elif 'EPHYS-1' in computer:
         shockerAddress = dev + '/port1/line5'  # Jean's PC
         print ("Be sure shocker connected to port1/Line6") #Output line 6
     else:
@@ -175,9 +175,10 @@ def shockerSetup():
 Returns a new fan task
 '''
 def fanSetup():
-    if 'EPHYS-2' in self.computer:
+    computer = os.environ['COMPUTERNAME']
+    if 'EPHYS-2' in computer:
         fanAddress = dev + '/port2/line2'#
-    if 'EPHYS-1' in self.computer:
+    if 'EPHYS-1' in computer:
         fanAddress = dev + '/port2/line2'#
     fan = InterfaceOut(fanAddress)
     fan.startTask()
