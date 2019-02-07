@@ -40,7 +40,8 @@ def openWhiskerEphys(NIDAQ_AVAILABLE):
         if not IsOpenEphysRunning:
             programName = 'Open Ephys GUI'
             #try
-            oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe'
+            oe = r'E:\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Jean's PC Ephys-1
+            # oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
             window = subprocess.Popen(oe)# # doesn't capture output
             time.sleep(2)
             win32gui.EnumWindows(lookForProgram, programName)
@@ -227,7 +228,8 @@ def log_event(self, event_lst, event, cur_time, other=''):
     event_lst.append(event_string+event_other) # To Display on GUI
     if len(event_lst) > 14:  self.start_line = len(event_lst) -14
     try:
-        #print(self.log_file_path_name)
+        print("TRYING TO OPEN", self.log_file_path_name)
+
         log_file = open(self.log_file_path_name,'a')        # OPEN LOG FILE
         log_file.write(event_string + event_other + '\n')   # To WRITE TO FILE
         print(event_string + event_other)                   # print to display

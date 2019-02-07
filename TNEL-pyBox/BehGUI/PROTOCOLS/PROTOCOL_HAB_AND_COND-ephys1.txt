@@ -3,7 +3,7 @@
 EXPT_NAME = HAB_and_COND
 EXPT_PATH 	= E:\py-behav-box\TNEL-pyBox\BehGUI\DATA
 VI_TIMES_LIST_PATH	=  E:\py-behav-box\TNEL-pyBox\BehGUI\PROTOCOLS\HAB_COND_EXT_AND_RECALL_VIs.txt
-OPEN_EPHYS_PATH = C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe
+OPEN_EPHYS_PATH = E:\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe
 
 
 [TONE1] # Need TONE1, TONE2

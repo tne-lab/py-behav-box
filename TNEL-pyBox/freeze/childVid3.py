@@ -30,4 +30,4 @@ def vidCapture(q,back_q):
         vid.run(q, back_q, outfile)
         return
     else:
-        print('error opening video')
+        print('error opening video in child')

@@ -38,7 +38,7 @@ def get_before_hash(line):
         print("Could not parse line")
         return clean_line
 def load_expt_file(self):
-    print("LOADING: ", self.expt_file_path_name)
+    print("LOADING: in load protocol", self.expt_file_path_name)
     self.setup = []
     self.protocol = []
     self.conditions = []
@@ -515,7 +515,7 @@ def load_expt_file(self):
                         #print(num)
                         self.recall_vi_times.append(int(num))
                 print("VI FILE LOADED",self.VIs_file_path)
-                
+
             f.close()
 
         except OSError:

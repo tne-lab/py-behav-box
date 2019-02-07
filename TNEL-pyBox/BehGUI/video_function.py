@@ -341,7 +341,7 @@ def runVid(q, back_q):
         vid.close()
         return
     else:
-        print('error opening video')
+        print('error opening video in video funcion.py')
 
 def runSimpleVid(q):
     simpleVid = SimpleVid(0,q) # 0 is the camera number

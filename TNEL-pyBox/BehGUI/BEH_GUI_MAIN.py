@@ -477,7 +477,7 @@ class BEH_GUI():
                                     self.START_EXPT = False
                                     button.UP_DN = "DN"
                                     self.events = []
-                                    #print("LOADING EXPT FILE: ", self.expt_file_path_name)
+                                    #print("LOADING EXPT FILE: in BehGUI_Main ", self.expt_file_path_name)
                                     self.EXPT_FILE_LOADED = self.load_expt_file()
 
                                     if self.EXPT_FILE_LOADED:
@@ -729,11 +729,11 @@ class BEH_GUI():
                             elif user_input.label == "EXPT FILE NAME":
                                  self.expt_file_name = GUIFunctions.choose_file()
                                  self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
-                                 print ("File selected: ",self.expt_file_name)
+                                 print ("File selected: in BehGUI main",self.expt_file_name,self.expt_file_path_name)
                                  if self.expt_file_name == '':
                                      self.expt_file_name = user_input.text
                                      self.expt_file_path_name = os.path.join(self.datapath,self.expt_file_name )
-
+                                     print ("File selected: in BehGUI main2",self.expt_file_name,self.expt_file_path_name)
                             elif user_input.label == "Spk(S)":
                                 try:    self.Tone1_Duration = float(user_input.text)
                                 except: self.Tone1_Duration = ''
