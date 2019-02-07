@@ -13,20 +13,21 @@ def get_val_between_equal_sign_and_hash(line):
         val = new_Left_right[0].strip()  # comment = left_right[1].strip()
         return val
     except:
-        print("Could not parse line")
+        print("Could not parse line1:", line)
         return False
 
 def get_LR_before_hash(line):
     try:
         left_right = line.split('=')
         left = left_right[0].strip()
-        right = left_right[1].strip()
+        if len(left_right) > 1 : right = left_right[1].strip()
+        else:  right = ''
         new_left_right = right.split('#') #IGNORES "#" FOLLOWED BY COMMENTS
         right = new_left_right[0].strip()  # comment = left_right[1].strip()
         #if len(new_left_right) > 1: print("Comment: ",new_left_right[1] )
         return left,right
     except:
-        print("Could not parse line")
+        print("Could not parse line2:", line)
         return left
 def get_before_hash(line):
     clean_line = line.strip()
@@ -35,8 +36,9 @@ def get_before_hash(line):
         new_left = left[0].strip()  #  # Remove leading and trailoing blanks and \n
         return new_left
     except:
-        print("Could not parse line")
+        print("Could not parse line3:", line)
         return clean_line
+
 def load_expt_file(self):
     print("LOADING: in load protocol", self.expt_file_path_name)
     self.setup = []
@@ -333,6 +335,7 @@ def load_expt_file(self):
                         #self.cur_probability = 100.0 # 100% To start. Reduced by 15% after 10 Presses/min for 10 min in BEH_GUI_MAIN
                     elif 'TOUCH_BANDIT' in line:
                         self.TOUCH_BANDIT = True
+
                 elif BAR_PRESS:
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
                     str_before_hash = get_before_hash(line)
@@ -403,6 +406,7 @@ def load_expt_file(self):
                         print("################")
                         print("#    SETUP     #")
                         print("################")
+
                 elif PROTOCOL:
                     #print("self.protocol: ",line)
                     if "PROTOCOL" not in line: # Skips [header] line
