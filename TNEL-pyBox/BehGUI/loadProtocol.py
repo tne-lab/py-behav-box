@@ -515,6 +515,9 @@ def load_expt_file(self):
                         #print(num)
                         self.recall_vi_times.append(int(num))
                 print("VI FILE LOADED",self.VIs_file_path)
+
+            f.close()
+
         except OSError:
             print("Could not open ",self.VIs_file_path)
             return False

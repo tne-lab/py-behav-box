@@ -458,7 +458,7 @@ class BEH_GUI():
                                     self.START_EXPT = False
                                     button.UP_DN = "DN"
                                     self.events = []
-                                    #print("LOADING EXPT FILE: ", self.expt_file_path_name)
+                                    print("LOADING EXPT FILE: ", self.expt_file_path_name)
                                     self.EXPT_FILE_LOADED = self.load_expt_file()
 
                                     if self.EXPT_FILE_LOADED:
@@ -473,8 +473,9 @@ class BEH_GUI():
 
                                     else:
                                         self.EXPT_FILE_LOADED = False
-                                        print("HUMPH! COULD NOT LOAD EXPT FILE (on button press)")
+                                        print("HUMPH! COULD NOT LOAD EXPT FILE (on LOAD PROTOCOL)")
                                         GUIFunctions.log_event(self, self.events,"Expt File name or path DOES NOT EXIST",self.cur_time)
+
                                     for LED in self.LEDs: # Look for EXPT STARTED LED
                                           if LED.index == 6: # Expt Started light
                                               LED.ONOFF = "OFF"
@@ -564,7 +565,7 @@ class BEH_GUI():
 
                                     else:
                                         self.EXPT_FILE_LOADED = False
-                                        print("HUMPH! COULD NOT LOAD EXPT FILE (on button press)")
+                                        print("HUMPH! COULD NOT LOAD EXPT FILE (on START EXPT)")
                                         GUIFunctions.log_event(self, self.events,"Expt File name or path DOES NOT EXIST",self.cur_time)
 
 
@@ -845,7 +846,8 @@ class BEH_GUI():
         RUN SETUP
         '''
         #cur_time = time.perf_counter()
-        print("SETUPDICT:....................",self.setup,"length: ",len(self.setup),"linenum: ",self.setup_ln_num)
+        try:  print("SETUPDICT:....................",self.setup,"length: ",len(self.setup),"linenum: ",self.setup_ln_num)
+        except: print("NO [SETUP] sectionin PROTOCOL FILE!!!!!!!!!!!!!!!!!!!!")
         setupDict = self.setup[self.setup_ln_num]
         key = list(setupDict.keys())[0] # First key in protocolDict
         #print ("KEY:.....................",key)
