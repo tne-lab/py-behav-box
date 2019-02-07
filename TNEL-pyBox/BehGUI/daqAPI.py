@@ -20,8 +20,9 @@ import nidaqmx
 from nidaqmx.constants import (LineGrouping)
 import time
 import os
+dev = 'Dev2'
 self.computer = os.environ['COMPUTERNAME']
-print
+print("USING COMPUTER: "self.computer)
 if 'EPHYS-2' in self.computer:
         dev = 'Dev2'
 elif 'EPHYS-1' in self.computer:

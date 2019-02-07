@@ -14,7 +14,7 @@ import time
 
 #############
 import os
-
+dev = 'Dev2'
 computer = os.environ['COMPUTERNAME']
 if 'EPHYS-2' in computer:
     dev = 'Dev2'
