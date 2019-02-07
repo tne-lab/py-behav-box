@@ -42,10 +42,10 @@ def openWhiskerEphys(NIDAQ_AVAILABLE):
             self.computer = os.environ['COMPUTERNAME']
             print("USING COMPUTER: ",self.computer)
             oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
-#            if 'EPHYS-2' in self.computer:
-#                oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
-#            elif 'EPHYS-1' in self.computer:
-#                oe = r'E:\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Jean's PC Ephys-1
+            if 'EPHYS-2' in self.computer:
+                oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
+            elif 'EPHYS-1' in self.computer:
+                oe = r'E:\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Jean's PC Ephys-1
 
 
             window = subprocess.Popen(oe)# # doesn't capture output

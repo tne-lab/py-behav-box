@@ -28,8 +28,8 @@ CAMERA=True
 REC=True
 FOOD_LIGHT=True
 
-[BAR_PRESS] #NOTE: VI=15 is variable interval with meant time of 15.  PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
-VI=15
+[BAR_PRESS] #NOTE: This is an independent process. PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
+VI=15       #NOTE: VI=15 is variable interval with meant time of 15.  PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 EXTEND_LEVERS=True

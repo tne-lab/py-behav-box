@@ -338,6 +338,7 @@ def load_expt_file(self):
                     str_before_hash = get_before_hash(line)
                     if "VI" in str_before_hash:
                         self.VI_REWARDING = True
+                        VI = get_val_between_equal_sign_and_hash(line)
                         try:
                             self.var_interval_reward = int(VI)
                             print("var_interval_reward: ",self.var_interval_reward)
