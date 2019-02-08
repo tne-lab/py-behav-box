@@ -105,6 +105,8 @@ class Vid:
             vid_cur_time = time.perf_counter()
             #Get frame
             ret, frame = self.cap.read()
+            frame = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
+
             # Run video
             try:
                 msg = self.q.pop()
@@ -364,7 +366,8 @@ class SimpleVid:
     def run(self):
         while(self.cap.isOpened()):
             ret, frame = self.cap.read()
-            frame = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
+
+            #frame = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
             if not ret:
                 print('Error loading frame, probably last frame')
                 return
