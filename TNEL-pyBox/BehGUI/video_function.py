@@ -273,7 +273,7 @@ class Vid:
     # Create Region of Interest coordinates
     def genROI(self, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.4,(0,255,255),2,cv2.LINE_AA)
+        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.4,(0,0,255),2,cv2.LINE_AA)
         ROI = cv2.selectROI(frame) #NOTE: NOT A STR, but tupple of 4 numbers: (x,y,w,h)
         self.ROIstr = str(ROI)
         #print("ROI CONVERTED TO STR",self.ROIstr )

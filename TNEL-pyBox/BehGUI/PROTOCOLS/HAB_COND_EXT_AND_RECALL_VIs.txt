@@ -1,4 +1,4 @@
-NOTE: All numbers are in seconds.
+NOTE: All numbers are in seconds and will be used a VI reward scheduling.
 Habituation: 221, 180, 65, 214, 220
 Conditioning: 207, 180, 139, 182, 261, 71, 220
 Extinction: 200, 127, 232, 71, 233, 191, 73, 268, 132, 282, 77, 297, 177, 107, 133, 116, 233, 252, 128, 271

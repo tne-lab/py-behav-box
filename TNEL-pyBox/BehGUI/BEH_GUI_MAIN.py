@@ -1285,7 +1285,7 @@ class BEH_GUI():
                      self.VI_start = self.cur_time
                      self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
                      #print("new vi", self.VI, " (sec)")
-                     GUIFunctions.log_event(self, self.events, "new vi: "+ str(self.VI) + " (sec)" , self.cur_time)
+                     GUIFunctions.log_event(self, self.events, "new VI: "+ str(self.VI) + " (sec)" , self.cur_time)
                      GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
 
            #### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1543,7 +1543,7 @@ class BEH_GUI():
                                    GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " CORRECT IMG TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)
                                    self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                                    # Holds the probability for each trial
-                                   self.cur_probability = probabilityList[self.trial_num]
+                                   self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
                                    self.correct_image_touches += 1
                                else:
@@ -1639,7 +1639,7 @@ class BEH_GUI():
                if self.CORRECT:
                   print("TONE1 DuRATION: ", self.Tone1_Duration)
                   #self.TONE_ON = True
-                  self.GUIFunctions.PLAY_TONE(self, self.events,'TONE1',self.cur_time) #using computer speeker
+                  self.GUIFunctions.PLAY_TONE(self, self.events,'TONE1 for Correct Response',self.cur_time) #using computer speeker
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
                   self.correctPercentage = self.num_correct/self.trial_num * 100
@@ -1655,29 +1655,26 @@ class BEH_GUI():
                   self.no_actionPercentage = self.num_no_action/self.trial_num * 100
                   print("No Action Taken")
                print(outcome)
-               #########################
-               # OUTCOMES
-               #########################
+               ##############################################################
+               # OUTCOMES (Specified in protocol files under [CONDITIONS])
+               ##############################################################
                if 'PELLET' in outcome:
-
-                   #print ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Deciding on pellet !!!!!!!!!!!!!")
                    if len(outcome)<=6: # Just 'PELLET'
                        GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                    else: #"PELLET****" i.e. PELLET80 or PELLET_VAR or PELLET_TOUCHVI1 or PELLET_TOUCHVI2
                        left_of_outcome_str = outcome[6:]
                        #print(left_of_outcome_str)
-                       if "_TOUCHVI1" == left_of_outcome_str: # PELLET_TOUCHVI1: Touched image
+                       if "_TOUCHVI1" == left_of_outcome_str: # PELLET_TOUCHVI1: Touched image (CORRECT RESPONSE)
                            if self.cur_time > (self.VI_start + self.cur_VI_images): # Give reward and reset VIs
                               # Give Rewards
                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
-                              #GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                               # Reset VIs
                               self.VI_start = self.cur_time
                               self.cur_VI_images = random.randint(0,int(self.VI_images * 2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
                               #print("new vi", self.cur_VI_images, " (sec)")
+                              GUIFunctions.log_event(self, self.events,"Cur_VI FOR IMAGE TOUCH = " + str(self.cur_VI_images),self.cur_time)
 
-
-                       elif "TOUCHVI2" in left_of_outcome_str: # or PELLET_TOUCHVI2: Touched Background
+                       elif "TOUCHVI2" in left_of_outcome_str: # or PELLET_TOUCHVI2: Touched Background (WRONG RESPONSE)
                            if self.cur_time > (self.VI_start + self.cur_VI_background): # Give reward and reset VIs
                               # Give 1 Reward
                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
@@ -1685,6 +1682,7 @@ class BEH_GUI():
                               self.VI_start = self.cur_time
                               self.cur_VI_background = random.randint(0,int(self.VI_background*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
                               #print("new backgroung vi", self.VI_background, " (sec)")
+                              GUIFunctions.log_event(self, self.events,"Cur_VI FOR BACKGROUND TOUCH = " + str(self.cur_VI_images),self.cur_time)
 
 
                        elif "VAR" in left_of_outcome_str: # if "VAR" after "PELLET"
