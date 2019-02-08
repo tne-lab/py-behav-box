@@ -333,8 +333,8 @@ class Vid:
         hours, minutes, seconds, milliseconds = s.split(":")
         return int(hours)*60*60*1000 + int(minutes)*60*1000 + int(seconds)*1000 + int(milliseconds)
 
-def runVid(q, back_q):
-    vid = Vid(1, q ,back_q)
+def runVid(q, back_q): # THIS TURNS ON MAIN Camera (if available)
+    vid = Vid(0, q ,back_q)
 
     if not vid.capError:
         vid.run()
@@ -343,8 +343,8 @@ def runVid(q, back_q):
     else:
         print('error opening video in video funcion.py')
 
-def runSimpleVid(q):
-    simpleVid = SimpleVid(0,q) # 0 is the camera number
+def runSimpleVid(q):# THIS TURNS ON 2nd Camera (if available)
+    simpleVid = SimpleVid(1,q) # 0 is the camera number
 
     if not simpleVid.capError:
         simpleVid.run()
