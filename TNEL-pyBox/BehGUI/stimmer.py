@@ -28,7 +28,7 @@ class Stim:
         widthSamp = int(width/1000.0*sr)
         ipiSamp = int(ipi/1000.0*sr)
         period = widthSamp + ipiSamp
-        pulseStart = int(phaseShift/360.0 * period)
+        pulseStart = int(phaseShift/360.0 * ipiSamp)
         pulseEnd = pulseStart + widthSamp
 
         for num in range(numPulse):
