@@ -22,7 +22,7 @@ def detectPress(checkPressLeft,checkPressRight):
         if rightPress and REPEAT_RP == False:
                 print('Right')
                 return 'Right'
-        else: return False
+        #else: return False
 
         # LEFT
         if prev_leftPress  and leftPress: # prev and current are BOTH True
@@ -30,10 +30,11 @@ def detectPress(checkPressLeft,checkPressRight):
         else: REPEAT_LP = False
         prev_leftPress = leftPress
 
-        if leftPress:
+        if leftPress and REPEAT_LP == False:
             print('left')
             return 'Left'
-        else: return False
+        #else: 
+        return False
 
 prev_foodEaten = False
 REPEAT_FE = False

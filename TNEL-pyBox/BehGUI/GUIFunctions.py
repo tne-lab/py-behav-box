@@ -9,6 +9,7 @@ import tkinter as Tk #Note: "Tkinter" in python 2 (capital T)
 from tkinter.filedialog import askopenfilename
 import os
 import giveFood
+import setGlobals
 try:
     import win32gui
     LINUX = False
@@ -39,13 +40,13 @@ def openWhiskerEphys(NIDAQ_AVAILABLE):
         win32gui.EnumWindows(lookForProgram, 'Open Ephys GUI')
         if not IsOpenEphysRunning:
             programName = 'Open Ephys GUI'
-            self.computer = os.environ['COMPUTERNAME']
-            print("USING COMPUTER: ",self.computer)
+            setGlobals.computer = os.environ['COMPUTERNAME']
+            print("USING COMPUTER: ",setGlobals.computer)
             oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
-            if 'EPHYS-2' in self.computer:
+            if 'EPHYS-2' in setGlobals.computer:
                 oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
-            elif 'EPHYS-1' in self.computer:
-                oe = r'E:\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Jean's PC Ephys-1
+            elif 'EPHYS-1' in setGlobals.computer:
+                oe = r'E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Jean's PC Ephys-1
 
 
             window = subprocess.Popen(oe)# # doesn't capture output
@@ -91,7 +92,7 @@ def PLAY_TONE_LAF(self, events, TONE_ID, cur_time):  # Plays tone using lafayett
     if TONE_ID == 'TONE1':
         log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
 
-        if self.NIDAQ_AVAILABLE:  self.low_tone.sendDByte(4)
+        if self.NIDAQ_AVAILABLE:  self.low_tone.sendDBit(True)
 
 #    elif TONE_ID == 'TONE2':
 #        log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
@@ -295,7 +296,7 @@ def exit_game(self):
     if self.TOUCH_TRHEAD_STARTED == True:
         self.TSq.put('STOP')
     self.openEphysQ.put('STOP')
-    self.stimQ.put('STOP')
+    #self.stimQ.put('STOP')
     pygame.quit()
     sys.exit()
 
