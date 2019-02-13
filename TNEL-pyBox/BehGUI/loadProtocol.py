@@ -338,7 +338,8 @@ def load_expt_file(self):
 
                 elif BAR_PRESS:
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
-                    str_before_hash = get_before_hash(line)
+                    str_before_hash = get_before_hash(line) # [BAR_PRESS]
+                                                            #  VI=15
                     if "VI" in str_before_hash:
                         self.VI_REWARDING = True
                         VI = get_val_between_equal_sign_and_hash(line)
@@ -346,10 +347,29 @@ def load_expt_file(self):
                             self.var_interval_reward = int(VI)
                             print("var_interval_reward: ",self.var_interval_reward)
                         except:
-                            print ("!!!!!!!!!!!VI must = a number in EXP PROOCOL file!!!!!!!!!!!!!!")
+                            print ("!!!!!!!!!!!VI must = a number in EXP PROOCOL file (VI=15 )!!!!!!!!!!!!!!")
+
                     if "BAR_PRESS_TRAIN" in line:
                         self.BAR_PRESS_TRAINING = True
-                        self.VR=1
+                        vis = get_val_between_equal_sign_and_hash(line)
+                        if len(vis) > 0 and "VI=" in vis: #BAR_PRESS_TRAIN=VI(1,15)
+                            VIs = vis.split(",")
+                            VI_intial = VIs[0][3:]
+                            print("VI_INITIAL: ",VI_intial)
+                            self.VI_initial = float(VI_intial)
+                            self.VI = self.VI_initial
+                            VI_final = VIs[1][:-1]
+                            print("VI_final: ",VI_final)
+                            self.VI_final =  float(VI_final)
+                        if len(vis) > 0 and "VR=" in vis: #BAR_PRESS_TRAIN=VI(1,15)
+                            VRs = vis.split(",")
+                            VR_intial = VRs[0][3:]
+                            print("VR_INITIAL: ",VR_intial)
+                            self.VR_initial = float(VR_intial)
+                            VR_final = VRs[1][:-1]
+                            print("VR_final: ",VR_final)
+                            self.VR_final =  float(VR_final)
+##                        self.VR=1
 ##                        VR = get_val_between_equal_sign_and_hash(line)
 ##                        # (10, 1,30,5) creates 10 variable ratio reward stating at every press (1, to random between (1,30) incremented by 5 every loop)
 ##                        try:

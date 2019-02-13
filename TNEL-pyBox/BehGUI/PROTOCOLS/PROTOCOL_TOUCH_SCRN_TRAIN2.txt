@@ -3,7 +3,7 @@
 EXPT_NAME = Screen_Touch_training
 EXPT_PATH 	= C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
 
-[TONE1] # Need TONE1 t obe associated with correct action
+[TONE1] # Need TONE1 to be associated with correct action
 Duration(s) = 2
 Freq(Hz)	= 1800
 Volume(0-1)	= 1.0

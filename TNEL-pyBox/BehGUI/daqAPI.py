@@ -198,7 +198,7 @@ def cabinLightSetup():
 Returns a new low tone task
 '''
 def lowToneSetup():
-    lowToneAddress = dev + '/port1/line7'
+    lowToneAddress = dev + '/port1/line7'#For 2Khz.  Note: #8 on Beh Box
     lowTone = InterfaceOut(lowToneAddress)
     lowTone.startTask()
     return lowTone
@@ -206,11 +206,11 @@ def lowToneSetup():
 '''
 Returns a new high tone Task
 '''
-#def highToneSetup():
-#    highToneAddress = dev + '/port2/line5'
-#    highTone = InterfaceOut(highToneAddress)
-#    highTone.startTask()
-#    return highTone
+def highToneSetup():
+    highToneAddress = dev + '/port2/line1' #For 6Khz.  Note: #9 on Beh Box
+    highTone = InterfaceOut(highToneAddress)
+    highTone.startTask()
+    return highTone
 
 ####################################################
 ##   Inputs
