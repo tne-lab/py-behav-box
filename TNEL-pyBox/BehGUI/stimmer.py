@@ -28,21 +28,20 @@ class Stim:
         widthSamp = int(width/1000.0*sr)
         ipiSamp = int(ipi/1000.0*sr)
         period = widthSamp + ipiSamp
-        pulseStart = int(phaseShift/360.0 * ipiSamp)
-        pulseEnd = pulseStart + widthSamp
 
         for num in range(numPulse):
-            for i in range(period):
-                if i in range(pulseStart, pulseEnd+1):
-                    if biphasic:
-                        if i in range(pulseStart, math.ceil((pulseEnd-pulseStart)/2) + 1 + pulseStart):
-                            waveform.append(amplitude)
-                        else:
-                            waveform.append(negAmplitude)
-                    else:
+            for i in range(int(phaseShift/360.0 * period)):
+                waveform.append(0)
+            for i in range(widthSamp):
+                if biphasic:
+                    if i <= math.ceil(widthSamp/2) + 1:
                         waveform.append(amplitude)
+                    else:
+                        waveform.append(negAmplitude)
                 else:
-                    waveform.append(0)
+                    waveform.append(amplitude)
+            for i in range(int((360-phaseShift)/360.0 * period)):
+                waveform.append(0)
         ##################################################################
 
         # From parent to get quit
