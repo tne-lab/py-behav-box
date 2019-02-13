@@ -15,9 +15,9 @@ def setGlobals(self):
 
     ###########################################################
     self.computer = os.environ['COMPUTERNAME']
-##    if 'ephys-2' in self.computer:
+##    if 'EPHYS-2' in self.computer:
 ##        self.dev = 'Dev2'
-##    elif 'ephys-1' in self.computer:
+##    elif 'EPHYS-1' in self.computer:
 ##        self.dev = 'Dev1'
     ################################################################
     # GUI GLOBALS
@@ -37,7 +37,8 @@ def setGlobals(self):
         self.fan = daqAPI.fanSetup()
         self.cabin_light = daqAPI.cabinLightSetup()
         self.leverOut = daqAPI.leverOutputSetup()
-        self.food_light = daqAPI.foodLightSetup()
+        if "EPHYS-2" in self.computer:
+            self.food_light = daqAPI.foodLightSetup()
         self.give_food = daqAPI.giveFoodSetup()
 
         self.apply_shock = daqAPI.shockerSetup()

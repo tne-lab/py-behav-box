@@ -680,7 +680,10 @@ class BEH_GUI():
                     if self.speeker.collidepoint(cur_x,cur_y):
                           # NOTE: Tone_OFF logged while drawing speeker above in main loop
                           print("TONE1 DURATION: ", self.Tone1_Duration)
-                          self.GUIFunctions.PLAY_TONE(self, self.events,"TONE1",self.cur_time) #using computer speeker
+                          if "EPHYS-2" in self.computer:
+                             self.GUIFunctions.PLAY_TONE(self, self.events,"TONE1",self.cur_time) #using computer speeker
+                          elif "EPHYS-1" in self.computer:
+                             self.GUIFunctions.PLAY_TONE_LAF(self, self.events,"TONE1",self.cur_time) #using computer speeker
                           #self.GUIFunctions.PLAY_TONE_LAF(self, self.events,"TONE1",self.cur_time) #Using Lafayette
 
                     # SHOCK PRESSED

@@ -198,7 +198,7 @@ def cabinLightSetup():
 Returns a new low tone task
 '''
 def lowToneSetup():
-    lowToneAddress = dev + '/port2/line5:7'
+    lowToneAddress = dev + '/port1/line7'
     lowTone = InterfaceOut(lowToneAddress)
     lowTone.startTask()
     return lowTone
