@@ -510,7 +510,7 @@ class BEH_GUI():
 
 ##                                    if not self.EXPT_FILE_LOADED:
                                     self.load_expt_file()
-
+                                    self.RUN_SETUP = True
                                     if self.EXPT_FILE_LOADED:
                                         self.runSetup()
 
@@ -1690,7 +1690,7 @@ class BEH_GUI():
                    else: #"PELLET****" i.e. PELLET80 or PELLET_VAR or PELLET_TOUCHVI1 or PELLET_TOUCHVI2
                        left_of_outcome_str = outcome[6:]
                        #print(left_of_outcome_str)
-                       if "TOUCHVI1" == left_of_outcome_str: # PELLET_TOUCHVI1: Touched image (CORRECT RESPONSE)
+                       if "_TOUCHVI1" == left_of_outcome_str: # PELLET_TOUCHVI1: Touched image (CORRECT RESPONSE)
                            if self.cur_time > (self.VI_start + self.cur_VI_images): # Give reward and reset VIs
                               # Give Rewards
                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
@@ -1700,7 +1700,7 @@ class BEH_GUI():
                               #print("new vi", self.cur_VI_images, " (sec)")
                               GUIFunctions.log_event(self, self.events,"Cur_VI FOR IMAGE TOUCH = " + str(self.cur_VI_images),self.cur_time)
 
-                       elif "TOUCHVI2" in left_of_outcome_str: # or PELLET_TOUCHVI2: Touched Background (WRONG RESPONSE)
+                       elif "_TOUCHVI2" in left_of_outcome_str: # or PELLET_TOUCHVI2: Touched Background (WRONG RESPONSE)
                            if self.cur_time > (self.VI_start + self.cur_VI_background): # Give reward and reset VIs
                               # Give 1 Reward
                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)

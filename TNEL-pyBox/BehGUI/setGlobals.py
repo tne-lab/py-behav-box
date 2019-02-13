@@ -173,8 +173,10 @@ def setGlobals(self):
     self.VI_final = 30
     self.num_bar_presses =0
     self.bar_press_time=0.0
+    self.BPPM = 0.0   #Screen Touches per minute (background + image)
+    self.BPPMs = []
 
-    self.VR_initial = 1
+    self.VR_initial = 0
     self.VR_final = 30
 
     self.touchMsg= []

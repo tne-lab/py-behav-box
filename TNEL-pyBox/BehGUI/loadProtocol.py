@@ -413,35 +413,37 @@ def load_expt_file(self):
                             print('freeze detection assumed')
 
                 elif SETUP:
-                    if "SETUP" not in line: # Skips [header] line
-                        #print(line)
-                        try:
-                            word1,word2 = get_LR_before_hash(line)
-                            self.setup.append({word1:word2})
-                        except:
-                            self.setup.append({line:True}) # For lines without an '=' in them
-                            #if line == 'END': PROTOCOL = False
-                        #print({word1:word2})
-                    else:
+                    if "SETUP" in line: # Skips [header] line
                         print("################")
                         print("#    SETUP     #")
                         print("################")
+                    else:
+                        try:
+                            word1,word2 = get_LR_before_hash(line)
+                            self.setup.append({word1:word2})
+                            print({word1:word2})
+                        except:
+                            self.setup.append({line:True}) # For lines without an '=' in them
+                            #if line == 'END': PROTOCOL = False
+
+
 
                 elif PROTOCOL:
                     #print("self.protocol: ",line)
-                    if "PROTOCOL" not in line: # Skips [header] line
-                        #print(line)
+                    if "PROTOCOL"  in line: # Skips [header] line
+                        print("###################")
+                        print("#    PROTOCOL     #")
+                        print("###################")
+                    else:
                         try:
                             word1,word2 = get_LR_before_hash(line)
                             self.protocol.append({word1:word2})
+                            print({word1:word2})
                         except:
                             #print("single word")
                             self.protocol.append({line:True}) # For lines without an '=' in them
                             #if line == 'END': self.protocol = False
-                    else:
-                        print("###################")
-                        print("#    PROTOCOL     #")
-                        print("###################")
+
 
                 elif CONDITIONS:
                     #print("self.conditions: ",line)
