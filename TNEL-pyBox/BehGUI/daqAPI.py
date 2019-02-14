@@ -206,11 +206,11 @@ def lowToneSetup():
 '''
 Returns a new high tone Task
 '''
-def highToneSetup():
-    highToneAddress = dev + '/port2/line1' #For 6Khz.  Note: #9 on Beh Box
-    highTone = InterfaceOut(highToneAddress)
-    highTone.startTask()
-    return highTone
+#def highToneSetup():
+#    highToneAddress = dev + '/port2/line1' #For 6Khz.  Note: #9 on Beh Box
+#    highTone = InterfaceOut(highToneAddress)
+#    highTone.startTask()
+#    return highTone
 
 ####################################################
 ##   Inputs

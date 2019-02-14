@@ -19,7 +19,7 @@ def vidCapture(q,back_q):
     # Create recording vid
     fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
     out = cv2.VideoWriter(text['PATH_FILE'],fourcc, 20.0, (640,480))
-    print("SAVING TO: ",text['PATH_FILE'])
+    print("SAVING TO: ",text['PATH_FILE'], " in child Vid2 line 22.")
 
     # Create video class
     vid = freezeAlg.Vid(0,'vid')

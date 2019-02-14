@@ -8,7 +8,7 @@ class Vid:
         self.q = q
         self.back_q = back_q
         self.out = None
-        self.outPath = 'NOT SET'
+        self.outPath = ''
         self.ROIenabled = False
         self.ROIstr = ""
         self.ROIGEN = True
@@ -212,7 +212,7 @@ class Vid:
         fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
         print(1.0/self.mspf * 1000)
         self.out = cv2.VideoWriter(path,fourcc, 1.0/self.mspf * 1000, (int(width),int(height)))
-        print("SAVING TO: ", path)
+        print("SAVING TO: ", path, " in video_function.py line 215")
 
     def mouse_callback(self, event, x, y, flags, params):
         if event == 2:
