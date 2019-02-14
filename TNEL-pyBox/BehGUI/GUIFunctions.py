@@ -276,7 +276,10 @@ def exit_game(self):
     if self.NIDAQ_AVAILABLE:
       self.fan.end()
       self.cabin_light.end()
-      self.food_light.end()
+      if 'EPHYS-2' in self.computer:
+          self.food_light.end()
+      if 'EPHYS-1' in self.computer:
+          self.low_tone.end()
       self.give_food.end()
       self.eaten.end()
 
