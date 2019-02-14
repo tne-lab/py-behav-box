@@ -340,7 +340,7 @@ def load_expt_file(self):
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
                     str_before_hash = get_before_hash(line) # [BAR_PRESS]
                                                             #  VI=15
-                    if "VI" in str_before_hash:
+                    if "VI" in str_before_hash: # Needs to line befroe = sign
                         self.VI_REWARDING = True
                         VI = get_val_between_equal_sign_and_hash(line)
                         try:
@@ -352,7 +352,7 @@ def load_expt_file(self):
                     if "BAR_PRESS_TRAIN" in line:
                         self.BAR_PRESS_TRAINING = True
                         vis = get_val_between_equal_sign_and_hash(line)
-                        if len(vis) > 0 and "VI=" in vis: #BAR_PRESS_TRAIN=VI(1,15)
+                        if len(vis) > 0 and "VI(" in vis: #BAR_PRESS_TRAIN=VI(1,15) needs to line after = sign
                             VIs = vis.split(",")
                             VI_intial = VIs[0][3:]
                             print("VI_INITIAL: ",VI_intial)
@@ -361,7 +361,7 @@ def load_expt_file(self):
                             VI_final = VIs[1][:-1]
                             print("VI_final: ",VI_final)
                             self.VI_final =  float(VI_final)
-                        if len(vis) > 0 and "VR=" in vis: #BAR_PRESS_TRAIN=VI(1,15)
+                        if len(vis) > 0 and "VR(" in vis: #BAR_PRESS_TRAIN=VI(1,15)
                             VRs = vis.split(",")
                             VR_intial = VRs[0][3:]
                             print("VR_INITIAL: ",VR_intial)
@@ -552,7 +552,7 @@ def load_expt_file(self):
 
 def create_files(self):
     # DATA PATH + FILES
-
+    print("\nCREATING LOG FILES:")
     #try:
     new_dir = os.path.join(self.datapath,self.Expt_Name)
     if not os.path.exists(new_dir ):  os.mkdir(new_dir)

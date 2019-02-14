@@ -274,6 +274,8 @@ class BEH_GUI():
               if (self.cur_time - self.TONE_TIME) > float(self.Tone1_Duration): # seconds
                   #print("TONE OFF")
                   self.TONE_ON = False
+                  if "EPHYS-1" in self.computer:
+                      self.low_tone.sendDBit(False)
                   GUIFunctions.log_event(self, self.events,"Tone_OFF",self.cur_time)
 
         # DRAW SHOCK LIGHTNING
@@ -488,7 +490,7 @@ class BEH_GUI():
                                         print("#   EXPT FILE LOADED!!    #")
                                         print("###########################")
                                         self.EXPT_FILE_LOADED = True
-                                        GUIFunctions.log_event(self, self.events,"EXPT FILE LOADED",self.cur_time)
+                                        #GUIFunctions.log_event(self, self.events,"EXPT FILE LOADED",self.cur_time)
                                         if len(self.setup) > 0:
                                             self.RUN_SETUP = True
                                             self.setup_ln_num = 0
@@ -878,24 +880,24 @@ class BEH_GUI():
             self.setup_ln_num +=1
         elif key == "FAN_ON":
            val = str2bool(setupDict[key])
-           #print("FAN")
+           print("FAN")
            GUIFunctions.FAN_ON_OFF(self, self.events,val,self.cur_time) # {'FAN_ON': True} or {'FAN_ON': False}
            self.setup_ln_num +=1
         elif key == "CAB_LIGHT":
            val = str2bool(setupDict[key])
-           #print("CAB_LIGHT")
+           print("CAB_LIGHT")
            self.Background_color = GUIFunctions.CAB_LIGHT(self, self.events,val,self.cur_time)
            #CAB_LIGHT(events,val,cur_time)
            self.setup_ln_num +=1
         elif key == "FOOD_LIGHT":
-            #print("FOOD LIGHT: ",setupDict["FOOD_LIGHT"])
+            print("FOOD LIGHT: ",setupDict["FOOD_LIGHT"])
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
             self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF (self, self.events,val,self.cur_time)
             self.LEDs[4].ONOFF = LEDsONOFF
             self.LEDs[5].ONOFF = LEDsONOFF
         elif key == "CAMERA":
-            #print("CAMERA\n")
+            print("CAMERA\n")
             val = str2bool(setupDict["CAMERA"])
             self.setup_ln_num +=1
             if val:  # TURN CAMERA ON.     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
@@ -946,7 +948,7 @@ class BEH_GUI():
             else:
                 val = str2bool(setupDict[key])
                 if val: # EXTEND_LEVERS == True
-                   #print ("EXTEND LEVERS")
+                   print ("LEVERS EXTENDED")
                    GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,True,self.cur_time)
                    for lever in self.levers:
                          lever.STATE = "OUT"
