@@ -512,7 +512,7 @@ class BEH_GUI():
                                     self.load_expt_file()
 
                                     if self.EXPT_FILE_LOADED:
-                                        self.runSetup()
+
 
                                         button.UP_DN = "DN"
                                         self.Expt_Count +=1
@@ -527,18 +527,6 @@ class BEH_GUI():
                                                 elif user_input.label == "SUBJECT":
                                                      user_input.border_color = (255,0,0)
 
-                                        # MAKE SURE CAMERA IS ON AND REOCRDING
-                                        if not self.CAMERA_ON: # CAMERA WAS OFF. Toggle ON
-                                            self.CAMERA_ON = True
-                                            GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
-                                            self.vidSTATE = 'ON'
-                                            GUIFunctions.MyVideo(self)
-                                        if not self.RECORDING:  # WAS NOT RECORDING. TOGGLE ON
-                                            self.RECORDING = True
-                                            button.UP_DN = "DN"
-                                            GUIFunctions.log_event(self, self.events,"START_RECORDING when Expt Started",self.cur_time)
-                                            self.vidSTATE = 'REC_VID'
-
                                         if self.NAME_OR_SUBJ_CHANGED :  # READY TO GO!!!
                                             self.create_files()
                                             self.create_expt_file_copy()
@@ -552,6 +540,9 @@ class BEH_GUI():
                                             for user_input in self.user_inputs:
                                                 if user_input.label == "EXPT":
                                                     user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
+
+                                            #### Run Setup ###
+                                            self.runSetup()
 
                                             if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
 
