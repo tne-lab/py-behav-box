@@ -511,7 +511,7 @@ class BEH_GUI():
                                elif button.text == "START EXPT":
 
 ##                                    if not self.EXPT_FILE_LOADED:
-                                    self.load_expt_file()
+                                    #self.load_expt_file()
                                     self.RUN_SETUP = True
                                     if self.EXPT_FILE_LOADED:
 
@@ -973,7 +973,6 @@ class BEH_GUI():
        # GUIFunctions.FOOD_REWARD_RESET(self) #NOTE: THIS IS SO LOW BIT IS SENT TO FEEDER WITHOUT PAUSING THE PROGRAM
         protocolDict = self.protocol[self.Protocol_ln_num]
         key = list(protocolDict.keys())[0] # First key in protocolDict
-
         # Tell open ephys to start acquisiton and recording?
         #cur_time = time.perf_counter()
 
@@ -1117,7 +1116,9 @@ class BEH_GUI():
 
                     print('log_string', log_string)
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
-                else:
+
+                    
+                else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
 
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
                     print(placementList, self.touchImgCoords)
@@ -1133,7 +1134,8 @@ class BEH_GUI():
                         print('ImgList', imgList)
                         i+=1
                         self.TSq.put(imgList)
-                        self.Protocol_ln_num +=1
+                        
+                    self.Protocol_ln_num +=1
 
                     log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
@@ -1557,6 +1559,7 @@ class BEH_GUI():
                        ##################################
                        if self.TOUCH_BANDIT:
                            for img, probabilityList in self.touchImgs.items():
+                               print(probabilityList,'problist\n')
                                if self.touchMsg['picture'] == img:  # Touched an image
                                    GUIFunctions.log_event(self,self.events, "Probability of pellet: " + str(probabilityList[self.trial_num]),self.cur_time)
                                    GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " CORRECT IMG TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)

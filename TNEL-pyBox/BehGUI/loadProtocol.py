@@ -308,10 +308,12 @@ def load_expt_file(self):
                         imageInfo = words.split(":")
                         imageName = imageInfo[0].strip()
                         if len(imageInfo)>1:
+                            print('getting probs')
                             for c in '()':
                                 #Remove parenthesis from rewards
                                 imageInfo[1] = imageInfo[1].replace(c, "")
                             imgRewardsList = []
+                            print(imageInfo[1].split(","))
                             for probability in imageInfo[1].split(","):
                                 imgRewardsList.append(int(probability))
                             # Saving as dictionary with key as filename
