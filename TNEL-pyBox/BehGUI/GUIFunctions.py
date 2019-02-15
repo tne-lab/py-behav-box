@@ -90,7 +90,7 @@ def FAN_ON_OFF(self, events, FAN_ON, cur_time):
 def PLAY_TONE_LAF(self, events, TONE_ID, cur_time):  # Plays tone using lafayette Tone generator
     # NOTE: Tone_OFF logged while drawing speeker above in main loop
     if TONE_ID == 'TONE1':
-        log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
+        log_event(self, events,"Tone_ON using Lafayette",cur_time)
 
         if self.NIDAQ_AVAILABLE:  self.low_tone.sendDBit(True)
 

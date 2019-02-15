@@ -512,7 +512,7 @@ class BEH_GUI():
 
 ##                                    if not self.EXPT_FILE_LOADED:
                                     self.load_expt_file()
-                                    #self.RUN_SETUP = True
+                                    self.RUN_SETUP = True
                                     if self.EXPT_FILE_LOADED:
 
 
@@ -672,8 +672,10 @@ class BEH_GUI():
                           # NOTE: Tone_OFF logged while drawing speeker above in main loop
                           print("TONE1 DURATION: ", self.Tone1_Duration)
                           if "EPHYS-2" in self.computer:
+                             print ("USING PC SOUND")
                              self.GUIFunctions.PLAY_TONE(self, self.events,"TONE1",self.cur_time) #using computer speeker
                           elif "EPHYS-1" in self.computer:
+                             print ("USING LAFAYETTE SOUND")
                              self.GUIFunctions.PLAY_TONE_LAF(self, self.events,"TONE1",self.cur_time) #using computer speeker
                           #self.GUIFunctions.PLAY_TONE_LAF(self, self.events,"TONE1",self.cur_time) #Using Lafayette
 
