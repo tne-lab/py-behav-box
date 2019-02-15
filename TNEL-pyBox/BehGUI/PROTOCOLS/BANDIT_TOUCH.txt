@@ -5,12 +5,12 @@ EXPT_PATH 	= E:\py-behav-box\TNEL-pyBox\BehGUI\DATA
 [TONE1] # Need TONE1, TONE2
 Duration(s) 	= 3
 Freq(Hz)	= 1800
-Volume(0-1)	= 0.6
+Volume(0-1)	= 1.0
 
 [TONE2] # Need TONE1, TONE2
 Duration(s) 	= 3
 Freq(Hz)	= 400
-Volume(0-1)	= 0.6
+Volume(0-1)	= 1.0
 
 [SHOCK]
 Duration(s) 	= 3
@@ -27,8 +27,8 @@ ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also
 IMAGES_PATH = E:\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
 COORDS=(98,100):(560,100)          # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 # Image name: probability of reward on each trial
-IMG1= SPIDER_REAL.bmp:(20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80)
-IMG2= FLOWER_REAL.bmp:(80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20)
+IMG1= SPIDER_REAL.bmp:(20,20,20,20,20,20,20,20,20,20, 20,20,20,20,20,20,20,20,20,20, 20,20,20,20,20,20,20,20,20,20, 20,20,20,20,20,20,20,20,20,20, 20,20,20,20,20,20,20,20,20,20, 80,80,80,80,80,80,80,80,80,80, 80,80,80,80,80,80,80,80,80,80, 80,80,80,80,80,80,80,80,80,80, 80,80,80,80,80,80,80,80,80,80, 80,80,80,80,80,80,80,80,80,80)
+IMG2= FLOWER_REAL.bmp:(80,80,80,80,80,80,80,80,80,80, 80,80,80,80,80,80,80,80,80,80, 80,80,80,80,80,80,80,80,80,80, 80,80,80,80,80,80,80,80,80,80, 80,80,80,80,80,80,80,80,80,80, 20,20,20,20,20,20,20,20,20,20, 20,20,20,20,20,20,20,20,20,20, 20,20,20,20,20,20,20,20,20,20, 20,20,20,20,20,20,20,20,20,20, 20,20,20,20,20,20,20,20,20,20)
 TOUCH_BANDIT
 
 [SETUP]
@@ -39,14 +39,14 @@ CAMERA=TRUE
 REC=TRUE
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
-START_LOOP1 = 10 #NOTE: 1st 10 reward probabilities next to img name under [TOUCH]
+START_LOOP1 = 50 #NOTE: 1st 10 reward probabilities next to img name under [TOUCH]
   PAUSE = 5
   TONE1
   DRAW_IMAGES=True
   CONDITIONS=0
 END_LOOP
 
-START_LOOP2 = 10 #NOTE: 2nt 10 reward probabilities next to img name  under [TOUCH]
+START_LOOP2 = 50 #NOTE: 2nt 10 reward probabilities next to img name  under [TOUCH]
   PAUSE = 5
   TONE2
   DRAW_IMAGES=True

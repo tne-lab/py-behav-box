@@ -1559,17 +1559,21 @@ class BEH_GUI():
                        ##################################
                        if self.TOUCH_BANDIT:
                            for img, probabilityList in self.touchImgs.items():
-                               print(probabilityList,'problist\n')
+                               #print(probabilityList,'problist\n')
+                               reward_prob_for_this_img = probabilityList[self.trial_num]
+                               print(" reward_prob_for ", img, " = ", reward_prob_for_this_img  )
+                               print(self.touchMsg['picture'], img)
                                if self.touchMsg['picture'] == img:  # Touched an image
+                                   print(self.touchMsg['picture'], img)
                                    GUIFunctions.log_event(self,self.events, "Probability of pellet: " + str(probabilityList[self.trial_num]),self.cur_time)
-                                   GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " CORRECT IMG TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)
+                                   GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)
                                    self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                                    # Holds the probability for each trial
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
                                    self.correct_image_touches += 1
                                else:
-                                   GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " WRONG IMG TOUCHED, " + "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)
+                                   GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " BACKGROUND TOUCHED, " + "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)
                                    self.wrong_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                        #################################
                        # TOUCH TRAINING
