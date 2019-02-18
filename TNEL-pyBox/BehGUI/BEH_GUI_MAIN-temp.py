@@ -95,7 +95,6 @@ class BEH_GUI():
                         GUIFunctions.log_event(self, self.events,"ROI:",self.cur_time,(newROIstr + ",( x; y; width; height)"))
                         print("ROI",self.ROIstr," x; y; width; hieght")
                         #print("\n\nRECEIVED ROI FROM VIDEO!\n\n", self.ROI)
-                        input("pauser")
                     except:
                         #print("\n\nNO ROI FROM VIDEO!\n\n", self.ROI)
                         pass
@@ -1291,22 +1290,31 @@ class BEH_GUI():
                 BPPM_time_interval = self.cur_time - self.VI_start
                 if BPPM_time_interval > 60.0: #60.0: #Calculate BPPM every minute (60 sec)
                     self.BPPM =  self.num_bar_presses/60.0
+                    GUIFunctions.log_event(self, self.events, "Bar Presses Per Min:,"+ str(self.BPPM ) , self.cur_time)
+                    print ("BPPM: ",self.BPPM)
                     self.BPPMs.append(self.BPPM) # Add a BPPM calcualtion to list every minute
                     # Reset for next minute  TPM_start_time
                     self.num_bar_presses = 0
                     self.VI_start = self.cur_time
 
                     # Calculate MEAN Bar Presses Per Minute over 10 min
-                    if len(self.BPPMs)> 10:#10: # after every 10 minutes (That is, 10 one minute evaluations convolved every minute)
+                    #if len(self.BPPMs)> 10:#10: # after every 10 minutes (That is, 10 one minute evaluations convolved every minute)
+                    if len(self.BPPMs)> 10:# after first 10 minutes only!!
+
                         self.meanBPPM10 = sum(self.BPPMs[-10:])/10.0       # Mean Bar PRESSES per minute over last 10 minutes
-                        self.BPPMs.pop(0)                                  # Removes first item of list for running list
+                        GUIFunctions.log_event(self, self.events, "MEAN Bar Presses Per Min:,"+ str(self.BPPM )+",Over 1st 10 min" , self.cur_time)
+                        print ("MEAN BPPM over ist 10 min: ",self.meanBPPM10)
+                        #self.BPPMs.pop(0)                                  # Removes first item of list for running list
                         if self.BAR_PRESS_TRAINING: # [BAR_PRESS] in protocol
                                                   #  BAR_PRESS_TRAIN=VI(1,15)
                                                   #  note: VI(a,b); a = initial VI for bar PRESS, b = final VI for session
-                            self.VI += 1  # Increases VI by 1
-                            if self.VI >=  self.VI_final:  self.VI =  self.VI_final # Set VI l
-                            GUIFunctions.log_event(self, self.events, "new VI: "+ str(self.VI) + " (sec)" , self.cur_time)
 
+                            if self.meanBPPM10 >= 10.0: #increae VI reward interval
+                                self.VI += 15 # Increases VI by 1
+                                if self.VI >=  self.VI_final:
+                                    self.VI =  self.VI_final # Limit VI to final value (b above)
+                                GUIFunctions.log_event(self, self.events, "new VI: "+ str(self.VI) + " (sec)" , self.cur_time)
+                                print ("NEW VI: ",str(self.VI))
 
                 # Check if amount of VI has passed
                 if self.cur_time > (self.VI_start + self.VI):
