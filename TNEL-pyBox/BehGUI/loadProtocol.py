@@ -307,7 +307,7 @@ def load_expt_file(self):
                         words = get_val_between_equal_sign_and_hash(line)
                         imageInfo = words.split(":")
                         imageName = imageInfo[0].strip()
-                        if len(imageInfo)>1:
+                        if len(imageInfo)>1:# There are probability values after ":", i.e. (20,20,20,20,20)
                             print('getting probs')
                             for c in '()':
                                 #Remove parenthesis from rewards
@@ -315,7 +315,17 @@ def load_expt_file(self):
                             imgRewardsList = []
                             print(imageInfo[1].split(","))
                             for probability in imageInfo[1].split(","):
-                                imgRewardsList.append(int(probability))
+                                if "X" in probability or "x" in probability: # There is a'X' in probability values, i.e. (20x10,80x10,...)
+                                    if "X" in probability:
+                                        Xsplit = probability.split('X')
+                                    elif "x" in probability:
+                                        Xsplit = probability.split('x')
+                                    prob = Xsplit[0]
+                                    num = Xsplit[1]
+                                    for i in range(int(num)):
+                                        imgRewardsList.append(int(prob))
+                                else:
+                                    imgRewardsList.append(int(probability))
                             # Saving as dictionary with key as filename
                             # and value as list of reward probability per trial
                             self.touchImgs[imageName] = imgRewardsList
