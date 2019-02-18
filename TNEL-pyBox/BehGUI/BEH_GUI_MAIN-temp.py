@@ -1093,7 +1093,7 @@ class BEH_GUI():
                    for button in self.buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
         ##############################
-        #  TOUCHSCREEN  (DRAWS IMAGES)
+        #  TOUCHSCREEN  in RUNEXPT (DRAWS IMAGES)
         ##############################
         elif "DRAW_IMAGES" in key: # IF USING TOUCHSCREEN
             if self.TOUCHSCREEN_USED:
@@ -1299,7 +1299,7 @@ class BEH_GUI():
 
                     # Calculate MEAN Bar Presses Per Minute over 10 min
                     #if len(self.BPPMs)> 10:#10: # after every 10 minutes (That is, 10 one minute evaluations convolved every minute)
-                    if len(self.BPPMs)> 10:# after first 10 minutes only!!
+                    if len(self.BPPMs)== 10:# after first 10 minutes only!!
 
                         self.meanBPPM10 = sum(self.BPPMs[-10:])/10.0       # Mean Bar PRESSES per minute over last 10 minutes
                         GUIFunctions.log_event(self, self.events, "MEAN Bar Presses Per Min:,"+ str(self.BPPM )+",Over 1st 10 min" , self.cur_time)
@@ -1309,7 +1309,7 @@ class BEH_GUI():
                                                   #  BAR_PRESS_TRAIN=VI(1,15)
                                                   #  note: VI(a,b); a = initial VI for bar PRESS, b = final VI for session
 
-                            if self.meanBPPM10 >= 10.0: #increae VI reward interval
+                            if self.meanBPPM10 >= 10.0: #increae VI reward interval if mean over 1st 10 min exceeeds 10 BPPM
                                 self.VI += 15 # Increases VI by 1
                                 if self.VI >=  self.VI_final:
                                     self.VI =  self.VI_final # Limit VI to final value (b above)
@@ -1573,7 +1573,11 @@ class BEH_GUI():
                        if self.TOUCH_BANDIT:
                            for img, probabilityList in self.touchImgs.items():
                                #print(probabilityList,'problist\n')
-                               reward_prob_for_this_img = probabilityList[self.trial_num]
+                                
+                               probabilityListIDX = self.trial_num % len(probabilityList) # IDX = trial num. If Trial num exceeds len(probabilityList), it starts over
+                               reward_prob_for_this_img = probabilityList[probabilityListIDX]
+
+                               
                                print(" reward_prob_for ", img, " = ", reward_prob_for_this_img  )
                                print(self.touchMsg['picture'], img)
                                if self.touchMsg['picture'] == img:  # Touched an image
