@@ -228,10 +228,10 @@ def log_event(self, event_lst, event, cur_time, other=''):
     #print("Log file: ", self.log_file_path_name)
     event_string = str(round(cur_time,9)) + ',  ' + event
     #print (event_string, other)
-    event_other = ''
-    for item in other:
-        event_other = event_other + ",  " +  str(item)
-
+##    event_other = ''
+##    for item in other:
+##        event_other = event_other + ",  " +  str(item)
+    event_other =  ",  "+ str(other)
     event_lst.append(event_string+event_other) # To Display on GUI
     if len(event_lst) > 14:  self.start_line = len(event_lst) -14
     try:
