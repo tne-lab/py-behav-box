@@ -25,7 +25,7 @@ ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also
 
 [TOUCHSCREEN]
 IMAGES_PATH = E:\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
-COORDS=(98,100):(560,100)          # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+COORDS=(181,100):(602,100)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 # Image name: probability of reward on each trial
 IMG1= SPIDER_REAL.bmp:(20x50,80x50,20x50,80x50,20x50,80x50,20x50,80x50,20x50,80x50)
 IMG2= FLOWER_REAL.bmp:(80x50,20x50,80x50,20x50,80x50,20x50,80x50,20x50,80x50,20x50)
