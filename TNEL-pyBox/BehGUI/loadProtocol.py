@@ -368,16 +368,16 @@ def load_expt_file(self):
                             VIs = vis.split(",")
                             VI_intial = VIs[0][3:]
                             print("VI_INITIAL: ",VI_intial)
-                            self.VI_initial = float(VI_intial)
-                            self.VI = self.VI_initial
+                            self.var_interval_reward = float(VI_intial)
+                            #self.VI = self.VI_initial
                             VI_final = VIs[1][:-1]
                             print("VI_final: ",VI_final)
                             self.VI_final =  float(VI_final)
-                        if len(vis) > 0 and "VR(" in vis: #BAR_PRESS_TRAIN=VI(1,15)
+                        if len(vis) > 0 and "VR(" in vis:
                             VRs = vis.split(",")
                             VR_intial = VRs[0][3:]
                             print("VR_INITIAL: ",VR_intial)
-                            self.VR_initial = float(VR_intial)
+                            self.var_interval_reward = float(VR_intial)
                             VR_final = VRs[1][:-1]
                             print("VR_final: ",VR_final)
                             self.VR_final =  float(VR_final)

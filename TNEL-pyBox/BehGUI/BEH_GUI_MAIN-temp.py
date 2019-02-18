@@ -1121,7 +1121,7 @@ class BEH_GUI():
                     print('log_string', log_string)
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
 
-                    
+
                 else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
 
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
@@ -1138,7 +1138,7 @@ class BEH_GUI():
                         print('ImgList', imgList)
                         i+=1
                         self.TSq.put(imgList)
-                        
+
                     self.Protocol_ln_num +=1
 
                     log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
@@ -1310,9 +1310,9 @@ class BEH_GUI():
                                                   #  note: VI(a,b); a = initial VI for bar PRESS, b = final VI for session
 
                             if self.meanBPPM10 >= 10.0: #increae VI reward interval if mean over 1st 10 min exceeeds 10 BPPM
-                                self.VI += 15 # Increases VI by 1
-                                if self.VI >=  self.VI_final:
-                                    self.VI =  self.VI_final # Limit VI to final value (b above)
+                                self.var_interval_reward += 15 # Increases VI by 15
+                                if self.var_interval_reward >=  self.VI_final:
+                                    self.var_interval_reward =  self.VI_final # Limit VI to final value (b above)
                                 GUIFunctions.log_event(self, self.events, "new VI: "+ str(self.VI) + " (sec)" , self.cur_time)
                                 print ("NEW VI: ",str(self.VI))
 
@@ -1573,18 +1573,18 @@ class BEH_GUI():
                        if self.TOUCH_BANDIT:
                            for img, probabilityList in self.touchImgs.items():
                                #print(probabilityList,'problist\n')
-                                
+
                                probabilityListIDX = self.trial_num % len(probabilityList) # IDX = trial num. If Trial num exceeds len(probabilityList), it starts over
                                reward_prob_for_this_img = probabilityList[probabilityListIDX]
 
-                               
+
                                print(" reward_prob_for ", img, " = ", reward_prob_for_this_img  )
                                print(self.touchMsg['picture'], img)
                                if self.touchMsg['picture'] == img:  # Touched an image
                                    print(self.touchMsg['picture'], img)
                                    GUIFunctions.log_event(self,self.events, "Probability of pellet: " + str(probabilityList[self.trial_num]),self.cur_time)
-                                   
-                                   if reward_prob_for_this_img > 50.0: 
+
+                                   if reward_prob_for_this_img > 50.0:
                                        self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                                        GUIFunctions.log_event(self, self.events,"High PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)
                                    else: # Less desirable image touchewd
@@ -1594,7 +1594,7 @@ class BEH_GUI():
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
                                    self.correct_image_touches += 1
-                                   
+
                        #################################
                        # TOUCH TRAINING
                        #################################
@@ -1664,7 +1664,7 @@ class BEH_GUI():
                #print (cond["Reset"])
                if self.WRONG or self.CORRECT: # A response was given
                    self.CONDITION_STARTED = False  # Time is up
-                   # NOTE: "END_OF_TRIAL" LOGGED AFTER OUTCOMES    
+                   # NOTE: "END_OF_TRIAL" LOGGED AFTER OUTCOMES
                    self.TIME_IS_UP = True
                if cond_time_elapsed >= float(self.cond["MAX_TIME"]): # Time is up
                   self.CONDITION_STARTED = False
