@@ -350,9 +350,9 @@ def load_expt_file(self):
 
                 elif BAR_PRESS:
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
-                    str_before_hash = get_before_hash(line) # [BAR_PRESS]
+                    str_before_equal, str_after_equal = get_LR_before_hash(line) # [BAR_PRESS]
                                                             #  VI=15
-                    if "VI" in str_before_hash: # Needs to line befroe = sign
+                    if "VI" in str_before_equal: # Needs to line befroe = sign
                         self.VI_REWARDING = True
                         VI = get_val_between_equal_sign_and_hash(line)
                         try:
@@ -361,9 +361,9 @@ def load_expt_file(self):
                         except:
                             print ("!!!!!!!!!!!VI must = a number in EXP PROOCOL file (VI=15 )!!!!!!!!!!!!!!")
 
-                    if "BAR_PRESS_TRAIN" in line:
+                    if "BAR_PRESS_TRAIN" in str_before_equal:
                         self.BAR_PRESS_TRAINING = True
-                        vis = get_val_between_equal_sign_and_hash(line)
+                        vis = str_after_equal
                         if len(vis) > 0 and "VI(" in vis: #BAR_PRESS_TRAIN=VI(1,15) needs to line after = sign
                             VIs = vis.split(",")
                             VI_intial = VIs[0][3:]
