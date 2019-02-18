@@ -121,6 +121,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
         #self.whisker.claim_audio(number=0, alias=AUDIO)
         self.whisker.set_media_directory(self.media_dir)
         self.display_size = self.whisker.display_get_size(DISPLAY)
+        print('display size\n\n\n', self.display_size)
         self.whisker.display_event_coords(True)
 
         self.whisker.display_scale_documents(DISPLAY, True)

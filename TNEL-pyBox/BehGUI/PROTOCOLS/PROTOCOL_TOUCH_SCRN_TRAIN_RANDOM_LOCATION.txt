@@ -1,7 +1,7 @@
 [EXPERIMENT] # This is a REQUIRED Header
 # This experiment will place an image in a random location on the screen
-EXPT_NAME = Screen_Touch_training
-EXPT_PATH 	= C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
+EXPT_NAME = Screen_Touch_train_RANDOM_LOC
+EXPT_PATH 	= E:\py-behav-box\TNEL-pyBox\BehGUI\DATA
 
 [TONE1] # Need TONE1 to be associated with correct action
 Duration(s) = 2
@@ -9,7 +9,7 @@ Freq(Hz)	= 1800
 Volume(0-1)	= 1.0
 
 [TOUCHSCREEN]
-IMAGES_PATH = C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
+IMAGES_PATH = E:\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
 # Note: Touchscreen is 1024 x 768. If we discount the deadzone, the
 #       screen is 1024 x 518.  picture size is 240 x 240.
 #       Image size is controlled in whiskerTouchZMQ.py

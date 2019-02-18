@@ -73,7 +73,7 @@ def play_sound(frequency, volume, duration):
     This is run a a sepoarate thread so calling program can keep running
     '''
     print ("freq: ",frequency, "vol: ",volume, "Duration: ",duration)
-    sample_rate = 44100 #Hz or data points per sec
+    sample_rate = 22050 #  44100 #Hz or data points per sec
     bits = 16
 
     pygame.mixer.pre_init(sample_rate, -bits, 2)
@@ -83,8 +83,8 @@ def play_sound(frequency, volume, duration):
 
     #setup our numpy array to handle 16 bit ints, which is what we set our mixer to expect with "bits" up above
     buf = numpy.zeros((n_samples, 2), dtype = numpy.int16)
-    #max_sample = 2**(bits - 1) - 1
-    max_sample =100.0
+    #max_sample = 2**(bits - 1) - 1   # at 16 bits, max_sample = 16384
+    max_sample =128.0
     for s in range(n_samples):
         t = float(s)/sample_rate    # time in seconds
 

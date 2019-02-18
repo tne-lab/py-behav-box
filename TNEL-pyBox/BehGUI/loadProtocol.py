@@ -307,13 +307,25 @@ def load_expt_file(self):
                         words = get_val_between_equal_sign_and_hash(line)
                         imageInfo = words.split(":")
                         imageName = imageInfo[0].strip()
-                        if len(imageInfo)>1:
+                        if len(imageInfo)>1:# There are probability values after ":", i.e. (20,20,20,20,20)
+                            print('getting probs')
                             for c in '()':
                                 #Remove parenthesis from rewards
                                 imageInfo[1] = imageInfo[1].replace(c, "")
                             imgRewardsList = []
+                            print(imageInfo[1].split(","))
                             for probability in imageInfo[1].split(","):
-                                imgRewardsList.append(int(probability))
+                                if "X" in probability or "x" in probability: # There is a'X' in probability values, i.e. (20x10,80x10,...)
+                                    if "X" in probability:
+                                        Xsplit = probability.split('X')
+                                    elif "x" in probability:
+                                        Xsplit = probability.split('x')
+                                    prob = Xsplit[0]
+                                    num = Xsplit[1]
+                                    for i in range(int(num)):
+                                        imgRewardsList.append(int(prob))
+                                else:
+                                    imgRewardsList.append(int(probability))
                             # Saving as dictionary with key as filename
                             # and value as list of reward probability per trial
                             self.touchImgs[imageName] = imgRewardsList
@@ -338,9 +350,9 @@ def load_expt_file(self):
 
                 elif BAR_PRESS:
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
-                    str_before_hash = get_before_hash(line) # [BAR_PRESS]
+                    str_before_equal, str_after_equal = get_LR_before_hash(line) # [BAR_PRESS]
                                                             #  VI=15
-                    if "VI" in str_before_hash: # Needs to line befroe = sign
+                    if "VI" in str_before_equal: # Needs to line befroe = sign
                         self.VI_REWARDING = True
                         VI = get_val_between_equal_sign_and_hash(line)
                         try:
@@ -349,23 +361,23 @@ def load_expt_file(self):
                         except:
                             print ("!!!!!!!!!!!VI must = a number in EXP PROOCOL file (VI=15 )!!!!!!!!!!!!!!")
 
-                    if "BAR_PRESS_TRAIN" in line:
+                    if "BAR_PRESS_TRAIN" in str_before_equal:
                         self.BAR_PRESS_TRAINING = True
-                        vis = get_val_between_equal_sign_and_hash(line)
+                        vis = str_after_equal
                         if len(vis) > 0 and "VI(" in vis: #BAR_PRESS_TRAIN=VI(1,15) needs to line after = sign
                             VIs = vis.split(",")
                             VI_intial = VIs[0][3:]
                             print("VI_INITIAL: ",VI_intial)
-                            self.VI_initial = float(VI_intial)
-                            self.VI = self.VI_initial
+                            self.var_interval_reward = float(VI_intial)
+                            #self.VI = self.VI_initial
                             VI_final = VIs[1][:-1]
                             print("VI_final: ",VI_final)
                             self.VI_final =  float(VI_final)
-                        if len(vis) > 0 and "VR(" in vis: #BAR_PRESS_TRAIN=VI(1,15)
+                        if len(vis) > 0 and "VR(" in vis:
                             VRs = vis.split(",")
                             VR_intial = VRs[0][3:]
                             print("VR_INITIAL: ",VR_intial)
-                            self.VR_initial = float(VR_intial)
+                            self.var_interval_reward = float(VR_intial)
                             VR_final = VRs[1][:-1]
                             print("VR_final: ",VR_final)
                             self.VR_final =  float(VR_final)

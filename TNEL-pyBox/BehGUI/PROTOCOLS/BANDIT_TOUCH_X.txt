@@ -5,12 +5,12 @@ EXPT_PATH 	= E:\py-behav-box\TNEL-pyBox\BehGUI\DATA
 [TONE1] # Need TONE1, TONE2
 Duration(s) 	= 3
 Freq(Hz)	= 1800
-Volume(0-1)	= 0.6
+Volume(0-1)	= 1.0
 
 [TONE2] # Need TONE1, TONE2
 Duration(s) 	= 3
 Freq(Hz)	= 400
-Volume(0-1)	= 0.6
+Volume(0-1)	= 1.0
 
 [SHOCK]
 Duration(s) 	= 3
@@ -20,15 +20,15 @@ Amps(mA)	= 100  # V and amps are set manually on scrambled grid generator
 [FREEZE]
 Min Duration(s)	= 2
 Min Moving Pix	= 5000
-Min Theshold = 26
+
 ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also starts FREEZE detection  FREEZE=TRUE
 
 [TOUCHSCREEN]
-IMAGES_PATH = C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
-COORDS=(100,150):(684,150)          # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+IMAGES_PATH = E:\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
+COORDS=(181,100):(602,100)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 # Image name: probability of reward on each trial
-IMG1= SPIDER.bmp:(20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80)
-IMG2= FLOWER.bmp:(80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20,80,80,80,80,80,80,80,80,80,80,20,20,20,20,20,20,20,20,20,20)
+IMG1= SPIDER_REAL.bmp:(20x50,80x50,20x50,80x50,20x50,80x50,20x50,80x50,20x50,80x50)
+IMG2= FLOWER_REAL.bmp:(80x50,20x50,80x50,20x50,80x50,20x50,80x50,20x50,80x50,20x50)
 TOUCH_BANDIT
 
 [SETUP]
@@ -39,10 +39,18 @@ CAMERA=TRUE
 REC=TRUE
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
-START_LOOP1 = 50
-  PAUSE = 2
+START_LOOP1 = 50 #NOTE: 1st 10 reward probabilities next to img name under [TOUCH]
+  PAUSE = 5
+  TONE1
   DRAW_IMAGES=True
-  CONDITIONS=0 # Only 1st condition listed
+  CONDITIONS=0
+END_LOOP
+
+START_LOOP2 = 50 #NOTE: 2nt 10 reward probabilities next to img name  under [TOUCH]
+  PAUSE = 5
+  TONE2
+  DRAW_IMAGES=True
+  CONDITIONS=0
 END_LOOP
 
 FOOD_LIGHT=False
@@ -53,5 +61,5 @@ FAN_ON=False
 [END PROTOCOL]
 
 [CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS.
-MAX_TIME, RESET,      CORRECT,        NO_ACTION
-60,      ON_RESPONSE, meanBPPM10,        NONE
+MAX_TIME, RESET,        CORRECT,        NO_ACTION
+60,       ON_RESPONSE,  PELLET_VAR,     NONE
