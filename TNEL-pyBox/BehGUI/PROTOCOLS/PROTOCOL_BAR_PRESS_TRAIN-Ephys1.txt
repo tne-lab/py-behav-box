@@ -8,7 +8,7 @@ CAB_LIGHT=True
 CAMERA=True
 REC=True
 #FOOD_LIGHT=True
-EXTEND_LEVERS=TRUE
+EXTEND_LEVERS=R_LVR  # NOTE:   =R_LVR, L_LVR, or TRUE for both
 
 [BAR_PRESS]
 #NOTE: VI=15 is variable interval with mean time of 15.  PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS

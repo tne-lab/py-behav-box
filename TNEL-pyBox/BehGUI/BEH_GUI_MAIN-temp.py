@@ -935,9 +935,9 @@ class BEH_GUI():
         elif "EXTEND_LEVERS" in key:
             self.setup_ln_num +=1
             if setupDict[key] == "L_LVR":
-                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,False,self.cur_time)
+                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Left Lever Extended",True,False,self.cur_time)
             elif setupDict[key] == "R_LVR":
-               GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",False,True,self.cur_time)
+               GUIFunctions.EXTEND_LEVERS(self, self.events,"Right Lever Extended",False,True,self.cur_time)
             else:
                 val = str2bool(setupDict[key])
                 if val: # EXTEND_LEVERS == True
@@ -954,7 +954,7 @@ class BEH_GUI():
                         lever.STATE = "IN"
                    for button in self.buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
-
+                        
 
         elif "MAX_EXPT_TIME" in key:
             self.setup_ln_num +=1
@@ -1284,12 +1284,13 @@ class BEH_GUI():
 
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 self.num_bar_presses +=1
+                
                 # Calculate Bar Presses Per Minute
                 BPPM_time_interval = self.cur_time - self.VI_start
-                if BPPM_time_interval > 60.0: #60.0: #Calculate BPPM every minute (60 sec)
-                    self.BPPM =  self.num_bar_presses/60.0
+                if BPPM_time_interval >= 60.0:  #Calculate BPPM every minute (60 sec)
+                    self.BPPM =  self.num_bar_presses#   0.0
                     GUIFunctions.log_event(self, self.events, "Bar Presses Per Min:,"+ str(self.BPPM ) , self.cur_time)
-                    print ("BPPM: ",self.BPPM)
+                    print ("\n\n\nnum_bar_presses:: ",self.num_bar_presses, "BPPM: ",self.BPPM)
                     self.BPPMs.append(self.BPPM) # Add a BPPM calcualtion to list every minute
                     # Reset for next minute  TPM_start_time
                     self.num_bar_presses = 0
@@ -1297,9 +1298,9 @@ class BEH_GUI():
 
                     # Calculate MEAN Bar Presses Per Minute over 10 min
                     #if len(self.BPPMs)> 10:#10: # after every 10 minutes (That is, 10 one minute evaluations convolved every minute)
-                    if len(self.BPPMs)== 10:# after first 10 minutes only!!
-
-                        self.meanBPPM10 = sum(self.BPPMs[-10:])/10.0       # Mean Bar PRESSES per minute over last 10 minutes
+                    if len(self.BPPMs)== 10:#10: # after first 10 minutes only!!
+                        print("BPPMs: ",self.BPPMs)
+                        self.meanBPPM10 = sum(self.BPPMs[-10:])/10.0#10.0       # Mean Bar PRESSES per minute over last 10 minutes
                         GUIFunctions.log_event(self, self.events, "MEAN Bar Presses Per Min:,"+ str(self.BPPM )+",Over 1st 10 min" , self.cur_time)
                         print ("MEAN BPPM over ist 10 min: ",self.meanBPPM10)
                         #self.BPPMs.pop(0)                                  # Removes first item of list for running list
@@ -1312,13 +1313,13 @@ class BEH_GUI():
                                 if self.var_interval_reward >=  self.VI_final:
                                     self.var_interval_reward =  self.VI_final # Limit VI to final value (b above)
                                 GUIFunctions.log_event(self, self.events, "new VI: "+ str(self.VI) + " (sec)" , self.cur_time)
-                                print ("NEW VI: ",str(self.VI))
+                                print ("NEW VI: ",str(self.var_interval_reward))
 
                 # Check if amount of VI has passed
                 if self.cur_time > (self.VI_start + self.VI):
-                    self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
-                    GUIFunctions.log_event(self, self.events, "Cur VI: "+ str(self.VI) + " (sec)" , self.cur_time)
-                    GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
+                   self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
+                   GUIFunctions.log_event(self, self.events, "Cur Rand VI(Between 0 and " + str(self.var_interval_reward)+": "+ str(self.VI) + " (sec)" , self.cur_time)
+                   GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
 
 
 
