@@ -1141,7 +1141,7 @@ class BEH_GUI():
 
                     self.Protocol_ln_num +=1
                     
-                    print('\n\nImgList', imgList,"\n\n")
+                    #print('\n\nImgList', imgList,"\n\n")
                     #input("paused ENTER")
                     log_string = str(imgList) # Looks like this:  {'SPIDER_REAL.BMP': (181, 100), 'FLOWER_REAL.BMP': (602, 100)}
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
@@ -1154,11 +1154,12 @@ class BEH_GUI():
                         try:
                             if log_string[idx+1] == ";": # Could be out of range if ")" is last char
                                 log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
-                            idx = log_string.find(")")
-                            #print("IDX: ", idx, "logstring: ", log_string)
+                            idx = log_string.find[:idx+2](")")
+                            print("IDX: ", idx, "logstring: ", log_string)
                         except:
                             print("\n\n FAILED creating log string\n\n")
-                    #print('log_string', log_string)
+                            break
+                    print('log_string', log_string)
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
         ###############################
         # START LOOP

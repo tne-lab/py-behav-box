@@ -89,7 +89,11 @@ class BEH_GUI():
                 if self.ROIstr == "":
                     try:  # Get ROI value if it exists
                         self.ROIstr = backDict['ROI']
-                        GUIFunctions.log_event(self, self.events,"ROI",self.cur_time,(self.ROIstr))
+                        print(self.ROIstr)
+                        newROIstr = self.ROIstr.replace(",",";")
+                        print(newROIstr)
+                        GUIFunctions.log_event(self, self.events,"ROI:",self.cur_time,(newROIstr + ",( x; y; width; height)"))
+                        print("ROI",self.ROIstr," x; y; width; hieght")
                         #print("\n\nRECEIVED ROI FROM VIDEO!\n\n", self.ROI)
                     except:
                         #print("\n\nNO ROI FROM VIDEO!\n\n", self.ROI)
@@ -274,6 +278,8 @@ class BEH_GUI():
               if (self.cur_time - self.TONE_TIME) > float(self.Tone1_Duration): # seconds
                   #print("TONE OFF")
                   self.TONE_ON = False
+                  if "EPHYS-1" in self.computer:
+                      self.low_tone.sendDBit(False)
                   GUIFunctions.log_event(self, self.events,"Tone_OFF",self.cur_time)
 
         # DRAW SHOCK LIGHTNING
@@ -488,7 +494,7 @@ class BEH_GUI():
                                         print("#   EXPT FILE LOADED!!    #")
                                         print("###########################")
                                         self.EXPT_FILE_LOADED = True
-                                        GUIFunctions.log_event(self, self.events,"EXPT FILE LOADED",self.cur_time)
+                                        #GUIFunctions.log_event(self, self.events,"EXPT FILE LOADED",self.cur_time)
                                         if len(self.setup) > 0:
                                             self.RUN_SETUP = True
                                             self.setup_ln_num = 0
@@ -509,8 +515,8 @@ class BEH_GUI():
                                elif button.text == "START EXPT":
 
 ##                                    if not self.EXPT_FILE_LOADED:
-                                    self.load_expt_file()
-
+                                    #self.load_expt_file()
+                                    self.RUN_SETUP = True
                                     if self.EXPT_FILE_LOADED:
 
 
@@ -539,11 +545,8 @@ class BEH_GUI():
 
                                             for user_input in self.user_inputs:
                                                 if user_input.label == "EXPT":
-                                                    user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
-
-                                            #### Run Setup ###
+                                                   user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
                                             self.runSetup()
-
                                             if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
 
                                             if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
@@ -585,6 +588,7 @@ class BEH_GUI():
                                self.BUTTON_SELECTED = True
                                dx = cur_x - button.x
                                dy = cur_y - button.y
+
 
                     # LEVERS
                     for lever in self.levers:
@@ -675,7 +679,7 @@ class BEH_GUI():
                              self.GUIFunctions.PLAY_TONE(self, self.events,"TONE1",self.cur_time) #using computer speeker
                           elif "EPHYS-1" in self.computer:
                              self.GUIFunctions.PLAY_TONE_LAF(self, self.events,"TONE1",self.cur_time) #using computer speeker
-                          #self.GUIFunctions.PLAY_TONE_LAF(self, self.events,"TONE1",self.cur_time) #Using Lafayette
+
 
                     # SHOCK PRESSED
                     if self.shock.collidepoint(cur_x,cur_y):
@@ -869,24 +873,24 @@ class BEH_GUI():
             self.setup_ln_num +=1
         elif key == "FAN_ON":
            val = str2bool(setupDict[key])
-           #print("FAN")
+           print("FAN")
            GUIFunctions.FAN_ON_OFF(self, self.events,val,self.cur_time) # {'FAN_ON': True} or {'FAN_ON': False}
            self.setup_ln_num +=1
         elif key == "CAB_LIGHT":
            val = str2bool(setupDict[key])
-           #print("CAB_LIGHT")
+           print("CAB_LIGHT")
            self.Background_color = GUIFunctions.CAB_LIGHT(self, self.events,val,self.cur_time)
            #CAB_LIGHT(events,val,cur_time)
            self.setup_ln_num +=1
         elif key == "FOOD_LIGHT":
-            #print("FOOD LIGHT: ",setupDict["FOOD_LIGHT"])
+            print("FOOD LIGHT: ",setupDict["FOOD_LIGHT"])
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
             self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF (self, self.events,val,self.cur_time)
             self.LEDs[4].ONOFF = LEDsONOFF
             self.LEDs[5].ONOFF = LEDsONOFF
         elif key == "CAMERA":
-            #print("CAMERA\n")
+            print("CAMERA\n")
             val = str2bool(setupDict["CAMERA"])
             self.setup_ln_num +=1
             if val:  # TURN CAMERA ON.     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
@@ -931,13 +935,13 @@ class BEH_GUI():
         elif "EXTEND_LEVERS" in key:
             self.setup_ln_num +=1
             if setupDict[key] == "L_LVR":
-                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,False,self.cur_time)
+                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Left Lever Extended",True,False,self.cur_time)
             elif setupDict[key] == "R_LVR":
-               GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",False,True,self.cur_time)
+               GUIFunctions.EXTEND_LEVERS(self, self.events,"Right Lever Extended",False,True,self.cur_time)
             else:
                 val = str2bool(setupDict[key])
                 if val: # EXTEND_LEVERS == True
-                   #print ("EXTEND LEVERS")
+                   print ("LEVERS EXTENDED")
                    GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,True,self.cur_time)
                    for lever in self.levers:
                          lever.STATE = "OUT"
@@ -950,7 +954,7 @@ class BEH_GUI():
                         lever.STATE = "IN"
                    for button in self.buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
-
+                        
 
         elif "MAX_EXPT_TIME" in key:
             self.setup_ln_num +=1
@@ -971,7 +975,6 @@ class BEH_GUI():
        # GUIFunctions.FOOD_REWARD_RESET(self) #NOTE: THIS IS SO LOW BIT IS SENT TO FEEDER WITHOUT PAUSING THE PROGRAM
         protocolDict = self.protocol[self.Protocol_ln_num]
         key = list(protocolDict.keys())[0] # First key in protocolDict
-
         # Tell open ephys to start acquisiton and recording?
         #cur_time = time.perf_counter()
 
@@ -1088,7 +1091,7 @@ class BEH_GUI():
                    for button in self.buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
         ##############################
-        #  TOUCHSCREEN  (DRAWS IMAGES)
+        #  TOUCHSCREEN  in RUNEXPT (DRAWS IMAGES)
         ##############################
         elif "DRAW_IMAGES" in key: # IF USING TOUCHSCREEN
             if self.TOUCHSCREEN_USED:
@@ -1105,8 +1108,10 @@ class BEH_GUI():
                         imgList[key] = self.touchImgCoords #places images
                         self.TSq.put(imgList)
                         self.Protocol_ln_num +=1
-                    print('ImgList', imgList)
-
+                    print('\n\nImgList', imgList,"\n\n")
+                    
+                    #input("paused ENTER")
+                    
                     log_string = str(imgList)   # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
@@ -1115,7 +1120,9 @@ class BEH_GUI():
 
                     print('log_string', log_string)
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
-                else:
+
+
+                else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
 
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
                     print(placementList, self.touchImgCoords)
@@ -1128,16 +1135,30 @@ class BEH_GUI():
                     i=0
                     for key in self.touchImgs.keys():
                         imgList[key] = self.touchImgCoords[placementList[i]] #places images
-                        print('ImgList', imgList)
+                        #print('ImgList', imgList)
                         i+=1
                         self.TSq.put(imgList)
-                        self.Protocol_ln_num +=1
 
-                    log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
+                    self.Protocol_ln_num +=1
+                    
+                    #print('\n\nImgList', imgList,"\n\n")
+                    #input("paused ENTER")
+                    log_string = str(imgList) # Looks like this:  {'SPIDER_REAL.BMP': (181, 100), 'FLOWER_REAL.BMP': (602, 100)}
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
                     log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                    idx = log_string.find(")")
+                    #print("IDX: ", idx, "logstring: ", log_string)
+                    while idx != -1: # returns -1 if string not found
+                        try:
+                            if log_string[idx+1] == ";": # Could be out of range if ")" is last char
+                                log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
+                            idx = log_string.find[:idx+2](")")
+                            print("IDX: ", idx, "logstring: ", log_string)
+                        except:
+                            print("\n\n FAILED creating log string\n\n")
+                            break
                     print('log_string', log_string)
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
         ###############################
@@ -1278,32 +1299,42 @@ class BEH_GUI():
 
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 self.num_bar_presses +=1
+                
                 # Calculate Bar Presses Per Minute
                 BPPM_time_interval = self.cur_time - self.VI_start
-                if BPPM_time_interval > 60.0: #60.0: #Calculate BPPM every minute (60 sec)
-                    self.BPPM =  self.num_bar_presses/60.0
+                if BPPM_time_interval >= 60.0:  #Calculate BPPM every minute (60 sec)
+                    self.BPPM =  self.num_bar_presses#   0.0
+                    GUIFunctions.log_event(self, self.events, "Bar Presses Per Min:,"+ str(self.BPPM ) , self.cur_time)
+                    print ("\n\n\nnum_bar_presses:: ",self.num_bar_presses, "BPPM: ",self.BPPM)
                     self.BPPMs.append(self.BPPM) # Add a BPPM calcualtion to list every minute
                     # Reset for next minute  TPM_start_time
                     self.num_bar_presses = 0
                     self.VI_start = self.cur_time
 
                     # Calculate MEAN Bar Presses Per Minute over 10 min
-                    if len(self.BPPMs)> 10:#10: # after every 10 minutes (That is, 10 one minute evaluations convolved every minute)
-                        self.meanBPPM10 = sum(self.BPPMs[-10:])/10.0       # Mean Bar PRESSES per minute over last 10 minutes
-                        self.BPPMs.pop(0)                                  # Removes first item of list for running list
+                    #if len(self.BPPMs)> 10:#10: # after every 10 minutes (That is, 10 one minute evaluations convolved every minute)
+                    if len(self.BPPMs)== 10:#10: # after first 10 minutes only!!
+                        print("BPPMs: ",self.BPPMs)
+                        self.meanBPPM10 = sum(self.BPPMs[-10:])/10.0#10.0       # Mean Bar PRESSES per minute over last 10 minutes
+                        GUIFunctions.log_event(self, self.events, "MEAN Bar Presses Per Min:,"+ str(self.BPPM )+",Over 1st 10 min" , self.cur_time)
+                        print ("MEAN BPPM over ist 10 min: ",self.meanBPPM10)
+                        #self.BPPMs.pop(0)                                  # Removes first item of list for running list
                         if self.BAR_PRESS_TRAINING: # [BAR_PRESS] in protocol
                                                   #  BAR_PRESS_TRAIN=VI(1,15)
                                                   #  note: VI(a,b); a = initial VI for bar PRESS, b = final VI for session
-                            self.VI += 1  # Increases VI by 1
-                            if self.VI >=  self.VI_final:  self.VI =  self.VI_final # Set VI l
-                            GUIFunctions.log_event(self, self.events, "new VI: "+ str(self.VI) + " (sec)" , self.cur_time)
 
+                            if self.meanBPPM10 >= 10.0: #increae VI reward interval if mean over 1st 10 min exceeeds 10 BPPM
+                                self.var_interval_reward += 15 # Increases VI by 15
+                                if self.var_interval_reward >=  self.VI_final:
+                                    self.var_interval_reward =  self.VI_final # Limit VI to final value (b above)
+                                GUIFunctions.log_event(self, self.events, "new VI: "+ str(self.VI) + " (sec)" , self.cur_time)
+                                print ("NEW VI: ",str(self.var_interval_reward))
 
                 # Check if amount of VI has passed
                 if self.cur_time > (self.VI_start + self.VI):
-                    self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
-                    GUIFunctions.log_event(self, self.events, "Cur VI: "+ str(self.VI) + " (sec)" , self.cur_time)
-                    GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
+                   self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
+                   GUIFunctions.log_event(self, self.events, "Cur Rand VI(Between 0 and " + str(self.var_interval_reward)+": "+ str(self.VI) + " (sec)" , self.cur_time)
+                   GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
 
 
 
@@ -1555,17 +1586,29 @@ class BEH_GUI():
                        ##################################
                        if self.TOUCH_BANDIT:
                            for img, probabilityList in self.touchImgs.items():
+                               #print(probabilityList,'problist\n')
+
+                               probabilityListIDX = self.trial_num % len(probabilityList) # IDX = trial num. If Trial num exceeds len(probabilityList), it starts over
+                               reward_prob_for_this_img = probabilityList[probabilityListIDX]
+
+
+                               print(" reward_prob_for ", img, " = ", reward_prob_for_this_img  )
+                               print(self.touchMsg['picture'], img)
                                if self.touchMsg['picture'] == img:  # Touched an image
+                                   print(self.touchMsg['picture'], img)
                                    GUIFunctions.log_event(self,self.events, "Probability of pellet: " + str(probabilityList[self.trial_num]),self.cur_time)
-                                   GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " CORRECT IMG TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)
-                                   self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+
+                                   if reward_prob_for_this_img > 50.0:
+                                       self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+                                       GUIFunctions.log_event(self, self.events,"High PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)
+                                   else: # Less desirable image touchewd
+                                       self.wrong_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+                                       GUIFunctions.log_event(self, self.events,"Low PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)
                                    # Holds the probability for each trial
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
                                    self.correct_image_touches += 1
-                               else:
-                                   GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " WRONG IMG TOUCHED, " + "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)
-                                   self.wrong_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+
                        #################################
                        # TOUCH TRAINING
                        #################################
@@ -1628,20 +1671,20 @@ class BEH_GUI():
                   self.CONDITION_STARTED = False
                   if not self.WRONG and not self.CORRECT:
                       self.NO_ACTION_TAKEN = True
-                      GUIFunctions.log_event(self, self.events,"END_OF_TRIAL: NO_ACTION_TAKEN",self.cur_time)
+                      GUIFunctions.log_event(self, self.events,"NO_ACTION_TAKEN",self.cur_time)
                   self.TIME_IS_UP = True
 
            if self.cond["RESET"] == "ON_RESPONSE":
                #print (cond["Reset"])
                if self.WRONG or self.CORRECT: # A response was given
                    self.CONDITION_STARTED = False  # Time is up
-                   GUIFunctions.log_event(self, self.events,"END_OF_TRIAL",self.cur_time)
+                   # NOTE: "END_OF_TRIAL" LOGGED AFTER OUTCOMES
                    self.TIME_IS_UP = True
                if cond_time_elapsed >= float(self.cond["MAX_TIME"]): # Time is up
                   self.CONDITION_STARTED = False
                   if not self.WRONG and not self.CORRECT:
                       self.NO_ACTION_TAKEN = True
-                      GUIFunctions.log_event(self, self.events,"END_OF_TRIAL: NO_ACTION_TAKEN",self.cur_time)
+                      GUIFunctions.log_event(self, self.events,"NO_ACTION_TAKEN",self.cur_time)
                   self.TIME_IS_UP = True
 
            if self.cond['RESET'] == "VI":
@@ -1656,7 +1699,7 @@ class BEH_GUI():
                if self.CORRECT:
                   print("TONE1 DuRATION: ", self.Tone1_Duration)
                   #self.TONE_ON = True
-                  self.GUIFunctions.PLAY_TONE(self, self.events,'TONE1 for Correct Response',self.cur_time) #using computer speeker
+                  self.GUIFunctions.PLAY_TONE(self, self.events,'TONE1 for Correct Response',self.cur_time) #THIS IS DONE EVERY CORRECT RESPOSE EVEN IF REWARD NOT GIVEN
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
                   self.correctPercentage = self.num_correct/self.trial_num * 100
@@ -1677,29 +1720,29 @@ class BEH_GUI():
                ##############################################################
                if 'PELLET' in outcome:
                    if len(outcome)<=6: # Just 'PELLET'
-                       GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
+                       GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet,100, % Probabilty",self.cur_time)
                    else: #"PELLET****" i.e. PELLET80 or PELLET_VAR or PELLET_TOUCHVI1 or PELLET_TOUCHVI2
                        left_of_outcome_str = outcome[6:]
                        #print(left_of_outcome_str)
-                       if "TOUCHVI1" == left_of_outcome_str: # PELLET_TOUCHVI1: Touched image (CORRECT RESPONSE)
+                       if "_TOUCHVI1" == left_of_outcome_str: # PELLET_TOUCHVI1: Touched image (CORRECT RESPONSE)
                            if self.cur_time > (self.VI_start + self.cur_VI_images): # Give reward and reset VIs
                               # Give Rewards
-                              GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
+                              GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet," + str(self.cur_VI_images)+ ",VI",self.cur_time)
                               # Reset VIs
                               self.VI_start = self.cur_time
                               self.cur_VI_images = random.randint(0,int(self.VI_images * 2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
                               #print("new vi", self.cur_VI_images, " (sec)")
-                              GUIFunctions.log_event(self, self.events,"Cur_VI FOR IMAGE TOUCH = " + str(self.cur_VI_images),self.cur_time)
+                              GUIFunctions.log_event(self, self.events,"NEW_VI FOR IMAGE TOUCH = " + str(self.cur_VI_images),self.cur_time)
 
-                       elif "TOUCHVI2" in left_of_outcome_str: # or PELLET_TOUCHVI2: Touched Background (WRONG RESPONSE)
+                       elif "_TOUCHVI2" in left_of_outcome_str: # or PELLET_TOUCHVI2: Touched Background (WRONG RESPONSE)
                            if self.cur_time > (self.VI_start + self.cur_VI_background): # Give reward and reset VIs
                               # Give 1 Reward
-                              GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
+                              GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet," + str(self.cur_VI_images)+ ",VI",self.cur_time)
                               # Reset VIs
                               self.VI_start = self.cur_time
                               self.cur_VI_background = random.randint(0,int(self.VI_background*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
                               #print("new backgroung vi", self.VI_background, " (sec)")
-                              GUIFunctions.log_event(self, self.events,"Cur_VI FOR BACKGROUND TOUCH = " + str(self.cur_VI_images),self.cur_time)
+                              GUIFunctions.log_event(self, self.events,"NEW_VI FOR BACKGROUND TOUCH = " + str(self.cur_VI_images),self.cur_time)
 
 
                        elif "VAR" in left_of_outcome_str: # if "PELLET_VAR" in conditions portion of protocol
@@ -1707,16 +1750,16 @@ class BEH_GUI():
                            #print("our random number", rand)
                            if rand <= self.cur_probability:
                                #print("Food_Pellet w"+str(self.cur_probability)+ "% probability")
-                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(self.cur_probability)+ "% probability", self.cur_time)
+                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet,"+str(self.cur_probability)+ ",% probability", self.cur_time)
                            else:
                                #print("Reward NOT given w " + str(self.cur_probability)+"% probability")
-                               GUIFunctions.log_event(self, self.events,"Reward NOT given w " + str(self.cur_probability)+"% probability", self.cur_time)
+                               GUIFunctions.log_event(self, self.events,"Reward NOT given," + str(self.cur_probability)+",% probability", self.cur_time)
 
                        else: # if PELLET80 or something like it.  NOTE: PELLETXX, converts XX into probability
                            if random.random()*100 <= float(left_of_outcome_str):
-                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet w"+str(left_of_outcome_str)+ "% probability", self.cur_time)
+                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet,"+str(left_of_outcome_str)+ "%, probability", self.cur_time)
                            else:
-                               GUIFunctions.log_event(self, self.events,"Reward NOT given w " + str(left_of_outcome_str)+"% probability", self.cur_time)
+                               GUIFunctions.log_event(self, self.events,"Reward NOT given" + str(left_of_outcome_str)+",% probability", self.cur_time)
 
 
                elif 'TONE' in outcome:
@@ -1742,6 +1785,7 @@ class BEH_GUI():
 
                self.TIME_IS_UP = False
                self.CONDITION_STARTED = False
+               GUIFunctions.log_event(self, self.events,"END_OF_TRIAL",self.cur_time)
                self.Protocol_ln_num +=1
 
 if __name__ == "__main__":
