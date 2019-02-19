@@ -53,6 +53,62 @@ START_LOOP2 = 50 #NOTE: 2nt 10 reward probabilities next to img name  under [TOU
   CONDITIONS=0
 END_LOOP
 
+START_LOOP3 = 50 #NOTE: 1st 10 reward probabilities next to img name under [TOUCH]
+  PAUSE = 5
+  TONE1
+  DRAW_IMAGES=True
+  CONDITIONS=0
+END_LOOP
+
+START_LOOP4 = 50 #NOTE: 2nt 10 reward probabilities next to img name  under [TOUCH]
+  PAUSE = 5
+  TONE2
+  DRAW_IMAGES=True
+  CONDITIONS=0
+END_LOOP
+
+START_LOOP5 = 50 #NOTE: 1st 10 reward probabilities next to img name under [TOUCH]
+  PAUSE = 5
+  TONE1
+  DRAW_IMAGES=True
+  CONDITIONS=0
+END_LOOP
+
+START_LOOP6 = 50 #NOTE: 2nt 10 reward probabilities next to img name  under [TOUCH]
+  PAUSE = 5
+  TONE2
+  DRAW_IMAGES=True
+  CONDITIONS=0
+END_LOOP
+
+START_LOOP7 = 50 #NOTE: 1st 10 reward probabilities next to img name under [TOUCH]
+  PAUSE = 5
+  TONE1
+  DRAW_IMAGES=True
+  CONDITIONS=0
+END_LOOP
+
+START_LOOP8 = 50 #NOTE: 2nt 10 reward probabilities next to img name  under [TOUCH]
+  PAUSE = 5
+  TONE2
+  DRAW_IMAGES=True
+  CONDITIONS=0
+END_LOOP
+
+START_LOOP9 = 50 #NOTE: 1st 10 reward probabilities next to img name under [TOUCH]
+  PAUSE = 5
+  TONE1
+  DRAW_IMAGES=True
+  CONDITIONS=0
+END_LOOP
+
+START_LOOP10 = 50 #NOTE: 2nt 10 reward probabilities next to img name  under [TOUCH]
+  PAUSE = 5
+  TONE2
+  DRAW_IMAGES=True
+  CONDITIONS=0
+END_LOOP
+
 FOOD_LIGHT=False
 REC=False
 CAMERA= False

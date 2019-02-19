@@ -1108,8 +1108,10 @@ class BEH_GUI():
                         imgList[key] = self.touchImgCoords #places images
                         self.TSq.put(imgList)
                         self.Protocol_ln_num +=1
-                    print('ImgList', imgList)
-
+                    print('\n\nImgList', imgList,"\n\n")
+                    
+                    #input("paused ENTER")
+                    
                     log_string = str(imgList)   # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
@@ -1138,12 +1140,21 @@ class BEH_GUI():
                         self.TSq.put(imgList)
 
                     self.Protocol_ln_num +=1
-
-                    log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
+                    
+                    print('\n\nImgList', imgList,"\n\n")
+                    #input("paused ENTER")
+                    log_string = str(imgList) # Looks like this:  {'SPIDER_REAL.BMP': (181, 100), 'FLOWER_REAL.BMP': (602, 100)}
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
                     log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                    idx = log_string.find(")")
+                    while idx != -1: # returns -1 if string not found
+                        try:
+                            if log_string[idx+1] == ";": # Could be out of range if ")" is last char
+                                log_string = log_string[:idx]+ "," + log_string[idx+1:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
+                            idx = log_string.find(")")
+                        except: pass
                     print('log_string', log_string)
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
         ###############################

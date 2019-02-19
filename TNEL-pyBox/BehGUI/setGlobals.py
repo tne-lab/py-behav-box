@@ -71,8 +71,11 @@ def setGlobals(self):
     print("....")
     print ("PROTOCOL PATH: ",self.protocolpath)
 
-    #self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN2' #Flav's Machine
-    self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN_1_OF_2_PICS.txt' #Jean's Machine
+    if 'EPHYS-2' in self.computer:
+        self.expt_file_name = 'BANDIT_TOUCH_X.txt' # Default protocol
+    elif 'EPHYS-1' in self.computer:
+        self.expt_file_name = 'PROTOCOL_BAR_PRESS_TRAIN-Ephys1.txt' # Default
+
     self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
     print("EXPT FILE TO LOAD: in set globals ", self.expt_file_path_name)
 
