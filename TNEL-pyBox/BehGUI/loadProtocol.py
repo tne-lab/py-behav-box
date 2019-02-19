@@ -567,11 +567,14 @@ def create_files(self):
     print("\nCREATING LOG FILES:")
     #try:
     new_dir = os.path.join(self.datapath,self.Expt_Name)
-    if not os.path.exists(new_dir ):  os.mkdir(new_dir)
+    if not os.path.exists(new_dir ):
+        os.mkdir(new_dir)
     new_sub_dir = os.path.join(new_dir,self.date)
-    if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
+    if not os.path.exists(new_sub_dir ):
+        os.mkdir(new_sub_dir)
     new_sub_dir = os.path.join(new_sub_dir,self.exptTime)
-    if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
+    if not os.path.exists(new_sub_dir ):
+        os.mkdir(new_sub_dir)
     self.newdatapath = new_sub_dir
     expt_file_name_COPY = self.expt_file_name[:-4] + '_COPY.txt' # Removes the '.txt' from original name and adds 'COPY.txt'
     self.expt_file_path_name_COPY = os.path.join(self.newdatapath,expt_file_name_COPY)
@@ -579,8 +582,10 @@ def create_files(self):
 
 
     log_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-LOG_file'  + '.csv'
+    print("LOG FILE: ", log_file_name, " in LoadProtocol 585\n\n")
+
     self.log_file_path_name = os.path.join(self.newdatapath,log_file_name)
-    print(self.log_file_path_name)
+    print("LOG FILE PATH & NAME: ", self.log_file_path_name, " in LoadProtocol 588\n\n")
 
     video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
     self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)

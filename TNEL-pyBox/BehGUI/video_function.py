@@ -213,7 +213,7 @@ class Vid:
         fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
         print(1.0/self.mspf * 1000)
         self.out = cv2.VideoWriter(path,fourcc, 1.0/self.mspf * 1000, (int(width),int(height)))
-        print("SAVING TO: ", path, " in video_function.py line 215")
+        print("SAVING TO: ", path, " in video_function.py line 215\n\n")
 
     def mouse_callback(self, event, x, y, flags, params):
         if event == 2:
@@ -399,6 +399,6 @@ class SimpleVid:
         self.outPath = path
         fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
         self.out = cv2.VideoWriter(path,fourcc, 30, (int(width),int(height)))
-        print("SAVING TO ax:\n\n\n\n\n\n\n\n ", path)
+        print("SAVING TO aux:\n\n\n\n\n\n\n\n ", path)
 
 print('freezeAlg Loaded')

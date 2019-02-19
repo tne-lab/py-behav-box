@@ -1135,7 +1135,7 @@ class BEH_GUI():
                     i=0
                     for key in self.touchImgs.keys():
                         imgList[key] = self.touchImgCoords[placementList[i]] #places images
-                        print('ImgList', imgList)
+                        #print('ImgList', imgList)
                         i+=1
                         self.TSq.put(imgList)
 
@@ -1149,13 +1149,16 @@ class BEH_GUI():
                     log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
                     log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
                     idx = log_string.find(")")
+                    #print("IDX: ", idx, "logstring: ", log_string)
                     while idx != -1: # returns -1 if string not found
                         try:
                             if log_string[idx+1] == ";": # Could be out of range if ")" is last char
-                                log_string = log_string[:idx]+ "," + log_string[idx+1:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
+                                log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
                             idx = log_string.find(")")
-                        except: pass
-                    print('log_string', log_string)
+                            #print("IDX: ", idx, "logstring: ", log_string)
+                        except:
+                            print("\n\n FAILED creating log string\n\n")
+                    #print('log_string', log_string)
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
         ###############################
         # START LOOP
