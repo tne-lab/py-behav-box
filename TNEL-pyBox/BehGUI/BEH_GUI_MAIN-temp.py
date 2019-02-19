@@ -71,25 +71,19 @@ class BEH_GUI():
 
             self.drawScreen()
             self.checkSystemEvents()
-            self.checkNIDAQEvents()
+            nidaqEvents = self.checkNIDAQEvents()
 
             if self.EXPT_STARTED:
-                self.expt.checkVidStatus()
-                self.expt.updateVideoQ(self)
-                self.expt.checkOpenEphysQ()
+                self.expt.checkQs()
                 if self.RUN_SETUP:
                     self.expt.runSetup()
                 if self.START_EXPT:
-                    self.expt.runExpt()
+                    self.expt.runExpt(nidaqEvents)
 
             ######################################
             #   UPDATE SCREEN
             ######################################
             pygame.display.flip()
-
-            ######################################
-            #   UPDATE VIDEO
-            ######################################
 
 ########################################################################################
     def drawScreen(self):
@@ -761,6 +755,7 @@ class BEH_GUI():
         '''
         CHECK INPUTS FROM BEH CHAMBER
         '''
+        event = False
         if self.NIDAQ_AVAILABLE:
             if self.L_LEVER_EXTENDED or self.R_LEVER_EXTENDED:
                   wasleverPressed = daqHelper.detectPress(self.checkPressLeft, self.checkPressRight)
@@ -772,6 +767,7 @@ class BEH_GUI():
                         #print("RIGHT LEVER PRESSED")
                         self.num_R_lever_preses += 1
                         self.levers[1].STATE = "DN"
+                        event = 'Lever_Press_R'
 
                   if  wasleverPressed == 'Left':
                         GUIFunctions.log_event(self, self.events,"Lever_Pressed_L",self.cur_time)
@@ -779,12 +775,14 @@ class BEH_GUI():
                         #print("LEFT LEVER PRESSED")
                         self.num_L_lever_preses += 1
                         self.levers[0].STATE = "DN"
+                        event = 'Lever_Press_L'
 
             # nose pokes
             #cur_time = time.perf_counter()
             was_nose_poked_L = daqHelper.checkLeftNosePoke(self.L_nose_poke)
 
             if was_nose_poked_L:
+                event = 'Nose_Poke_L'
                 #print("LEFT Nose Poked")
                 self.NOSE_POKE_TIME = self.cur_time
                 #events.append("LEFT Nose Poke: " + str(cur_time))
@@ -801,6 +799,7 @@ class BEH_GUI():
 
             was_nose_poked_R = daqHelper.checkRightNosePoke(self.R_nose_poke)
             if was_nose_poked_R:
+                event = 'Nose_Poke_R'
                 #print("Right Nose Poked")
                 #events.append("RIGHT Nose Poke: " + str(cur_time))
                 GUIFunctions.log_event(self, self.events,"Nose_Poke_R",self.cur_time)
@@ -820,10 +819,13 @@ class BEH_GUI():
             foodEaten = daqHelper.checkFoodEaten(self.eaten)
 
             if foodEaten:
+                event = 'Food_Eaten'
                 self.num_eaten +=1
                 #events.append("Food Eaten: " + str(cur_time))
                 GUIFunctions.log_event(self, self.events,"Food_Eaten",self.cur_time)
                 print("Yum!")
+
+        return event
 
 ###########################################################################################################
 #  SETUP EXPERIMENT

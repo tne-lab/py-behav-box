@@ -929,6 +929,14 @@ class Experiment:
         if self.TOUCH_TRHEAD_STARTED == True:
             self.TSq.put('STOP')
 
+################################################################
+# CHECK Qs
+################################################################
+    def checkQs(self):
+        self.expt.checkVidStatus()
+        self.expt.updateVideoQ()
+        self.expt.checkOpenEphysQ()
+
 ### CHECK VIDEO Q ###
     def checkVidStatus(self):
         if not self.VIDBack_q.empty():
