@@ -40,175 +40,61 @@ def get_before_hash(line):
         return clean_line
 
 def load_expt_file(self):
-    print("LOADING: in load protocol", self.expt_file_path_name)
-    self.setup = []
-    self.protocol = []
-    self.conditions = []
-    self.exptFileLines = []
-
     try:
         f = open(self.expt_file_path_name,'r')
         # Read Line by line
         EXPERIMENT = False
         for ln in f:
-            line = get_before_hash(ln)
+            str_before_equal, str_after_equal = get_LR_before_hash(ln)
 
-            if not EXPERIMENT: # What is this for?
+            if not EXPERIMENT: # Makes sure that path is correct
                 line = line.upper()
-            #print(line)
+
             self.exptFileLines.append(line)
 
-            if line != "" and line[0] != "#" : #Skip Blank Lines and Skip lines that are just comments (but still copy them to new file)
-                #condition={} # Why is this here? Moved to line 362
-
-                if '[EXPERIMENT' in line:
-                    EXPERIMENT = True
-                    TONE1 = False
-                    TONE2 = False
-                    SHOCK = False
-                    FREEZE = False
-                    PROTOCOL = False
-                    CONDITIONS = False
-                    TOUCH = False
-                    BAR_PRESS = False
-                    SETUP = False
-                elif '[TONE1' in line:
-                    EXPERIMENT = False
-                    TONE1 = True
-                    TONE2 = False
-                    SHOCK = False
-                    FREEZE = False
-                    PROTOCOL = False
-                    CONDITIONS = False
-                    TOUCH = False
-                    BAR_PRESS = False
-                    SETUP = False
-                elif '[TONE2' in line:
-                    EXPERIMENT = False
-                    TONE1 = False
-                    TONE2 = True
-                    SHOCK = False
-                    FREEZE = False
-                    PROTOCOL = False
-                    CONDITIONS = False
-                    TOUCH = False
-                    BAR_PRESS = False
-                    SETUP = False
-                elif '[SHOCK]' in line:
-                    EXPERIMENT = False
-                    TONE1 = False
-                    TONE2 = False
-                    SHOCK = True
-                    FREEZE = False
-                    PROTOCOL = False
-                    CONDITIONS = False
-                    TOUCH = False
-                    BAR_PRESS = False
-                    SETUP = False
-                elif '[FREEZE]' in line:
-                    EXPERIMENT = False
-                    TONE1 = False
-                    TONE2 = False
-                    SHOCK = False
-                    FREEZE = True
-                    PROTOCOL = False
-                    CONDITIONS = False
-                    TOUCH = False
-                    BAR_PRESS = False
-                    SETUP = False
-
-                elif '[TOUCHSCREEN]' in line:
-                    EXPERIMENT = False
-                    TONE1 = False
-                    TONE2 = False
-                    SHOCK = False
-                    FREEZE = False
-                    PROTOCOL = False
-                    CONDITIONS = False
-                    TOUCH = True
-                    BAR_PRESS = False
-                    SETUP = False
-
-                elif '[BAR_PRESS]' in line:
-                    EXPERIMENT = False
-                    TONE1 = False
-                    TONE2 = False
-                    SHOCK = False
-                    FREEZE = False
-                    PROTOCOL = False
-                    CONDITIONS = False
-                    TOUCH = False
-                    BAR_PRESS = True
-                    SETUP = False
-
-                elif '[PROTOCOL' in line:
-                    EXPERIMENT = False
-                    TONE1 = False
-                    TONE2 = False
-                    SHOCK = False
-                    FREEZE = False
-                    PROTOCOL = True
-                    CONDITIONS = False
-                    TOUCH = False
-                    BAR_PRESS = False
-                    SETUP = False
-
-                elif '[SETUP' in line:
-                    EXPERIMENT = False
-                    TONE1 = False
-                    TONE2 = False
-                    SHOCK = False
-                    FREEZE = False
-                    PROTOCOL = False
-                    CONDITIONS = False
-                    TOUCH = False
-                    BAR_PRESS = False
-                    SETUP = True
-
-                elif "[CONDITIONS" in line:
+            if str_before_equal != "" and str_before_equal[0] != "#" : #Skip Blank Lines and Skip lines that are just comments (but still copy them to new file)
+                if '[EXPERIMENT' in str_before_equal:
+                    currentlySetting = 'EXPERIMENT'
+                elif '[TONE1' in str_before_equal:
+                    currentlySetting = 'TONE1'
+                elif '[TONE2' in str_before_equal:
+                    currentlySetting = 'TONE2'
+                elif '[SHOCK]' in str_before_equal:
+                    currentlySetting = 'SHOCK'
+                elif '[FREEZE]' in str_before_equal:
+                    currentlySetting = 'FREEZE'
+                elif '[TOUCHSCREEN]' in str_before_equal:
+                    currentlySetting = 'TOUCHSCREEN'
+                    self.setTouchGlobals()
+                elif '[BAR_PRESS]' in str_before_equal:
+                    currentlySetting = 'BARPRESS'
+                elif '[PROTOCOL' in str_before_equal:
+                    currentlySetting = 'PROTOCOL'
+                elif '[SETUP' in str_before_equal:
+                    currentlySetting = 'SETUP'
+                elif "[CONDITIONS" in str_before_equal:
                     print("#####################")
                     print("#    CONDITIONS     #")
                     print("#####################")
-                    EXPERIMENT = False
-                    TONE1 = False
-                    TONE2 = False
-                    SHOCK = False
-                    FREEZE = False
-                    PROTOCOL = False
-                    CONDITIONS = True
-                    TOUCH = False
-                    BAR_PRESS = False
-                    SETUP = False
+                    currentlySetting = 'CONDITIONS'
+                elif '[END' in str_before_equal:
+                    currentlySetting = 'END'
 
-                elif '[END' in line:
-                    EXPERIMENT = False
-                    TONE1 = False
-                    TONE2 = False
-                    SHOCK = False
-                    FREEZE = False
-                    PROTOCOL = False
-                    CONDITIONS = False
-                    TOUCH = False
-                    BAR_PRESS = False
-                    SETUP = False
-
-
-                if EXPERIMENT:
-
-                    if 'EXPT_NAME' in line:
+                if currentlySetting == 'EXPERIMENT':
+                    if 'EXPT_NAME' in str_before_equal:
                         print("#####################")
                         print("#    EXPERIMENT     #")
                         print("#####################")
                         if self.Expt_Name == "": #Change only if it does not already exist
-                            self.Expt_Name = get_val_between_equal_sign_and_hash(line)
+                            self.Expt_Name = str_after_equal
                         print(self.Expt_Name)
 
-                    elif 'SUBJECT' in line:
-                        self.Subject = get_val_between_equal_sign_and_hash(line)
+                    elif 'SUBJECT' in str_before_equal:
+                        self.Subject = str_after_equal
                         print(self.Subject)
 
-                    elif 'EXPT_PATH' in line:
-                        self.datapath = get_val_between_equal_sign_and_hash(line)
+                    elif 'EXPT_PATH' in str_before_equal:
+                        self.datapath = str_after_equal
                         if not os.path.isdir(self.datapath):
                             print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                             print(self.datapath, " DOES NOT EXIST!!!!")
@@ -219,8 +105,8 @@ def load_expt_file(self):
                             return False
                         else: print(self.datapath)
 
-                    elif 'LOG_FILE_PATH' in line:
-                        log_file_path = get_val_between_equal_sign_and_hash(line)
+                    elif 'LOG_FILE_PATH' in str_before_equal:
+                        log_file_path = str_after_equal
                         if not os.path.isdir(log_file_path):
                             print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                             print(log_file_path, " DOES NOT EXIST!!!!")
@@ -230,8 +116,8 @@ def load_expt_file(self):
                             return False
                         else: print("Log File Path",log_file_path)
 
-                    elif 'VIDEO_FILE_PATH' in line:
-                        video_file_path = get_val_between_equal_sign_and_hash(line)
+                    elif 'VIDEO_FILE_PATH' in str_before_equal:
+                        video_file_path = str_after_equal
                         if not os.path.isdir(video_file_path):
                             print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                             print(video_file_path, " DOES NOT EXIST!!!!")
@@ -241,89 +127,74 @@ def load_expt_file(self):
                             return False
                         print(video_file_path)
 
-                    elif 'OPEN_EPHYS_PATH' in line:
-                        if not self.open_ephys_started:
-                            print('opening ephys')
-                            self.open_ephys_started = True
-                            open_ephys_path = get_val_between_equal_sign_and_hash(line)
-                            subprocess.Popen(open_ephys_path)
+                    elif 'OPEN_EPHYS' in str_before_equal:
+                        self.EPHYS_ENABLED = bool(str_after_equal)
 
-                    elif 'VI_TIMES_LIST_PATH' in line:
-                        self.VIs_file_path = get_val_between_equal_sign_and_hash(line)
+                    elif 'VI_TIMES_LIST_PATH' in str_before_equal:
+                        self.VIs_file_path = str_after_equal
                         print(self.VIs_file_path)
 
                 elif TONE1:#TONE1
-                    if 'DURATION' in line:
-                        self.Tone1_Duration = float(get_val_between_equal_sign_and_hash(line))
+                    if 'DURATION' in str_before_equal:
+                        self.Tone1_Duration = float(str_after_equal)
                         print("self.Tone1_Duration",self.Tone1_Duration)
 
-                    if 'FREQ' in line:
-                        self.Tone1_Freq = float(get_val_between_equal_sign_and_hash(line))
+                    if 'FREQ' in str_before_equal:
+                        self.Tone1_Freq = float(str_after_equal)
                         print("self.Tone1_Freq: ",self.Tone1_Freq)
 
-                    if 'VOL' in line:
-                        self.Tone1_Vol = float(get_val_between_equal_sign_and_hash(line))
+                    if 'VOL' in str_before_equal:
+                        self.Tone1_Vol = float(str_after_equal)
                         print("self.Tone1_Vol: ",self.Tone1_Vol)
 
                 elif TONE2:#TONE2
-                    if 'DURATION' in line:
-                        self.Tone2_Duration = get_val_between_equal_sign_and_hash(line)
+                    if 'DURATION' in str_before_equal:
+                        self.Tone2_Duration = str_after_equal
                         print("self.Tone2_Duration",self.Tone2_Duration)
 
-                    if 'FREQ' in line:
-                        self.Tone2_Freq = float(get_val_between_equal_sign_and_hash(line))
+                    if 'FREQ' in str_before_equal:
+                        self.Tone2_Freq = float(str_after_equal)
                         print("self.Tone2_Freq: ",self.Tone2_Freq)
 
-                    if 'VOL' in line:
-                        self.Tone2_Vol = float(get_val_between_equal_sign_and_hash(line))
+                    if 'VOL' in str_before_equal:
+                        self.Tone2_Vol = float(str_after_equal)
                         print("self.Tone2_Vol: ",self.Tone2_Vol)
 
                 elif TOUCH:
                     touch_image_dict={}
-                    if 'IMAGES_PATH' in line:
-                        self.TOUCH_IMG_PATH = get_val_between_equal_sign_and_hash(line)
-                        self.TOUCHSCREEN_USED = True
-                        self.touchImgs = {}
+                    if 'IMAGES_PATH' in str_before_equal:
+                        self.TOUCH_IMG_PATH = str_after_equal
 
-                    if 'COORDS' in line:
-                        self.touchImgCoords = []
-                        words = get_val_between_equal_sign_and_hash(line)
+                    if 'COORDS' in str_before_equal:
+                        words = str_after_equal
                         if "RANDOM" in words:
-                            self.RANDOM_IMG_COORDS = True
-                            # self.touchImgCoords will be made radom in BehGUI.py
+                            self.RANDOM_IMG_COORDS = True # self.touchImgCoords will be made radom in BehGUI.py
                         else:
-                            self.RANDOM_IMG_COORDS = False
                             imageCoords = words.split(':')
-                            for i in range(len(imageCoords)):
-                                for c in '()':
-                                    #Remove parenthesis from (x,y)
+                            for i in range(len(imageCoords)): # Loop through coord list
+                                for c in '()':#Remove parenthesis from (x,y)
                                     imageCoords[i] = imageCoords[i].replace(c, "")
 
                                 imageCoordsStr = imageCoords[i].split(",")
-                                print()
                                 self.touchImgCoords.append((int(imageCoordsStr[0]), int(imageCoordsStr[1])))
 
-                    elif 'IMG' in line:
-                        words = get_val_between_equal_sign_and_hash(line)
+                    elif 'IMG' in str_before_equal:
+                        words = str_after_equal
                         imageInfo = words.split(":")
                         imageName = imageInfo[0].strip()
-                        if len(imageInfo)>1:# There are probability values after ":", i.e. (20,20,20,20,20)
-                            print('getting probs')
-                            for c in '()':
-                                #Remove parenthesis from rewards
+                        if len(imageInfo)>1: # There are probability values after ":", i.e. (20,20,20,20,20)
+                            for c in '()': #Remove parenthesis from rewards
                                 imageInfo[1] = imageInfo[1].replace(c, "")
                             imgRewardsList = []
-                            print(imageInfo[1].split(","))
                             for probability in imageInfo[1].split(","):
                                 if "X" in probability or "x" in probability: # There is a'X' in probability values, i.e. (20x10,80x10,...)
-                                    if "X" in probability:
-                                        Xsplit = probability.split('X')
-                                    elif "x" in probability:
-                                        Xsplit = probability.split('x')
-                                    prob = Xsplit[0]
-                                    num = Xsplit[1]
-                                    for i in range(int(num)):
-                                        imgRewardsList.append(int(prob))
+                                    for x in 'Xx':
+                                        if x in probability:
+                                            Xsplit = probability.split(x)
+                                        prob = Xsplit[0]
+                                        num = Xsplit[1]
+                                        for i in range(int(num)):
+                                            imgRewardsList.append(int(prob))
                                 else:
                                     imgRewardsList.append(int(probability))
                             # Saving as dictionary with key as filename
@@ -334,9 +205,9 @@ def load_expt_file(self):
                             # Saving as dictionary with key as filename
                             # and this means we're training so reward probability is hard coded in BEH_GUI_MAIN
                             self.touchImgs[imageName] = 0
-                    elif 'TRAIN_TOUCH' in line:
+                    elif 'TRAIN_TOUCH' in str_before_equal:
                         self.TOUCH_TRAINING = True
-                        vis = get_val_between_equal_sign_and_hash(line)
+                        vis = str_after_equal
                         if len(vis) > 0:
                             VIs = vis.split(",")
                             self.VI_images = float(VIs[0].strip())
@@ -345,16 +216,14 @@ def load_expt_file(self):
                             self.cur_VI_background = self.VI_background
 
                         #self.cur_probability = 100.0 # 100% To start. Reduced by 15% after 10 Presses/min for 10 min in BEH_GUI_MAIN
-                    elif 'TOUCH_BANDIT' in line:
+                    elif 'TOUCH_BANDIT' in str_before_equal:
                         self.TOUCH_BANDIT = True
 
                 elif BAR_PRESS:
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
-                    str_before_equal, str_after_equal = get_LR_before_hash(line) # [BAR_PRESS]
-                                                            #  VI=15
                     if "VI" in str_before_equal: # Needs to line befroe = sign
                         self.VI_REWARDING = True
-                        VI = get_val_between_equal_sign_and_hash(line)
+                        VI = str_after_equal
                         try:
                             self.var_interval_reward = int(VI)
                             print("var_interval_reward: ",self.var_interval_reward)
@@ -391,16 +260,16 @@ def load_expt_file(self):
 ##                            print ("!!!!!!!!!!!VR must have the form '(10, 1,30,5)' in EXP PROOCOL file!!!!!!!!!!!!!!")
 
                 elif SHOCK:
-                    if 'DURATION' in line:
-                        self.Shock_Duration = float(get_val_between_equal_sign_and_hash(line))
+                    if 'DURATION' in str_before_equal:
+                        self.Shock_Duration = float(str_after_equal)
                         print(self.Shock_Duration)
 
-                    if 'VOLTS' in line:
-                        self.Shock_V = float(get_val_between_equal_sign_and_hash(line))
+                    if 'VOLTS' in str_before_equal:
+                        self.Shock_V = float(str_after_equal)
                         print(self.Shock_V)
 
-                    if 'AMPS' in line:
-                        self.Shock_Amp = float(get_val_between_equal_sign_and_hash(line))
+                    if 'AMPS' in str_before_equal:
+                        self.Shock_Amp = float(str_after_equal)
                         print(self.Shock_Amp)
 
                 elif FREEZE:
@@ -408,15 +277,15 @@ def load_expt_file(self):
                     print("#    FREEZE DETECTION ENABLED     #")
                     print("###################################")
                     self.FREEZE_DETECTION_ENABLED = True
-                    if 'DURATION' in line:
-                        Freeze_Duration = get_val_between_equal_sign_and_hash(line)
+                    if 'DURATION' in str_before_equal:
+                        Freeze_Duration = str_after_equal
                         #print(Freeze_Duration)
-                    if 'PIX' in line:
-                        Min_Pixels = get_val_between_equal_sign_and_hash(line)
+                    if 'PIX' in str_before_equal:
+                        Min_Pixels = str_after_equal
                         #print(Min_Pixels)
 
-                    if 'ROI' in line:  #key == 'ROI':  # THIS SHOULD BE IN LOAD PROTOCOL ONLY WHEN and WHERE FREEZE INFO IS GIVEN
-                        self.ROI = get_val_between_equal_sign_and_hash(line)
+                    if 'ROI' in str_before_equal:  #key == 'ROI':  # THIS SHOULD BE IN LOAD PROTOCOL ONLY WHEN and WHERE FREEZE INFO IS GIVEN
+                        self.ROI = str_after_equal
                         self.vidDict['ROI'] = self.ROI
                         if "GENERATE" in self.ROI:
                             print("ROI: ",self.ROI)
@@ -425,7 +294,7 @@ def load_expt_file(self):
                             print('freeze detection assumed')
 
                 elif SETUP:
-                    if "SETUP" in line: # Skips [header] line
+                    if "SETUP" in str_before_equal: # Skips [header] line
                         print("################")
                         print("#    SETUP     #")
                         print("################")
@@ -442,7 +311,7 @@ def load_expt_file(self):
 
                 elif PROTOCOL:
                     #print("self.protocol: ",line)
-                    if "PROTOCOL"  in line: # Skips [header] line
+                    if "PROTOCOL"  in str_before_equal: # Skips [header] line
                         print("###################")
                         print("#    PROTOCOL     #")
                         print("###################")
@@ -459,7 +328,7 @@ def load_expt_file(self):
 
                 elif CONDITIONS:
                     #print("self.conditions: ",line)
-                    if "[CONDITIONS]" in line: # Condition header line
+                    if "[CONDITIONS]" in str_before_equal: # Condition header line
                         KEY_LINE = True
 
                     elif KEY_LINE: # CONDITION HEADING (i.e. all the KEYS)

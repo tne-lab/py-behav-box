@@ -176,7 +176,7 @@ class Vid:
             # draw trial start circle
             #print("STATE",msg['STATE'])
             #if self.ROIenabled:  print("ROI: ", self.ROI)
-            if msg['STATE'] == 'REC_VID'or msg['STATE'] == 'START_EXPT': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+            if msg['STATE'] == 'REC_VID': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                 recframe = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
                 self.out.write(recframe)
             if msg['STATE'] == 'REC_STOP': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
