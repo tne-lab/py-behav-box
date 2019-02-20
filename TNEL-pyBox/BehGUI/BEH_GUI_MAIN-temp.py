@@ -28,15 +28,15 @@ import zmq
 import json
 #from NIDAQ_GUI_elements import *
 from RESOURCES.GUI_elements_by_flav import *
-import daqHelper
-import daqAPI
-NIDAQ_AVAILABLE = True
-##try:
-##    import daqHelper
-##    import daqAPI
-##    NIDAQ_AVAILABLE = True
-##except:
-##    NIDAQ_AVAILABLE = False
+#import daqHelper
+#import daqAPI
+#NIDAQ_AVAILABLE = True
+try:
+    import daqHelper
+    import daqAPI
+    NIDAQ_AVAILABLE = True
+except:
+    NIDAQ_AVAILABLE = False
 
 from collections import deque
 from multiprocessing import Process, Queue
@@ -498,6 +498,30 @@ class BEH_GUI():
                                         if len(self.setup) > 0:
                                             self.RUN_SETUP = True
                                             self.setup_ln_num = 0
+                                            
+                                        win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
+                                        if self.USING_OPEN_EPHYS:
+                                            if not GUIFunctions.IsOpenEphysRunning:
+                                                programName = 'Open Ephys GUI'
+                                                #self.computer = os.environ['COMPUTERNAME']
+                                                #print("USING COMPUTER (in GUIfunctions): ",self.computer)
+                                                oe = self.open_ephys_path
+
+                                                window = subprocess.Popen(oe)# # doesn't capture output
+                                                time.sleep(2)
+                                                win32gui.EnumWindows(GUIFunctions.lookForProgram, programName)
+                                            #except:
+                                            #    print("Could not start Open Ephys")
+                                            else: print("Open Ephysis already RUNNING")
+                                            print(".............................................")
+
+
+
+
+
+
+
+
 
                                     else:
                                         self.EXPT_FILE_LOADED = False

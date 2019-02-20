@@ -219,6 +219,20 @@ def load_expt_file(self):
                             return False
                         else: print(self.datapath)
 
+                    elif 'OPEN_EPHYS_PATH' in line:
+                        self.USING_OPEN_EPHYS = True
+                        self.open_ephys_path = get_val_between_equal_sign_and_hash(line)
+                        print("/n/n HERE I AM: ",  self.open_ephys_path, "/n/n")
+                        if not os.path.isfile(self.open_ephys_path):
+                            print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                            print(self.open_ephys_path, " DOES NOT EXIST!!!!")
+                            print("Please correct the path in your protocol file!")
+                            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+                            GUIFunctions.log_event(self, self.events,self.open_ephys_path + " DOES NOT EXIST!!!!",self.cur_time)
+                            GUIFunctions.log_event(self, self.events,"PLEASE CHECK PATH IN PROTOCOL FILE",self.cur_time)
+                            return False
+                        else: print(self.open_ephys_path)
+
                     elif 'LOG_FILE_PATH' in line:
                         log_file_path = get_val_between_equal_sign_and_hash(line)
                         if not os.path.isdir(log_file_path):

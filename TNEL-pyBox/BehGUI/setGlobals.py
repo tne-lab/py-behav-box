@@ -87,6 +87,11 @@ def setGlobals(self):
     self.exptTime = time.strftime("%H-%M")
 
     ##
+
+    self.open_ephys_started = False
+    self.USING_OPEN_EPHYS = False
+    self.open_ephys_path = ''
+
     self.log_file_name = ''
     self.log_file_path_name = ''
     self.video_file_name = ''
@@ -213,7 +218,7 @@ def setGlobals(self):
     self.VRs_given = 0
     self.VR = 1
 
-    self.open_ephys_started = False
+
     self.Experiment_Start_time = 0.0
     self.cur_time = 0.0
     self.MAX_EXPT_TIME = 60 # in min

@@ -19,6 +19,7 @@ import subprocess
 
 IsWhiskerRunning = False
 IsOpenEphysRunning = False
+
 # Add open ephys here possibly?
 def closeWindow(hwnd, windowName):
     if windowName in win32gui.GetWindowText(hwnd):
@@ -37,25 +38,26 @@ def lookForProgram(hwnd, programName):
 def openWhiskerEphys(NIDAQ_AVAILABLE):
     global IsWhiskerRunning, IsOpenEphysRunning #, self.NIDAQ_AVAILABLE
     if NIDAQ_AVAILABLE:
-        win32gui.EnumWindows(lookForProgram, 'Open Ephys GUI')
-        if not IsOpenEphysRunning:
-            programName = 'Open Ephys GUI'
-            setGlobals.computer = os.environ['COMPUTERNAME']
-            print("USING COMPUTER: ",setGlobals.computer)
-            oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
-            if 'EPHYS-2' in setGlobals.computer:
-                oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
-            elif 'EPHYS-1' in setGlobals.computer:
-                oe = r'E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Jean's PC Ephys-1
-
-
-            window = subprocess.Popen(oe)# # doesn't capture output
-            time.sleep(2)
-            win32gui.EnumWindows(lookForProgram, programName)
-            #except:
-            #    print("Could not start Open Ephys")
-        else: print("Open Ephysis already RUNNING")
-        print(".............................................")
+##        win32gui.EnumWindows(lookForProgram, 'Open Ephys GUI')
+##        if self.USING_OPEN_EPHYS:
+##            if not IsOpenEphysRunning:
+##                programName = 'Open Ephys GUI'
+##                self.computer = os.environ['COMPUTERNAME']
+##                print("USING COMPUTER (in GUIfunctions): ",self.computer)
+###            if 'EPHYS-2' in setGlobals.computer:
+###                oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
+###            elif 'EPHYS-1' in setGlobals.computer:
+###                oe = r'E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Jean's PC Ephys-1
+##                oe = self.open_ephys_path
+##
+##                window = subprocess.Popen(oe)# # doesn't capture output
+##                time.sleep(2)
+##                win32gui.EnumWindows(lookForProgram, programName)
+##            #except:
+##            #    print("Could not start Open Ephys")
+##            else: print("Open Ephysis already RUNNING")
+##            print(".............................................")
+##
         win32gui.EnumWindows(lookForProgram, 'WhiskerServer')
         if not IsWhiskerRunning:
             try:

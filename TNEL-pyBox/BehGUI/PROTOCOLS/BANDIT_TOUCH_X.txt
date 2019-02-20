@@ -1,6 +1,9 @@
 [EXPERIMENT]
 EXPT_NAME = Bandit-Touch
 EXPT_PATH 	= E:\py-behav-box\TNEL-pyBox\BehGUI\DATA
+OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe # on Flav's PC Ephys-2
+###               E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe # on Jean's PC Ephys-1
+
 
 [TONE1] # Need TONE1, TONE2
 Duration(s) 	= 3
