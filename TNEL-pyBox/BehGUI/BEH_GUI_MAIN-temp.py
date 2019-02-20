@@ -498,39 +498,7 @@ class BEH_GUI():
                                         if len(self.setup) > 0:
                                             self.RUN_SETUP = True
                                             self.setup_ln_num = 0
-                                            
-                                        win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
-                                        if self.USING_OPEN_EPHYS:
-                                            if not GUIFunctions.IsOpenEphysRunning:
-                                                programName = 'Open Ephys GUI'
-                                                #self.computer = os.environ['COMPUTERNAME']
-                                                #print("USING COMPUTER (in GUIfunctions): ",self.computer)
-                                                oe = self.open_ephys_path
-
-                                                window = subprocess.Popen(oe)# # doesn't capture output
-                                                time.sleep(2)
-                                                win32gui.EnumWindows(GUIFunctions.lookForProgram, programName)
-                                            #except:
-                                            #    print("Could not start Open Ephys")
-                                            else: print("Open Ephysis already RUNNING")
-                                            print(".............................................")
-
-
-
-
-
-
-
-
-
-                                    else:
-                                        self.EXPT_FILE_LOADED = False
-                                        print("HUMPH! COULD NOT LOAD EXPT FILE (on button press)")
-                                        GUIFunctions.log_event(self, self.events,"Expt File name or path DOES NOT EXIST",self.cur_time)
-                                    for LED in self.LEDs: # Look for EXPT STARTED LED
-                                          if LED.index == 6: # Expt Started light
-                                              LED.ONOFF = "OFF"
-                                    self.setupGUI()
+                                            self.setupGUI()
                                #######################################
                                #
                                #   START EXPERIMENT

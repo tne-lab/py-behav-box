@@ -158,12 +158,16 @@ class Vid:
                     self.timeFrozen = 0
                     if self.isFrozen:
                         self.isFrozen = False
-                        self.freezeFile.write('end freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
+                        try:
+                            self.freezeFile.write('end freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
+                        except: print("Freeze file closed")
                         #back_q.put({'FREEZE' : False, 'TIME' : time_from_GUI})
                 else:
                     if self.checkFreeze() and not self.isFrozen:
                         self.isFrozen = True
-                        self.freezeFile.write('freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
+                        try:
+                            self.freezeFile.write('freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
+                        except: print("Freeze file closed")
                         #back_q.put({'FREEZE' : True, 'TIME' : time_from_GUI})
                         self.text = 'freeze'
 
