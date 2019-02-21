@@ -75,10 +75,7 @@ class BEH_GUI():
 
             if self.EXPT_STARTED:
                 self.expt.checkQs()
-                if self.RUN_SETUP:
-                    self.expt.runSetup()
-                if self.START_EXPT:
-                    self.expt.runExpt()
+                self.expt.run()
 
             ######################################
             #   UPDATE SCREEN

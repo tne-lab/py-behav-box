@@ -431,10 +431,13 @@ def load_expt_file(self):
             return False
     return True
 
+####################################################################################
+#   MAKE LOG/VIDEO/EPHYS FILES
+####################################################################################
 def create_files(self):
     # DATA PATH + FILES
     print("\nCREATING LOG FILES:")
-    #try:
+    ###### EXPT COPY FILE #####
     new_dir = os.path.join(self.datapath,self.Expt_Name)
     if not os.path.exists(new_dir ):  os.mkdir(new_dir)
     new_sub_dir = os.path.join(new_dir,self.date)
@@ -446,24 +449,29 @@ def create_files(self):
     self.expt_file_path_name_COPY = os.path.join(self.newdatapath,expt_file_name_COPY)
     print(self.expt_file_path_name_COPY)
 
-
+    ###### LOG FILE ####
     log_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-LOG_file'  + '.csv'
     self.log_file_path_name = os.path.join(self.newdatapath,log_file_name)
     print(self.log_file_path_name)
+    self.log_file = open(self.log_file_path_name,'w')        # OPEN LOG FILE
 
-    video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
-    self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
-    print(self.video_file_path_name)
+    ##### MAIN VIDEO #######
+    if self.VID_ENABLED = True:
+        video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
+        self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
+        print(self.video_file_path_name)
+    ## AUX VIDEO ##
+    if self.GUI.num_cameras == 2:
+        video_file_name_aux = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file_aux' + '.avi'
+        self.video_file_path_name_aux = os.path.join(self.newdatapath,video_file_name_aux)
+        print(self.video_file_path_name_aux)
+        self.SIMPLEVIDq.put({'STATE':'ON','PATH_FILE':self.video_file_path_name_aux})
 
-    video_file_name_aux = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file_aux' + '.avi'
-    self.video_file_path_name_aux = os.path.join(self.newdatapath,video_file_name_aux)
-    print(self.video_file_path_name_aux)
-    self.SIMPLEVIDq.put({'STATE':'ON','PATH_FILE':self.video_file_path_name_aux})
-
-    # Change open ephys recoding dir
-    self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.Subject)
-    self.snd.send(self.snd.START_REC)
-    time.sleep(3)
+    ###### Change open ephys recoding dir #####
+    if self.EPHYS_ENABLED:
+        self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.Subject)
+        self.snd.send(self.snd.START_REC)
+        time.sleep(3) # Let Open Ephys record for a bit (maybe remove?)
 
 # COPY EXPT FILE TO EXPT FILE DATAPATH
 def create_expt_file_copy(self):
