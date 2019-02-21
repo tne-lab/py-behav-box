@@ -226,6 +226,7 @@ def FOOD_REWARD_RESET(self):
 def log_event(self, event_lst, event, cur_time, other=''):
 
     #print("Log file: ", self.log_file_path_name)
+    cur_time = time.perf_counter()
     event_string = str(round(cur_time,9)) + ',  ' + event
     #print (event_string, other)
 ##    event_other = ''
@@ -235,8 +236,6 @@ def log_event(self, event_lst, event, cur_time, other=''):
     event_lst.append(event_string+event_other) # To Display on GUI
     if len(event_lst) > 14:  self.start_line = len(event_lst) -14
     try:
-        print("TRYING TO OPEN", self.log_file_path_name," to log event from GUIfunctions line 238.")
-
         log_file = open(self.log_file_path_name,'a')        # OPEN LOG FILE
         log_file.write(event_string + event_other + '\n')   # To WRITE TO FILE
         print(event_string + event_other)                   # print to display
