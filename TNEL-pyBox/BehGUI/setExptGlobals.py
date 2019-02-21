@@ -52,6 +52,7 @@ def setExptGlobals(self):
     self.R_LEVER_EXTENDED = False
     self.LEVERS_EXTENDED = False
 
+
     ################################################################
     # VI
     ################################################################
@@ -138,20 +139,7 @@ def setExptGlobals(self):
     ################################################################
     # More to parse and make sure work
     ################################################################
-    self.ROIstr = ""
-    self.ROI = (0,0,0,0)
-    self.vidSTATE= ''
-
-
-    self.PREVIOUSLY_FROZEN = False #Used to prevent 'unfrozen' from being logged prior to first 'frozen' event
-    self.FROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
-    self.UNFROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
     self.cur_time =  time.perf_counter()
-
-    self.num_L_nose_pokes = 0
-    self.num_R_nose_pokes = 0
-    self.num_L_lever_preses = 0
-    self.num_R_lever_preses = 0
 
     self.Protocol_ln_num = 0
     self.loop = 0
@@ -161,10 +149,7 @@ def setExptGlobals(self):
     self.CONDITION_STARTED = False
     self.RUN_SETUP = False
     self.VI_index = 0
-
-    self.TOUCH_IMAGES_SENT = False
     self.PAUSE_STARTED = False
-
 
     ################################################################
     # VIDEO GLOBALS
@@ -176,6 +161,9 @@ def setVidGlobals(self):
     self.VIDBack_q = Queue()
     self.video_file_name = ''
     self.video_file_path_name = ''
+    self.ROIstr = ""
+    self.ROI = (0,0,0,0)
+    self.vidSTATE= ''
 
 
     ################################################################
@@ -201,3 +189,7 @@ def setTouchGlobals(self):
     self.correct_image_touches = 0
     self.TOUCH_IMG_PATH = ''
     self.touch_img_files = []
+    self.TOUCH_IMAGES_SENT = False
+    self.PREVIOUSLY_FROZEN = False #Used to prevent 'unfrozen' from being logged prior to first 'frozen' event
+    self.FROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
+    self.UNFROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video

@@ -231,6 +231,12 @@ def setupGUI(self):
     self.RECORDING = False
     self.FREEZE_DETECTION_ENABLED = False
 
+    self.num_L_nose_pokes = 0
+    self.num_R_nose_pokes = 0
+    self.num_L_lever_preses = 0
+    self.num_R_lever_preses = 0
+
+
     self.START_EXPT = False
 
     self.Expt_Count = 0

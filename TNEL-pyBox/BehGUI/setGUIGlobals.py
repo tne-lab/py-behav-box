@@ -1,3 +1,4 @@
+import cv2
 def setGUIGlobals(self):
     self.computer = os.environ['COMPUTERNAME']
 
@@ -64,3 +65,15 @@ def setGUIGlobals(self):
     self.date = time.strftime("%b_%d_%y")#month-day-Year-H:M
     self.dateTm = time.strftime("%b_%d_%y-%H_%M")#month_day_Year-H:M
     self.exptTime = time.strftime("%H-%M")
+    self.events = []
+
+    ## Get number of cameras
+    self.num_cameras = count_cameras()
+def count_cameras():
+    max_tested = 2
+    for i in range(max_tested):
+        temp_camera = cv2.VideoCapture(i)
+        if temp_camera.isOpened():
+            temp_camera.release()
+            continue
+        return i + 1
