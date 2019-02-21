@@ -451,6 +451,16 @@ class BEH_GUI():
                                           if LED.index == 6: # Expt Started light
                                               LED.ONOFF = "OFF"
                                     self.setupGUI()
+
+                               #######################################
+                               #
+                               #   STOP EXPERIMENT
+                               #
+                               #######################################
+                                elif button.text == "STOP EXPT":
+                                    self.expt.endExpt()
+                                    self.START_EXPT = False
+
                                #######################################
                                #
                                #   START EXPERIMENT
@@ -503,7 +513,7 @@ class BEH_GUI():
                                                 if self.BAR_PRESS_TRAINING:
                                                     pass
                                             GUIFunctions.log_event(self, self.events,"EXPT STARTED USING " + self.expt_file_path_name_COPY,self.cur_time)
-
+                                            button.text = "STOP EXPT"
                                             ##################################
                                             #
                                             # RESET EXPT TIMER
