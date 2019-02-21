@@ -83,7 +83,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
         info_boxes.append(InfoBox( myscreen,405,330,50,15,"R PRESSES",'BOTTOM','0'))
         info_boxes.append(InfoBox( myscreen,225,400,50,15,"EATEN",'BOTTOM','0'))
         info_boxes.append(InfoBox( myscreen,225,455,50,15,"PELLETS",'BOTTOM','0'))
-        
+
     else:
         info_boxes.append(InfoBox( myscreen,415,420,40,15,"EATEN",'BOTTOM','0'))
         info_boxes.append(InfoBox( myscreen,320,420,40,15,"PELLETS",'BOTTOM','0'))
@@ -220,11 +220,6 @@ def setupGUI(self):
     self.TONE_TIME = START_TIME
     self.SHOCK_TIME = START_TIME
 
-    self.num_L_nose_pokes = 0
-    self.num_R_nose_pokes = 0
-    self.num_L_lever_preses = 0
-    self.num_R_lever_preses = 0
-
     self.num_eaten = 0
     self.NOSE_POKED_L = False
     self.NOSE_POKED_R = False
@@ -235,38 +230,7 @@ def setupGUI(self):
     self.CAMERA_ON = False
     self.RECORDING = False
     self.FREEZE_DETECTION_ENABLED = False
-    self.ROIstr = ""
-    self.ROI = (0,0,0,0)
-    self.vidSTATE= ''
-
-    self.events.append(("StartTime: " + str(START_TIME)))
-
-    self.PREVIOUSLY_FROZEN = False #Used to prevent 'unfrozen' from being logged prior to first 'frozen' event
-    self.FROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
-    self.UNFROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
-    self.cur_time =  time.perf_counter()
 
     self.START_EXPT = False
-    self.PAUSE_STARTED = False
-
-    self.Protocol_ln_num = 0
-    self.loop = 0
-    self.Protocol_loops = 0
-    self.LOOP_FIRST_PASS = True
-    self.CONDITONS_NOT_SET = True
-    self.CONDITION_STARTED = False
-    self.RUN_SETUP = False
-    self.VI_index = 0
 
     self.Expt_Count = 0
-
-    self.TOUCH_IMAGES_SENT = False
-
-    # Open ephys stuff
-    self.snd = zmqClasses.SNDEvent(5556) # subject number or something
-
-    self.openEphysBack_q = Queue()
-    self.openEphysQ = Queue()
-    # Start thread
-    open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike']})
-    open_ephys_rcv.start()

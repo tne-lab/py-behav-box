@@ -136,6 +136,37 @@ def setExptGlobals(self):
     simpleVidThread.start()
 
     ################################################################
+    # More to parse and make sure work
+    ################################################################
+    self.ROIstr = ""
+    self.ROI = (0,0,0,0)
+    self.vidSTATE= ''
+
+
+    self.PREVIOUSLY_FROZEN = False #Used to prevent 'unfrozen' from being logged prior to first 'frozen' event
+    self.FROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
+    self.UNFROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
+    self.cur_time =  time.perf_counter()
+
+    self.num_L_nose_pokes = 0
+    self.num_R_nose_pokes = 0
+    self.num_L_lever_preses = 0
+    self.num_R_lever_preses = 0
+
+    self.Protocol_ln_num = 0
+    self.loop = 0
+    self.Protocol_loops = 0
+    self.LOOP_FIRST_PASS = True
+    self.CONDITONS_NOT_SET = True
+    self.CONDITION_STARTED = False
+    self.RUN_SETUP = False
+    self.VI_index = 0
+
+    self.TOUCH_IMAGES_SENT = False
+    self.PAUSE_STARTED = False
+
+
+    ################################################################
     # VIDEO GLOBALS
     ################################################################
 def setVidGlobals(self):

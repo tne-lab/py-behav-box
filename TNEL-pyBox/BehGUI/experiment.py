@@ -1,13 +1,32 @@
 class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
-    def __init__(self, protocolPath, computer, GUI):
+    import GUIFunctions
+    def __init__(self, GUI, computer):
         setExptGlobals()
         self.computer = computer
         self.GUI = GUI
-        self.load_expt_file(protocolPath)
+        EXPT_FILE_LOADED = self.load_expt_file(protocolPath)
+        if EXPT_FILE_LOADED:
+            print("\n###########################")
+            print("#   EXPT FILE LOADED!!    #")
+            print("###########################")
+            if len(self.setup) > 0:
+                self.RUN_SETUP = True
+                self.setup_ln_num = 0
+        else:
+            print("COULD NOT LOAD EXPT FILE")
+            GUIFunctions.log_event(self, self.events,"COULD NOT LOAD EXPT FILE")
 
-    def startExpt(self):
-        stuff
+        GUIFunctions.log_event(self, self.events, "START_TIME" + str(time.perf_counter()))
+
+        # Open ephys stuff
+        self.snd = zmqClasses.SNDEvent(5556) # subject number or something
+
+        self.openEphysBack_q = Queue()
+        self.openEphysQ = Queue()
+        # Start thread
+        open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike']})
+        open_ephys_rcv.start()
 
     def runSetup(self):
         '''
@@ -118,10 +137,8 @@ class Experiment:
         '''
         RUN EXPERIMENTAL PROTOCOL IF START EXPT BUTTON PRESSED
         '''
-       # GUIFunctions.FOOD_REWARD_RESET(self) #NOTE: THIS IS SO LOW BIT IS SENT TO FEEDER WITHOUT PAUSING THE PROGRAM
         protocolDict = self.protocol[self.Protocol_ln_num]
         key = list(protocolDict.keys())[0] # First key in protocolDict
-        # Tell open ephys to start acquisiton and recording?
         #cur_time = time.perf_counter()
 
         if key == "":
@@ -886,23 +903,6 @@ class Experiment:
 
 ### END EXPT ###
     def endExpt(self):
-        if DEBUG:
-            print("Protocol_ln_num: ",self.Protocol_ln_num,"plength: ", len(self.protocol),"\n")
-            print("......END.....\n")
-            print("__________________________________________________________________________\n\n\n\n")
-        self.START_EXPT = False
-        self.Protocol_ln_num = 0
-        self.trial_num = 0
-        self.LEDs[0].ONOFF = "OFF"
-        self.LEDs[1].ONOFF = "OFF"
-        for LED in self.LEDs: # Look for EXPT STARTED LED
-            if LED.index == 6: # Expt Started light
-               LED.ONOFF = "OFF"
-        GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
-        GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
-
-
-
         # Tell open ephys to stop acquistion and recording?
         # Maybe we want to wait and continue getting data for awhile. Just send some sort of event
         if self.EPHYS_ENABLED:

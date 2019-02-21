@@ -71,14 +71,14 @@ class BEH_GUI():
 
             self.drawScreen()
             self.checkSystemEvents()
-            nidaqEvents = self.checkNIDAQEvents()
+            self.checkNIDAQEvents()
 
             if self.EXPT_STARTED:
                 self.expt.checkQs()
                 if self.RUN_SETUP:
                     self.expt.runSetup()
                 if self.START_EXPT:
-                    self.expt.runExpt(nidaqEvents)
+                    self.expt.runExpt()
 
             ######################################
             #   UPDATE SCREEN
@@ -449,23 +449,7 @@ class BEH_GUI():
                                     self.START_EXPT = False
                                     button.UP_DN = "DN"
                                     self.events = []
-                                    #print("LOADING EXPT FILE: in BehGUI_Main ", self.expt_file_path_name)
-                                    self.EXPT_FILE_LOADED = self.load_expt_file()
-
-                                    if self.EXPT_FILE_LOADED:
-                                        print("\n###########################")
-                                        print("#   EXPT FILE LOADED!!    #")
-                                        print("###########################")
-                                        self.EXPT_FILE_LOADED = True
-                                        #GUIFunctions.log_event(self, self.events,"EXPT FILE LOADED",self.cur_time)
-                                        if len(self.setup) > 0:
-                                            self.RUN_SETUP = True
-                                            self.setup_ln_num = 0
-
-                                    else:
-                                        self.EXPT_FILE_LOADED = False
-                                        print("HUMPH! COULD NOT LOAD EXPT FILE (on button press)")
-                                        GUIFunctions.log_event(self, self.events,"Expt File name or path DOES NOT EXIST",self.cur_time)
+                                    self.expt = experiment.Experiment(self, self.computer)
                                     for LED in self.LEDs: # Look for EXPT STARTED LED
                                           if LED.index == 6: # Expt Started light
                                               LED.ONOFF = "OFF"
@@ -755,7 +739,6 @@ class BEH_GUI():
         '''
         CHECK INPUTS FROM BEH CHAMBER
         '''
-        event = False
         if self.NIDAQ_AVAILABLE:
             if self.L_LEVER_EXTENDED or self.R_LEVER_EXTENDED:
                   wasleverPressed = daqHelper.detectPress(self.checkPressLeft, self.checkPressRight)
@@ -767,7 +750,6 @@ class BEH_GUI():
                         #print("RIGHT LEVER PRESSED")
                         self.num_R_lever_preses += 1
                         self.levers[1].STATE = "DN"
-                        event = 'Lever_Press_R'
 
                   if  wasleverPressed == 'Left':
                         GUIFunctions.log_event(self, self.events,"Lever_Pressed_L",self.cur_time)
@@ -775,14 +757,12 @@ class BEH_GUI():
                         #print("LEFT LEVER PRESSED")
                         self.num_L_lever_preses += 1
                         self.levers[0].STATE = "DN"
-                        event = 'Lever_Press_L'
 
             # nose pokes
             #cur_time = time.perf_counter()
             was_nose_poked_L = daqHelper.checkLeftNosePoke(self.L_nose_poke)
 
             if was_nose_poked_L:
-                event = 'Nose_Poke_L'
                 #print("LEFT Nose Poked")
                 self.NOSE_POKE_TIME = self.cur_time
                 #events.append("LEFT Nose Poke: " + str(cur_time))
@@ -799,7 +779,6 @@ class BEH_GUI():
 
             was_nose_poked_R = daqHelper.checkRightNosePoke(self.R_nose_poke)
             if was_nose_poked_R:
-                event = 'Nose_Poke_R'
                 #print("Right Nose Poked")
                 #events.append("RIGHT Nose Poke: " + str(cur_time))
                 GUIFunctions.log_event(self, self.events,"Nose_Poke_R",self.cur_time)
@@ -825,7 +804,6 @@ class BEH_GUI():
                 GUIFunctions.log_event(self, self.events,"Food_Eaten",self.cur_time)
                 print("Yum!")
 
-        return event
 
 ###########################################################################################################
 #  SETUP EXPERIMENT
@@ -1352,15 +1330,12 @@ class BEH_GUI():
            print("\nPROTOCOL ENDED NORMALLY")
            GUIFunctions.log_event(self, self.events,"Camera_OFF",self.cur_time)
            self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-           self.end_expt()
 
     def end_expt(self):
            print("Protocol_ln_num: ",self.Protocol_ln_num,"plength: ", len(self.protocol),"\n")
            print("......END.....\n")
            print("__________________________________________________________________________\n\n\n\n")
            self.START_EXPT = False
-           self.Protocol_ln_num = 0
-           self.trial_num = 0
            self.LEDs[0].ONOFF = "OFF"
            self.LEDs[1].ONOFF = "OFF"
            for LED in self.LEDs: # Look for EXPT STARTED LED
@@ -1369,23 +1344,7 @@ class BEH_GUI():
            GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
            GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
 
-
-
-           # Tell open ephys to stop acquistion and recording?
-           # Maybe we want to wait and continue getting data for awhile. Just send some sort of event
-           self.snd.send(self.snd.STOP_ACQ)
-           self.snd.send(self.snd.STOP_REC)
-
-           if self.TOUCHSCREEN_USED:
-               self.TSq.put('')
-               self.TOUCHSCREEN_USED = False
-               while not self.TSBack_q.empty():  # EMPTY TSBack_q between Expt Runs.
-                   self.touchMsg = self.TSBack_q.get()
-
-           for user_input in self.user_inputs:
-              if user_input.label == "SUBJECT":
-                 self.Subject = ''
-                 self.prev_Subject = self.Subject
+           self.expt.end_expt()
 
 ####################################################################################
 #   DO CONDITIONS
