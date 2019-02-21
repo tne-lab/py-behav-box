@@ -494,6 +494,31 @@ class BEH_GUI():
                                         print("#   EXPT FILE LOADED!!    #")
                                         print("###########################")
                                         self.EXPT_FILE_LOADED = True
+
+
+                                        win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
+                                        if self.USING_OPEN_EPHYS:
+                                            if not GUIFunctions.IsOpenEphysRunning:
+                                                programName = 'Open Ephys GUI'
+                                                self.computer = os.environ['COMPUTERNAME']
+                                                print("USING COMPUTER (in GUIfunctions): ",self.computer)
+                                                oe = self.open_ephys_path
+
+                                                window = subprocess.Popen(oe)# # doesn't capture output
+                                                time.sleep(2)
+                                                win32gui.EnumWindows(GUIFunctions.lookForProgram, programName)
+                                            #except:
+                                            #    print("Could not start Open Ephys")
+                                            else: print("Open Ephysis already RUNNING")
+                                            print(".............................................")
+
+
+
+
+
+
+
+                                        
                                         #GUIFunctions.log_event(self, self.events,"EXPT FILE LOADED",self.cur_time)
                                         if len(self.setup) > 0:
                                             self.RUN_SETUP = True
