@@ -24,7 +24,6 @@ def closeWindow(hwnd, windowName):
     if windowName in win32gui.GetWindowText(hwnd):
         win32gui.CloseWindow(hwnd) # Minimize Window
 
-
 def lookForProgram(hwnd, programName):
     global IsWhiskerRunning, IsOpenEphysRunning
     if programName in win32gui.GetWindowText(hwnd):
@@ -69,7 +68,6 @@ def openWhiskerEphys(NIDAQ_AVAILABLE):
         else: print("Whisker server is already RUNNING")
         print(".............................................")
 
-
 def choose_file():
     #Tk.withdraw() # we don't want a full GUI, so keep the root window from appearing
     chosenFileName = askopenfilename() # show an "Open" dialog box and return the path to the selected file
@@ -77,6 +75,30 @@ def choose_file():
     win32gui.EnumWindows(closeWindow, 'tk')
 
     return filename
+
+
+##################### NEEDS TO BE REOMVED WHEN DONE!!!!!!! ############################ MAYBE MOVE?
+#def log_event(self, event, other='')
+def log_event(self, event_lst, event, cur_time, other=''):
+
+    #print("Log file: ", self.log_file_path_name)
+    cur_time = time.perf_counter()
+    event_string = str(round(cur_time,9)) + ',  ' + event
+    #print (event_string, other)
+##    event_other = ''
+##    for item in other:
+##        event_other = event_other + ",  " +  str(item)
+    event_other =  ",  "+ str(other)
+    event_lst.append(event_string+event_other) # To Display on GUI
+    if len(event_lst) > 14:  self.start_line = len(event_lst) -14
+    try:
+        log_file = open(self.log_file_path_name,'a')        # OPEN LOG FILE
+        log_file.write(event_string + event_other + '\n')   # To WRITE TO FILE
+        print(event_string + event_other)                   # print to display
+        log_file.close()                                    #CLOSE LOG FILE
+    except:
+        print ('Log file not created yet. Check EXPT PATH, then Press "LOAD EXPT FILE BUTTON"')
+########################################################################
 
 def FAN_ON_OFF(self, events, FAN_ON, cur_time):
     if FAN_ON:
@@ -126,8 +148,6 @@ def PLAY_TONE(self, events, TONE_ID, cur_time):  # Plays tone using computer spe
             self.TONE_ON = True
         else: log_event(self, events,"Could not play TONE (already on)",cur_time)
 
-
-
 def CAB_LIGHT(self, events, ON_OFF, cur_time):
     gray        = (100,100,100)
     darkgray    = (50,50,50)
@@ -143,7 +163,6 @@ def CAB_LIGHT(self, events, ON_OFF, cur_time):
        if self.NIDAQ_AVAILABLE: self.cabin_light.sendDBit(False)
        #self.cabin_light.end()
     return Background_color
-
 
 def EXTEND_LEVERS(self, events, text, L_LVR, R_LVR, cur_time):
     if L_LVR and R_LVR: # Extend both levers
@@ -222,56 +241,9 @@ def FOOD_REWARD_RESET(self):
     if self.NIDAQ_AVAILABLE:
        self.give_food.sendDBit(False)
 
-
-def log_event(self, event_lst, event, cur_time, other=''):
-
-    #print("Log file: ", self.log_file_path_name)
-    cur_time = time.perf_counter()
-    event_string = str(round(cur_time,9)) + ',  ' + event
-    #print (event_string, other)
-##    event_other = ''
-##    for item in other:
-##        event_other = event_other + ",  " +  str(item)
-    event_other =  ",  "+ str(other)
-    event_lst.append(event_string+event_other) # To Display on GUI
-    if len(event_lst) > 14:  self.start_line = len(event_lst) -14
-    try:
-        log_file = open(self.log_file_path_name,'a')        # OPEN LOG FILE
-        log_file.write(event_string + event_other + '\n')   # To WRITE TO FILE
-        print(event_string + event_other)                   # print to display
-        log_file.close()                                    #CLOSE LOG FILE
-    except:
-        print ('Log file not created yet. Check EXPT PATH, then Press "LOAD EXPT FILE BUTTON"')
-
-def StartTouchScreen(self):
-    if not self.TOUCH_TRHEAD_STARTED:
-        whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(self.TSBack_q,self.TSq), kwargs={'media_dir' : self.resourcepath})
-        whiskerThread.daemon = True
-        whiskerThread.start()
-        self.TOUCH_TRHEAD_STARTED = True
-
-def MyVideo(self):
-      vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q,))
-      vid_thread.daemon = True
-      self.VIDq.pop()
-      updateVideoQ(self)
-      vid_thread.start()
-
-      while True:
-          time.sleep(0.1)
-          if not self.VIDBack_q.empty():
-              msg = self.VIDBack_q.get()
-              if msg == 'vid ready':
-                  return
-
-def updateVideoQ(self):
-    self.vidDict['cur_time'] = self.cur_time
-    self.vidDict['trial_num'] = self.trial_num
-    self.vidDict['STATE'] = self.vidSTATE
-    self.vidDict['PATH_FILE'] = self.video_file_path_name
-    self.VIDq.append(self.vidDict)
-
 def exit_game(self):
+    if self.EXPT_STARTED:
+        self.expt.end_expt()
     if self.NIDAQ_AVAILABLE:
       self.fan.end()
       self.cabin_light.end()
@@ -295,7 +267,6 @@ def exit_game(self):
     #self.stimQ.put('STOP')
     pygame.quit()
     sys.exit()
-
 
 def draw_speeker(myscreen, x, y, TONE_ON):
         if TONE_ON: col = (0,255,0)
