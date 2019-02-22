@@ -76,30 +76,6 @@ def choose_file():
 
     return filename
 
-
-##################### NEEDS TO BE REOMVED WHEN DONE!!!!!!! ############################ MAYBE MOVE?
-#def log_event(self, event, other='')
-def log_event(self, event_lst, event, cur_time, other=''):
-
-    #print("Log file: ", self.log_file_path_name)
-    cur_time = time.perf_counter()
-    event_string = str(round(cur_time,9)) + ',  ' + event
-    #print (event_string, other)
-##    event_other = ''
-##    for item in other:
-##        event_other = event_other + ",  " +  str(item)
-    event_other =  ",  "+ str(other)
-    event_lst.append(event_string+event_other) # To Display on GUI
-    if len(event_lst) > 14:  self.start_line = len(event_lst) -14
-    try:
-        log_file = open(self.log_file_path_name,'a')        # OPEN LOG FILE
-        log_file.write(event_string + event_other + '\n')   # To WRITE TO FILE
-        print(event_string + event_other)                   # print to display
-        log_file.close()                                    #CLOSE LOG FILE
-    except:
-        print ('Log file not created yet. Check EXPT PATH, then Press "LOAD EXPT FILE BUTTON"')
-########################################################################
-
 def FAN_ON_OFF(self, events, FAN_ON, cur_time):
     if FAN_ON:
         log_event(self, events,"Fan_ON",cur_time)

@@ -36,6 +36,7 @@ class Experiment:
 ####################################################################################
     def run(self):
         self.cur_time = time.perf_counter()
+        self.expt.checkQs()
         if self.RUN_SETUP:
             self.expt.runSetup()
         if self.START_EXPT:
