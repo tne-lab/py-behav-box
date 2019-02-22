@@ -1364,7 +1364,7 @@ class BEH_GUI():
             # Check if amount of VI has passed. If so, reward. Recalc VI
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 if self.cur_time > (self.VI_start + self.VI):
-                   GUIFunctions.log_event(self, self.events, "Cur Rand VI(Between 0 and " + str(2*self.var_interval_reward)+": "+ str(self.VI) + " (sec)" , self.cur_time)
+                   GUIFunctions.log_event(self, self.events, "Cur Rand VI(Between 0 and " + str(2*self.var_interval_reward)+")= "+ str(self.VI) + " (sec)" , self.cur_time)
                    GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                    # Calculate self.VI for next time
                    self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
