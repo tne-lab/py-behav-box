@@ -611,9 +611,10 @@ def create_files(self):
     self.SIMPLEVIDq.put({'STATE':'ON','PATH_FILE':self.video_file_path_name_aux})
 
     # Change open ephys recoding dir
-    self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.Subject)
-    self.snd.send(self.snd.START_REC)
-    time.sleep(3)
+    if self.USING_OPEN_EPHYS:
+        self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.Subject)
+        self.snd.send(self.snd.START_REC)
+        time.sleep(3)
 
 # COPY EXPT FILE TO EXPT FILE DATAPATH
 def create_expt_file_copy(self):

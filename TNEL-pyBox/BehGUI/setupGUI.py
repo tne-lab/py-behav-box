@@ -83,7 +83,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
         info_boxes.append(InfoBox( myscreen,405,330,50,15,"R PRESSES",'BOTTOM','0'))
         info_boxes.append(InfoBox( myscreen,225,400,50,15,"EATEN",'BOTTOM','0'))
         info_boxes.append(InfoBox( myscreen,225,455,50,15,"PELLETS",'BOTTOM','0'))
-        
+
     else:
         info_boxes.append(InfoBox( myscreen,415,420,40,15,"EATEN",'BOTTOM','0'))
         info_boxes.append(InfoBox( myscreen,320,420,40,15,"PELLETS",'BOTTOM','0'))
@@ -261,12 +261,11 @@ def setupGUI(self):
     self.Expt_Count = 0
 
     self.TOUCH_IMAGES_SENT = False
-
-    # Open ephys stuff
-    self.snd = zmqClasses.SNDEvent(5556) # subject number or something
-
     self.openEphysBack_q = Queue()
     self.openEphysQ = Queue()
-    # Start thread
-    open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike']})
-    open_ephys_rcv.start()
+    # Open ephys stuff
+    if self.USING_OPEN_EPHYS:
+        self.snd = zmqClasses.SNDEvent(5556) # subject number or something
+        # Start thread
+        open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike']})
+        open_ephys_rcv.start()

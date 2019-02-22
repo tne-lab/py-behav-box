@@ -496,8 +496,9 @@ class BEH_GUI():
                                         self.EXPT_FILE_LOADED = True
 
 
-                                        win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
+                                        
                                         if self.USING_OPEN_EPHYS:
+                                            win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
                                             if not GUIFunctions.IsOpenEphysRunning:
                                                 programName = 'Open Ephys GUI'
                                                 self.computer = os.environ['COMPUTERNAME']
@@ -944,8 +945,9 @@ class BEH_GUI():
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
-                self.snd.send(self.snd.START_REC) # OPEN_EPHYS
+                if self.USING_OPEN_EPHYS:
+                    self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
+                    self.snd.send(self.snd.START_REC) # OPEN_EPHYS
                 self.vidSTATE = 'REC_VID'
                 if self.FREEZE_DETECTION_ENABLED:
                     print("\nFREEZE DETECTION ENABLED")
@@ -1450,8 +1452,9 @@ class BEH_GUI():
 
            # Tell open ephys to stop acquistion and recording?
            # Maybe we want to wait and continue getting data for awhile. Just send some sort of event
-           self.snd.send(self.snd.STOP_ACQ)
-           self.snd.send(self.snd.STOP_REC)
+           if self.USING_OPEN_EPHYS:
+               self.snd.send(self.snd.STOP_ACQ)
+               self.snd.send(self.snd.STOP_REC)
 
            if self.TOUCHSCREEN_USED:
                self.TSq.put('')
