@@ -172,7 +172,7 @@ class Vid:
                         self.text = 'freeze'
 
                 cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),2,cv2.LINE_AA)
-                cv2.moveWindow('thresh',1400,30)# window, x, y. x = 1024 (touchscree w) + gui width =    
+                cv2.moveWindow('thresh',1400,30)# window, x, y. x = 1024 (touchscree w) + gui width =
                 cv2.imshow('thresh',self.prevThresh)
 
             # Write stuff on screen (need to add trial number and probably not time differential)
@@ -404,6 +404,5 @@ class SimpleVid:
         self.outPath = path
         fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
         self.out = cv2.VideoWriter(path,fourcc, 30, (int(width),int(height)))
-        print("SAVING TO aux:\n\n\n\n\n\n\n\n ", path)
 
 print('freezeAlg Loaded')

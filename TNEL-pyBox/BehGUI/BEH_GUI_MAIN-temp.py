@@ -515,12 +515,6 @@ class BEH_GUI():
                                             print(".............................................")
 
 
-
-
-
-
-
-
                                         #GUIFunctions.log_event(self, self.events,"EXPT FILE LOADED",self.cur_time)
                                         if len(self.setup) > 0:
                                             self.RUN_SETUP = True
@@ -535,7 +529,6 @@ class BEH_GUI():
                                     self.setup_ln_num = 0
                                     if self.EXPT_FILE_LOADED:
                                         button.UP_DN = "DN"
-                                        self.Expt_Count +=1
                                         #if self.EXPT_FILE_LOADED:
                                         if self.Subject == "" or "?" in self.Subject or self.Subject == " " or len(self.Subject) == 0 :
                                             GUIFunctions.log_event(self, self.events,"Check SUBJECT  and EXPT name!!!!",self.cur_time)
@@ -548,6 +541,7 @@ class BEH_GUI():
                                                      user_input.border_color = (255,0,0)
 
                                         if self.NAME_OR_SUBJ_CHANGED :  # READY TO GO!!!
+                                            self.Expt_Count +=1
                                             self.create_files()
                                             self.create_expt_file_copy()
                                             self.NAME_OR_SUBJ_CHANGED = False
@@ -1630,9 +1624,9 @@ class BEH_GUI():
                        GUIFunctions.log_event(self, self.events," missed ," + "(" + str(x) + ";" + str(y)  + ")", self.cur_time)
                        self.background_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                        self.background_touches += 1
-                       if self.TOUCH_TRAINING:
-                          self.WRONG = True # When TOUCHSCREEN TRAING, ANY TOUCH RESULTS IN TRUE (??????????)
-
+                       #if self.TOUCH_TRAINING:
+                       #   self.WRONG = True # When TOUCHSCREEN TRAING, ANY TOUCH RESULTS IN TRUE (??????????)
+                       self.WRONG = True # When TOUCHSCREEN TRAING, ANY TOUCH RESULTS IN TRUE (??????????)
                    ###################
                    #  IMAGE TOUCHED
                    ###################
