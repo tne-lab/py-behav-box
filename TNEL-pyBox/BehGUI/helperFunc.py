@@ -18,18 +18,18 @@ def detectPress(checkPressLeft,checkPressRight):
                REPEAT_RP = True
         else: REPEAT_RP = False
         prev_rightPress = rightPress
-        
+
         if rightPress and REPEAT_RP == False:
-                print('Right')
+                #print('Right')
                 return 'Right'
         else: return False
-        
+
         # LEFT
         if prev_leftPress  and leftPress: # prev and current are BOTH True
                REPEAT_LP = True
         else: REPEAT_LP = False
         prev_leftPress = leftPress
-        
+
         if leftPress:
             print('left')
             return 'Left'
@@ -56,7 +56,7 @@ def checkRightNosePoke(R_nose_poke):
         if prev_R_nose_poke  and nose_poked_R: # prev and current are BOTH True
                REPEAT_RNP = True
         else: REPEAT_RNP = False
-        prev_R_nose_poke = nose_poked_R 
+        prev_R_nose_poke = nose_poked_R
         if nose_poked_R and REPEAT_RNP == False:
                 return True
         else: return False
@@ -69,7 +69,7 @@ def checkLeftNosePoke(L_nose_poke):
         if prev_L_nose_poke  and nose_poked_L: # prev and current are BOTH True
                REPEAT_LNP = True
         else: REPEAT_LNP = False
-        prev_L_nose_poke = nose_poked_L 
+        prev_L_nose_poke = nose_poked_L
         if nose_poked_L and REPEAT_LNP == False:
                 return True
         else: return False

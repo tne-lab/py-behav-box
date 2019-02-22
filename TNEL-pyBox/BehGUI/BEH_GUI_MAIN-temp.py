@@ -944,8 +944,8 @@ class BEH_GUI():
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
-                self.snd.send(self.snd.START_REC) # OPEN_EPHYS
+                #self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
+                #self.snd.send(self.snd.START_REC) # OPEN_EPHYS
                 self.vidSTATE = 'REC_VID'
                 if self.FREEZE_DETECTION_ENABLED:
                     print("\nFREEZE DETECTION ENABLED")
@@ -1321,13 +1321,15 @@ class BEH_GUI():
         # RUN BAR PRESS INDEPENDENT OF PROTOCOLS OR CONDTIONS
         #########################################################################################
         if self.BAR_PRESS_INDEPENDENT_PROTOCOL: #Running independently of CONDITIONS. Used for conditioning, habituation, extinction, and recall
+            if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
+               self.num_bar_presses +=1
+               
             if self.VI_REWARDING:  # [BAR_PRESS] in protocol
                                    #  VI=15
                 self.VI = self.var_interval_reward
-                #############################  Changed here!!!
-                if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
-                    self.num_bar_presses +=1
-                    self.VI_start = self.cur_time
+
+            elif self.BAR_PRESS_TRAINING: # BAR_PRESS_TRAIN=VI(1,15) in protocol
+
                 # Calculate Bar Presses Per Minute
                 BPPM_time_interval = self.cur_time - self.VI_calc_start
                 
@@ -1342,9 +1344,9 @@ class BEH_GUI():
 
                     # Calculate MEAN Bar Presses Per Minute over 10 min
                     #if len(self.BPPMs)> 10:#10: # after every 10 minutes (That is, 10 one minute evaluations convolved every minute)
-                    if len(self.BPPMs)== 2:#10: # after first 10 minutes only!!
+                    if len(self.BPPMs)== 10:#10: # after first 10 minutes only!!
                         print("BPPMs: ",self.BPPMs)
-                        self.meanBPPM10 = sum(self.BPPMs[-10:])/2.0#10.0       # Mean Bar PRESSES per minute over last 10 minutes
+                        self.meanBPPM10 = sum(self.BPPMs[-10:])/10.0#10.0       # Mean Bar PRESSES per minute over last 10 minutes
                         GUIFunctions.log_event(self, self.events, "MEAN Bar Presses Per Min:,"+ str(self.BPPM )+",Over 1st 10 min" , self.cur_time)
                         print ("MEAN BPPM over ist 10 min: ",self.meanBPPM10)
                         #self.BPPMs.pop(0)                                  # Removes first item of list for running list
@@ -1359,13 +1361,16 @@ class BEH_GUI():
                                 GUIFunctions.log_event(self, self.events, "new VI: "+ str(self.VI) + " (sec)" , self.cur_time)
                                 print ("NEW VI: ",str(self.var_interval_reward))
 
-                # Check if amount of VI has passed
+            # Check if amount of VI has passed. If so, reward. Recalc VI
+            if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 if self.cur_time > (self.VI_start + self.VI):
-                   self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
-                   GUIFunctions.log_event(self, self.events, "Cur Rand VI(Between 0 and " + str(self.var_interval_reward)+": "+ str(self.VI) + " (sec)" , self.cur_time)
+                   GUIFunctions.log_event(self, self.events, "Cur Rand VI(Between 0 and " + str(2*self.var_interval_reward)+": "+ str(self.VI) + " (sec)" , self.cur_time)
                    GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
-
-
+                   # Calculate self.VI for next time
+                   self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
+                   self.VI_start = self.cur_time
+                self.LEVER_PRESSED_R = False
+                self.LEVER_PRESSED_L = False
 
 #Variable Ratio rewards.
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
