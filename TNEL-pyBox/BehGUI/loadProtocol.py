@@ -449,7 +449,7 @@ def create_files(self):
     # DATA PATH + FILES
     print("\nCREATING LOG FILES:")
     ###### EXPT COPY FILE #####
-    new_dir = os.path.join(self.datapath,self.Expt_Name)
+    new_dir = os.path.join(self.GUI.datapath,self.Expt_Name)
     if not os.path.exists(new_dir ):  os.mkdir(new_dir)
     new_sub_dir = os.path.join(new_dir,self.date)
     if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)

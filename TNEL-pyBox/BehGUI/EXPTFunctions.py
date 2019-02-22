@@ -95,10 +95,9 @@ def log_event(self, event, other=''):
 
     event_other =  ",  "+ str(other)
     self.GUI.events.append(event_string+event_other) # To Display on GUI
-    if len(event_lst) > 14:  self.start_line = len(event_lst) -14
+    if len(event_lst) > 14:  self.start_line = len(event_lst) - 14
     try:
         self.log_file.write(event_string + event_other + '\n')   # To WRITE TO FILE
         print(event_string + event_other)                   # print to display
-
     except:
         print ('Log file not created yet. Check EXPT PATH, then Press "LOAD EXPT FILE BUTTON"')

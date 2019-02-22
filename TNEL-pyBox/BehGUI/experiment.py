@@ -31,7 +31,6 @@ class Experiment:
                 self.VI_start = 0.0 #self.cur_time
                 self.VI = random.randint(0,int(self.var_interval_reward*2))
                 self.log_event("New VI: " + str(self.VI))
-                #print("VI.......................", self.VI)
             if self.BAR_PRESS_TRAINING:
                 pass
 
@@ -39,7 +38,6 @@ class Experiment:
         # Open ephys stuff
         if self.EPHYS_ENABLED:
             self.snd = zmqClasses.SNDEvent(5556) # subject number or something
-
             self.openEphysBack_q = Queue()
             self.openEphysQ = Queue()
             # Start thread
@@ -57,8 +55,6 @@ class Experiment:
             self.expt.runSetup()
         if self.START_EXPT:
             self.expt.runExpt()
-
-
 ###########################################################################################################
 #  SETUP EXPERIMENT
 ###########################################################################################################
@@ -66,7 +62,6 @@ class Experiment:
         '''
         RUN SETUP
         '''
-
         self.create_files()
         self.create_expt_file_copy()
         self.NAME_OR_SUBJ_CHANGED = False
