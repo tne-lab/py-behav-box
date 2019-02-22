@@ -174,7 +174,8 @@ def setGlobals(self):
     self.BAR_PRESS_INDEPENDENT_PROTOCOL = False
     self.VI_REWARDING = False
     self.var_interval_reward = 0.0
-    self.VI_start = 0.0
+    self.VI_start = 0.0       # To see if VI time has passed
+    self.VI_calc_start = 0.0  # To recalc PRESSES PER MINUTE every minute
     #################################
     self.BAR_PRESS_TRAINING = False
     self.VI_initial = 1

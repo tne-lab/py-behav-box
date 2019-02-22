@@ -496,9 +496,8 @@ class BEH_GUI():
                                         self.EXPT_FILE_LOADED = True
 
 
-                                        
+                                        win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
                                         if self.USING_OPEN_EPHYS:
-                                            win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
                                             if not GUIFunctions.IsOpenEphysRunning:
                                                 programName = 'Open Ephys GUI'
                                                 self.computer = os.environ['COMPUTERNAME']
@@ -531,7 +530,7 @@ class BEH_GUI():
                                #
                                #######################################
                                elif button.text == "START EXPT":
-
+                                    self.setup_ln_num = 0
 ##                                    if not self.EXPT_FILE_LOADED:
                                     #self.load_expt_file()
                                     self.RUN_SETUP = True
@@ -945,9 +944,8 @@ class BEH_GUI():
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                if self.USING_OPEN_EPHYS:
-                    self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
-                    self.snd.send(self.snd.START_REC) # OPEN_EPHYS
+                self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
+                self.snd.send(self.snd.START_REC) # OPEN_EPHYS
                 self.vidSTATE = 'REC_VID'
                 if self.FREEZE_DETECTION_ENABLED:
                     print("\nFREEZE DETECTION ENABLED")
@@ -1329,9 +1327,10 @@ class BEH_GUI():
                 #############################  Changed here!!!
                 if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                     self.num_bar_presses +=1
-                
+                    self.VI_start = self.cur_time
                 # Calculate Bar Presses Per Minute
-                BPPM_time_interval = self.cur_time - self.VI_start
+                BPPM_time_interval = self.cur_time - self.VI_calc_start
+                
                 if BPPM_time_interval >= 60.0:  #Calculate BPPM every minute (60 sec)
                     self.BPPM =  self.num_bar_presses#   0.0
                     GUIFunctions.log_event(self, self.events, "Bar Presses Per Min:,"+ str(self.BPPM ) , self.cur_time)
@@ -1339,13 +1338,13 @@ class BEH_GUI():
                     self.BPPMs.append(self.BPPM) # Add a BPPM calcualtion to list every minute
                     # Reset for next minute  TPM_start_time
                     self.num_bar_presses = 0
-                    self.VI_start = self.cur_time
+                    self.VI_calc_start = self.cur_time
 
                     # Calculate MEAN Bar Presses Per Minute over 10 min
                     #if len(self.BPPMs)> 10:#10: # after every 10 minutes (That is, 10 one minute evaluations convolved every minute)
-                    if len(self.BPPMs)== 10:#10: # after first 10 minutes only!!
+                    if len(self.BPPMs)== 2:#10: # after first 10 minutes only!!
                         print("BPPMs: ",self.BPPMs)
-                        self.meanBPPM10 = sum(self.BPPMs[-10:])/10.0#10.0       # Mean Bar PRESSES per minute over last 10 minutes
+                        self.meanBPPM10 = sum(self.BPPMs[-10:])/2.0#10.0       # Mean Bar PRESSES per minute over last 10 minutes
                         GUIFunctions.log_event(self, self.events, "MEAN Bar Presses Per Min:,"+ str(self.BPPM )+",Over 1st 10 min" , self.cur_time)
                         print ("MEAN BPPM over ist 10 min: ",self.meanBPPM10)
                         #self.BPPMs.pop(0)                                  # Removes first item of list for running list
@@ -1452,9 +1451,8 @@ class BEH_GUI():
 
            # Tell open ephys to stop acquistion and recording?
            # Maybe we want to wait and continue getting data for awhile. Just send some sort of event
-           if self.USING_OPEN_EPHYS:
-               self.snd.send(self.snd.STOP_ACQ)
-               self.snd.send(self.snd.STOP_REC)
+           self.snd.send(self.snd.STOP_ACQ)
+           self.snd.send(self.snd.STOP_REC)
 
            if self.TOUCHSCREEN_USED:
                self.TSq.put('')
