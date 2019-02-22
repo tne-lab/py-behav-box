@@ -236,9 +236,9 @@ def setupGUI(self):
     self.RECORDING = False
     self.FREEZE_DETECTION_ENABLED = False
     self.ROIstr = ""
-    self.ROI = (0,0,0,0)
+    #self.ROI = (0,0,0,0)
     self.vidSTATE= ''
-    self.ROI_RECEIVED = True
+    self.ROI_RECEIVED = False
 
     self.events.append(("StartTime: " + str(START_TIME)))
 
