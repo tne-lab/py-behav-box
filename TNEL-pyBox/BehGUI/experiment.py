@@ -1,6 +1,8 @@
 class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
     import GUIFunctions
+    from EXPTFunctions import checkStatus, checkQs, StartTouchScreen, MyVideo, log_event
+    from setExptGlobals import setExptGlobals, setVidGlobals, setTouchGlobals
 ####################################################################################
 #   INITIALIZE EXPERIMENT
 ####################################################################################
@@ -20,33 +22,43 @@ class Experiment:
             print("COULD NOT LOAD EXPT FILE")
             GUIFunctions.log_event(self, self.events,"COULD NOT LOAD EXPT FILE")
 
-        GUIFunctions.log_event(self, self.events, "START_TIME" + str(time.perf_counter()))
+        self.log_event("START_TIME" + str(time.perf_counter()))
+        if self.TOUCHSCREEN_USED:
+            GUIFunctions.StartTouchScreen(self)
+        if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
+            # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
+            if self.VI_REWARDING:
+                self.VI_start = 0.0 #self.cur_time
+                self.VI = random.randint(0,int(self.var_interval_reward*2))
+                self.log_event("New VI: " + str(self.VI))
+                #print("VI.......................", self.VI)
+            if self.BAR_PRESS_TRAINING:
+                pass
 
+        self.log_event("EXPT STARTED USING " + self.expt_file_path_name_COPY)
         # Open ephys stuff
-        self.snd = zmqClasses.SNDEvent(5556) # subject number or something
+        if self.EPHYS_ENABLED:
+            self.snd = zmqClasses.SNDEvent(5556) # subject number or something
 
-        self.openEphysBack_q = Queue()
-        self.openEphysQ = Queue()
-        # Start thread
-        open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike']})
-        open_ephys_rcv.start()
+            self.openEphysBack_q = Queue()
+            self.openEphysQ = Queue()
+            # Start thread
+            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike']})
+            open_ephys_rcv.start()
 
 ####################################################################################
 #   MAIN LOOP FOR EXPERIMENT
 ####################################################################################
     def run(self):
         self.cur_time = time.perf_counter()
+        self.checkStatus()
         self.expt.checkQs()
         if self.RUN_SETUP:
             self.expt.runSetup()
         if self.START_EXPT:
             self.expt.runExpt()
 
-####################################################################################
-#   GET BOX INPUTS FROM GUI
-####################################################################################
-    def checkStatus(self):
-        self.Left_Lever_Pressed = self.GUI.Left_Lever_Pressed
+
 ###########################################################################################################
 #  SETUP EXPERIMENT
 ###########################################################################################################
@@ -54,6 +66,12 @@ class Experiment:
         '''
         RUN SETUP
         '''
+
+        self.create_files()
+        self.create_expt_file_copy()
+        self.NAME_OR_SUBJ_CHANGED = False
+        print("EXPT FILE COPY UPDATED!!!!")
+        self.trial_num = 0
         #cur_time = time.perf_counter()
         print("SETUPDICT:....................",self.setup,"length: ",len(self.setup),"linenum: ",self.setup_ln_num)
         setupDict = self.setup[self.setup_ln_num]
@@ -150,6 +168,18 @@ class Experiment:
             self.setup_ln_num +=1
             self.MAX_EXPT_TIME = float(setupDict["MAX_EXPT_TIME"])
             print("Max Expt Time :", self.MAX_EXPT_TIME * 60.0, " sec")
+
+        ## STUFF FROM MAIN ## NEEDS TO BE UPDATED
+        self.cur_time = time.perf_counter()
+        self.Experiment_Start_time = self.cur_time
+        self.cur_time = self.cur_time-self.Experiment_Start_time
+        self.TPM_start_time = self.cur_time #Screen TOUCHES per Min start time
+        self.START_EXPT = True
+        self.vidSTATE = 'START_EXPT'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+        print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
+        for LED in self.LEDs: # Look for EXPT STARTED LED
+              if LED.index == 6: # Expt Started light
+                  LED.ONOFF = "ON"
 
         if self.setup_ln_num >= len(self.setup):
             self.setup_ln_num = 0
@@ -955,87 +985,3 @@ class Experiment:
             self.TSq.put('STOP')
 
         self.log_file.close()  # CLOSE LOG FILE
-###########################################################################################################
-# CHECK Qs
-###########################################################################################################
-    def checkQs(self):
-        self.expt.checkVidStatus()
-        self.expt.updateVideoQ()
-        self.expt.checkOpenEphysQ()
-    ### CHECK VIDEO Q ###
-    def checkVidStatus(self):
-        if not self.VIDBack_q.empty():
-            backDict = self.VIDBack_q.get()
-            if backDict['FROZEN']: # FROZEN
-                  # NOTE: this must be "debounced"
-                  if not self.FROZEN_ALREADY_LOGGED:
-                      GUIFunctions.log_event(self, self.events,"Frozen",self.cur_time,("Orig_NIDAQ_t",backDict['NIDAQ_time'],"video_time",backDict['vid_time'],"time_diff",backDict['Vid-NIDAQ']))
-                      self.FROZEN_ALREADY_LOGGED = True
-                      self.UNFROZEN_ALREADY_LOGGED = False
-
-            else:  # UN FROZEN
-                if self.PREVIOUSLY_FROZEN:
-                   # NOTE: this must be "debounced"
-                   if not self.UNFROZEN_ALREADY_LOGGED:
-                        GUIFunctions.log_event(self, self.events,"Unfrozen",self.cur_time)
-                        self.FROZEN_ALREADY_LOGGED = False
-                        self.UNFROZEN_ALREADY_LOGGED = True
-            if self.ROIstr == "":
-                try:  # Get ROI value if it exists
-                    self.ROIstr = backDict['ROI']
-                    newROIstr = self.ROIstr.replace(",",";")
-                    print(newROIstr)
-                    GUIFunctions.log_event(self, self.events,"ROI:",self.cur_time,(newROIstr + ",( x; y; width; height)"))
-                except:
-                    pass
-    ### CHECK OE Q ###
-    def checkOpenEphysQ(self):
-        if not self.openEphysBack_q.empty():
-            OEMsg = self.openEphysBack_q.get()
-    ### UPDATE VID Q ###
-    def updateVideoQ(self):
-        self.vidDict['cur_time'] = self.cur_time
-        self.vidDict['trial_num'] = self.trial_num
-        self.vidDict['STATE'] = self.vidSTATE
-        self.vidDict['PATH_FILE'] = self.video_file_path_name
-        self.VIDq.append(self.vidDict)
-###########################################################################################################
-#  START THREADS FOR VID/TOUCHSCREEN
-###########################################################################################################
-    def StartTouchScreen(self):
-        if not self.TOUCH_TRHEAD_STARTED:
-            whiskerThread = threading.Thread(target = whiskerTouchZMQ.main, args=(self.TSBack_q,self.TSq), kwargs={'media_dir' : self.resourcepath})
-            whiskerThread.daemon = True
-            whiskerThread.start()
-            self.TOUCH_TRHEAD_STARTED = True
-
-    def MyVideo(self):
-          vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q,))
-          vid_thread.daemon = True
-          self.VIDq.pop()
-          updateVideoQ(self)
-          vid_thread.start()
-
-          while True:
-              time.sleep(0.1)
-              if not self.VIDBack_q.empty():
-                  msg = self.VIDBack_q.get()
-                  if msg == 'vid ready':
-                      return
-
-####################################################################################
-#   LOG EVENTS
-####################################################################################
-    def log_event(self, event, other=''):
-        cur_time = time.perf_counter()
-        event_string = str(round(cur_time,9)) + ',  ' + event
-
-        event_other =  ",  "+ str(other)
-        self.GUI.events.append(event_string+event_other) # To Display on GUI
-        if len(event_lst) > 14:  self.start_line = len(event_lst) -14
-        try:
-            self.log_file.write(event_string + event_other + '\n')   # To WRITE TO FILE
-            print(event_string + event_other)                   # print to display
-
-        except:
-            print ('Log file not created yet. Check EXPT PATH, then Press "LOAD EXPT FILE BUTTON"')

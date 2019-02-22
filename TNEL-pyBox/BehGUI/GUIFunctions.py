@@ -19,10 +19,12 @@ import subprocess
 
 IsWhiskerRunning = False
 IsOpenEphysRunning = False
+
 # Add open ephys here possibly?
 def closeWindow(hwnd, windowName):
     if windowName in win32gui.GetWindowText(hwnd):
         win32gui.CloseWindow(hwnd) # Minimize Window
+
 
 def lookForProgram(hwnd, programName):
     global IsWhiskerRunning, IsOpenEphysRunning
@@ -36,25 +38,6 @@ def lookForProgram(hwnd, programName):
 def openWhiskerEphys(NIDAQ_AVAILABLE):
     global IsWhiskerRunning, IsOpenEphysRunning #, self.NIDAQ_AVAILABLE
     if NIDAQ_AVAILABLE:
-        win32gui.EnumWindows(lookForProgram, 'Open Ephys GUI')
-        if not IsOpenEphysRunning:
-            programName = 'Open Ephys GUI'
-            setGlobals.computer = os.environ['COMPUTERNAME']
-            print("USING COMPUTER: ",setGlobals.computer)
-            oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
-            if 'EPHYS-2' in setGlobals.computer:
-                oe = r'C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Flav's PC Ephys-2
-            elif 'EPHYS-1' in setGlobals.computer:
-                oe = r'E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe' # Jean's PC Ephys-1
-
-
-            window = subprocess.Popen(oe)# # doesn't capture output
-            time.sleep(2)
-            win32gui.EnumWindows(lookForProgram, programName)
-            #except:
-            #    print("Could not start Open Ephys")
-        else: print("Open Ephysis already RUNNING")
-        print(".............................................")
         win32gui.EnumWindows(lookForProgram, 'WhiskerServer')
         if not IsWhiskerRunning:
             try:
@@ -67,6 +50,7 @@ def openWhiskerEphys(NIDAQ_AVAILABLE):
                 print("Could not start WHISKER server")
         else: print("Whisker server is already RUNNING")
         print(".............................................")
+
 
 def choose_file():
     #Tk.withdraw() # we don't want a full GUI, so keep the root window from appearing
@@ -124,6 +108,8 @@ def PLAY_TONE(self, events, TONE_ID, cur_time):  # Plays tone using computer spe
             self.TONE_ON = True
         else: log_event(self, events,"Could not play TONE (already on)",cur_time)
 
+
+
 def CAB_LIGHT(self, events, ON_OFF, cur_time):
     gray        = (100,100,100)
     darkgray    = (50,50,50)
@@ -139,6 +125,7 @@ def CAB_LIGHT(self, events, ON_OFF, cur_time):
        if self.NIDAQ_AVAILABLE: self.cabin_light.sendDBit(False)
        #self.cabin_light.end()
     return Background_color
+
 
 def EXTEND_LEVERS(self, events, text, L_LVR, R_LVR, cur_time):
     if L_LVR and R_LVR: # Extend both levers
@@ -213,13 +200,8 @@ def FOOD_REWARD(self, events, text,cur_time):
         foodThread = threading.Thread(target=giveFood.food, args=(self.give_food,))
         foodThread.start()
 
-def FOOD_REWARD_RESET(self):
-    if self.NIDAQ_AVAILABLE:
-       self.give_food.sendDBit(False)
-
 def exit_game(self):
-    if self.EXPT_STARTED:
-        self.expt.end_expt()
+    #Close all NIDAQ tasks
     if self.NIDAQ_AVAILABLE:
       self.fan.end()
       self.cabin_light.end()
@@ -240,9 +222,11 @@ def exit_game(self):
       self.checkPressLeft.end()
       self.checkPressRight.end()
 
-    #self.stimQ.put('STOP')
+      #self.stimQ.put('STOP')
+
     pygame.quit()
     sys.exit()
+
 
 def draw_speeker(myscreen, x, y, TONE_ON):
         if TONE_ON: col = (0,255,0)

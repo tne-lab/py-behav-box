@@ -225,6 +225,7 @@ def setupGUI(self):
     self.NOSE_POKED_R = False
     self.LEVER_PRESSED_L = False
     self.LEVER_PRESSED_R = False
+    self.FOOD_EATEN = False
     self.ACTION_TAKEN = False
     self.SHOCK_ON = False
     self.CAMERA_ON = False

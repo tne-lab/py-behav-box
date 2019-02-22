@@ -128,7 +128,18 @@ def load_expt_file(self):
                         print(video_file_path)
 
                     elif 'OPEN_EPHYS' in str_before_equal:
-                        self.EPHYS_ENABLED = bool(str_after_equal)
+                        self.EPHYS_ENABLED = True
+                        if self.GUI.NIDAQ_AVAILABLE:
+                            ephys = 'Open Ephys GUI'
+                            if not win32gui.EnumWindows(lookForProgram, ephys):
+                                oe = str_after_equal
+                                window = subprocess.Popen(oe)# # doesn't capture output
+                                time.sleep(2)
+                                win32gui.EnumWindows(lookForProgram, ephys)
+                                #except:
+                                #    print("Could not start Open Ephys")
+                            else: print("Open Ephysis already RUNNING")
+                            print(".............................................")
 
                     elif 'VI_TIMES_LIST_PATH' in str_before_equal:
                         self.VIs_file_path = str_after_equal

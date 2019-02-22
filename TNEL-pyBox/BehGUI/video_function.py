@@ -399,6 +399,5 @@ class SimpleVid:
         self.outPath = path
         fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
         self.out = cv2.VideoWriter(path,fourcc, 30, (int(width),int(height)))
-        print("SAVING TO ax:\n\n\n\n\n\n\n\n ", path)
 
 print('freezeAlg Loaded')

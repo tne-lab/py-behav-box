@@ -54,10 +54,9 @@ import win32gui, win32con
 class BEH_GUI():
     def __init__(self, NIDAQ_AVAILABLE):
         self.NIDAQ_AVAILABLE = NIDAQ_AVAILABLE
-        self.setGlobals()
+        self.setGUIGlobals()
         self.computer = os.environ['COMPUTERNAME']
         random.seed()
-        #self.load_expt_file()
         self.setupGUI()
 
     from setGlobals import setGlobals
@@ -466,18 +465,11 @@ class BEH_GUI():
                                #
                                #######################################
                                elif button.text == "START EXPT":
-
-##                                    if not self.EXPT_FILE_LOADED:
-                                    #self.load_expt_file()
-                                    self.RUN_SETUP = True
                                     if self.EXPT_FILE_LOADED:
-
-
                                         button.UP_DN = "DN"
                                         self.Expt_Count +=1
                                         #if self.EXPT_FILE_LOADED:
                                         if self.Subject == "" or "?" in self.Subject or self.Subject == " " or len(self.Subject) == 0 :
-                                            GUIFunctions.log_event(self, self.events,"Check SUBJECT  and EXPT name!!!!",self.cur_time)
                                             print('SUBJECT = "" or "?" or same as last time')
                                             # HIGHLIGHT USER INPUT BOXES
                                             for user_input in self.user_inputs:
@@ -487,49 +479,15 @@ class BEH_GUI():
                                                      user_input.border_color = (255,0,0)
 
                                         if self.NAME_OR_SUBJ_CHANGED :  # READY TO GO!!!
-                                            self.create_files()
-                                            self.create_expt_file_copy()
-                                            self.NAME_OR_SUBJ_CHANGED = False
-                                            print("EXPT FILE COPY UPDATED!!!!")
                                             # GOOD TO GO!
                                             print("EXPT STARTED!")
-                                            self.trial_num = 0
-
-
                                             for user_input in self.user_inputs:
                                                 if user_input.label == "EXPT":
                                                    user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
-                                            self.runSetup()
-                                            if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
 
-                                            if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
-                                                # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
-                                                if self.VI_REWARDING:
-                                                    self.VI_start = 0.0 #self.cur_time
-                                                    self.VI = random.randint(0,int(self.var_interval_reward*2))
-                                                    GUIFunctions.log_event(self, self.events,"New VI: " + str(self.VI),self.cur_time)
-                                                    #print("VI.......................", self.VI)
-                                                if self.BAR_PRESS_TRAINING:
-                                                    pass
-                                            GUIFunctions.log_event(self, self.events,"EXPT STARTED USING " + self.expt_file_path_name_COPY,self.cur_time)
                                             button.text = "STOP EXPT"
-                                            ##################################
-                                            #
-                                            # RESET EXPT TIMER
-                                            #
-                                            ##################################
-                                            #self.events = []
-
-                                            self.cur_time = time.perf_counter()
-                                            self.Experiment_Start_time = self.cur_time
-                                            self.cur_time = self.cur_time-self.Experiment_Start_time
-                                            self.TPM_start_time = self.cur_time #Screen TOUCHES per Min start time
                                             self.START_EXPT = True
-                                            self.vidSTATE = 'START_EXPT'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                                            print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
-                                            for LED in self.LEDs: # Look for EXPT STARTED LED
-                                                  if LED.index == 6: # Expt Started light
-                                                      LED.ONOFF = "ON"
+
 
                                     else:
                                         self.EXPT_FILE_LOADED = False
@@ -803,6 +761,7 @@ class BEH_GUI():
             foodEaten = daqHelper.checkFoodEaten(self.eaten)
 
             if foodEaten:
+                self.FOOD_EATEN = True
                 event = 'Food_Eaten'
                 self.num_eaten +=1
                 #events.append("Food Eaten: " + str(cur_time))
