@@ -98,7 +98,7 @@ def play_sound(frequency, volume, duration):
     playTime = int(duration *1000)  # Duration in sec, need millisec
     print("playtime: ",playTime, "millisec")
     sound.play(loops = -1,maxtime=playTime) # - 1 = loops forever, maxtime in millisec
-
+    print('played sound')
 
 def play_sound_file(music_file, volume=0.8):
     '''

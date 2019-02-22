@@ -316,7 +316,9 @@ class BEH_GUI():
                 x,y = int(coords[0]/4 + 40), int(coords[1]/4 + 320)   # NOTE: 40,320 is top-left of gui touch representation. 1/4 is its scale
                 pygame.draw.rect(self.myscreen, (0,0,255) , (x,y,60,60),  1)
 
+        
         except: pass
+        
 ###########################################################################################################
 #  HANDLE GUI EVENTS
 ###########################################################################################################
