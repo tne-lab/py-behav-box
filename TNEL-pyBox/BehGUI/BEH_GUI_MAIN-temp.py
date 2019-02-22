@@ -94,9 +94,8 @@ class BEH_GUI():
                         print(newROIstr)
                         GUIFunctions.log_event(self, self.events,"ROI:",self.cur_time,(newROIstr + ",( x; y; width; height)"))
                         print("ROI",self.ROIstr," x; y; width; hieght")
-                        #print("\n\nRECEIVED ROI FROM VIDEO!\n\n", self.ROI)
+                        self.ROI_RECEIVED = True
                     except:
-                        #print("\n\nNO ROI FROM VIDEO!\n\n", self.ROI)
                         pass
 
 
@@ -108,8 +107,6 @@ class BEH_GUI():
             self.checkSystemEvents()
             self.checkNIDAQEvents()
 
-            if self.RUN_SETUP:
-                self.runSetup()
             if self.START_EXPT:
                 self.runExpt()
 
@@ -518,7 +515,7 @@ class BEH_GUI():
 
 
 
-                                        
+
                                         #GUIFunctions.log_event(self, self.events,"EXPT FILE LOADED",self.cur_time)
                                         if len(self.setup) > 0:
                                             self.RUN_SETUP = True
@@ -531,12 +528,7 @@ class BEH_GUI():
                                #######################################
                                elif button.text == "START EXPT":
                                     self.setup_ln_num = 0
-##                                    if not self.EXPT_FILE_LOADED:
-                                    #self.load_expt_file()
-                                    self.RUN_SETUP = True
                                     if self.EXPT_FILE_LOADED:
-
-
                                         button.UP_DN = "DN"
                                         self.Expt_Count +=1
                                         #if self.EXPT_FILE_LOADED:
@@ -562,43 +554,16 @@ class BEH_GUI():
                                             for user_input in self.user_inputs:
                                                 if user_input.label == "EXPT":
                                                    user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
-                                            self.runSetup()
-                                            if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
-
-                                            if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
-                                                # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
-                                                if self.VI_REWARDING:
-                                                    self.VI_start = 0.0 #self.cur_time
-                                                    self.VI = random.randint(0,int(self.var_interval_reward*2))
-                                                    GUIFunctions.log_event(self, self.events,"New VI: " + str(self.VI),self.cur_time)
-                                                    #print("VI.......................", self.VI)
-                                                if self.BAR_PRESS_TRAINING:
-                                                    pass
+                                            self.RUN_SETUP = True
                                             GUIFunctions.log_event(self, self.events,"EXPT STARTED USING " + self.expt_file_path_name_COPY,self.cur_time)
                                             button.text = "STOP EXPT"
-                                            ##################################
-                                            #
-                                            # RESET EXPT TIMER
-                                            #
-                                            ##################################
-                                            #self.events = []
-
-                                            self.cur_time = time.perf_counter()
-                                            self.Experiment_Start_time = self.cur_time
-                                            self.cur_time = self.cur_time-self.Experiment_Start_time
-                                            self.TPM_start_time = self.cur_time #Screen TOUCHES per Min start time
-                                            self.START_EXPT = True
-                                            self.vidSTATE = 'START_EXPT'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                                            print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
-                                            for LED in self.LEDs: # Look for EXPT STARTED LED
-                                                  if LED.index == 6: # Expt Started light
-                                                      LED.ONOFF = "ON"
+                                            if self.TOUCHSCREEN_USED: GUIFunctions.StartTouchScreen(self)
 
                                     else:
                                         self.EXPT_FILE_LOADED = False
                                         print("HUMPH! COULD NOT LOAD EXPT FILE (on button press)")
                                         GUIFunctions.log_event(self, self.events,"Expt File name or path DOES NOT EXIST",self.cur_time)
- 
+
                                #######################################
                                #
                                #   STOP EXPERIMENT
@@ -611,7 +576,7 @@ class BEH_GUI():
                                     self.end_expt()
 
 
-                                                      
+
                                self.LEFT_MOUSE_DOWN = False
                                self.BUTTON_SELECTED = True
                                dx = cur_x - button.x
@@ -812,8 +777,6 @@ class BEH_GUI():
 
                     else: # ALL OTHER BUTTONS, NOT REC BUTTON
                         button.UP_DN = "UP"
-
-
 ###########################################################################################################
 #  HANDLE BEHAVIORAL CHAMBER EVENTS
 ###########################################################################################################
@@ -951,10 +914,6 @@ class BEH_GUI():
                     print("\nFREEZE DETECTION ENABLED")
                     print(self.ROI)
                     self.vidROI = self.ROI
-                    #self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC_VID', 'ROI':self.ROI, 'PATH_FILE':self.video_file_path_name}
-                    print("Slef.ROI: ",self.ROI,"\n")
-                #else: # NO FREEZE DETECTION WANTED
-                #    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC_VID', 'PATH_FILE':self.video_file_path_name}
                     print("\nSelf.ROI: ",self.ROI,"\n")
             else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
                 self.vidSTATE = 'REC_STOP'
@@ -982,7 +941,7 @@ class BEH_GUI():
                         lever.STATE = "IN"
                    for button in self.buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
-                        
+
 
         elif "MAX_EXPT_TIME" in key:
             self.setup_ln_num +=1
@@ -990,9 +949,43 @@ class BEH_GUI():
             print("Max Expt Time :", self.MAX_EXPT_TIME * 60.0, " sec")
 
         if self.setup_ln_num >= len(self.setup):
+            setup_done = False
+            if self.FREEZE_DETECTION_ENABLED and self.ROI = 'GENERATE':
+                if self.ROI_RECEIVED:
+                    setup_done = True
+            else:
+                setup_done = True
+
+        if setup_done:
             self.setup_ln_num = 0
             self.RUN_SETUP = False
+            if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
+                # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
+                if self.VI_REWARDING:
+                    self.VI_start = 0.0 #self.cur_time
+                    self.VI = random.randint(0,int(self.var_interval_reward*2))
+                    GUIFunctions.log_event(self, self.events,"New VI: " + str(self.VI),self.cur_time)
+                    #print("VI.......................", self.VI)
+                if self.BAR_PRESS_TRAINING:
+                    pass
 
+            ##################################
+            #
+            # RESET EXPT TIMER
+            #
+            ##################################
+            #self.events = []
+
+            self.cur_time = time.perf_counter()
+            self.Experiment_Start_time = self.cur_time
+            self.cur_time = self.cur_time-self.Experiment_Start_time
+            self.TPM_start_time = self.cur_time #Screen TOUCHES per Min start time
+            self.START_EXPT = True
+            self.vidSTATE = 'START_EXPT'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+            print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
+            for LED in self.LEDs: # Look for EXPT STARTED LED
+                  if LED.index == 6: # Expt Started light
+                      LED.ONOFF = "ON"
 ###########################################################################################################
 #  RUN EXPERIMENT
 ###########################################################################################################
@@ -1137,9 +1130,9 @@ class BEH_GUI():
                         self.TSq.put(imgList)
                         self.Protocol_ln_num +=1
                     print('\n\nImgList', imgList,"\n\n")
-                    
+
                     #input("paused ENTER")
-                    
+
                     log_string = str(imgList)   # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
@@ -1168,7 +1161,7 @@ class BEH_GUI():
                         self.TSq.put(imgList)
 
                     self.Protocol_ln_num +=1
-                    
+
                     #print('\n\nImgList', imgList,"\n\n")
                     #input("paused ENTER")
                     log_string = str(imgList) # Looks like this:  {'SPIDER_REAL.BMP': (181, 100), 'FLOWER_REAL.BMP': (602, 100)}
@@ -1323,7 +1316,7 @@ class BEH_GUI():
         if self.BAR_PRESS_INDEPENDENT_PROTOCOL: #Running independently of CONDITIONS. Used for conditioning, habituation, extinction, and recall
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                self.num_bar_presses +=1
-               
+
             if self.VI_REWARDING:  # [BAR_PRESS] in protocol
                                    #  VI=15
                 self.VI = self.var_interval_reward
@@ -1332,7 +1325,7 @@ class BEH_GUI():
 
                 # Calculate Bar Presses Per Minute
                 BPPM_time_interval = self.cur_time - self.VI_calc_start
-                
+
                 if BPPM_time_interval >= 60.0:  #Calculate BPPM every minute (60 sec)
                     self.BPPM =  self.num_bar_presses#   0.0
                     GUIFunctions.log_event(self, self.events, "Bar Presses Per Min:,"+ str(self.BPPM ) , self.cur_time)
@@ -1364,7 +1357,7 @@ class BEH_GUI():
             # Check if amount of VI has passed. If so, reward. Recalc VI
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 if self.cur_time > (self.VI_start + self.VI):
-                   
+
                    GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
                    # Calculate self.VI for next time
                    if self.var_interval_reward <= 1:
@@ -1490,7 +1483,7 @@ class BEH_GUI():
            self.Background_color = GUIFunctions.CAB_LIGHT(self, self.events,False,self.cur_time)
            GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers_Retracted",False,False,self.cur_time)
 
-          
+
 ####################################################################################
 #   DO CONDITIONS
 ####################################################################################

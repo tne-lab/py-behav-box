@@ -238,6 +238,7 @@ def setupGUI(self):
     self.ROIstr = ""
     self.ROI = (0,0,0,0)
     self.vidSTATE= ''
+    self.ROI_RECEIVED = True
 
     self.events.append(("StartTime: " + str(START_TIME)))
 
