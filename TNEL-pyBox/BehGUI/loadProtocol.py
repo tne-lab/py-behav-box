@@ -281,7 +281,7 @@ def load_expt_file(self):
 
                 elif TONE2:#TONE2
                     if 'DURATION' in line:
-                        self.Tone2_Duration = get_val_between_equal_sign_and_hash(line)
+                        self.Tone2_Duration = float(get_val_between_equal_sign_and_hash(line))
                         print("self.Tone2_Duration",self.Tone2_Duration)
 
                     if 'FREQ' in line:

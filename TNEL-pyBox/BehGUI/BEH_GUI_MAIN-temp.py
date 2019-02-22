@@ -518,7 +518,7 @@ class BEH_GUI():
 
 
 
-                                        
+
                                         #GUIFunctions.log_event(self, self.events,"EXPT FILE LOADED",self.cur_time)
                                         if len(self.setup) > 0:
                                             self.RUN_SETUP = True
@@ -598,7 +598,7 @@ class BEH_GUI():
                                         self.EXPT_FILE_LOADED = False
                                         print("HUMPH! COULD NOT LOAD EXPT FILE (on button press)")
                                         GUIFunctions.log_event(self, self.events,"Expt File name or path DOES NOT EXIST",self.cur_time)
- 
+
                                #######################################
                                #
                                #   STOP EXPERIMENT
@@ -611,7 +611,7 @@ class BEH_GUI():
                                     self.end_expt()
 
 
-                                                      
+
                                self.LEFT_MOUSE_DOWN = False
                                self.BUTTON_SELECTED = True
                                dx = cur_x - button.x
@@ -982,7 +982,7 @@ class BEH_GUI():
                         lever.STATE = "IN"
                    for button in self.buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
-                        
+
 
         elif "MAX_EXPT_TIME" in key:
             self.setup_ln_num +=1
@@ -1137,9 +1137,9 @@ class BEH_GUI():
                         self.TSq.put(imgList)
                         self.Protocol_ln_num +=1
                     print('\n\nImgList', imgList,"\n\n")
-                    
+
                     #input("paused ENTER")
-                    
+
                     log_string = str(imgList)   # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
@@ -1168,7 +1168,7 @@ class BEH_GUI():
                         self.TSq.put(imgList)
 
                     self.Protocol_ln_num +=1
-                    
+
                     #print('\n\nImgList', imgList,"\n\n")
                     #input("paused ENTER")
                     log_string = str(imgList) # Looks like this:  {'SPIDER_REAL.BMP': (181, 100), 'FLOWER_REAL.BMP': (602, 100)}
@@ -1185,7 +1185,7 @@ class BEH_GUI():
                             idx = log_string.find[:idx+2](")")
                             print("IDX: ", idx, "logstring: ", log_string)
                         except:
-                            print("\n\n FAILED creating log string\n\n")
+                            print("\n\n IDX: ",idx,"  FAILED creating log string\n\n")
                             break
                     print('log_string', log_string)
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
@@ -1323,7 +1323,7 @@ class BEH_GUI():
         if self.BAR_PRESS_INDEPENDENT_PROTOCOL: #Running independently of CONDITIONS. Used for conditioning, habituation, extinction, and recall
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                self.num_bar_presses +=1
-               
+
             if self.VI_REWARDING:  # [BAR_PRESS] in protocol
                                    #  VI=15
                 self.VI = self.var_interval_reward
@@ -1332,7 +1332,7 @@ class BEH_GUI():
 
                 # Calculate Bar Presses Per Minute
                 BPPM_time_interval = self.cur_time - self.VI_calc_start
-                
+
                 if BPPM_time_interval >= 60.0:  #Calculate BPPM every minute (60 sec)
                     self.BPPM =  self.num_bar_presses#   0.0
                     GUIFunctions.log_event(self, self.events, "Bar Presses Per Min:,"+ str(self.BPPM ) , self.cur_time)
@@ -1484,7 +1484,7 @@ class BEH_GUI():
            self.Background_color = GUIFunctions.CAB_LIGHT(self, self.events,False,self.cur_time)
            GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers_Retracted",False,False,self.cur_time)
 
-          
+
 ####################################################################################
 #   DO CONDITIONS
 ####################################################################################
