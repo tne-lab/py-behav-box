@@ -71,7 +71,6 @@ class Experiment:
         print("SETUPDICT:....................",self.setup,"length: ",len(self.setup),"linenum: ",self.setup_ln_num)
         setupDict = self.setup[self.setup_ln_num]
         key = list(setupDict.keys())[0] # First key in protocolDict
-        #print ("KEY:.....................",key)
         if key == "":
             self.setup_ln_num +=1
         elif key == "FAN_ON":
@@ -83,7 +82,6 @@ class Experiment:
            val = str2bool(setupDict[key])
            print("CAB_LIGHT")
            self.Background_color = GUIFunctions.CAB_LIGHT(self, self.events,val,self.cur_time)
-           #CAB_LIGHT(events,val,cur_time)
            self.setup_ln_num +=1
         elif key == "FOOD_LIGHT":
             print("FOOD LIGHT: ",setupDict["FOOD_LIGHT"])
@@ -119,18 +117,15 @@ class Experiment:
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
-                self.snd.send(self.snd.START_REC) # OPEN_EPHYS
+                if self.EPHYS_ENABLED:
+                    self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
+                    self.snd.send(self.snd.START_REC) # OPEN_EPHYS
                 self.vidSTATE = 'REC_VID'
                 if self.FREEZE_DETECTION_ENABLED:
                     print("\nFREEZE DETECTION ENABLED")
                     print(self.ROI)
                     self.vidROI = self.ROI
-                    #self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC_VID', 'ROI':self.ROI, 'PATH_FILE':self.video_file_path_name}
                     print("Slef.ROI: ",self.ROI,"\n")
-                #else: # NO FREEZE DETECTION WANTED
-                #    self.vidDict = {'trial_num' : self.trial_num, 'cur_time':self.cur_time, 'STATE':'REC_VID', 'PATH_FILE':self.video_file_path_name}
-                    print("\nSelf.ROI: ",self.ROI,"\n")
             else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
                 self.vidSTATE = 'REC_STOP'
                 print("\nREC = False, Self.ROI: ",self.ROI,"\n")
@@ -966,10 +961,10 @@ class Experiment:
             while not self.TSBack_q.empty():  # EMPTY TSBack_q between Expt Runs.
                 self.touchMsg = self.TSBack_q.get()
 
-        for user_input in self.user_inputs:
+        for user_input in self.GUI.user_inputs:
            if user_input.label == "SUBJECT":
-              self.Subject = ''
-              self.prev_Subject = self.Subject
+              self.GUI.Subject = ''
+              self.GUI.prev_Subject = self.GUI.Subject
 
         if self.VID_ENABLED:
             self.vidDict['STATE'] = 'OFF'
@@ -980,3 +975,5 @@ class Experiment:
             self.TSq.put('STOP')
 
         self.log_file.close()  # CLOSE LOG FILE
+
+        self.GUI.EXPT_STARTED = False

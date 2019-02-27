@@ -104,7 +104,7 @@ class BEH_GUI():
                    if self.LEVER_PRESSED_L:
                       if (self.cur_time - LEVER_PRESS_TIME) > 0.5: #Leaves on for 0.5 sec
                          lever.STATE = "OUT"
-                         LEVER_PRESSED_L = False
+                         self.LEVER_PRESSED_L = False
                       else:
                          lever.STATE = "DN"
                # else lever.state == "IN" or "DN"
@@ -313,7 +313,6 @@ class BEH_GUI():
                 self.LEFT_MOUSE_DOWN = False
                 self.RIGHT_MOUSE_DOWN = False
                 cur_x,cur_y = pygame.mouse.get_pos()
-                #print("MOUSE_Button ",event.button, "pressed!", cur_x,cur_y)
                 if event.button == 1:
                     self.LEFT_MOUSE_DOWN = True
                 elif event.button == 3:
