@@ -353,24 +353,24 @@ class BEH_GUI():
                                #button.draw()
                                if button.text == "CABIN LT":
                                    if self.CAB_LIGHT_ON: #Toggle OFF
-                                       self.Background_color = GUIFunctions.CAB_LIGHT(self, self.events,False)
+                                       self.Background_color = GUIFunctions.CAB_LIGHT(self,False)
                                        self.CAB_LIGHT_ON = False
                                    else: # Toggle ON
-                                       self.Background_color = GUIFunctions.CAB_LIGHT(self, self.events,True)
+                                       self.Background_color = GUIFunctions.CAB_LIGHT(self,True)
                                        self.CAB_LIGHT_ON = True
                                if button.text == "FAN": #TOGGLE ON TOGGLE OFF
                                     if self.FAN_0N:
                                        self.FAN_0N = False
-                                       GUIFunctions.FAN_ON_OFF(self, self.events,self.FAN_0N)
+                                       GUIFunctions.FAN_ON_OFF(self,self.FAN_0N)
 
                                     else:
                                        self.FAN_0N = True
-                                       GUIFunctions.FAN_ON_OFF(self, self.events,self.FAN_0N)
+                                       GUIFunctions.FAN_ON_OFF(self,self.FAN_0N)
 
                                elif button.text == "FEED":
                                     button.UP_DN = "DN"
                                     self.FEED = True
-                                    GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet_by_GUI", self.cur_time)
+                                    GUIFunctions.FOOD_REWARD(self,"Food_Pellet_by_GUI", self.cur_time)
                                     # NOTE: Food reward needs time after High bit, before low bit is sent.
                                     #       So rather than putting a sleep in the FOOD_REWARD function, a low bit
                                     #       is sent when button is released using FOOD_REWARD_RESET(self)
@@ -532,9 +532,9 @@ class BEH_GUI():
                             if LED.ONOFF == "OFF": # WAS OFF
                                 LED.ONOFF = "ON"   # NOW ON
                                 if   LED.index == 0: # LEFT CONDITION LIGHT
-                                    GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,True)
+                                    GUIFunctions.L_CONDITIONING_LIGHT(self,True)
                                 elif LED.index == 1: # RIGHT CONDITION LIGHT
-                                    GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,True)
+                                    GUIFunctions.R_CONDITIONING_LIGHT(self,True)
 
                                 # NOSE POKES
                                 elif LED.index == 2 or LED.index == 3: # NOSE POKES
@@ -550,7 +550,7 @@ class BEH_GUI():
 
                                 # FEEDER LEDS
                                 elif LED.index == 4 or LED.index == 5: # FEEDER LIGHTS
-                                    self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF (self, self.events,True)
+                                    self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF (self,True)
                                     self.LEDs[4].ONOFF = LEDsONOFF
                                     self.LEDs[5].ONOFF = LEDsONOFF
 
@@ -558,13 +558,13 @@ class BEH_GUI():
                                 LED.ONOFF = "OFF"  # NOW OFF
                                 LED.draw()
                                 if   LED.index == 0: # LEFT CONDITION LIGHT
-                                    GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False)
+                                    GUIFunctions.L_CONDITIONING_LIGHT(self,False)
                                 elif LED.index == 1: # RIGHT CONDITION LIGHT
-                                    GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False)
+                                    GUIFunctions.R_CONDITIONING_LIGHT(self,False)
 
                                 # FEEDER LEDS
                                 elif LED.index == 4 or LED.index == 5: # FEEDER LIGHTS
-                                    self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF (self, self.events,False)
+                                    self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF (self,False)
                                     self.LEDs[4].ONOFF = LEDsONOFF
                                     self.LEDs[5].ONOFF = LEDsONOFF
 
@@ -573,12 +573,12 @@ class BEH_GUI():
                     for box in self.boxes: # Check for collision with EXISTING buttons
                         if box.rect.collidepoint(cur_x,cur_y):
                            if self.FEEDER_LT_ON: #Toggle OFF
-                              self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self, self.events,False)
+                              self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self,False)
                               self.LEDs[4].ONOFF = LEDsONOFF
                               self.LEDs[5].ONOFF = LEDsONOFF
                               self.FEEDER_LT_ON = False
                            else: # Toggle ON
-                              self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF (self, self.events,True)
+                              self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF (self,True)
                               self.FEEDER_LT_ON = True
 
                     # SPEEKER PRESSED
@@ -586,9 +586,9 @@ class BEH_GUI():
                           # NOTE: Tone_OFF logged while drawing speeker above in main loop
                           print("TONE1 DURATION: ", self.Tone1_Duration)
                           if "EPHYS-2" in self.computer:
-                             self.GUIFunctions.PLAY_TONE(self, self.events,"TONE1") #using computer speeker
+                             self.GUIFunctions.PLAY_TONE(self,"TONE1") #using computer speeker
                           elif "EPHYS-1" in self.computer:
-                             self.GUIFunctions.PLAY_TONE_LAF(self, self.events,"TONE1") #using computer speeker
+                             self.GUIFunctions.PLAY_TONE_LAF(self,"TONE1") #using computer speeker
 
 
                     # SHOCK PRESSED

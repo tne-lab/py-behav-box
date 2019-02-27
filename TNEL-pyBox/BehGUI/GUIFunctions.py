@@ -82,7 +82,7 @@ def PLAY_TONE_LAF(self, TONE_ID):  # Plays tone using lafayette Tone generator
 #        # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
 
 #    newThread.start()
-    self.TONE_TIME = cur_time
+    self.TONE_TIME = time.perf_counter()
     self.TONE_ON = True
 ###################################################
 def PLAY_TONE(self, TONE_ID):  # Plays tone using computer speaker
@@ -94,7 +94,7 @@ def PLAY_TONE(self, TONE_ID):  # Plays tone using computer speaker
             print("freq: ",self.Tone1_Freq,"Vol: ", self.Tone1_Vol, "Duration: ",self.Tone1_Duration)
             # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
             newThread.start()
-            self.TONE_TIME = cur_time
+            self.TONE_TIME = time.perf_counter()
             self.TONE_ON = True
         else: if self.EXPT_STARTED: self.expt.log_event("Could not play TONE (already on)")
 
@@ -104,9 +104,9 @@ def PLAY_TONE(self, TONE_ID):  # Plays tone using computer speaker
             newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration))
             # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
             newThread.start()
-            self.TONE_TIME = cur_time
+            self.TONE_TIME = time.perf_counter()
             self.TONE_ON = True
-        else: if self.EXPT_STARTED: self.expt.log_event("Could not play TONE (already on)",cur_time)
+        else: if self.EXPT_STARTED: self.expt.log_event("Could not play TONE (already on)")
 
 
 
@@ -154,7 +154,7 @@ def EXTEND_LEVERS(self, text, L_LVR, R_LVR):
         self.R_LEVER_EXTENDED = False
         self.L_LEVER_EXTENDED = False
 
-def L_CONDITIONING_LIGHT(self, events,ON_OFF,cur_time):
+def L_CONDITIONING_LIGHT(self, events,ON_OFF):
     if ON_OFF : # ON
        if self.EXPT_STARTED: self.expt.log_event("Left_Light_ON")
        if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(True)
@@ -163,7 +163,7 @@ def L_CONDITIONING_LIGHT(self, events,ON_OFF,cur_time):
        if self.EXPT_STARTED: self.expt.log_event("Left_Light_OFF")
        if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(False)
 
-def R_CONDITIONING_LIGHT(self, events,ON_OFF,cur_time):
+def R_CONDITIONING_LIGHT(self, events,ON_OFF):
     if ON_OFF: # ON
        if self.EXPT_STARTED: self.expt.log_event("Right_Light_ON")
        if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(True)
@@ -172,7 +172,7 @@ def R_CONDITIONING_LIGHT(self, events,ON_OFF,cur_time):
        if self.EXPT_STARTED: self.expt.log_event("Right_Light_OFF")
        if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(False)
 
-def Food_Light_ONOFF(self, events,ON_OFF,cur_time):
+def Food_Light_ONOFF(self, events,ON_OFF):
     gray = (100,100,100)
     black = (0,0,0)
     if ON_OFF: # ON
@@ -189,7 +189,7 @@ def Food_Light_ONOFF(self, events,ON_OFF,cur_time):
 
     return fill_color,LEDsONOFF
 
-def FOOD_REWARD(self, text,cur_time):
+def FOOD_REWARD(self, text):
     if self.EXPT_STARTED: self.expt.log_event(text)
     self.num_pellets +=1
     if self.NIDAQ_AVAILABLE:
