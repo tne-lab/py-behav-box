@@ -625,7 +625,7 @@ def create_expt_file_copy(self):
     except:
         print("XXXXXX 1 could NOT copy of EXPT file",self.expt_file_path_name_COPY)
     try:
-        for ln in self.exptFileLines:
+        for ln in self.exptFileLines:# IF ROI STORED IN PROTOCOL FILE
             if "EXPT_NAME" in ln: #NOTE: SUBJECT not in original PROTOCOL files. It is added here
                 ln = "EXPT_NAME = " + self.Expt_Name + "\nSUBJECT = " + self.Subject
                 prev_ln = ln

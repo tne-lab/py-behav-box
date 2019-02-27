@@ -110,6 +110,7 @@ def setGlobals(self):
     ################################################################
     # VIDEO GLOBALS
     ################################################################
+    self.ROI = ""
     self.FLIP = False
     self.FLIPAUX = False
     self.vidDict = {'STATE' : 'STOP','FLIP':self.FLIP,'FLIPAUX':self.FLIPAUX}

@@ -23,7 +23,6 @@ Amps(mA)	= 100  # V and amps are set manually on scrambled grid generator
 [FREEZE]
 Min Duration(s)	= 2
 Min Moving Pix	= 5000
-
 ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also starts FREEZE detection  FREEZE=TRUE
 
 [TOUCHSCREEN]
