@@ -608,7 +608,7 @@ def create_files(self):
     video_file_name_aux = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file_aux' + '.avi'
     self.video_file_path_name_aux = os.path.join(self.newdatapath,video_file_name_aux)
     print(self.video_file_path_name_aux)
-    self.SIMPLEVIDq.put({'STATE':'ON','PATH_FILE':self.video_file_path_name_aux})
+    self.SIMPLEVIDq.put({'STATE':'ON','PATH_FILE':self.video_file_path_name_aux,'FLIPAUX':self.FLIPAUX})
 
     # Change open ephys recoding dir
     if self.USING_OPEN_EPHYS:

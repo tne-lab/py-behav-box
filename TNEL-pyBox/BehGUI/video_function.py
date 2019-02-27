@@ -9,6 +9,11 @@ class Vid:
         self.back_q = back_q
         self.out = None
         self.outPath = ''
+
+        self.CAMERA_ON = False
+        self.RECORD = False
+        self.FLIP = False
+
         self.ROIenabled = False
         self.ROIstr = ""
         self.ROIGEN = True
@@ -105,17 +110,27 @@ class Vid:
             vid_cur_time = time.perf_counter()
             #Get frame
             ret, frame = self.cap.read()
-            frame = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
+            if self.FLIP:
+                frame = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
 
             # Run video
             try:
                 msg = self.q.pop()
                 time_from_GUI = msg['cur_time']
-                STATE = msg['STATE'] # NOTE: NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                self.FLIP = msg['FLIP']
+                STATE = msg['STATE'] # NOTE: NOTE: STATE = (ON,OFF,  REC_VID,REC_STOP, START_EXPT,STOP_EXPT)
+                if STATE == 'ON':
+                    self.CAMERA_ON = True
+                if STATE == 'OFF':
+                    self.CAMERA_ON = False
+                    self.RECORD = False
                 if STATE == 'START_EXPT':
                     self.exptStarted = True
+                if STATE == 'REC_VID':
+                    self.RECORD = True
                 if STATE == 'REC_STOP':
-                    self.exptStarted = False
+                    #self.exptStarted = False
+                    self.RECORD = False
                 if 'ROI' in msg and not self.ROIenabled:
                     if msg['ROI'] in 'GENERATE':
                         self.ROIGEN = True
@@ -129,10 +144,12 @@ class Vid:
                         self.initROIFrames()
 
 
+
                 msg['time_diff'] = vid_cur_time - time_from_GUI
                 msg['vid_time'] = vid_cur_time
-                if msg['PATH_FILE'] != self.outPath:
-                    self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))
+                if self.RECORD:
+                    if msg['PATH_FILE'] != self.outPath:
+                        self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))
             except IndexError:
                 #print("Error in run()")
                 pass
@@ -181,13 +198,18 @@ class Vid:
             # draw trial start circle
             #print("STATE",msg['STATE'])
             #if self.ROIenabled:  print("ROI: ", self.ROI)
-            if msg['STATE'] == 'REC_VID'or msg['STATE'] == 'START_EXPT': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                recframe = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
-                self.out.write(recframe)
-            if msg['STATE'] == 'REC_STOP': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+            if msg['STATE'] == 'START_EXPT': # NOTE: STATE = (ON,OFF, FLIP, REC_VID,REC_STOP, START_EXPT,STOP_EXPT)
+
+                if self.FLIP:
+                    recframe = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
+                else:
+                    recframe = frame# flipcodes: 1 = hflip, 0 = vflip
+                if self.RECORD:
+                    self.out.write(recframe)
+            if msg['STATE'] == 'REC_STOP': # NOTE: STATE = (ON,OFF,  REC_VID,REC_STOP, START_EXPT,STOP_EXPT)
                 self.out.release() # CLOSE VIDEO FILE
                 self.freezeFile.close()
-
+                self.RECORD = False
 
             # Show the frames
             cv2.imshow(self.winName,frame)
@@ -205,7 +227,7 @@ class Vid:
                 self.close()
                 return
 
-            if msg['STATE'] == 'OFF': #  # NOTE: STATE = (ON,OFF,REC, START_EXPT,STOP_EXPT)
+            if msg['STATE'] == 'OFF': #  # NOTE: STATE = (ON,OFF, REC_VID,REC_STOP, START_EXPT,STOP_EXPT)
                 self.close()
                 return
 
@@ -231,6 +253,7 @@ class Vid:
         self.freezeFile.close()
         self.cap.release()
         self.out.release()
+        self.out.close()
         cv2.destroyAllWindows()
         for i in range(1,10):
             cv2.waitKey(1)
@@ -281,7 +304,9 @@ class Vid:
     # Create Region of Interest coordinates
     def genROI(self, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.4,(0,0,255),2,cv2.LINE_AA)
+        if self.FLIP:
+            frame = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
+        cv2.putText(frame,"SELECT REGION OF INTEREST (CLICK AND DRAG MOUSE TO DRAW A RECTANGLE)",(20,405), font, 0.4,(0,255,0),2,cv2.LINE_AA)
         ROI = cv2.selectROI(frame) #NOTE: NOT A STR, but tupple of 4 numbers: (x,y,w,h)
         self.ROIstr = str(ROI)
         #print("ROI CONVERTED TO STR",self.ROIstr )
@@ -365,6 +390,8 @@ class SimpleVid:
         self.capError = False
         self.outPath = 'NOT SET'
         self.rec = False
+        self.FLIPAUX = False
+
         if not self.cap.isOpened():
             print('error opening aux vid, probably doesn\'t exist')
             self.capError = True
@@ -372,8 +399,8 @@ class SimpleVid:
     def run(self):
         while(self.cap.isOpened()):
             ret, frame = self.cap.read()
-
-            #frame = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
+            if self.FLIPAUX:
+                frame = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
             if not ret:
                 print('Error loading frame, probably last frame')
                 return
@@ -381,7 +408,8 @@ class SimpleVid:
             cv2.imshow('Aux Camera', frame)
 
             if self.rec:
-                self.out.write(frame)
+                grayFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                self.out.write(grayFrame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
@@ -399,6 +427,7 @@ class SimpleVid:
                 if msg['PATH_FILE'] != self.outPath:
                     self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))
                     self.rec = True
+                if msg['FLIPAUX']: self.FLIPAUX = msg['FLIPAUX']
 
     def openOutfile(self, path, height, width):
         self.outPath = path

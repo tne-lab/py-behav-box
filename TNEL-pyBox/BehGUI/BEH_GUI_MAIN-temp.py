@@ -326,8 +326,10 @@ class BEH_GUI():
         '''
          SYSTEM EVENTS
         '''
+
+
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == pygame.QUIT:
                 GUIFunctions.exit_game(self)
 
             ##############################################################
@@ -466,7 +468,11 @@ class BEH_GUI():
                                           if self.RECORDING: #STOP RECORDING BUT KEEP CAMERA ON. # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                                                 self.RECORDING = False  #KEEP CAMERA ON, JUST STOP RECORDING
                                                 GUIFunctions.log_event(self, self.events,"STOP_RECORDING_by_GUI",self.cur_time)
+                                                if "EPHYS-2" in self.computer:
+                                                    self.FLIP = True
+                                                    
                                                 self.vidSTATE= 'REC_VID'
+                                                #GUIFunctions.updateVideoQ(self)
                                                 button.UP_DN = "UP"
                                           else:
                                                 self.RECORDING = True
@@ -570,6 +576,7 @@ class BEH_GUI():
                                #######################################
                                elif button.text == "STOP EXPT":
                                     button.text = "START EXPT"
+                                    
                                     self.START_EXPT = False
                                     print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
                                     self.end_expt()
@@ -701,6 +708,11 @@ class BEH_GUI():
                                 GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
                                 #print("CAMERA ON")
                                 self.vidSTATE = 'ON'
+
+                                if "EPHYS-2" in self.computer:
+                                    self.FLIP = True
+
+                                #GUIFunctions.updateVideoQ(self) #XXXXXXXXXXXXXXX Was indented
                                 GUIFunctions.MyVideo(self)
 
                     # USER KEYBOARD INPUTS
@@ -889,8 +901,12 @@ class BEH_GUI():
                     if not self.CAMERA_ON: # CAMERA WAS OFF
                         self.CAMERA_ON = True
                         GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
-                        self.vidSTATE = 'ON'
-                        GUIFunctions.updateVideoQ(self)
+
+                        STATE = 'ON'
+                        if "EPHYS-2" in self.computer:
+                            self.FLIP = True
+
+                        #GUIFunctions.updateVideoQ(self)
                         GUIFunctions.MyVideo(self)
                     else: # CAMERA IS ALREADY ON
                         GUIFunctions.log_event(self, self.events,"Camera is ALREADY ON",self.cur_time)
@@ -916,6 +932,10 @@ class BEH_GUI():
                         print(self.ROI)
                         self.vidROI = self.ROI
                         print("\nSelf.ROI: ",self.ROI,"\n")
+                        if "EPHYS-2" in self.computer:
+                            self.FLIP = True
+
+                        #GUIFunctions.updateVideoQ(self) # added 
                 else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
                     self.vidSTATE = 'REC_STOP'
                     print("\nREC = False, Self.ROI: ",self.ROI,"\n")
@@ -1069,8 +1089,11 @@ class BEH_GUI():
                 if not self.CAMERA_ON: # CAMERA WAS OFF
                     self.CAMERA_ON = True
                     GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
-                    self.vidSTATE = 'ON'
-                    GUIFunctions.updateVideoQ(self)
+                    STATE = 'ON'
+                    if "EPHYS-2" in self.computer:
+                            self.FLIP = True
+
+                    #GUIFunctions.updateVideoQ(self)
                                     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                     GUIFunctions.MyVideo(self)
                 else: # CAMERA IS ALREADY ON
@@ -1088,7 +1111,11 @@ class BEH_GUI():
             val = str2bool(protocolDict[key])
             self.Protocol_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC, START_EXPT,STOP_EXPT)
+                if "EPHYS-2" in self.computer:
+                            self.FLIP = True
                 self.vidSTATE = 'REC_VID'
+                GUIFunctions.updateVideoQ(self)
+
             else:  # KEEP CAMERA ON, JUST STOP RECORDING
                 self.vidSTATE = 'REC_STOP'
 
@@ -1477,7 +1504,8 @@ class BEH_GUI():
            self.RECORDING = False
            GUIFunctions.log_event(self, self.events,"Recording_OFF",self.cur_time)
            self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-
+           #GUIFunctions.updateVideoQ(self)
+           
            if "EPHYS-2" in self.computer:
                GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False, self.cur_time)
                GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False, self.cur_time)

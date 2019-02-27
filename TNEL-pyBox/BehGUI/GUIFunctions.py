@@ -271,6 +271,8 @@ def updateVideoQ(self):
     self.vidDict['cur_time'] = self.cur_time
     self.vidDict['trial_num'] = self.trial_num
     self.vidDict['STATE'] = self.vidSTATE
+    self.vidDict['FLIP'] = self.FLIP
+    self.vidDict['FLIPAUX'] = self.FLIPAUX
     self.vidDict['PATH_FILE'] = self.video_file_path_name
     self.VIDq.append(self.vidDict)
 

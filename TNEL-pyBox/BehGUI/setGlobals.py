@@ -110,7 +110,10 @@ def setGlobals(self):
     ################################################################
     # VIDEO GLOBALS
     ################################################################
-    self.vidDict = {'STATE' : 'STOP'}
+    self.FLIP = False
+    self.FLIPAUX = False
+    self.vidDict = {'STATE' : 'STOP','FLIP':self.FLIP,'FLIPAUX':self.FLIPAUX}
+
     self.VIDq = deque(maxlen = 1) # Most recent
     self.VIDBack_q = Queue()
     # Simple VIDEO
