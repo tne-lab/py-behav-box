@@ -20,11 +20,11 @@ class Experiment:
                 self.setup_ln_num = 0
         else:
             print("COULD NOT LOAD EXPT FILE")
-            GUIFunctions.log_event(self, self.events,"COULD NOT LOAD EXPT FILE")
+            self.log_event(self.events,"COULD NOT LOAD EXPT FILE")
 
         self.log_event("START_TIME" + str(time.perf_counter()))
         if self.TOUCHSCREEN_USED:
-            GUIFunctions.StartTouchScreen(self)
+            self.StartTouchScreen()
         if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
             # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
             if self.VI_REWARDING:
@@ -76,18 +76,18 @@ class Experiment:
         elif key == "FAN_ON":
            val = str2bool(setupDict[key])
            print("FAN")
-           GUIFunctions.FAN_ON_OFF(self, self.events,val,self.cur_time) # {'FAN_ON': True} or {'FAN_ON': False}
+           GUIFunctions.FAN_ON_OFF(self.GUI,val) # {'FAN_ON': True} or {'FAN_ON': False}
            self.setup_ln_num +=1
         elif key == "CAB_LIGHT":
            val = str2bool(setupDict[key])
            print("CAB_LIGHT")
-           self.Background_color = GUIFunctions.CAB_LIGHT(self, self.events,val,self.cur_time)
+           self.Background_color = GUIFunctions.CAB_LIGHT(self.GUI,val)
            self.setup_ln_num +=1
         elif key == "FOOD_LIGHT":
             print("FOOD LIGHT: ",setupDict["FOOD_LIGHT"])
             val = str2bool(setupDict[key])
             self.setup_ln_num +=1
-            self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF (self, self.events,val,self.cur_time)
+            self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self.GUI,val)
             self.LEDs[4].ONOFF = LEDsONOFF
             self.LEDs[5].ONOFF = LEDsONOFF
         elif key == "CAMERA":
@@ -97,17 +97,17 @@ class Experiment:
             if val:  # TURN CAMERA ON.     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                 if not self.CAMERA_ON: # CAMERA WAS OFF
                     self.CAMERA_ON = True
-                    GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
+                    self.log_events("Camera_ON")
                     self.vidSTATE = 'ON'
-                    GUIFunctions.updateVideoQ(self)
-                    GUIFunctions.MyVideo(self)
+                    self.updateVideoQ()
+                    self.MyVideo()
                 else: # CAMERA IS ALREADY ON
-                    GUIFunctions.log_event(self, self.events,"Camera is ALREADY ON",self.cur_time)
+                    self.log_events("Camera is ALREADY ON")
             else: # TURN CAMERA OFF
                 if self.CAMERA_ON: # CAMERA CURRENTLY ON
                     self.CAMERA_ON = False
                     self.RECORDING = False
-                    GUIFunctions.log_event(self, self.events,"Camera_OFF",self.cur_time)
+                    self.log_events("Camera_OFF")
                     self.vidSTATE = 'OFF'
 
 
@@ -133,21 +133,21 @@ class Experiment:
         elif "EXTEND_LEVERS" in key:
             self.setup_ln_num +=1
             if setupDict[key] == "L_LVR":
-                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Left Lever Extended",True,False,self.cur_time)
+                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Left Lever Extended",True,False)
             elif setupDict[key] == "R_LVR":
-               GUIFunctions.EXTEND_LEVERS(self, self.events,"Right Lever Extended",False,True,self.cur_time)
+               GUIFunctions.EXTEND_LEVERS(self.GUI,"Right Lever Extended",False,True)
             else:
                 val = str2bool(setupDict[key])
                 if val: # EXTEND_LEVERS == True
                    print ("LEVERS EXTENDED")
-                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,True,self.cur_time)
+                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,True)
                    for lever in self.levers:
                          lever.STATE = "OUT"
                    for button in self.buttons:
                         if button.text == "EXTEND": button.text = "RETRACT"
                 else: # RETRACT LEVERS (EXTEND_LEVERS == False)
                    #print ("RETRACT LEVERS")
-                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers_Retracted",False,False,self.cur_time)
+                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
                    for lever in self.levers:
                         lever.STATE = "IN"
                    for button in self.buttons:
@@ -190,13 +190,13 @@ class Experiment:
         elif key == "FAN_ON":
            val = str2bool(protocolDict[key])
            #print("FAN")
-           GUIFunctions.FAN_ON_OFF(self, self.events,val,self.cur_time) # {'FAN_ON': True} or {'FAN_ON': False}
+           GUIFunctions.FAN_ON_OFF(self.GUI,val) # {'FAN_ON': True} or {'FAN_ON': False}
            self.Protocol_ln_num +=1
 
         elif key == "CAB_LIGHT":
            val = str2bool(protocolDict[key])
            #print("CAB_LIGHT")
-           self.Background_color = GUIFunctions.CAB_LIGHT(self, self.events,val,self.cur_time)
+           self.Background_color = GUIFunctions.CAB_LIGHT(self.GUI,val)
            #CAB_LIGHT(events,val,cur_time)
            self.Protocol_ln_num +=1
 
@@ -205,32 +205,32 @@ class Experiment:
             idx = key[4:]
             #print("TONE idx: ",idx)
             if idx == '1':
-                 GUIFunctions.PLAY_TONE(self, self.events,"TONE1", self.cur_time)
+                 GUIFunctions.PLAY_TONE(self.GUI,"TONE1")
                  self.TONE_TIME = self.cur_time
             elif idx == '2':
-                 GUIFunctions.PLAY_TONE(self, self.events,"TONE2", self.cur_time)
+                 GUIFunctions.PLAY_TONE(self.GUI,"TONE2")
                  self.TONE_TIME = self.cur_time
             self.TONE_ON = True
 
         elif key == "FOOD_LIGHT":
             val = str2bool(protocolDict[key])
             self.Protocol_ln_num +=1
-            self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self, self.events,val, self.cur_time)
+            self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self.GUI,val)
             self.LEDs[4].ONOFF = LEDsONOFF
             self.LEDs[5].ONOFF = LEDsONOFF
 
         elif key  == 'SHOCK':
-            GUIFunctions.log_event(self, self.events,"Shock_ON", self.cur_time,("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
+            self.log_events("Shock_ON",("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
             self.SHOCK_ON = True
 
         elif key == "L_CONDITIONING_LIGHT":
             val = str2bool(protocolDict[key])
             self.Protocol_ln_num +=1
             if val:
-                GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,True, self.cur_time)
+                GUIFunctions.L_CONDITIONING_LIGHT(self.GUI,True)
                 self.LEDs[0].ONOFF = "ON"
             else:
-                GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False, self.cur_time)
+                GUIFunctions.L_CONDITIONING_LIGHT(self.GUI,False)
                 self.LEDs[0].ONOFF = "OFF"
 
         elif key == "R_CONDITIONING_LIGHT":
@@ -238,10 +238,10 @@ class Experiment:
             self.Protocol_ln_num +=1
 
             if val:
-                GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,True, self.cur_time)
+                GUIFunctions.R_CONDITIONING_LIGHT(self.GUI,True)
                 self.LEDs[1].ONOFF = "ON"
             else:
-                GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False, self.cur_time)
+                GUIFunctions.R_CONDITIONING_LIGHT(self.GUI,False)
                 self.LEDs[1].ONOFF = "OFF"
 
         elif key == "CAMERA":
@@ -253,18 +253,18 @@ class Experiment:
             if val:  # TURN CAMERA ON
                 if not self.CAMERA_ON: # CAMERA WAS OFF
                     self.CAMERA_ON = True
-                    GUIFunctions.log_event(self, self.events,"Camera_ON",self.cur_time)
+                    self.log_events("Camera_ON")
                     self.vidSTATE = 'ON'
-                    GUIFunctions.updateVideoQ(self)
+                    self.updateVideoQ(self)
                                     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                    GUIFunctions.MyVideo(self)
+                    self.MyVideo(self)
                 else: # CAMERA IS ALREADY ON
-                    GUIFunctions.log_event(self, self.events,"Camera is ALREADY ON", self.cur_time)
+                    self.log_events("Camera is ALREADY ON")
             else: # TURN CAMERA OFF
                 if self.CAMERA_ON: # CAMERA CURRENTLY ON
                     self.CAMERA_ON = False
                     self.RECORDING = False
-                    GUIFunctions.log_event(self, self.events,"Camera_OFF",self.cur_time)
+                    self.log_events("Camera_OFF")
                     self.vidSTATE = 'OFF'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
 
         elif key == "REC": ## NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
@@ -280,21 +280,21 @@ class Experiment:
         elif "EXTEND_LEVERS" in key:
             self.Protocol_ln_num +=1
             if protocolDict[key] == "L_LVR":
-                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,False,self.cur_time)
+                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,False)
             elif protocolDict[key] == "R_LVR":
-               GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",False,True,self.cur_time)
+               GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",False,True)
             else:
                 val = str2bool(protocolDict[key])
                 if val: # EXTEND_LEVERS == True
                    #print ("EXTEND LEVERS")
-                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers Extended",True,True,self.cur_time)
+                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,True)
                    for lever in self.levers:
                          lever.STATE = "OUT"
                    for button in self.buttons:
                         if button.text == "EXTEND": button.text = "RETRACT"
                 else: # RETRACT LEVERS (EXTEND_LEVERS == False)
                    #print ("RETRACT LEVERS")
-                   GUIFunctions.EXTEND_LEVERS(self, self.events,"Levers_Retracted",False,False,self.cur_time)
+                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
                    for lever in self.levers:
                         lever.STATE = "IN"
                    for button in self.buttons:
@@ -326,7 +326,7 @@ class Experiment:
                     log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
 
                     print('log_string', log_string)
-                    GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
+                    self.log_events( log_string)
 
 
                 else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
@@ -354,7 +354,7 @@ class Experiment:
                     log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
                     log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
                     print('log_string', log_string)
-                    GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
+                    self.log_events( log_string)
         ###############################
         # START LOOP
         ###############################
@@ -411,7 +411,7 @@ class Experiment:
                 self.check_no_action = True
 
             else:  self.NUM_LOOPS = int(protocolDict[key])
-            GUIFunctions.log_event(self, self.events,"LOOPING "+ str(self.NUM_LOOPS)+ " times, TRIAL "+str(self.trial_num),self.cur_time)
+            self.log_events("LOOPING "+ str(self.NUM_LOOPS)+ " times, TRIAL "+str(self.trial_num))
         ###############################
         # END LOOP
         ###############################
@@ -425,7 +425,7 @@ class Experiment:
                         or (self.percent < self.wrongPercentage and self.check_wrong)
                         or (self.percent < self.no_actionPercentage and self.check_no_action)):
                     self.Protocol_ln_num +=1
-                    GUIFunctions.log_event(self, self.events,"END_OF_LOOP",self.cur_time)
+                    self.log_events("END_OF_LOOP")
                     self.loop = 0
                     self.LOOP_FIRST_PASS = True
                     self.VI_index = 0
@@ -441,7 +441,7 @@ class Experiment:
 
             else:
                 self.Protocol_ln_num +=1
-                GUIFunctions.log_event(self, self.events,"END_OF_LOOP",self.cur_time)
+                self.log_events("END_OF_LOOP")
                 self.loop = 0
                 self.LOOP_FIRST_PASS = True
                 self.VI_index = 0
@@ -462,7 +462,7 @@ class Experiment:
                     self.PAUSE_TIME = self.conditioning_vi_times[self.VI_index]
 
             if not self.PAUSE_STARTED:
-                GUIFunctions.log_event(self, self.events,"PAUSEING FOR "+str(self.PAUSE_TIME)+" sec",self.cur_time)
+                self.log_events("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
                 self.pause_start_time = self.cur_time
 
@@ -475,10 +475,10 @@ class Experiment:
             if self.TOUCHSCREEN_USED:
                 if not self.TSBack_q.empty():
                        self.touchMsg = self.TSBack_q.get()
-                       GUIFunctions.log_event(self, self.events, self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" , self.cur_time)
+                       self.log_events( self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
 
         elif key == "CONDITIONS":
-            self.runConditions(protocolDict, self.cur_time)
+            self.runConditions(protocolDict)
 
         else:
             print("PROTOCOL ITEM NOT RECOGNIZED",key)
@@ -498,7 +498,7 @@ class Experiment:
                 BPPM_time_interval = self.cur_time - self.VI_start
                 if BPPM_time_interval >= 60.0:  #Calculate BPPM every minute (60 sec)
                     self.BPPM =  self.num_bar_presses#   0.0
-                    GUIFunctions.log_event(self, self.events, "Bar Presses Per Min:,"+ str(self.BPPM ) , self.cur_time)
+                    self.log_events( "Bar Presses Per Min:,"+ str(self.BPPM ) )
                     print ("\n\n\nnum_bar_presses:: ",self.num_bar_presses, "BPPM: ",self.BPPM)
                     self.BPPMs.append(self.BPPM) # Add a BPPM calcualtion to list every minute
                     # Reset for next minute  TPM_start_time
@@ -510,7 +510,7 @@ class Experiment:
                     if len(self.BPPMs)== 10:#10: # after first 10 minutes only!!
                         print("BPPMs: ",self.BPPMs)
                         self.meanBPPM10 = sum(self.BPPMs[-10:])/10.0#10.0       # Mean Bar PRESSES per minute over last 10 minutes
-                        GUIFunctions.log_event(self, self.events, "MEAN Bar Presses Per Min:,"+ str(self.BPPM )+",Over 1st 10 min" , self.cur_time)
+                        self.log_events( "MEAN Bar Presses Per Min:,"+ str(self.BPPM )+",Over 1st 10 min" )
                         print ("MEAN BPPM over ist 10 min: ",self.meanBPPM10)
                         #self.BPPMs.pop(0)                                  # Removes first item of list for running list
                         if self.BAR_PRESS_TRAINING: # [BAR_PRESS] in protocol
@@ -521,14 +521,14 @@ class Experiment:
                                 self.var_interval_reward += 15 # Increases VI by 15
                                 if self.var_interval_reward >=  self.VI_final:
                                     self.var_interval_reward =  self.VI_final # Limit VI to final value (b above)
-                                GUIFunctions.log_event(self, self.events, "new VI: "+ str(self.VI) + " (sec)" , self.cur_time)
+                                self.log_events( "new VI: "+ str(self.VI) + " (sec)" )
                                 print ("NEW VI: ",str(self.var_interval_reward))
 
                 # Check if amount of VI has passed
                 if self.cur_time > (self.VI_start + self.VI):
                    self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
-                   GUIFunctions.log_event(self, self.events, "Cur Rand VI(Between 0 and " + str(self.var_interval_reward)+": "+ str(self.VI) + " (sec)" , self.cur_time)
-                   GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
+                   self.log_events( "Cur Rand VI(Between 0 and " + str(self.var_interval_reward)+": "+ str(self.VI) + " (sec)" )
+                   GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
 
 
 
@@ -540,11 +540,11 @@ class Experiment:
 #                      if self.VRs_given > 10:
 #                          self.VRs_given = 0
 #                          self.VR +=1 #VR = 2
-#                      GUIFunctions.log_event(self, self.events, "new vi: "+ str(self.VI) + " (sec)" , self.cur_time)
+#                      self.log_events( "new vi: "+ str(self.VI) + " (sec)" , self.cur_time)
 #
 #                  if self.VR == 2:
 #                      VR_reward = random.randint(1,self.VR) # Give reward on average every 2 bar presses
-#                      GUIFunctions.log_event(self, self.events, "VR reward: "+ str(VR_reward), self.cur_time)
+#                      self.log_events( "VR reward: "+ str(VR_reward), self.cur_time)
 #                      #print("VR", self.VR, "rand num: ", VR_reward)
 #                      if VR_reward == self.VR:
 #                         GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
@@ -556,7 +556,7 @@ class Experiment:
 #
 #                  if self.VR % 5 == 0:  # Will continue giving rewards on average 1 out of every N times(where n is divisible by 5, i.e. 5, 10, 15, 20 ...)
 #                      VR_reward = random.randint(1,self.VR)
-#                      GUIFunctions.log_event(self, self.events, "VR reward: "+ str(VR_reward), self.cur_time)
+#                      self.log_events( "VR reward: "+ str(VR_reward), self.cur_time)
 #                      #print("VR", self.VR, "rand num: ", VR_reward)
 #                      if VR_reward == self.VR:
 #                         GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
@@ -577,19 +577,19 @@ class Experiment:
         #########################################################
         #print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.max_time * 60.0, " sec")
         if self.cur_time >= self.MAX_EXPT_TIME * 60.0: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
-           GUIFunctions.log_event(self, self.events,"Exceeded MAX_EXPT_TIME",self.cur_time)
+           self.log_events("Exceeded MAX_EXPT_TIME")
            print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX_EXPT_TIME: ",self.MAX_EXPT_TIME)
-           GUIFunctions.log_event(self, self.events,"PROTOCOL ENDED-max time exceeded",self.cur_time)
+           self.log_events("PROTOCOL ENDED-max time exceeded")
            print("\nPROTOCOL ENDED-Max time exceeded")
            self.RECORDING = False
-           GUIFunctions.log_event(self, self.events,"Camera_OFF",self.cur_time)
+           self.log_events("Camera_OFF")
            self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
            self.end_expt()
 
         if self.Protocol_ln_num >= len(self.protocol):
-           GUIFunctions.log_event(self, self.events,"PROTOCOL ENDED",self.cur_time)
+           self.log_events("PROTOCOL ENDED")
            print("\nPROTOCOL ENDED NORMALLY")
-           GUIFunctions.log_event(self, self.events,"Camera_OFF",self.cur_time)
+           self.log_events("Camera_OFF")
            self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
            self.end_expt()
 ###########################################################################################################
@@ -616,7 +616,7 @@ class Experiment:
             self.HAS_ALREADY_RESPONDED = False
             self.CONDITONS_NOT_SET = False
             self.cond = self.conditions[self.choose_cond]
-            GUIFunctions.log_event(self, self.events,"CONDITION["+str(self.choose_cond)+"]",self.cur_time)
+            self.log_events("CONDITION["+str(self.choose_cond)+"]")
             COND_MAX_TIME = float(self.cond["MAX_TIME"])
             reset = self.cond["RESET"]
 
@@ -629,34 +629,34 @@ class Experiment:
             # SET LEVERS WHEN IN CONDITIONS
             try:
                 if self.cond['EXTEND_L_LEVER'] and self.cond['EXTEND_R_LEVER']:
-                    daqHelper.EXTEND_LEVERS(self.events,"Levers Extended",True,True,self.cur_time)
+                    daqHelper.EXTEND_LEVERS(self.events,"Levers Extended",True,True)
 
                 elif self.cond['EXTEND_L_LEVER']:
-                    daqHelper.EXTEND_LEVERS(self.events,"L Lever Extended",True,False,self.cur_time)
+                    daqHelper.EXTEND_LEVERS(self.events,"L Lever Extended",True,False)
 
                 elif self.cond['EXTEND_R_LEVER']:
-                    daqHelper.EXTEND_LEVERS(self.events,"R Lever Extended",False,True,self.cur_time)
+                    daqHelper.EXTEND_LEVERS(self.events,"R Lever Extended",False,True)
 
                 else:
-                    daqHelper.EXTEND_LEVERS(self.events,"Levers Retracted",False,False,self.cur_time)
+                    daqHelper.EXTEND_LEVERS(self.events,"Levers Retracted",False,False)
 
             except:
                 pass
             # SET CONDITIONING LIGHTS
             try: # if conditionaing lights are used
                 if self.cond['L_CONDITION_LT']: # Left_Conditioning lit 1/0
-                    GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,True,self.cur_time)
+                    GUIFunctions.L_CONDITIONING_LIGHT(self.GUI,True)
                     self.LEDs[0].ONOFF = "ON"
                 else:
-                    GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
+                    GUIFunctions.L_CONDITIONING_LIGHT(self.GUI,False)
                     self.LEDs[0].ONOFF = "OFF"
 
 
                 if self.cond['R_CONDITION_LT']: # Left_Conditioning lit 1/0
-                    GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,True,self.cur_time)
+                    GUIFunctions.R_CONDITIONING_LIGHT(self.GUI,True)
                     self.LEDs[1].ONOFF = "ON"
                 else:
-                    GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
+                    GUIFunctions.R_CONDITIONING_LIGHT(self.GUI,False)
                     self.LEDs[1].ONOFF = "OFF"
             except: # Conditionaing lights not used, Use Touch screen instead
                 pass
@@ -674,39 +674,39 @@ class Experiment:
            cond_time_elapsed = self.cur_time - self.condition_start_time
 
            if self.LEVER_PRESSED_L: # LEFT LEVER
-               GUIFunctions.log_event(self, self.events,"Left_Lever_Pressed",self.cur_time)
+               self.log_events("Left_Lever_Pressed")
                if not self.HAS_ALREADY_RESPONDED:# Prevents rewarding for multiple presses. Ensures max of one press per trial.
                    if self.cond['DES_L_LEVER_PRESS']:
-                       GUIFunctions.log_event(self, self.events,"CORRECT Response",self.cur_time)
+                       self.log_events("CORRECT Response")
                        self.CORRECT = True
                        if self.cond["RESET"] == "ON_RESPONSE":
                           self.CONDITION_STARTED = False
                    else:
                        self.WRONG = True
-                       GUIFunctions.log_event(self, self.events,"WRONG Response",self.cur_time)
+                       self.log_events("WRONG Response")
                    self.HAS_ALREADY_RESPONDED = True
-                   GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
-                   GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
+                   GUIFunctions.L_CONDITIONING_LIGHT(self.GUI,False)
+                   GUIFunctions.R_CONDITIONING_LIGHT(self.GUI,False)
                    self.LEDs[0].ONOFF = "OFF"
                    self.LEDs[1].ONOFF = "OFF"
 
            if self.LEVER_PRESSED_R: # RIGHT LEVER
-               GUIFunctions.log_event(self, self.events,"Right_Lever_Pressed",self.cur_time)
+               self.log_events("Right_Lever_Pressed")
                if not self.HAS_ALREADY_RESPONDED:# Prevents rewarding for multiple presses
                    #print("cond['DES_R_LEVER_PRESS']",self.cond['DES_R_LEVER_PRESS'])
                    if self.cond['DES_R_LEVER_PRESS']:
-                       GUIFunctions.log_event(self, self.events,"CORRECT Response",self.cur_time)
+                       self.log_events("CORRECT Response")
                        self.CORRECT = True
                        if self.cond["RESET"] == "ON_RESPONSE":
                           self.CONDITION_STARTED = False
                    else:
                        self.WRONG = True
-                       GUIFunctions.log_event(self, self.events,"WRONG Response",self.cur_time)
+                       self.log_events("WRONG Response")
                    self.HAS_ALREADY_RESPONDED = True
                    self.LEDs[0].ONOFF = "OFF"
                    self.LEDs[1].ONOFF = "OFF"
-                   GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
-                   GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False,self.cur_time)
+                   GUIFunctions.L_CONDITIONING_LIGHT(self.GUI,False)
+                   GUIFunctions.R_CONDITIONING_LIGHT(self.GUI,False)
 
            ######################################
            #     TOUCHSCREEN USED
@@ -726,7 +726,7 @@ class Experiment:
                    ##########################################
                    if self.touchMsg['picture'] == 'missed': # Touched background
 
-                       GUIFunctions.log_event(self, self.events," missed ," + "(" + str(x) + ";" + str(y)  + ")", self.cur_time)
+                       self.log_events(" missed ," + "(" + str(x) + ";" + str(y)  + ")")
                        self.background_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                        self.background_touches += 1
                        if self.TOUCH_TRAINING:
@@ -755,14 +755,14 @@ class Experiment:
                                print(self.touchMsg['picture'], img)
                                if self.touchMsg['picture'] == img:  # Touched an image
                                    print(self.touchMsg['picture'], img)
-                                   GUIFunctions.log_event(self,self.events, "Probability of pellet: " + str(probabilityList[self.trial_num]),self.cur_time)
+                                   self.log_events( "Probability of pellet: " + str(probabilityList[self.trial_num]))
 
                                    if reward_prob_for_this_img > 50.0:
                                        self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
-                                       GUIFunctions.log_event(self, self.events,"High PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)
+                                       self.log_events("High PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" )
                                    else: # Less desirable image touchewd
                                        self.wrong_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
-                                       GUIFunctions.log_event(self, self.events,"Low PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" , self.cur_time)
+                                       self.log_events("Low PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" )
                                    # Holds the probability for each trial
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
@@ -778,7 +778,7 @@ class Experiment:
                                if self.touchMsg['picture'] == img:  # Touched an image
                                   self.correct_image_touches += 1
                                   self.CORRECT = True
-                                  GUIFunctions.log_event(self, self.events,self.touchMsg['picture'] + " Pressed," + "(" + str(x) + ";" + str(y) + ")" , self.cur_time)
+                                  self.log_events(self.touchMsg['picture'] + " Pressed," + "(" + str(x) + ";" + str(y) + ")" )
 
                # CALCULATE TOUCHES PER MINUTE (TPMs)
                if TPM_time_interval > 60.0: #60.0: #Calculate TPM every minute (60 sec)
@@ -809,14 +809,14 @@ class Experiment:
 
                       if self.meanTPM10 > 10:# 10: # Reduce probability of reward for touching background + self.any_image_touches
                             self.VI_background += 15.0
-                            GUIFunctions.log_event(self, self.events,"VI for BACKGROUND Touches: "+ str(self.VI_background),self.cur_time)
+                            self.log_events("VI for BACKGROUND Touches: "+ str(self.VI_background))
                       if self.meanTPM10imgs > 10:# 10: # Reduce probability of reward for touching images only
                             self.VI_images += 1.0
                             if self.VI_images >= 15.0: self.VI_images = 15.0 # Limits VI for images to 60!!!!
-                            GUIFunctions.log_event(self, self.events,"VI for IMG Touches: "+ str(self.VI_images),self.cur_time)
+                            self.log_events("VI for IMG Touches: "+ str(self.VI_images))
 
                             self.VI_background += 15.0
-                            GUIFunctions.log_event(self, self.events,"VI for BACKGROUND Touches: "+ str(self.VI_background),self.cur_time)
+                            self.log_events("VI for BACKGROUND Touches: "+ str(self.VI_background))
 
                       print("MeanTPM10: ", self.meanTPM10, "MeanTPM10imgs: ", self.meanTPM10imgs)
                       print("\nVI_background: ", self.VI_background,"\nVI_images ", self.VI_images)
@@ -830,7 +830,7 @@ class Experiment:
                   self.CONDITION_STARTED = False
                   if not self.WRONG and not self.CORRECT:
                       self.NO_ACTION_TAKEN = True
-                      GUIFunctions.log_event(self, self.events,"NO_ACTION_TAKEN",self.cur_time)
+                      self.log_events("NO_ACTION_TAKEN")
                   self.TIME_IS_UP = True
 
            if self.cond["RESET"] == "ON_RESPONSE":
@@ -843,7 +843,7 @@ class Experiment:
                   self.CONDITION_STARTED = False
                   if not self.WRONG and not self.CORRECT:
                       self.NO_ACTION_TAKEN = True
-                      GUIFunctions.log_event(self, self.events,"NO_ACTION_TAKEN",self.cur_time)
+                      self.log_events("NO_ACTION_TAKEN")
                   self.TIME_IS_UP = True
 
            if self.cond['RESET'] == "VI":
@@ -858,7 +858,7 @@ class Experiment:
                if self.CORRECT:
                   print("TONE1 DuRATION: ", self.Tone1_Duration)
                   #self.TONE_ON = True
-                  self.GUIFunctions.PLAY_TONE(self, self.events,'TONE1 for Correct Response',self.cur_time) #THIS IS DONE EVERY CORRECT RESPOSE EVEN IF REWARD NOT GIVEN
+                  self.GUIFunctions.PLAY_TONE(self.GUI,'TONE1 for Correct Response') #THIS IS DONE EVERY CORRECT RESPOSE EVEN IF REWARD NOT GIVEN
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
                   self.correctPercentage = self.num_correct/self.trial_num * 100
@@ -879,29 +879,29 @@ class Experiment:
                ##############################################################
                if 'PELLET' in outcome:
                    if len(outcome)<=6: # Just 'PELLET'
-                       GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet,100, % Probabilty",self.cur_time)
+                       GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet,100, % Probabilty")
                    else: #"PELLET****" i.e. PELLET80 or PELLET_VAR or PELLET_TOUCHVI1 or PELLET_TOUCHVI2
                        left_of_outcome_str = outcome[6:]
                        #print(left_of_outcome_str)
                        if "_TOUCHVI1" == left_of_outcome_str: # PELLET_TOUCHVI1: Touched image (CORRECT RESPONSE)
                            if self.cur_time > (self.VI_start + self.cur_VI_images): # Give reward and reset VIs
                               # Give Rewards
-                              GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet," + str(self.cur_VI_images)+ ",VI",self.cur_time)
+                              GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet," + str(self.cur_VI_images)+ ",VI")
                               # Reset VIs
                               self.VI_start = self.cur_time
                               self.cur_VI_images = random.randint(0,int(self.VI_images * 2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
                               #print("new vi", self.cur_VI_images, " (sec)")
-                              GUIFunctions.log_event(self, self.events,"NEW_VI FOR IMAGE TOUCH = " + str(self.cur_VI_images),self.cur_time)
+                              self.log_events("NEW_VI FOR IMAGE TOUCH = " + str(self.cur_VI_images))
 
                        elif "_TOUCHVI2" in left_of_outcome_str: # or PELLET_TOUCHVI2: Touched Background (WRONG RESPONSE)
                            if self.cur_time > (self.VI_start + self.cur_VI_background): # Give reward and reset VIs
                               # Give 1 Reward
-                              GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet," + str(self.cur_VI_images)+ ",VI",self.cur_time)
+                              GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet," + str(self.cur_VI_images)+ ",VI")
                               # Reset VIs
                               self.VI_start = self.cur_time
                               self.cur_VI_background = random.randint(0,int(self.VI_background*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
                               #print("new backgroung vi", self.VI_background, " (sec)")
-                              GUIFunctions.log_event(self, self.events,"NEW_VI FOR BACKGROUND TOUCH = " + str(self.cur_VI_images),self.cur_time)
+                              self.log_events("NEW_VI FOR BACKGROUND TOUCH = " + str(self.cur_VI_images))
 
 
                        elif "VAR" in left_of_outcome_str: # if "PELLET_VAR" in conditions portion of protocol
@@ -909,32 +909,32 @@ class Experiment:
                            #print("our random number", rand)
                            if rand <= self.cur_probability:
                                #print("Food_Pellet w"+str(self.cur_probability)+ "% probability")
-                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet,"+str(self.cur_probability)+ ",% probability", self.cur_time)
+                               GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet,"+str(self.cur_probability)+ ",% probability")
                            else:
                                #print("Reward NOT given w " + str(self.cur_probability)+"% probability")
-                               GUIFunctions.log_event(self, self.events,"Reward NOT given," + str(self.cur_probability)+",% probability", self.cur_time)
+                               self.log_events("Reward NOT given," + str(self.cur_probability)+",% probability")
 
                        else: # if PELLET80 or something like it.  NOTE: PELLETXX, converts XX into probability
                            if random.random()*100 <= float(left_of_outcome_str):
-                               GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet,"+str(left_of_outcome_str)+ "%, probability", self.cur_time)
+                               GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet,"+str(left_of_outcome_str)+ "%, probability")
                            else:
-                               GUIFunctions.log_event(self, self.events,"Reward NOT given" + str(left_of_outcome_str)+",% probability", self.cur_time)
+                               self.log_events("Reward NOT given" + str(left_of_outcome_str)+",% probability")
 
 
                elif 'TONE' in outcome:
                    idx = outcome[4:]
                    if idx == '1':
-                      GUIFunctions.PLAY_TONE(self, self.events,"TONE1",self.cur_time)
+                      GUIFunctions.PLAY_TONE(self.GUI,"TONE1")
                       self.TONE_TIME = self.cur_time
                    elif idx == '2':
-                      GUIFunctions.PLAY_TONE(self, self.events,"TONE2",self.cur_time)
+                      GUIFunctions.PLAY_TONE(self.GUI,"TONE2")
                       self.TONE_TIME = self.cur_time
 
                elif outcome == 'SHOCK':
-                    GUIFunctions.log_event(self, self.events,"Shock_ON",self.cur_time,("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
+                    self.log_events("Shock_ON",("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
                     self.SHOCK_ON = True
                else: #outcome == 'NONE'
-                   GUIFunctions.log_event(self, self.events,"NONE",self.cur_time)
+                   self.log_events("NONE")
                    #print("Outcome = NONE")
                if self.TOUCHSCREEN_USED:
                    # Want to wait a second before blanking screen
@@ -944,7 +944,7 @@ class Experiment:
 
                self.TIME_IS_UP = False
                self.CONDITION_STARTED = False
-               GUIFunctions.log_event(self, self.events,"END_OF_TRIAL",self.cur_time)
+               self.log_events("END_OF_TRIAL")
                self.Protocol_ln_num +=1
     ### END EXPT ###
     def endExpt(self):

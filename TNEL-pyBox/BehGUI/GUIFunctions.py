@@ -60,24 +60,24 @@ def choose_file():
 
     return filename
 
-def FAN_ON_OFF(self, events, FAN_ON, cur_time):
+def FAN_ON_OFF(self, FAN_ON):
     if FAN_ON:
-        log_event(self, events,"Fan_ON",cur_time)
+        if self.EXPT_STARTED: self.expt.log_event("Fan_ON")
         if self.NIDAQ_AVAILABLE:    self.fan.sendDBit(True)
     else:
-        log_event(self, events,"Fan_OFF",cur_time)
+        if self.EXPT_STARTED: self.expt.log_event("Fan_OFF")
         if self.NIDAQ_AVAILABLE:    self.fan.sendDBit(False)
         #self.fan.end()
 ###################################################
-def PLAY_TONE_LAF(self, events, TONE_ID, cur_time):  # Plays tone using lafayette Tone generator
+def PLAY_TONE_LAF(self, TONE_ID):  # Plays tone using lafayette Tone generator
     # NOTE: Tone_OFF logged while drawing speeker above in main loop
     if TONE_ID == 'TONE1':
-        log_event(self, events,"Tone_ON using Lafayette",cur_time)
+        if self.EXPT_STARTED: self.expt.log_event("Tone_ON using Lafayette")
 
         if self.NIDAQ_AVAILABLE:  self.low_tone.sendDBit(True)
 
 #    elif TONE_ID == 'TONE2':
-#        log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
+#        if self.EXPT_STARTED: self.expt.log_event("Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
 #        newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration))
 #        # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
 
@@ -85,91 +85,91 @@ def PLAY_TONE_LAF(self, events, TONE_ID, cur_time):  # Plays tone using lafayett
     self.TONE_TIME = cur_time
     self.TONE_ON = True
 ###################################################
-def PLAY_TONE(self, events, TONE_ID, cur_time):  # Plays tone using computer speaker
+def PLAY_TONE(self, TONE_ID):  # Plays tone using computer speaker
     # NOTE: Tone_OFF logged while drawing speeker above in main loop
     if TONE_ID == 'TONE1':
         if not self.TONE_ON:
-            log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
+            if self.EXPT_STARTED: self.expt.log_event("Tone_ON",("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
             newThread = threading.Thread(target=play_sound, args=(self.Tone1_Freq, self.Tone1_Vol,self.Tone1_Duration))
             print("freq: ",self.Tone1_Freq,"Vol: ", self.Tone1_Vol, "Duration: ",self.Tone1_Duration)
             # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
             newThread.start()
             self.TONE_TIME = cur_time
             self.TONE_ON = True
-        else: log_event(self, events,"Could not play TONE (already on)",cur_time)
+        else: if self.EXPT_STARTED: self.expt.log_event("Could not play TONE (already on)")
 
     elif TONE_ID == 'TONE2':
         if not self.TONE_ON:
-            log_event(self, events,"Tone_ON",cur_time,("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
+            if self.EXPT_STARTED: self.expt.log_event("Tone_ON",("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
             newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration))
             # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
             newThread.start()
             self.TONE_TIME = cur_time
             self.TONE_ON = True
-        else: log_event(self, events,"Could not play TONE (already on)",cur_time)
+        else: if self.EXPT_STARTED: self.expt.log_event("Could not play TONE (already on)",cur_time)
 
 
 
-def CAB_LIGHT(self, events, ON_OFF, cur_time):
+def CAB_LIGHT(self, ON_OFF):
     gray        = (100,100,100)
     darkgray    = (50,50,50)
     if ON_OFF: # ON
-       log_event(self, events,"Cabin Light ON",cur_time)
+       if self.EXPT_STARTED: self.expt.log_event("Cabin Light ON")
        Background_color = gray
        #self.cabin_light = daqAPI.cabinLightSetup()
        if self.NIDAQ_AVAILABLE:  self.cabin_light.sendDBit(True)
 
     else: # ON_OFF = False
-       log_event(self, events,"Cabin Light OFF",cur_time)
+       if self.EXPT_STARTED: self.expt.log_event("Cabin Light OFF")
        Background_color = darkgray
        if self.NIDAQ_AVAILABLE: self.cabin_light.sendDBit(False)
        #self.cabin_light.end()
     return Background_color
 
 
-def EXTEND_LEVERS(self, events, text, L_LVR, R_LVR, cur_time):
+def EXTEND_LEVERS(self, text, L_LVR, R_LVR):
     if L_LVR and R_LVR: # Extend both levers
         if self.NIDAQ_AVAILABLE:  self.leverOut.sendDByte(3)
-        log_event(self, events, text, cur_time)
+        if self.EXPT_STARTED: self.expt.log_event( text)
         self.LEVERS_EXTENDED = True
         self.R_LEVER_EXTENDED = True
         self.L_LEVER_EXTENDED = True
 
     elif L_LVR:  # Extend L lever only
         if self.NIDAQ_AVAILABLE:  self.leverOut.sendDByte(1)
-        log_event(self, events, text, cur_time)
+        if self.EXPT_STARTED: self.expt.log_event( text)
         self.LEVERS_EXTENDED = False
         self.R_LEVER_EXTENDED = False
         self.L_LEVER_EXTENDED = True
     elif R_LVR:  # Extend R lever only
         if self.NIDAQ_AVAILABLE:  self.leverOut.sendDByte(2)
-        log_event(self, events, text, cur_time)
+        if self.EXPT_STARTED: self.expt.log_event( text)
         self.LEVERS_EXTENDED = False
         self.R_LEVER_EXTENDED = True
         self.L_LEVER_EXTENDED = False
     else: # Retract both
         if self.NIDAQ_AVAILABLE:  self.leverOut.sendDByte(0)
-        log_event(self, events, text, cur_time)
+        if self.EXPT_STARTED: self.expt.log_event( text)
         self.LEVERS_EXTENDED = False
         self.R_LEVER_EXTENDED = False
         self.L_LEVER_EXTENDED = False
 
 def L_CONDITIONING_LIGHT(self, events,ON_OFF,cur_time):
     if ON_OFF : # ON
-       log_event(self, events,"Left_Light_ON",cur_time)
+       if self.EXPT_STARTED: self.expt.log_event("Left_Light_ON")
        if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(True)
 
     else: # ON_OFF = False
-       log_event(self, events,"Left_Light_OFF",cur_time)
+       if self.EXPT_STARTED: self.expt.log_event("Left_Light_OFF")
        if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(False)
 
 def R_CONDITIONING_LIGHT(self, events,ON_OFF,cur_time):
     if ON_OFF: # ON
-       log_event(self, events,"Right_Light_ON",cur_time)
+       if self.EXPT_STARTED: self.expt.log_event("Right_Light_ON")
        if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(True)
 
     else: # ON_OFF = False
-       log_event(self, events,"Right_Light_OFF",cur_time)
+       if self.EXPT_STARTED: self.expt.log_event("Right_Light_OFF")
        if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(False)
 
 def Food_Light_ONOFF(self, events,ON_OFF,cur_time):
@@ -178,19 +178,19 @@ def Food_Light_ONOFF(self, events,ON_OFF,cur_time):
     if ON_OFF: # ON
           fill_color = gray
           LEDsONOFF = "ON"
-          log_event(self, events,"Feeder_Light_ON",cur_time)
+          if self.EXPT_STARTED: self.expt.log_event("Feeder_Light_ON")
           if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(True)
 
     else:
           fill_color = black
           LEDsONOFF = "OFF"
           if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(False)
-          log_event(self, events,"Feeder_Light_OFF",cur_time)
+          if self.EXPT_STARTED: self.expt.log_event("Feeder_Light_OFF")
 
     return fill_color,LEDsONOFF
 
-def FOOD_REWARD(self, events, text,cur_time):
-    log_event(self, events,text,cur_time)
+def FOOD_REWARD(self, text,cur_time):
+    if self.EXPT_STARTED: self.expt.log_event(text)
     self.num_pellets +=1
     if self.NIDAQ_AVAILABLE:
         #self.give_food.sendDBit(True) # Note:  Needs a delay (1 sec works)
