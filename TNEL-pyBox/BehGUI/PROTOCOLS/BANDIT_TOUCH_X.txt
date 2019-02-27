@@ -42,70 +42,70 @@ REC=TRUE
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 START_LOOP1 = 50 #NOTE: 1st 50 reward probabilities next to img name under [TOUCH]
-  PAUSE = 10 # sec
+  PAUSE = 5 # sec
   TONE1
   DRAW_IMAGES=True
   CONDITIONS=0
 END_LOOP
 
 START_LOOP2 = 50 #NOTE: 2nt 50 reward probabilities next to img name  under [TOUCH]
-  PAUSE = 10
+  PAUSE = 5
   TONE2
   DRAW_IMAGES=True
   CONDITIONS=0
 END_LOOP
 
 START_LOOP3 = 50 #NOTE: 3rd 50 reward probabilities next to img name under [TOUCH]
-  PAUSE = 10
+  PAUSE = 5
   TONE1
   DRAW_IMAGES=True
   CONDITIONS=0
 END_LOOP
 
 START_LOOP4 = 50 #NOTE: 4th 50 reward probabilities next to img name  under [TOUCH]
-  PAUSE = 10
+  PAUSE = 5
   TONE2
   DRAW_IMAGES=True
   CONDITIONS=0
 END_LOOP
 
 START_LOOP5 = 50 #NOTE: 5th 50 reward probabilities next to img name under [TOUCH]
-  PAUSE = 10
+  PAUSE = 5
   TONE1
   DRAW_IMAGES=True
   CONDITIONS=0
 END_LOOP
 
 START_LOOP6 = 50 #NOTE: 6th 50 reward probabilities next to img name  under [TOUCH]
-  PAUSE = 10
+  PAUSE = 5
   TONE2
   DRAW_IMAGES=True
   CONDITIONS=0
 END_LOOP
 
 START_LOOP7 = 50 #NOTE: 7th 50 reward probabilities next to img name under [TOUCH]
-  PAUSE = 10
+  PAUSE = 5
   TONE1
   DRAW_IMAGES=True
   CONDITIONS=0
 END_LOOP
 
 START_LOOP8 = 50 #NOTE: 8th 50 reward probabilities next to img name  under [TOUCH]
-  PAUSE = 10
+  PAUSE = 5
   TONE2
   DRAW_IMAGES=True
   CONDITIONS=0
 END_LOOP
 
 START_LOOP9 = 50 #NOTE: 9th 50 reward probabilities next to img name under [TOUCH]
-  PAUSE = 10
+  PAUSE = 5
   TONE1
   DRAW_IMAGES=True
   CONDITIONS=0
 END_LOOP
 
 START_LOOP10 = 50 #NOTE: 10th 50 reward probabilities next to img name  under [TOUCH]
-  PAUSE = 10
+  PAUSE = 5
   TONE2
   DRAW_IMAGES=True
   CONDITIONS=0
