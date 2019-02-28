@@ -470,7 +470,7 @@ class BEH_GUI():
                                                 GUIFunctions.log_event(self, self.events,"STOP_RECORDING_by_GUI",self.cur_time)
                                                 if "EPHYS-2" in self.computer:
                                                     self.FLIP = True
-                                                    
+
                                                 self.vidSTATE= 'REC_VID'
                                                 #GUIFunctions.updateVideoQ(self)
                                                 button.UP_DN = "UP"
@@ -576,7 +576,7 @@ class BEH_GUI():
                                #######################################
                                elif button.text == "STOP EXPT":
                                     button.text = "START EXPT"
-                                    
+
                                     self.START_EXPT = False
                                     print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
                                     self.end_expt()
@@ -935,7 +935,7 @@ class BEH_GUI():
                         if "EPHYS-2" in self.computer:
                             self.FLIP = True
 
-                        #GUIFunctions.updateVideoQ(self) # added 
+                        #GUIFunctions.updateVideoQ(self) # added
                 else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
                     self.vidSTATE = 'REC_STOP'
                     print("\nREC = False, Self.ROI: ",self.ROI,"\n")
@@ -1485,8 +1485,9 @@ class BEH_GUI():
 
            # Tell open ephys to stop acquistion and recording?
            # Maybe we want to wait and continue getting data for awhile. Just send some sort of event
-           self.snd.send(self.snd.STOP_ACQ)
-           self.snd.send(self.snd.STOP_REC)
+           if self.USING_OPEN_EPHYS:
+               self.snd.send(self.snd.STOP_ACQ)
+               self.snd.send(self.snd.STOP_REC)
 
            if self.TOUCHSCREEN_USED:
                self.TSq.put('')
@@ -1504,8 +1505,8 @@ class BEH_GUI():
            self.RECORDING = False
            GUIFunctions.log_event(self, self.events,"Recording_OFF",self.cur_time)
            self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-           #GUIFunctions.updateVideoQ(self)
-           
+           GUIFunctions.updateVideoQ(self)
+
            if "EPHYS-2" in self.computer:
                GUIFunctions.L_CONDITIONING_LIGHT(self, self.events,False, self.cur_time)
                GUIFunctions.R_CONDITIONING_LIGHT(self, self.events,False, self.cur_time)

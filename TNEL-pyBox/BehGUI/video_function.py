@@ -208,6 +208,7 @@ class Vid:
                     self.out.write(recframe)
             if msg['STATE'] == 'REC_STOP': # NOTE: STATE = (ON,OFF,  REC_VID,REC_STOP, START_EXPT,STOP_EXPT)
                 self.out.release() # CLOSE VIDEO FILE
+                self.out.close()
                 self.freezeFile.close()
                 self.RECORD = False
 
@@ -391,6 +392,7 @@ class SimpleVid:
         self.outPath = 'NOT SET'
         self.rec = False
         self.FLIPAUX = False
+        self.out = None
 
         if not self.cap.isOpened():
             print('error opening aux vid, probably doesn\'t exist')
@@ -430,6 +432,9 @@ class SimpleVid:
                 if msg['FLIPAUX']: self.FLIPAUX = msg['FLIPAUX']
 
     def openOutfile(self, path, height, width):
+        if self.out != None:
+            self.out.release()
+            self.out.close()
         self.outPath = path
         fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
         self.out = cv2.VideoWriter(path,fourcc, 30, (int(width),int(height)))
