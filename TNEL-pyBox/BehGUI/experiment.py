@@ -10,7 +10,7 @@ class Experiment:
         setExptGlobals()
         self.computer = computer
         self.GUI = GUI
-        EXPT_FILE_LOADED = self.load_expt_file(protocolPath)
+        EXPT_FILE_LOADED = self.load_expt_file(self.GUI.expt_file_path_name)
         if EXPT_FILE_LOADED:
             print("\n###########################")
             print("#   EXPT FILE LOADED!!    #")
@@ -62,11 +62,12 @@ class Experiment:
         '''
         RUN SETUP
         '''
-        self.create_files()
-        self.create_expt_file_copy()
-        self.NAME_OR_SUBJ_CHANGED = False
-        print("EXPT FILE COPY UPDATED!!!!")
-        self.trial_num = 0
+        if self.GUI.NAME_OR_SUBJ_CHANGED:
+            self.create_files()
+            self.create_expt_file_copy()
+            self.GUI.NAME_OR_SUBJ_CHANGED = False
+            print("EXPT FILE COPY UPDATED!!!!")
+            self.trial_num = 0
         #cur_time = time.perf_counter()
         print("SETUPDICT:....................",self.setup,"length: ",len(self.setup),"linenum: ",self.setup_ln_num)
         setupDict = self.setup[self.setup_ln_num]
@@ -167,7 +168,7 @@ class Experiment:
         self.START_EXPT = True
         self.vidSTATE = 'START_EXPT'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
         print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
-        for LED in self.LEDs: # Look for EXPT STARTED LED
+        for LED in self.GUI.LEDs: # Look for EXPT STARTED LED
               if LED.index == 6: # Expt Started light
                   LED.ONOFF = "ON"
 
@@ -365,10 +366,7 @@ class Experiment:
             for user_input in self.user_inputs:
                 if user_input.label == "TRIAL":
                         user_input.text = str(self.trial_num)
-
-
             self.CONDITONS_NOT_SET = True
-
             self.loop_start_line_num = self.Protocol_ln_num
             self.Protocol_ln_num +=1
             # NUMBER OF LOOPS DEPENDS ON PERCENT CORRECT?
@@ -437,8 +435,6 @@ class Experiment:
                 #self.Protocol_ln_num = self.Protocol_ln_num - self.num_lines_in_loop
                 self.Protocol_ln_num = self.loop_start_line_num
                 self.VI_index += 1
-
-
             else:
                 self.Protocol_ln_num +=1
                 self.log_events("END_OF_LOOP")
