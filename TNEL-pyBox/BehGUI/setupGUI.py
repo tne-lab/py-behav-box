@@ -220,7 +220,7 @@ def setupGUI(self):
     self.TONE_TIME = START_TIME
     self.SHOCK_TIME = START_TIME
 
-    self.num_eaten = 0
+
     self.NOSE_POKED_L = False
     self.NOSE_POKED_R = False
     self.LEVER_PRESSED_L = False
@@ -231,12 +231,6 @@ def setupGUI(self):
     self.CAMERA_ON = False
     self.RECORDING = False
     self.FREEZE_DETECTION_ENABLED = False
-
-    self.num_L_nose_pokes = 0
-    self.num_R_nose_pokes = 0
-    self.num_L_lever_preses = 0
-    self.num_R_lever_preses = 0
-
 
     self.START_EXPT = False
 

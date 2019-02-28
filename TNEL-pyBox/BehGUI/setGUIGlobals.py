@@ -67,6 +67,21 @@ def setGUIGlobals(self):
     self.exptTime = time.strftime("%H-%M")
     self.events = []
 
+    ################################################################
+    # TONE AND SHOCK DEFAULTS
+    ################################################################
+    self.globalsTone1_Duration = 1.0 # sec
+    self.Tone1_Duration = 1.0 # sec
+    self.Tone1_Freq = 1800.0
+    self.Tone1_Vol = 1.0
+    self.Tone2_Duration = 1.0 # sec
+    self.Tone2_Freq = 1200.0
+    self.Tone2_Vol = 1.0
+    self.TONE_ON = False
+    self.Shock_Duration = 1.0
+    self.Shock_V = 9.0
+    self.Shock_Amp = 0.5
+
     ## Get number of cameras
     self.num_cameras = count_cameras()
 def count_cameras():

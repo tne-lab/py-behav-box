@@ -23,7 +23,6 @@ def setExptGlobals(self):
     self.prev_Subject = ''
     self.NAME_OR_SUBJ_CHANGED = False
     self.trial_num = 0
-    self.num_pellets = 0
     self.EXPT_FILE_LOADED = False
 
     ################################################################
@@ -52,6 +51,12 @@ def setExptGlobals(self):
     self.R_LEVER_EXTENDED = False
     self.LEVERS_EXTENDED = False
 
+    self.num_L_nose_pokes = 0
+    self.num_R_nose_pokes = 0
+    self.num_L_lever_preses = 0
+    self.num_R_lever_preses = 0
+    self.num_eaten = 0
+    self.num_pellets = 0
 
     ################################################################
     # VI
@@ -113,21 +118,6 @@ def setExptGlobals(self):
     self.TOUCHSCREEN_USED = False
     self.BAR_PRESS_INDEPENDENT_PROTOCOL = False
     self.BAR_PRESS_TRAINING = False
-
-    ################################################################
-    # TONE AND SHOCK DEFAULTS
-    ################################################################
-    self.globalsTone1_Duration = 1.0 # sec
-    self.Tone1_Duration = 1.0 # sec
-    self.Tone1_Freq = 1800.0
-    self.Tone1_Vol = 1.0
-    self.Tone2_Duration = 1.0 # sec
-    self.Tone2_Freq = 1200.0
-    self.Tone2_Vol = 1.0
-    self.TONE_ON = False
-    self.Shock_Duration = 1.0
-    self.Shock_V = 9.0
-    self.Shock_Amp = 0.5
 
     ################################################################
     # AUX CAMERA (Only starts if second camera is exists)
