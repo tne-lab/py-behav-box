@@ -85,25 +85,25 @@ def load_expt_file(self):
                         print("#####################")
                         print("#    EXPERIMENT     #")
                         print("#####################")
-                        if self.Expt_Name == "": #Change only if it does not already exist
-                            self.Expt_Name = str_after_equal
-                        print(self.Expt_Name)
+                        if self.GUI.Expt_Name == "": #Change only if it does not already exist
+                            self.GUI.Expt_Name = str_after_equal
+                        print(self.GUI.Expt_Name)
 
                     elif 'SUBJECT' in str_before_equal:
-                        self.Subject = str_after_equal
-                        print(self.Subject)
+                        self.GUI.Subject = str_after_equal
+                        print(self.GUI.Subject)
 
                     elif 'EXPT_PATH' in str_before_equal:
-                        self.datapath = str_after_equal
-                        if not os.path.isdir(self.datapath):
+                        self.GUI.datapath = str_after_equal
+                        if not os.path.isdir(self.GUI.datapath):
                             print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                            print(self.datapath, " DOES NOT EXIST!!!!")
+                            print(self.GUI.datapath, " DOES NOT EXIST!!!!")
                             print("Please correct the path in your protocol file!")
                             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-                            GUIFunctions.log_event(self, self.events,self.datapath + " DOES NOT EXIST!!!!",self.cur_time)
+                            GUIFunctions.log_event(self, self.events,self.GUI.datapath + " DOES NOT EXIST!!!!",self.cur_time)
                             GUIFunctions.log_event(self, self.events,"PLEASE CHECK PATH IN PROTOCOL FILE",self.cur_time)
                             return False
-                        else: print(self.datapath)
+                        else: print(self.GUI.datapath)
 
                     elif 'LOG_FILE_PATH' in str_before_equal:
                         log_file_path = str_after_equal
@@ -151,25 +151,25 @@ def load_expt_file(self):
                         print("self.Tone1_Duration",self.Tone1_Duration)
 
                     if 'FREQ' in str_before_equal:
-                        self.Tone1_Freq = float(str_after_equal)
-                        print("self.Tone1_Freq: ",self.Tone1_Freq)
+                        self.GUI.Tone1_Freq = float(str_after_equal)
+                        print("self.Tone1_Freq: ",self.GUI.Tone1_Freq)
 
                     if 'VOL' in str_before_equal:
                         self.Tone1_Vol = float(str_after_equal)
-                        print("self.Tone1_Vol: ",self.Tone1_Vol)
+                        print("self.Tone1_Vol: ",self.GUI.Tone1_Vol)
 
                 elif TONE2:#TONE2
                     if 'DURATION' in str_before_equal:
                         self.Tone2_Duration = str_after_equal
-                        print("self.Tone2_Duration",self.Tone2_Duration)
+                        print("self.Tone2_Duration",self.GUI.Tone2_Duration)
 
                     if 'FREQ' in str_before_equal:
                         self.Tone2_Freq = float(str_after_equal)
-                        print("self.Tone2_Freq: ",self.Tone2_Freq)
+                        print("self.Tone2_Freq: ",self.GUI.Tone2_Freq)
 
                     if 'VOL' in str_before_equal:
                         self.Tone2_Vol = float(str_after_equal)
-                        print("self.Tone2_Vol: ",self.Tone2_Vol)
+                        print("self.Tone2_Vol: ",self.GUI.Tone2_Vol)
 
                 elif TOUCH:
                     touch_image_dict={}
@@ -272,16 +272,16 @@ def load_expt_file(self):
 
                 elif SHOCK:
                     if 'DURATION' in str_before_equal:
-                        self.Shock_Duration = float(str_after_equal)
-                        print(self.Shock_Duration)
+                        self.GUI.Shock_Duration = float(str_after_equal)
+                        print(self.GUI.Shock_Duration)
 
                     if 'VOLTS' in str_before_equal:
-                        self.Shock_V = float(str_after_equal)
-                        print(self.Shock_V)
+                        self.GUI.Shock_V = float(str_after_equal)
+                        print(self.GUI.Shock_V)
 
                     if 'AMPS' in str_before_equal:
-                        self.Shock_Amp = float(str_after_equal)
-                        print(self.Shock_Amp)
+                        self.GUI.Shock_Amp = float(str_after_equal)
+                        print(self.GUI.Shock_Amp)
 
                 elif FREEZE:
                     print("###################################")
@@ -449,38 +449,38 @@ def create_files(self):
     # DATA PATH + FILES
     print("\nCREATING LOG FILES:")
     ###### EXPT COPY FILE #####
-    new_dir = os.path.join(self.GUI.datapath,self.Expt_Name)
+    new_dir = os.path.join(self.GUI.datapath,self.GUI.Expt_Name)
     if not os.path.exists(new_dir ):  os.mkdir(new_dir)
     new_sub_dir = os.path.join(new_dir,self.date)
     if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
     new_sub_dir = os.path.join(new_sub_dir,self.exptTime)
     if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
     self.newdatapath = new_sub_dir
-    expt_file_name_COPY = self.expt_file_name[:-4] + '_COPY.txt' # Removes the '.txt' from original name and adds 'COPY.txt'
+    expt_file_name_COPY = self.GUI.expt_file_name[:-4] + '_COPY.txt' # Removes the '.txt' from original name and adds 'COPY.txt'
     self.expt_file_path_name_COPY = os.path.join(self.newdatapath,expt_file_name_COPY)
     print(self.expt_file_path_name_COPY)
 
     ###### LOG FILE ####
-    log_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-LOG_file'  + '.csv'
+    log_file_name = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-LOG_file'  + '.csv'
     self.log_file_path_name = os.path.join(self.newdatapath,log_file_name)
     print(self.log_file_path_name)
     self.log_file = open(self.log_file_path_name,'w')        # OPEN LOG FILE
 
     ##### MAIN VIDEO #######
     if self.VID_ENABLED = True:
-        video_file_name = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
+        video_file_name = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
         self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
         print(self.video_file_path_name)
     ## AUX VIDEO ##
     if self.GUI.num_cameras == 2:
-        video_file_name_aux = self.Expt_Name + "-" + self.Subject + '-' +  self.dateTm + '-VIDEO_file_aux' + '.avi'
+        video_file_name_aux = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-VIDEO_file_aux' + '.avi'
         self.video_file_path_name_aux = os.path.join(self.newdatapath,video_file_name_aux)
         print(self.video_file_path_name_aux)
         self.SIMPLEVIDq.put({'STATE':'ON','PATH_FILE':self.video_file_path_name_aux})
 
     ###### Change open ephys recoding dir #####
     if self.EPHYS_ENABLED:
-        self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.Subject)
+        self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.GUI.Subject)
         self.snd.send(self.snd.START_REC)
         time.sleep(3) # Let Open Ephys record for a bit (maybe remove?)
 
@@ -495,7 +495,7 @@ def create_expt_file_copy(self):
     try:
         for ln in self.exptFileLines:
             if "EXPT_NAME" in ln: #NOTE: SUBJECT not in original PROTOCOL files. It is added here
-                ln = "EXPT_NAME = " + self.Expt_Name + "\nSUBJECT = " + self.Subject
+                ln = "EXPT_NAME = " + self.GUI.Expt_Name + "\nSUBJECT = " + self.GUI.Subject
                 prev_ln = ln
                 #exptfl.write(ln+"\n")
 
