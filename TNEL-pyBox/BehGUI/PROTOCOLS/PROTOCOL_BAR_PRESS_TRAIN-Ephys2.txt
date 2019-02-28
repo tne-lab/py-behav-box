@@ -1,6 +1,6 @@
 [EXPERIMENT]
 EXPT_NAME = BAR_PRESS_TRAIN
-EXPT_PATH 	=  C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
+EXPT_PATH 	=  E:\py-behav-box\TNEL-pyBox\BehGUI\DATA
 #OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe # on Flav's PC Ephys-2
 ###               E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe # on Jean's PC Ephys-1
 
@@ -8,7 +8,7 @@ EXPT_PATH 	=  C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\D
 FAN_ON=True
 CAB_LIGHT=True
 CAMERA=True
-#REC=True
+REC=True
 FOOD_LIGHT=True
 EXTEND_LEVERS=TRUE
 
@@ -24,7 +24,7 @@ END_LOOP
 
 EXTEND_LEVERS=FALSE
 FOOD_LIGHT=FALSE
-#REC=FALSE
+REC=FALSE
 #CAMERA= FALSE
 CAB_LIGHT=FALSE
 FAN_ON=FALSE

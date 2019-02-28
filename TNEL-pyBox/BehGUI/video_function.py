@@ -208,7 +208,7 @@ class Vid:
                     self.out.write(recframe)
             if msg['STATE'] == 'REC_STOP': # NOTE: STATE = (ON,OFF,  REC_VID,REC_STOP, START_EXPT,STOP_EXPT)
                 self.out.release() # CLOSE VIDEO FILE
-                self.out.close()
+                #self.out.close()
                 self.freezeFile.close()
                 self.RECORD = False
 
@@ -254,7 +254,7 @@ class Vid:
         self.freezeFile.close()
         self.cap.release()
         self.out.release()
-        self.out.close()
+        #self.out.close()
         cv2.destroyAllWindows()
         for i in range(1,10):
             cv2.waitKey(1)
@@ -434,7 +434,7 @@ class SimpleVid:
     def openOutfile(self, path, height, width):
         if self.out != None:
             self.out.release()
-            self.out.close()
+            #self.out.close()
         self.outPath = path
         fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
         self.out = cv2.VideoWriter(path,fourcc, 30, (int(width),int(height)))
