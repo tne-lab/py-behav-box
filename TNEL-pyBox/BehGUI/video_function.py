@@ -200,12 +200,12 @@ class Vid:
             #if self.ROIenabled:  print("ROI: ", self.ROI)
             if msg['STATE'] == 'START_EXPT': # NOTE: STATE = (ON,OFF, FLIP, REC_VID,REC_STOP, START_EXPT,STOP_EXPT)
 
-                if self.FLIP:
-                    recframe = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
-                else:
-                    recframe = frame# flipcodes: 1 = hflip, 0 = vflip
+                #if self.FLIP:
+                #    recframe = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
+                #else:
+                #    recframe = frame# flipcodes: 1 = hflip, 0 = vflip
                 if self.RECORD:
-                    self.out.write(recframe)
+                    self.out.write(frame)
             if msg['STATE'] == 'REC_STOP': # NOTE: STATE = (ON,OFF,  REC_VID,REC_STOP, START_EXPT,STOP_EXPT)
                 self.out.release() # CLOSE VIDEO FILE
                 #self.out.close()
