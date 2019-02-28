@@ -426,15 +426,16 @@ class SimpleVid:
                     self.cap.release()
                     self.out.release()
                     return
+                if msg['STATE'] == 'REC_STOP' and self.rec == True:
+                    self.out.release()
+                    self.rec = False
+                    continue
                 if msg['PATH_FILE'] != self.outPath:
                     self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))
                     self.rec = True
                 if msg['FLIPAUX']: self.FLIPAUX = msg['FLIPAUX']
 
     def openOutfile(self, path, height, width):
-        if self.out != None:
-            self.out.release()
-            #self.out.close()
         self.outPath = path
         fourcc = cv2.VideoWriter_fourcc(*'XVID') # for AVI files
         self.out = cv2.VideoWriter(path,fourcc, 30, (int(width),int(height)))

@@ -1505,6 +1505,7 @@ class BEH_GUI():
            self.RECORDING = False
            GUIFunctions.log_event(self, self.events,"Recording_OFF",self.cur_time)
            self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+           self.SIMPLEVIDq.put({'STATE':'REC_STOP'})
            GUIFunctions.updateVideoQ(self)
 
            if "EPHYS-2" in self.computer:
