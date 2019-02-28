@@ -72,7 +72,7 @@ class BEH_GUI():
             self.checkSystemEvents()
             self.checkNIDAQEvents()
 
-            if self.EXPT_STARTED:
+            if self.START_EXPT:
                 self.expt.run()
 
             ######################################
@@ -144,24 +144,40 @@ class BEH_GUI():
 ##        for tog in self.toggles:
 ##            tog.draw()
 
-
-
         for lbl in self.labels: # Last so on top
             lbl.draw()
 
         for info in self.info_boxes: # Last so on top
             if info.label == "L NOSE POKES":
-                  info.text = [str(self.num_L_nose_pokes)]
+                if self.START_EXPT:
+                    info.text = 0
+                else:
+                  info.text = [str(self.expt.num_L_nose_pokes)]
             elif info.label == "R NOSE POKES":
-                  info.text = [str(self.num_R_nose_pokes)]
+                if self.START_EXPT:
+                    info.text = 0
+                else:
+                  info.text = [str(self.expt.num_R_nose_pokes)]
             elif info.label == "L PRESSES":
-                  info.text = [str(self.num_L_lever_preses)]
+                if self.START_EXPT:
+                    info.text = 0
+                else:
+                  info.text = [str(self.expt.num_L_lever_preses)]
             elif info.label == "R PRESSES":
-                  info.text = [str(self.num_R_lever_preses) ]
+                if self.START_EXPT:
+                    info.text = 0
+                else:
+                  info.text = [str(self.expt.num_R_lever_preses) ]
             elif info.label == "PELLETS":
-                  info.text = [str(self.num_pellets)]
+                if self.START_EXPT:
+                    info.text = 0
+                else:
+                  info.text = [str(self.expt.num_pellets)]
             elif info.label == "EATEN":
-                  info.text = [str(self.num_eaten)]
+                if self.START_EXPT:
+                    info.text = 0
+                else:
+                  info.text = [str(self.expt.num_eaten)]
             elif info.label == "DATE":
                   info.text = [str(self.date)]
             elif info.label == "TIME":
@@ -186,8 +202,6 @@ class BEH_GUI():
                     self.sliders[0].sliderY = self.new_slider_y #+ self.start_line * self.y_per_line
                     #self.sliders[0].sliderY = self.new_slider_y + (self.sliders[0].slotL - self.sliders[0].bh) - self.start_line * self.y_per_line
 
-
-
                     self.sliders[0].draw()
                     #info.text = self.events[self.start_line:self.start_line+14]
                     # Proportion of events to display
@@ -207,7 +221,10 @@ class BEH_GUI():
             elif user_input.label == "SUBJECT":
                  user_input.text = str(self.Subject)
             elif user_input.label == "TRIAL":
-                 user_input.text  = str(self.trial_num)
+                if self.START_EXPT:
+                    info.text = 0
+                else:
+                 user_input.text  = str(self.expt.trial_num)
             elif user_input.label == "EXPT PATH":
                  user_input.text = str(self.datapath)
             elif user_input.label == "EXPT FILE NAME":
@@ -224,7 +241,6 @@ class BEH_GUI():
                  user_input.text = str(self.Shock_V)
             elif "Amps" in user_input.label:
                  user_input.text = str(self.Shock_Amp)
-
             user_input.draw()
 
 
@@ -238,7 +254,7 @@ class BEH_GUI():
                   self.TONE_ON = False
                   if "EPHYS-1" in self.computer:
                       self.low_tone.sendDBit(False)
-                  if self.EXPT_STARTED: self.expt.log_event("Tone_OFF")
+                  if self.START_EXPT: self.expt.log_event("Tone_OFF")
 
         # DRAW SHOCK LIGHTNING
         self.shock = GUIFunctions.draw_lighting(self.myscreen, self.SHOCK_ON, 248,150,1,(255,255,0),2)
@@ -249,7 +265,7 @@ class BEH_GUI():
                   self.SHOCK_ON = False
                   self.apply_shock.sendDBit(False)
                   #print("SHOCK OFF")
-                  if self.EXPT_STARTED: self.expt.log_event("Shock_OFF")
+                  if self.START_EXPT: self.expt.log_event("Shock_OFF")
 
 
         # DRAW CAMERA
@@ -378,24 +394,24 @@ class BEH_GUI():
                                elif button.text == "L":
                                     if self.L_LEVER_EXTENDED: # Was EXTENDED
                                           button.UP_DN = "UP"
-                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"L_Lever_Retracted_by_GUI",False,False)
+                                          GUIFunctions.EXTEND_LEVERS(self,"L_Lever_Retracted_by_GUI",False,False)
                                           self.levers[0].STATE = "IN"
 
                                     else: # Was not extended
                                           button.UP_DN = "DN"
-                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"L_Lever_Extended_by_GUI",True,False)
+                                          GUIFunctions.EXTEND_LEVERS(self,"L_Lever_Extended_by_GUI",True,False)
                                           self.levers[0].STATE = "OUT"
 
                                # RIGHT LEVER
                                elif button.text == "R":
                                     if self.R_LEVER_EXTENDED: # Was EXTENDED
                                           button.UP_DN = "UP"
-                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"R_Lever_Retracted_by_GUI",False,False)
+                                          GUIFunctions.EXTEND_LEVERS(self,"R_Lever_Retracted_by_GUI",False,False)
                                           self.levers[1].STATE = "IN"
 
                                     else: # was not extended
                                           button.UP_DN = "DN"
-                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"R_Lever_Extended_by_GUI",False,True)
+                                          GUIFunctions.EXTEND_LEVERS(self,"R_Lever_Extended_by_GUI",False,True)
                                           self.levers[1].STATE = "OUT"
 
                                # BOTH LEVERS AT ONCE
@@ -403,7 +419,7 @@ class BEH_GUI():
                                     if self.LEVERS_EXTENDED: #Toggle EXTEND and RETRACT
                                           button.UP_DN = "UP"
                                           #LEVERS_EXTENDED = False
-                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"Levers_Retracted_by_GUI",False,False)
+                                          GUIFunctions.EXTEND_LEVERS(self,"Levers_Retracted_by_GUI",False,False)
                                           button.text = "EXTEND"
                                           for lever in self.levers:
                                                 lever.STATE = "IN"
@@ -412,7 +428,7 @@ class BEH_GUI():
                                           button.UP_DN = "DN"
                                           button.text = "RETRACT"
                                           #LEVERS_EXTENDED = True
-                                          GUIFunctions.EXTEND_LEVERS(self,self.events,"Levers_Extended_by_GUI",True,True)
+                                          GUIFunctions.EXTEND_LEVERS(self,"Levers_Extended_by_GUI",True,True)
                                           for lever in self.levers:
                                                 lever.STATE = "OUT"
 
@@ -420,13 +436,13 @@ class BEH_GUI():
                                     if self.CAMERA_ON:
                                           if self.RECORDING: #STOP RECORDING BUT KEEP CAMERA ON. # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                                                 self.RECORDING = False  #KEEP CAMERA ON, JUST STOP RECORDING
-                                                if self.EXPT_STARTED: self.expt.log_event("STOP_RECORDING_by_GUI")
+                                                if self.START_EXPT: self.expt.log_event("STOP_RECORDING_by_GUI")
                                                 self.vidSTATE= 'ON'
                                                 button.UP_DN = "UP"
                                           else:
                                                 self.RECORDING = True
                                                 button.UP_DN = "DN"
-                                                if self.EXPT_STARTED: self.expt.log_event("START_RECORDING_by_GUI")
+                                                if self.START_EXPT: self.expt.log_event("START_RECORDING_by_GUI")
                                                 self.vidSTATE = 'REC_VID'
 
 
@@ -487,18 +503,15 @@ class BEH_GUI():
                                             button.text = "STOP EXPT"
                                             self.START_EXPT = True
 
-
                                     else:
                                         self.EXPT_FILE_LOADED = False
                                         print("HUMPH! COULD NOT LOAD EXPT FILE (on button press)")
-                                        if self.EXPT_STARTED: self.expt.log_event("Expt File name or path DOES NOT EXIST")
-
+                                        if self.START_EXPT: self.expt.log_event("Expt File name or path DOES NOT EXIST")
 
                                self.LEFT_MOUSE_DOWN = False
                                self.BUTTON_SELECTED = True
                                dx = cur_x - button.x
                                dy = cur_y - button.y
-
 
                     # LEVERS
                     for lever in self.levers:
@@ -596,11 +609,11 @@ class BEH_GUI():
                           self.SHOCK_TIME = self.cur_time
                           if self.SHOCK_ON:
                                 self.SHOCK_ON = False
-                                if self.EXPT_STARTED: self.expt.log_event("Shock_OFF")
+                                if self.START_EXPT: self.expt.log_event("Shock_OFF")
                                 # NOTE: SHOCK ALSO TURNED OFF IN GAME LOOP AFTER Shock_Duration (s)
                           else:
                                 self.SHOCK_ON = True
-                                if self.EXPT_STARTED: self.expt.log_event("Shock_ON",("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
+                                if self.START_EXPT: self.expt.log_event("Shock_ON",("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
                                 # NOTE: SHOCK ALSO TURNED OFF IN GAME LOOP AFTER Shock_Duration (s)
 
                           #print("SHOCK PRESSED")
@@ -610,13 +623,13 @@ class BEH_GUI():
                           if self.CAMERA_ON: #CAMERAL ALREWADY ON, TURN CAMERA OFF.  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                                 self.CAMERA_ON = False
                                 self.RECORDING = False
-                                if self.EXPT_STARTED: self.expt.log_event("Camera_OFF")
+                                if self.START_EXPT: self.expt.log_event("Camera_OFF")
                                 #print("CAMERA OFF")
                                 self.vidSTATE = 'OFF'
 
                           else: #TURN CAMERA ON # NOTE: STATE = (ON,OFF,REC, START_EXPT,STOP_EXPT)
                                 self.CAMERA_ON = True
-                                if self.EXPT_STARTED: self.expt.log_event("Camera_ON")
+                                if self.START_EXPT: self.expt.log_event("Camera_ON")
                                 #print("CAMERA ON")
                                 self.vidSTATE = 'ON'
                                 GUIFunctions.MyVideo(self)
@@ -707,14 +720,14 @@ class BEH_GUI():
                   #cur_time = time.perf_counter()
                   self.LEVER_PRESS_TIME = self.cur_time
                   if  wasleverPressed == 'Right':
-                        if self.EXPT_STARTED: self.expt.log_event("Lever_Pressed_R")
+                        if self.START_EXPT: self.expt.log_event("Lever_Pressed_R")
                         self.LEVER_PRESSED_R = True
                         #print("RIGHT LEVER PRESSED")
                         self.num_R_lever_preses += 1
                         self.levers[1].STATE = "DN"
 
                   if  wasleverPressed == 'Left':
-                        if self.EXPT_STARTED: self.expt.log_event("Lever_Pressed_L")
+                        if self.START_EXPT: self.expt.log_event("Lever_Pressed_L")
                         self.LEVER_PRESSED_L = True
                         #print("LEFT LEVER PRESSED")
                         self.num_L_lever_preses += 1
@@ -728,7 +741,7 @@ class BEH_GUI():
                 #print("LEFT Nose Poked")
                 self.NOSE_POKE_TIME = self.cur_time
                 #events.append("LEFT Nose Poke: " + str(cur_time))
-                if self.EXPT_STARTED: self.expt.log_event("Nose_Poke_L")
+                if self.START_EXPT: self.expt.log_event("Nose_Poke_L")
                 self.NOSE_POKED_L = True
                 self.num_L_nose_pokes += 1
                 for LED in self.LEDs:
@@ -743,7 +756,7 @@ class BEH_GUI():
             if was_nose_poked_R:
                 #print("Right Nose Poked")
                 #events.append("RIGHT Nose Poke: " + str(cur_time))
-                if self.EXPT_STARTED: self.expt.log_event("Nose_Poke_R")
+                if self.START_EXPT: self.expt.log_event("Nose_Poke_R")
                 self.NOSE_POKE_TIME = time.perf_counter()
                 self.NOSE_POKED_R = True
                 self.num_R_nose_pokes += 1
@@ -764,7 +777,7 @@ class BEH_GUI():
                 event = 'Food_Eaten'
                 self.num_eaten +=1
                 #events.append("Food Eaten: " + str(cur_time))
-                if self.EXPT_STARTED: self.expt.log_event("Food_Eaten")
+                if self.START_EXPT: self.expt.log_event("Food_Eaten")
                 print("Yum!")
 
 if __name__ == "__main__":
