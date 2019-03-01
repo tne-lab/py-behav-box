@@ -129,9 +129,12 @@ def setGlobals(self):
     self.TOUCH_TRHEAD_STARTED = False
     self.TOUCH_TRAINING = False
     self.TOUCH_BANDIT = False
+    self.TOUCH_INITIATED = False
     self.touchImgCoords = []
     self.touchImgs = {}
     self.touch_time = 0.0
+    #self.TOUCHED_TO_START_TRIAL=False
+    self.START_IMG_PLACED = False
     ################################################################
     # GENERAL GLOBALS
     ################################################################

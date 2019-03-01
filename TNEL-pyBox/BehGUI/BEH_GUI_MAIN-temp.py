@@ -1309,31 +1309,62 @@ class BEH_GUI():
         ###############################
         elif key == "PAUSE":
             try: # WAS A NUMBER
+                #print("1")
                 self.PAUSE_TIME = float(protocolDict["PAUSE"])
             except: # NOT A NUMBER. MUST BE VI_TIMES
                 #print(protocolDict["PAUSE"])
                 #print(habituation_vi_times)
+                #print("2")
                 if "HABITUATION" in protocolDict["PAUSE"]:
                     self.PAUSE_TIME = self.habituation_vi_times[self.VI_index]
-                if "CONDITIONING" in protocolDict["PAUSE"]:
+                elif "CONDITIONING" in protocolDict["PAUSE"]:
                     self.PAUSE_TIME = self.conditioning_vi_times[self.VI_index]
+                    
+                elif "TOUCH_TO_START" in protocolDict["PAUSE"] and not self.START_IMG_PLACED: #
+                    self.PAUSE_TIME = 1000.0
+                    #self.TOUCHED_TO_START_TRIAL = True
+                    
+    #####
+                    start_img = {'BLANK.BMP':(392,100)}
+                    self.TSq.put(start_img)
+                    self.START_IMG_PLACED = True
 
+    #####
+                
             if not self.PAUSE_STARTED:
                 GUIFunctions.log_event(self, self.events,"PAUSEING FOR "+str(self.PAUSE_TIME)+" sec",self.cur_time)
                 self.PAUSE_STARTED = True
                 self.pause_start_time = self.cur_time
+                print("PAUSE STARTED")
 
             else: #PAUSE_STARTED
                 time_elapsed = self.cur_time - self.pause_start_time
                 if time_elapsed >= self.PAUSE_TIME:
-                    self.Protocol_ln_num +=1 #Go to next protocol item
+                    self.Protocol_ln_num +=1 # Go to next protocol item (That is, whatever comes after PAUSE in protocol)
                     self.PAUSE_STARTED = False
+                    print("PAUSE ENDED")
 
+            #print("self.TOUCHSCREEN_USED: ", self.TOUCHSCREEN_USED)        
             if self.TOUCHSCREEN_USED:
                 if not self.TSBack_q.empty():
-                       self.touchMsg = self.TSBack_q.get()
-                       GUIFunctions.log_event(self, self.events, self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" , self.cur_time)
+                   
+                   self.touchMsg = self.TSBack_q.get()
+                   print("self.touchMsg: ", self.touchMsg)
+                   if self.START_IMG_PLACED and "BLANK" in self.touchMsg['picture']:
+                      self.Protocol_ln_num +=1
+                      self.PAUSE_STARTED = False
+                      self.TOUCHED_TO_START_TRIAL = False
+                      self.START_IMG_PLACED = False
+                      print("ready to draw test images")
+                      GUIFunctions.log_event(self, self.events, self.touchMsg['picture'] + " RAT Pressed START, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" , self.cur_time)
+                      self.TSq.put('')
+                   else:
+                      GUIFunctions.log_event(self, self.events, self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" , self.cur_time)
+                        
 
+        ###############################
+        # CONDITIONS
+        ###############################        
         elif key == "CONDITIONS":
             self.runConditions(protocolDict, self.cur_time)
 
