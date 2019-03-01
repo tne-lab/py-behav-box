@@ -41,14 +41,15 @@ def get_before_hash(line):
 
 def load_expt_file(self):
     try:
-        f = open(self.expt_file_path_name,'r')
+        f = open(self.GUI.expt_file_path_name,'r')
         # Read Line by line
         EXPERIMENT = False
         for ln in f:
             str_before_equal, str_after_equal = get_LR_before_hash(ln)
+            line = get_before_hash(ln)
 
             if not EXPERIMENT: # Makes sure that path is correct
-                line = line.upper()
+                str_after_equal = str_after_equal.upper()
 
             self.exptFileLines.append(line)
 
@@ -100,8 +101,8 @@ def load_expt_file(self):
                             print(self.GUI.datapath, " DOES NOT EXIST!!!!")
                             print("Please correct the path in your protocol file!")
                             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-                            GUIFunctions.log_event(self, self.events,self.GUI.datapath + " DOES NOT EXIST!!!!",self.cur_time)
-                            GUIFunctions.log_event(self, self.events,"PLEASE CHECK PATH IN PROTOCOL FILE",self.cur_time)
+                            self.log_event(self.GUI.datapath + " DOES NOT EXIST!!!!")
+                            self.log_event("PLEASE CHECK PATH IN PROTOCOL FILE")
                             return False
                         else: print(self.GUI.datapath)
 
@@ -112,7 +113,7 @@ def load_expt_file(self):
                             print(log_file_path, " DOES NOT EXIST!!!!")
                             print("Please correct the path in your protocol file!")
                             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-                            GUIFunctions.log_event(self, self.events,log_file_path + " DOES NOT EXIST!!!!",self.cur_time)
+                            self.log_event(log_file_path + " DOES NOT EXIST!!!!")
                             return False
                         else: print("Log File Path",log_file_path)
 
@@ -123,7 +124,7 @@ def load_expt_file(self):
                             print(video_file_path, " DOES NOT EXIST!!!!")
                             print("Please correct the path in your protocol file!")
                             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-                            GUIFunctions.log_event(self, self.events,video_file_path + " DOES NOT EXIST!!!!",self.cur_time)
+                            self.log_event(video_file_path + " DOES NOT EXIST!!!!")
                             return False
                         print(video_file_path)
 
@@ -145,7 +146,7 @@ def load_expt_file(self):
                         self.VIs_file_path = str_after_equal
                         print(self.VIs_file_path)
 
-                elif TONE1:#TONE1
+                elif currentlySetting == 'TONE1':#TONE1
                     if 'DURATION' in str_before_equal:
                         self.Tone1_Duration = float(str_after_equal)
                         print("self.Tone1_Duration",self.Tone1_Duration)
@@ -158,7 +159,7 @@ def load_expt_file(self):
                         self.Tone1_Vol = float(str_after_equal)
                         print("self.Tone1_Vol: ",self.GUI.Tone1_Vol)
 
-                elif TONE2:#TONE2
+                elif currentlySetting == 'TONE2':#TONE2
                     if 'DURATION' in str_before_equal:
                         self.Tone2_Duration = str_after_equal
                         print("self.Tone2_Duration",self.GUI.Tone2_Duration)
@@ -171,8 +172,7 @@ def load_expt_file(self):
                         self.Tone2_Vol = float(str_after_equal)
                         print("self.Tone2_Vol: ",self.GUI.Tone2_Vol)
 
-                elif TOUCH:
-                    touch_image_dict={}
+                elif currentlySetting == 'TOUCHSCREEN':
                     if 'IMAGES_PATH' in str_before_equal:
                         self.TOUCH_IMG_PATH = str_after_equal
 
@@ -230,7 +230,7 @@ def load_expt_file(self):
                     elif 'TOUCH_BANDIT' in str_before_equal:
                         self.TOUCH_BANDIT = True
 
-                elif BAR_PRESS:
+                elif currentlySetting == 'BARPRESS':
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
                     if "VI" in str_before_equal: # Needs to line befroe = sign
                         self.VI_REWARDING = True
@@ -270,7 +270,7 @@ def load_expt_file(self):
 ##                        except:
 ##                            print ("!!!!!!!!!!!VR must have the form '(10, 1,30,5)' in EXP PROOCOL file!!!!!!!!!!!!!!")
 
-                elif SHOCK:
+                elif currentlySetting == 'SHOCK':
                     if 'DURATION' in str_before_equal:
                         self.GUI.Shock_Duration = float(str_after_equal)
                         print(self.GUI.Shock_Duration)
@@ -283,7 +283,7 @@ def load_expt_file(self):
                         self.GUI.Shock_Amp = float(str_after_equal)
                         print(self.GUI.Shock_Amp)
 
-                elif FREEZE:
+                elif currentlySetting == 'FREEZE':
                     print("###################################")
                     print("#    FREEZE DETECTION ENABLED     #")
                     print("###################################")
@@ -304,7 +304,7 @@ def load_expt_file(self):
                             print("ROI COORINATES: ",self.ROI)
                             print('freeze detection assumed')
 
-                elif SETUP:
+                elif currentlySetting == 'SETUP':
                     if "SETUP" in str_before_equal: # Skips [header] line
                         print("################")
                         print("#    SETUP     #")
@@ -320,7 +320,7 @@ def load_expt_file(self):
 
 
 
-                elif PROTOCOL:
+                elif currentlySetting == 'PROTOCOL':
                     #print("self.protocol: ",line)
                     if "PROTOCOL"  in str_before_equal: # Skips [header] line
                         print("###################")
@@ -337,7 +337,7 @@ def load_expt_file(self):
                             #if line == 'END': self.protocol = False
 
 
-                elif CONDITIONS:
+                elif currentlySetting == 'CONDTIONS':
                     #print("self.conditions: ",line)
                     if "[CONDITIONS]" in str_before_equal: # Condition header line
                         KEY_LINE = True
@@ -368,7 +368,6 @@ def load_expt_file(self):
 
         f.close()
         print(".......\n")
-        print(self.touch_img_files)
     except OSError:
         print("NO SUCH FILE!!!!",self.expt_file_path_name)
         return False
@@ -467,7 +466,7 @@ def create_files(self):
     self.log_file = open(self.log_file_path_name,'w')        # OPEN LOG FILE
 
     ##### MAIN VIDEO #######
-    if self.VID_ENABLED = True:
+    if self.VID_ENABLED == True:
         video_file_name = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
         self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
         print(self.video_file_path_name)

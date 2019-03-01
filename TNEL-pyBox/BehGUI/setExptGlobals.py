@@ -1,3 +1,6 @@
+import time
+from queue import Queue
+import threading
 def setExptGlobals(self):
     ################################################################
     # DATA FILES
@@ -18,10 +21,7 @@ def setExptGlobals(self):
     ################################################################
     # GENERAL GLOBALS
     ################################################################
-    self.Expt_Name = ''
-    self.Subject = ''
-    self.prev_Subject = ''
-    self.NAME_OR_SUBJ_CHANGED = False
+
     self.trial_num = 0
     self.EXPT_FILE_LOADED = False
 
@@ -46,10 +46,6 @@ def setExptGlobals(self):
     self.check_wrong = False
     self.check_no_action = False
     self.cur_probability = 0.0  # Used for PELLET_VAR
-
-    self.L_LEVER_EXTENDED = False
-    self.R_LEVER_EXTENDED = False
-    self.LEVERS_EXTENDED = False
 
     self.num_L_nose_pokes = 0
     self.num_R_nose_pokes = 0
@@ -113,7 +109,7 @@ def setExptGlobals(self):
     ################################################################
     # What are we using for this EXPT? (Gets set in load_expt_file())
     ################################################################
-    self.EPHYS_ENABLED = True
+    self.EPHYS_ENABLED = False
     self.VID_ENABLED = False
     self.TOUCHSCREEN_USED = False
     self.BAR_PRESS_INDEPENDENT_PROTOCOL = False
@@ -123,8 +119,8 @@ def setExptGlobals(self):
     # AUX CAMERA (Only starts if second camera is exists)
     ################################################################
     self.SIMPLEVIDq = Queue()
-    simpleVidThread = threading.Thread(target=video_function.runSimpleVid, args=(self.SIMPLEVIDq,))
-    simpleVidThread.start()
+    #simpleVidThread = threading.Thread(target=video_function.runSimpleVid, args=(self.SIMPLEVIDq,))
+    #simpleVidThread.start()
 
     ################################################################
     # More to parse and make sure work

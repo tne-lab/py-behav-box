@@ -3,13 +3,22 @@ import zmqClasses
 from queue import Queue
 import eventRECV
 
+def checkForTouch(self):
+    if self.EXPT_LOADED:
+        if self.expt.TOUCHSCREEN_USED:
+            return True
+        else:
+            return False
+    else:
+        return False
+
 def NIDAQ_GUI_ELEMENT(self, myscreen):
     #global boxes,circles,LEDs,labels,toggles,info_boxes,sliders
 
     # BOXES
     boxes = []
 
-    if self.TOUCHSCREEN_USED:
+    if checkForTouch(self):
         boxes.append(My_Rimmed_Box(myscreen,395,380,80,62,self.black,self.darkgray)) # FEEDER
         boxes.append(My_Rimmed_Box(myscreen,40,320,256,192,0,self.black)) # future touch screen
         boxes.append(My_Rimmed_Box(myscreen,40,450,256,63,self.lightgray,self.black)) # future touch screen Dead zon
@@ -20,7 +29,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     buttons.append(MyButton(myscreen,0,10,5,50,20,"CABIN LT",12))  # 0
     buttons.append(MyButton(myscreen,5,10,32,50,20,"FAN",12))         # 5
 
-    if self.TOUCHSCREEN_USED:
+    if checkForTouch(self):
         buttons.append(MyButton(myscreen,4,315,390,50,20,"FEED",12))     # 4
         buttons.append(MyButton(myscreen,6,235, 270, 30,20,"REC",12))    # 6
         buttons.append(MyButton(myscreen,7,400, 560, 75,50,"START EXPT",12))  # 7
@@ -42,7 +51,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     # LEVERS
     #def __init__(self, surface, index, x, y, w, h, text,fsize = 18):
     levers = []
-    if not self.TOUCHSCREEN_USED:
+    if not checkForTouch(self):
         levers.append(MyLever(myscreen,0,50,300,50,20,"L LEVER",12))   # left
         levers.append(MyLever(myscreen,1,405,300,50,20,"R LEVER",12))   # right
 
@@ -57,7 +66,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     LEDs.append(MyLED(myscreen,2,45,130,30,"OFF", self.lightpurple, self.darkpurple)) # NOSE POKES
     LEDs.append(MyLED(myscreen,3,400,130,30,"OFF", self.lightpurple, self.darkpurple))# NOSE POKES
 
-    if self.TOUCHSCREEN_USED:
+    if checkForTouch(self):
         LEDs.append(MyLED(myscreen,4,385,400,10,"OFF", self.white, self.lightgray)) # FEEDER BOX
         LEDs.append(MyLED(myscreen,5,465,400,10,"OFF", self.white, self.lightgray)) # FEEDER BOX
 
@@ -78,7 +87,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     info_boxes.append(InfoBox( myscreen,50,200,50,15,"L NOSE POKES",'BOTTOM','0'))
     info_boxes.append(InfoBox( myscreen,405,200,50,15,"R NOSE POKES",'BOTTOM','0'))
 
-    if not self.TOUCHSCREEN_USED:
+    if not checkForTouch(self):
         info_boxes.append(InfoBox( myscreen,50,330,50,15,"L PRESSES",'BOTTOM','0'))
         info_boxes.append(InfoBox( myscreen,405,330,50,15,"R PRESSES",'BOTTOM','0'))
         info_boxes.append(InfoBox( myscreen,225,400,50,15,"EATEN",'BOTTOM','0'))
@@ -186,7 +195,10 @@ def setupGUI(self):
         elif user_input.label == "SUBJECT":
              user_input.text = str(self.Subject)
         elif user_input.label == "TRIAL":
-             user_input.text  = str(self.trial_num)
+             if self.START_EXPT:
+                 info.text = 0
+             else:
+              user_input.text  = str(self.expt.trial_num)
         elif user_input.label == "EXPT PATH":
              user_input.text = str(self.datapath)
         elif user_input.label == "EXPT FILE NAME":
@@ -231,7 +243,5 @@ def setupGUI(self):
     self.CAMERA_ON = False
     self.RECORDING = False
     self.FREEZE_DETECTION_ENABLED = False
-
-    self.START_EXPT = False
 
     self.Expt_Count = 0

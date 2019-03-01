@@ -1,4 +1,7 @@
-import cv2
+#import cv2
+import os
+import pygame
+import time
 def setGUIGlobals(self):
     self.computer = os.environ['COMPUTERNAME']
 
@@ -56,7 +59,7 @@ def setGUIGlobals(self):
     self.resourcepath = os.path.join(cwd, 'RESOURCES')
 
     #self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN2' #Flav's Machine
-    self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN_1_OF_2_PICS.txt' #Jean's Machine
+    self.expt_file_name = 'PROTOCOL_BAR_PRESS_TRAIN-Ephys.txt'#Jean's Machine
     self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
 
     self.exptFileLines = []
@@ -66,6 +69,16 @@ def setGUIGlobals(self):
     self.dateTm = time.strftime("%b_%d_%y-%H_%M")#month_day_Year-H:M
     self.exptTime = time.strftime("%H-%M")
     self.events = []
+
+    ################################################################
+    # EXPT DEFAULTS
+    ################################################################
+    self.EXPT_LOADED = False
+    self.Expt_Name = ''
+    self.Subject = ''
+    self.prev_Subject = ''
+    self.NAME_OR_SUBJ_CHANGED = False
+    self.START_EXPT = False
 
     ################################################################
     # TONE AND SHOCK DEFAULTS
@@ -82,8 +95,16 @@ def setGUIGlobals(self):
     self.Shock_V = 9.0
     self.Shock_Amp = 0.5
 
+    ################################################################
+    # LEVERS
+    ################################################################
+    self.L_LEVER_EXTENDED = False
+    self.R_LEVER_EXTENDED = False
+    self.LEVERS_EXTENDED = False
+
     ## Get number of cameras
-    self.num_cameras = count_cameras()
+    self.num_cameras = 0#count_cameras()
+    '''
 def count_cameras():
     max_tested = 2
     for i in range(max_tested):
@@ -92,3 +113,4 @@ def count_cameras():
             temp_camera.release()
             continue
         return i + 1
+'''
