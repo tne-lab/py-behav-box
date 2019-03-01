@@ -204,7 +204,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             if "missedClick" == event:
                 if int(y) <= self.background_ht:
                     sendDict = {'picture' : 'missed', 'XY' : (x,y)}
-                    #print(sendDict)
+                    print(sendDict)
                     self.back_q.put(sendDict)
                 #self.whisker.audio_play_wav(AUDIO, DEFAULT_WAV)
             # Or a picture
@@ -212,7 +212,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
                 for picName in self.pics:
                     if picName == event:
                         sendDict = {'picture' : picName, 'XY' : (x,y)}
-                        #print(sendDict)
+                        print(sendDict)
                         self.back_q.put(sendDict)
                         self.RECVCMD()
         except ValueError:

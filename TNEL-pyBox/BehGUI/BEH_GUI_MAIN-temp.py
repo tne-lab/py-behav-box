@@ -1208,7 +1208,7 @@ class BEH_GUI():
                             idx = log_string.find[:idx+2](")")
                             print("IDX: ", idx, "logstring: ", log_string)
                         except:
-                            print("\n\n IDX: ",idx,"  FAILED creating log string\n\n")
+                            #print("\n\n IDX: ",idx,"  FAILED creating log string\n\n")
                             break
                     print('log_string', log_string)
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)

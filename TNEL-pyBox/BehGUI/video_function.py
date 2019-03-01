@@ -207,10 +207,12 @@ class Vid:
                 if self.RECORD:
                     self.out.write(frame)
             if msg['STATE'] == 'REC_STOP': # NOTE: STATE = (ON,OFF,  REC_VID,REC_STOP, START_EXPT,STOP_EXPT)
-                self.out.release() # CLOSE VIDEO FILE
-                #self.out.close()
-                self.freezeFile.close()
-                self.RECORD = False
+                try:
+                    self.out.release() # CLOSE VIDEO FILE
+                    #self.out.close()
+                    self.freezeFile.close()
+                    self.RECORD = False
+                except: pass
 
             # Show the frames
             cv2.imshow(self.winName,frame)
