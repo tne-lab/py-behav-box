@@ -79,6 +79,7 @@ def setGUIGlobals(self):
     self.prev_Subject = ''
     self.NAME_OR_SUBJ_CHANGED = False
     self.START_EXPT = False
+    self.RESTART_EXPT = False
 
     ################################################################
     # TONE AND SHOCK DEFAULTS

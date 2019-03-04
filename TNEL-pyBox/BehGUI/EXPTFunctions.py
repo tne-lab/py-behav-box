@@ -42,7 +42,7 @@ def checkQs(self):
             if backDict['FROZEN']: # FROZEN
                   # NOTE: this must be "debounced"
                   if not self.FROZEN_ALREADY_LOGGED:
-                      GUIFunctions.log_event(self, self.events,"Frozen",self.cur_time,("Orig_NIDAQ_t",backDict['NIDAQ_time'],"video_time",backDict['vid_time'],"time_diff",backDict['Vid-NIDAQ']))
+                      self.log_event("Frozen",("Orig_NIDAQ_t",backDict['NIDAQ_time'],"video_time",backDict['vid_time'],"time_diff",backDict['Vid-NIDAQ']))
                       self.FROZEN_ALREADY_LOGGED = True
                       self.UNFROZEN_ALREADY_LOGGED = False
 
@@ -50,7 +50,7 @@ def checkQs(self):
                 if self.PREVIOUSLY_FROZEN:
                    # NOTE: this must be "debounced"
                    if not self.UNFROZEN_ALREADY_LOGGED:
-                        GUIFunctions.log_event(self, self.events,"Unfrozen",self.cur_time)
+                        self.log_event("Unfrozen")
                         self.FROZEN_ALREADY_LOGGED = False
                         self.UNFROZEN_ALREADY_LOGGED = True
             if self.ROIstr == "":
@@ -58,7 +58,7 @@ def checkQs(self):
                     self.ROIstr = backDict['ROI']
                     newROIstr = self.ROIstr.replace(",",";")
                     print(newROIstr)
-                    GUIFunctions.log_event(self, self.events,"ROI:",self.cur_time,(newROIstr + ",( x; y; width; height)"))
+                    self.log_event("ROI:",(newROIstr + ",( x; y; width; height)"))
                 except:
                     pass
 
@@ -107,11 +107,11 @@ def MyVideo(self):
 ####################################################################################
 #   LOG EVENTS
 ####################################################################################
-def log_event(self,event, other=''):
+def log_event(self,event, event_other=''):
     cur_time = time.perf_counter()
     event_string = str(round(cur_time,9)) + ',  ' + event
-
-    event_other =  ",  "+ str(other)
+    if len(event_other) > 0:
+        event_other =  ",  "+ str(event_other)
     self.GUI.events.append(event_string+event_other) # To Display on GUI
     if len(self.GUI.events) > 14:  self.start_line = len(self.GUI.events) - 14
     try:

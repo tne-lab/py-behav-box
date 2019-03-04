@@ -114,6 +114,7 @@ def setExptGlobals(self):
     self.TOUCHSCREEN_USED = False
     self.BAR_PRESS_INDEPENDENT_PROTOCOL = False
     self.BAR_PRESS_TRAINING = False
+    self.TOUCH_TRHEAD_STARTED = False
 
     ################################################################
     # AUX CAMERA (Only starts if second camera is exists)

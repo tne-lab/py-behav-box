@@ -447,6 +447,10 @@ def load_expt_file(self):
 def create_files(self):
     # DATA PATH + FILES
     print("\nCREATING LOG FILES:")
+    # Update times
+    self.date = time.strftime("%b_%d_%y")#month-day-Year-H:M
+    self.dateTm = time.strftime("%b_%d_%y-%H_%M")#month_day_Year-H:M
+    self.exptTime = time.strftime("%H-%M")
     ###### EXPT COPY FILE #####
     new_dir = os.path.join(self.GUI.datapath,self.GUI.Expt_Name)
     if not os.path.exists(new_dir ):  os.mkdir(new_dir)

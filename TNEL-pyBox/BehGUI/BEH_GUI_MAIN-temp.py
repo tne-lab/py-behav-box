@@ -64,6 +64,9 @@ class BEH_GUI():
 
             if self.START_EXPT:
                 self.expt.run()
+            if self.RESTART_EXPT:
+                self.expt = experiment.Experiment(self)
+                self.RESTART_EXPT = False
 
             ######################################
             #   UPDATE SCREEN
@@ -213,7 +216,7 @@ class BEH_GUI():
                  user_input.text = str(self.Subject)
             elif user_input.label == "TRIAL":
                 if self.START_EXPT:
-                    info.text = 0
+                    user_input.text = "0"
                 else:
                  user_input.text  = str(self.expt.trial_num)
             elif user_input.label == "EXPT PATH":
@@ -652,6 +655,7 @@ class BEH_GUI():
                                      self.expt_file_name = user_input.text
                                      self.expt_file_path_name = os.path.join(self.datapath,self.expt_file_name )
                                      print ("File selected: in BehGUI main2",self.expt_file_name,self.expt_file_path_name)
+                                 self.expt = experiment.Experiment(self) # RESTART EXPT if protocol changed
                             elif user_input.label == "Spk(S)":
                                 try:    self.Tone1_Duration = float(user_input.text)
                                 except: self.Tone1_Duration = ''

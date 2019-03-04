@@ -30,19 +30,8 @@ class Experiment:
         else:
             print("COULD NOT LOAD EXPT FILE")
             self.log_event("COULD NOT LOAD EXPT FILE")
-
-        self.log_event("START_TIME" + str(time.perf_counter()))
         if self.TOUCHSCREEN_USED:
             self.StartTouchScreen()
-        if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
-            # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
-            if self.VI_REWARDING:
-                self.VI_start = 0.0 #self.cur_time
-                self.VI = random.randint(0,int(self.var_interval_reward*2))
-                self.log_event("New VI: " + str(self.VI))
-            if self.BAR_PRESS_TRAINING:
-                pass
-
 
         # Open ephys stuff
         if self.EPHYS_ENABLED:
@@ -179,12 +168,22 @@ class Experiment:
         self.TPM_start_time = self.cur_time #Screen TOUCHES per Min start time
         self.START_EXPT = True
         self.vidSTATE = 'START_EXPT'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-        print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
+        #print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
+        self.log_event("START_TIME")
         for LED in self.GUI.LEDs: # Look for EXPT STARTED LED
               if LED.index == 6: # Expt Started light
                   LED.ONOFF = "ON"
 
         if self.setup_ln_num >= len(self.setup):
+            # Start bar_press if using
+            if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
+                # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
+                if self.VI_REWARDING:
+                    self.VI_start = 0.0 #self.cur_time
+                    self.VI = random.randint(0,int(self.var_interval_reward*2))
+                    self.log_event("New VI: " + str(self.VI))
+                if self.BAR_PRESS_TRAINING:
+                    pass
             self.setup_ln_num = 0
             self.RUN_SETUP = False
 ###########################################################################################################
@@ -228,9 +227,9 @@ class Experiment:
         elif key == "FOOD_LIGHT":
             val = str2bool(protocolDict[key])
             self.Protocol_ln_num +=1
-            self.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self.GUI,val)
-            self.LEDs[4].ONOFF = LEDsONOFF
-            self.LEDs[5].ONOFF = LEDsONOFF
+            self.GUI.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self.GUI,val)
+            self.GUI.LEDs[4].ONOFF = LEDsONOFF
+            self.GUI.LEDs[5].ONOFF = LEDsONOFF
 
         elif key  == 'SHOCK':
             self.log_event("Shock_ON",("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
@@ -241,10 +240,10 @@ class Experiment:
             self.Protocol_ln_num +=1
             if val:
                 GUIFunctions.L_CONDITIONING_LIGHT(self.GUI,True)
-                self.LEDs[0].ONOFF = "ON"
+                self.GUI.LEDs[0].ONOFF = "ON"
             else:
                 GUIFunctions.L_CONDITIONING_LIGHT(self.GUI,False)
-                self.LEDs[0].ONOFF = "OFF"
+                self.GUI.LEDs[0].ONOFF = "OFF"
 
         elif key == "R_CONDITIONING_LIGHT":
             val = str2bool(protocolDict[key])
@@ -252,10 +251,10 @@ class Experiment:
 
             if val:
                 GUIFunctions.R_CONDITIONING_LIGHT(self.GUI,True)
-                self.LEDs[1].ONOFF = "ON"
+                self.GUI.LEDs[1].ONOFF = "ON"
             else:
                 GUIFunctions.R_CONDITIONING_LIGHT(self.GUI,False)
-                self.LEDs[1].ONOFF = "OFF"
+                self.GUI.LEDs[1].ONOFF = "OFF"
 
         elif key == "CAMERA":
             #print("CAMERA")
@@ -301,16 +300,16 @@ class Experiment:
                 if val: # EXTEND_LEVERS == True
                    #print ("EXTEND LEVERS")
                    GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,True)
-                   for lever in self.levers:
+                   for lever in self.GUI.levers:
                          lever.STATE = "OUT"
-                   for button in self.buttons:
+                   for button in self.GUI.buttons:
                         if button.text == "EXTEND": button.text = "RETRACT"
                 else: # RETRACT LEVERS (EXTEND_LEVERS == False)
                    #print ("RETRACT LEVERS")
                    GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
-                   for lever in self.levers:
+                   for lever in self.GUI.levers:
                         lever.STATE = "IN"
-                   for button in self.buttons:
+                   for button in self.GUI.buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
         ##############################
         #  TOUCHSCREEN  in RUNEXPT (DRAWS IMAGES)
@@ -599,7 +598,7 @@ class Experiment:
            print("\nPROTOCOL ENDED NORMALLY")
            self.log_event("Camera_OFF")
            self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-           self.end_expt()
+           self.endExpt()
 ###########################################################################################################
 #   RUN CONDITIONS
 ###########################################################################################################
@@ -654,18 +653,18 @@ class Experiment:
             try: # if conditionaing lights are used
                 if self.cond['L_CONDITION_LT']: # Left_Conditioning lit 1/0
                     GUIFunctions.L_CONDITIONING_LIGHT(self.GUI,True)
-                    self.LEDs[0].ONOFF = "ON"
+                    self.GUI.LEDs[0].ONOFF = "ON"
                 else:
                     GUIFunctions.L_CONDITIONING_LIGHT(self.GUI,False)
-                    self.LEDs[0].ONOFF = "OFF"
+                    self.GUI.LEDs[0].ONOFF = "OFF"
 
 
                 if self.cond['R_CONDITION_LT']: # Left_Conditioning lit 1/0
                     GUIFunctions.R_CONDITIONING_LIGHT(self.GUI,True)
-                    self.LEDs[1].ONOFF = "ON"
+                    self.GUI.LEDs[1].ONOFF = "ON"
                 else:
                     GUIFunctions.R_CONDITIONING_LIGHT(self.GUI,False)
-                    self.LEDs[1].ONOFF = "OFF"
+                    self.GUI.LEDs[1].ONOFF = "OFF"
             except: # Conditionaing lights not used, Use Touch screen instead
                 pass
 
@@ -695,8 +694,8 @@ class Experiment:
                    self.HAS_ALREADY_RESPONDED = True
                    GUIFunctions.L_CONDITIONING_LIGHT(self.GUI,False)
                    GUIFunctions.R_CONDITIONING_LIGHT(self.GUI,False)
-                   self.LEDs[0].ONOFF = "OFF"
-                   self.LEDs[1].ONOFF = "OFF"
+                   self.GUI.LEDs[0].ONOFF = "OFF"
+                   self.GUI.LEDs[1].ONOFF = "OFF"
 
            if self.LEVER_PRESSED_R: # RIGHT LEVER
                self.log_event("Right_Lever_Pressed")
@@ -711,8 +710,8 @@ class Experiment:
                        self.WRONG = True
                        self.log_event("WRONG Response")
                    self.HAS_ALREADY_RESPONDED = True
-                   self.LEDs[0].ONOFF = "OFF"
-                   self.LEDs[1].ONOFF = "OFF"
+                   self.GUI.LEDs[0].ONOFF = "OFF"
+                   self.GUI.LEDs[1].ONOFF = "OFF"
                    GUIFunctions.L_CONDITIONING_LIGHT(self.GUI,False)
                    GUIFunctions.R_CONDITIONING_LIGHT(self.GUI,False)
 
@@ -986,3 +985,9 @@ class Experiment:
 
         self.GUI.START_EXPT = False
         self.GUI.EXPT_LOADED = True
+        self.GUI.LEDs[6].ONOFF = False
+        for button in self.GUI.buttons:
+            if button.text == 'STOP EXPT':
+                button.text = 'START EXPT'
+        self.GUI.events = []
+        self.GUI.RESTART_EXPT = True
