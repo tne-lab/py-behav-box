@@ -170,7 +170,7 @@ class Vid:
                         self.text = 'freeze'
 
                 cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),2,cv2.LINE_AA)
-                cv2.moveWindow('thresh',1400,30)# window, x, y. x = 1024 (touchscree w) + gui width =  
+                cv2.moveWindow('thresh',1400,30)# window, x, y. x = 1024 (touchscree w) + gui width =
                 cv2.imshow('thresh',self.prevThresh)
 
             # Write stuff on screen (need to add trial number and probably not time differential)
@@ -186,7 +186,7 @@ class Vid:
                 try: # In case we get an unwanted REC_STOP before vid file is created
                     self.out.release() # CLOSE VIDEO FILE
                     self.freezeFile.close()
-                else: pass
+                except: pass
 
 
             # Show the frames

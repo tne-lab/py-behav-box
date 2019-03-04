@@ -22,7 +22,7 @@ def checkStatus(self):
         self.GUI.FOOD_EATEN = False
 
     self.GUI.LEVER_PRESSED_L = False
-    self.GUI. LEVER_PRESSED_R = False
+    self.GUI.LEVER_PRESSED_R = False
     self.GUI.NOSE_POKED_L = False
     self.GUI.NOSE_POKED_R = False
 ###########################################################################################################
