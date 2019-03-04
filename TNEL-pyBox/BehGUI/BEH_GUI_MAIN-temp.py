@@ -143,32 +143,32 @@ class BEH_GUI():
 
         for info in self.info_boxes: # Last so on top
             if info.label == "L NOSE POKES":
-                if self.START_EXPT:
+                if not self.START_EXPT:
                     info.text = "0"
                 else:
                   info.text = [str(self.expt.num_L_nose_pokes)]
             elif info.label == "R NOSE POKES":
-                if self.START_EXPT:
+                if not self.START_EXPT:
                     info.text = "0"
                 else:
                   info.text = [str(self.expt.num_R_nose_pokes)]
             elif info.label == "L PRESSES":
-                if self.START_EXPT:
+                if not self.START_EXPT:
                     info.text = "0"
                 else:
                   info.text = [str(self.expt.num_L_lever_preses)]
             elif info.label == "R PRESSES":
-                if self.START_EXPT:
+                if not self.START_EXPT:
                     info.text = "0"
                 else:
                   info.text = [str(self.expt.num_R_lever_preses) ]
             elif info.label == "PELLETS":
-                if self.START_EXPT:
+                if not self.START_EXPT:
                     info.text = "0"
                 else:
                   info.text = [str(self.expt.num_pellets)]
             elif info.label == "EATEN":
-                if self.START_EXPT:
+                if not self.START_EXPT:
                     info.text = "0"
                 else:
                   info.text = [str(self.expt.num_eaten)]
@@ -215,7 +215,7 @@ class BEH_GUI():
             elif user_input.label == "SUBJECT":
                  user_input.text = str(self.Subject)
             elif user_input.label == "TRIAL":
-                if self.START_EXPT:
+                if not self.START_EXPT:
                     user_input.text = "0"
                 else:
                  user_input.text  = str(self.expt.trial_num)
@@ -295,7 +295,7 @@ class BEH_GUI():
          SYSTEM EVENTS
         '''
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == pygame.QUIT:
                 GUIFunctions.exit_game(self)
 
             ##############################################################
@@ -496,6 +496,11 @@ class BEH_GUI():
                                             for user_input in self.user_inputs:
                                                 if user_input.label == "EXPT":
                                                    user_input.text = str(self.Expt_Name)+str(self.Expt_Count)
+                                                   for user_input in self.user_inputs:
+                                                       if user_input.label == "EXPT":
+                                                            user_input.border_color = (0,0,0)
+                                                       elif user_input.label == "SUBJECT":
+                                                            user_input.border_color = (0,0,0)
 
                                             button.text = "STOP EXPT"
                                             self.START_EXPT = True

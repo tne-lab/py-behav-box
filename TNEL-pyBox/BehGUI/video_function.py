@@ -105,13 +105,15 @@ class Vid:
             vid_cur_time = time.perf_counter()
             #Get frame
             ret, frame = self.cap.read()
-            frame = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
+            if self.FLIP:
+                frame = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
 
             # Run video
             try:
                 msg = self.q.pop()
                 time_from_GUI = msg['cur_time']
                 STATE = msg['STATE'] # NOTE: NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                FLIP = msg['FLIP']
                 if STATE == 'START_EXPT':
                     self.exptStarted = True
                 if STATE == 'REC_STOP':
@@ -168,6 +170,7 @@ class Vid:
                         self.text = 'freeze'
 
                 cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),2,cv2.LINE_AA)
+                cv2.moveWindow('thresh',1400,30)# window, x, y. x = 1024 (touchscree w) + gui width =  
                 cv2.imshow('thresh',self.prevThresh)
 
             # Write stuff on screen (need to add trial number and probably not time differential)
@@ -180,8 +183,10 @@ class Vid:
                 recframe = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
                 self.out.write(recframe)
             if msg['STATE'] == 'REC_STOP': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                self.out.release() # CLOSE VIDEO FILE
-                self.freezeFile.close()
+                try: # In case we get an unwanted REC_STOP before vid file is created
+                    self.out.release() # CLOSE VIDEO FILE
+                    self.freezeFile.close()
+                else: pass
 
 
             # Show the frames

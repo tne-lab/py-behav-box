@@ -175,17 +175,27 @@ class Experiment:
                   LED.ONOFF = "ON"
 
         if self.setup_ln_num >= len(self.setup):
+            setup_done = False
             # Start bar_press if using
-            if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
-                # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
-                if self.VI_REWARDING:
-                    self.VI_start = 0.0 #self.cur_time
-                    self.VI = random.randint(0,int(self.var_interval_reward*2))
-                    self.log_event("New VI: " + str(self.VI))
-                if self.BAR_PRESS_TRAINING:
-                    pass
-            self.setup_ln_num = 0
-            self.RUN_SETUP = False
+            if self.GUI.CAMERA_ON and self.ROI == 'GENERATE':
+                if self.ROI_RECEIVED:
+                    setup_done = True
+                    print('ROI recv', self.ROIstr)
+                    self.ROI_RECEIVED = False
+            else:
+                setup_done = True
+
+            if setup_done:
+                if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
+                    # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
+                    if self.VI_REWARDING:
+                        self.VI_start = 0.0 #self.cur_time
+                        self.VI = random.randint(0,int(self.var_interval_reward*2))
+                        self.log_event("New VI: " + str(self.VI))
+                    if self.BAR_PRESS_TRAINING:
+                        pass
+                self.setup_ln_num = 0
+                self.RUN_SETUP = False
 ###########################################################################################################
 #  RUN EXPERIMENT
 ###########################################################################################################
@@ -365,6 +375,18 @@ class Experiment:
                     log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
                     log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                    idx = log_string.find(")")
+                    #print("IDX: ", idx, "logstring: ", log_string)
+                    while idx != -1: # returns -1 if string not found
+                        try:
+                            if log_string[idx+1] == ";": # Could be out of range if ")" is last char
+                                log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
+                            idx = log_string.find[:idx+2](")")
+                            print("IDX: ", idx, "logstring: ", log_string)
+                        except:
+                            print("\n\n FAILED creating log string\n\n")
+                            break
+
                     print('log_string', log_string)
                     self.log_event( log_string)
         ###############################
@@ -458,31 +480,42 @@ class Experiment:
         # PAUSE
         ###############################
         elif key == "PAUSE":
-            try: # WAS A NUMBER
-                self.PAUSE_TIME = float(protocolDict["PAUSE"])
-            except: # NOT A NUMBER. MUST BE VI_TIMES
-                #print(protocolDict["PAUSE"])
-                #print(habituation_vi_times)
-                if "HABITUATION" in protocolDict["PAUSE"]:
-                    self.PAUSE_TIME = self.habituation_vi_times[self.VI_index]
-                if "CONDITIONING" in protocolDict["PAUSE"]:
-                    self.PAUSE_TIME = self.conditioning_vi_times[self.VI_index]
-
             if not self.PAUSE_STARTED:
+                try: # WAS A NUMBER
+                    self.PAUSE_TIME = float(protocolDict["PAUSE"])
+                except: # NOT A NUMBER. MUST BE VI_TIMES
+                    if "HABITUATION" in protocolDict["PAUSE"]:
+                        self.PAUSE_TIME = self.habituation_vi_times[self.VI_index]
+                    elif "CONDITIONING" in protocolDict["PAUSE"]:
+                        self.PAUSE_TIME = self.conditioning_vi_times[self.VI_index]
+                    elif "TOUCH_TO_START" in protocolDict["PAUSE"] and not self.START_IMG_PLACED:
+                        self.PAUSE_TIME = 1000.0
+                        start_img = {'BLANK.BMP':(392,100)}
+                        self.TSq.put(start_img)
+                        self.START_IMG_PLACED = True
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
-                self.pause_start_time = self.cur_time
+                self.pause_start_time = time.perf_counter()
 
             else: #PAUSE_STARTED
-                time_elapsed = self.cur_time - self.pause_start_time
+                time_elapsed = time.perf_counter() - self.pause_start_time
                 if time_elapsed >= self.PAUSE_TIME:
+                    print("cur ", self.cur_time, "\n puase start: ",self.pause_start_time)
                     self.Protocol_ln_num +=1 #Go to next protocol item
                     self.PAUSE_STARTED = False
 
-            if self.TOUCHSCREEN_USED:
-                if not self.TSBack_q.empty():
-                       self.touchMsg = self.TSBack_q.get()
-                       self.log_event( self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
+                if self.TOUCHSCREEN_USED:
+                    if not self.TSBack_q.empty():
+                        self.touchMsg = self.TSBack_q.get()
+                        if self.START_IMG_PLACED and "BLANK" in self.touchMsg['picture']:
+                            self.Protocol_ln_num +=1
+                            self.PAUSE_STARTED = False
+                            self.TOUCHED_TO_START_TRIAL = False
+                            self.START_IMG_PLACED = False
+                            GUIFunctions.log_event(self.touchMsg['picture'] + " RAT Pressed START, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
+                            self.TSq.put('')
+                        else:
+                            self.log_event(self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
 
         elif key == "CONDITIONS":
             self.runConditions(protocolDict)
@@ -500,9 +533,9 @@ class Experiment:
 
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 self.num_bar_presses +=1
-
+                self.VI_start = self.cur_time
                 # Calculate Bar Presses Per Minute
-                BPPM_time_interval = self.cur_time - self.VI_start
+                BPPM_time_interval = self.cur_time - self.VI_calc_start
                 if BPPM_time_interval >= 60.0:  #Calculate BPPM every minute (60 sec)
                     self.BPPM =  self.num_bar_presses#   0.0
                     self.log_event( "Bar Presses Per Min:,"+ str(self.BPPM ) )
@@ -510,13 +543,13 @@ class Experiment:
                     self.BPPMs.append(self.BPPM) # Add a BPPM calcualtion to list every minute
                     # Reset for next minute  TPM_start_time
                     self.num_bar_presses = 0
-                    self.VI_start = self.cur_time
+                    self.VI_calc_start = self.cur_time
 
                     # Calculate MEAN Bar Presses Per Minute over 10 min
                     #if len(self.BPPMs)> 10:#10: # after every 10 minutes (That is, 10 one minute evaluations convolved every minute)
-                    if len(self.BPPMs)== 10:#10: # after first 10 minutes only!!
+                    if len(self.BPPMs)== 2:#10: # after first 10 minutes only!!
                         print("BPPMs: ",self.BPPMs)
-                        self.meanBPPM10 = sum(self.BPPMs[-10:])/10.0#10.0       # Mean Bar PRESSES per minute over last 10 minutes
+                        self.meanBPPM10 = sum(self.BPPMs[-10:])/2.0#10.0       # Mean Bar PRESSES per minute over last 10 minutes
                         self.log_event( "MEAN Bar Presses Per Min:,"+ str(self.BPPM )+",Over 1st 10 min" )
                         print ("MEAN BPPM over ist 10 min: ",self.meanBPPM10)
                         #self.BPPMs.pop(0)                                  # Removes first item of list for running list
@@ -528,14 +561,18 @@ class Experiment:
                                 self.var_interval_reward += 15 # Increases VI by 15
                                 if self.var_interval_reward >=  self.VI_final:
                                     self.var_interval_reward =  self.VI_final # Limit VI to final value (b above)
-                                self.log_event( "new VI: "+ str(self.VI) + " (sec)" )
+                                self.log_event( "NEW VI between: 0 and "+ str(2*self.var_interval_reward) + " (sec)" )
                                 print ("NEW VI: ",str(self.var_interval_reward))
 
                 # Check if amount of VI has passed
                 if self.cur_time > (self.VI_start + self.VI):
-                   self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
-                   self.log_event( "Cur Rand VI(Between 0 and " + str(self.var_interval_reward)+": "+ str(self.VI) + " (sec)" )
                    GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
+                   if self.var_interval_reward <= 1:
+                       self.VI = 0
+                   else:
+                       self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
+                   self.log_event( "Cur VI:" + str(self.VI) + " (sec)" )
+                   self.VI_START = self.cur_time
 
 
 
@@ -736,8 +773,7 @@ class Experiment:
                        self.log_event(" missed ," + "(" + str(x) + ";" + str(y)  + ")")
                        self.background_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                        self.background_touches += 1
-                       if self.TOUCH_TRAINING:
-                          self.WRONG = True # When TOUCHSCREEN TRAING, ANY TOUCH RESULTS IN TRUE (??????????)
+                       self.WRONG = True # When TOUCHSCREEN TRAING, ANY TOUCH RESULTS IN TRUE (??????????)
 
                    ###################
                    #  IMAGE TOUCHED
@@ -893,7 +929,7 @@ class Experiment:
                        if "_TOUCHVI1" == left_of_outcome_str: # PELLET_TOUCHVI1: Touched image (CORRECT RESPONSE)
                            if self.cur_time > (self.VI_start + self.cur_VI_images): # Give reward and reset VIs
                               # Give Rewards
-                              GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet," + str(self.cur_VI_images)+ ",VI")
+                              GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
                               # Reset VIs
                               self.VI_start = self.cur_time
                               self.cur_VI_images = random.randint(0,int(self.VI_images * 2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
@@ -903,7 +939,7 @@ class Experiment:
                        elif "_TOUCHVI2" in left_of_outcome_str: # or PELLET_TOUCHVI2: Touched Background (WRONG RESPONSE)
                            if self.cur_time > (self.VI_start + self.cur_VI_background): # Give reward and reset VIs
                               # Give 1 Reward
-                              GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet," + str(self.cur_VI_images)+ ",VI")
+                              GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
                               # Reset VIs
                               self.VI_start = self.cur_time
                               self.cur_VI_background = random.randint(0,int(self.VI_background*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
@@ -916,14 +952,14 @@ class Experiment:
                            #print("our random number", rand)
                            if rand <= self.cur_probability:
                                #print("Food_Pellet w"+str(self.cur_probability)+ "% probability")
-                               GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet,"+str(self.cur_probability)+ ",% probability")
+                               GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
                            else:
                                #print("Reward NOT given w " + str(self.cur_probability)+"% probability")
                                self.log_event("Reward NOT given," + str(self.cur_probability)+",% probability")
 
                        else: # if PELLET80 or something like it.  NOTE: PELLETXX, converts XX into probability
                            if random.random()*100 <= float(left_of_outcome_str):
-                               GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet,"+str(left_of_outcome_str)+ "%, probability")
+                               GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
                            else:
                                self.log_event("Reward NOT given" + str(left_of_outcome_str)+",% probability")
 

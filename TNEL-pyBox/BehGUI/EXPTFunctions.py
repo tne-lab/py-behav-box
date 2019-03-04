@@ -56,9 +56,10 @@ def checkQs(self):
             if self.ROIstr == "":
                 try:  # Get ROI value if it exists
                     self.ROIstr = backDict['ROI']
-                    newROIstr = self.ROIstr.replace(",",";")
-                    print(newROIstr)
-                    self.log_event("ROI:",(newROIstr + ",( x; y; width; height)"))
+                    if self.ROIstr != "":
+                        newROIstr = self.ROIstr.replace(",",";")
+                        self.log_event("ROI:",(newROIstr + ",( x; y; width; height)"))
+                        self.ROI_RECEIVED = True
                 except:
                     pass
 
@@ -67,6 +68,7 @@ def checkQs(self):
         self.vidDict['trial_num'] = self.trial_num
         self.vidDict['STATE'] = self.vidSTATE
         self.vidDict['PATH_FILE'] = self.video_file_path_name
+        self.vidDict['FLIP'] = self.FLIP
         self.VIDq.append(self.vidDict)
 
     if self.EPHYS_ENABLED:

@@ -72,6 +72,8 @@ def setExptGlobals(self):
     self.conditioning_vi_times = []
     self.extinction_vi_times = []
     self.recall_vi_times = []
+    self.VI_start = 0.0       # To see if VI time has passed
+    self.VI_calc_start = 0.0  # To recalc PRESSES PER MINUTE every minute
 
     ################################################################
     # Touches Per Minute
@@ -138,6 +140,10 @@ def setExptGlobals(self):
     self.VI_index = 0
     self.PAUSE_STARTED = False
 
+    self.TOUCHED_TO_START_TRIAL = False
+    self.START_IMG_PLACED = False
+    self.FLIP = False
+
     ################################################################
     # VIDEO GLOBALS
     ################################################################
@@ -149,8 +155,10 @@ def setVidGlobals(self):
     self.video_file_name = ''
     self.video_file_path_name = ''
     self.ROIstr = ""
-    self.ROI = (0,0,0,0)
+    self.ROI = ""
     self.vidSTATE= ''
+    if "EPHYS-2" in self.computer:
+        self.FLIP = True
 
 
     ################################################################

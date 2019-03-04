@@ -161,7 +161,7 @@ def load_expt_file(self):
 
                 elif currentlySetting == 'TONE2':#TONE2
                     if 'DURATION' in str_before_equal:
-                        self.Tone2_Duration = str_after_equal
+                        self.Tone2_Duration = float(str_after_equal)
                         print("self.Tone2_Duration",self.GUI.Tone2_Duration)
 
                     if 'FREQ' in str_before_equal:
