@@ -229,7 +229,6 @@ def exit_game(self):
       self.checkPressRight.end()
 
       #self.stimQ.put('STOP')
-
     pygame.quit()
     sys.exit()
 

@@ -11,6 +11,7 @@ def setExptGlobals(self):
     self.date = time.strftime("%b_%d_%y")#month-day-Year-H:M
     self.dateTm = time.strftime("%b_%d_%y-%H_%M")#month_day_Year-H:M
     self.exptTime = time.strftime("%H-%M")
+    self.cur_time =  time.perf_counter()
 
     ##
     self.log_file_name = ''
@@ -21,7 +22,6 @@ def setExptGlobals(self):
     ################################################################
     # GENERAL GLOBALS
     ################################################################
-
     self.trial_num = 0
     self.EXPT_FILE_LOADED = False
 
@@ -31,6 +31,13 @@ def setExptGlobals(self):
     self.setup = []
     self.protocol = []
     self.conditions = []
+    self.Protocol_ln_num = 0
+    self.loop = 0
+    self.Protocol_loops = 0
+    self.LOOP_FIRST_PASS = True
+    self.CONDITONS_NOT_SET = True
+    self.CONDITION_STARTED = False
+    self.RUN_SETUP = False
 
     ################################################################
     # OUTCOME STATS
@@ -74,6 +81,7 @@ def setExptGlobals(self):
     self.recall_vi_times = []
     self.VI_start = 0.0       # To see if VI time has passed
     self.VI_calc_start = 0.0  # To recalc PRESSES PER MINUTE every minute
+    self.VI_index = 0
 
     ################################################################
     # Touches Per Minute
@@ -122,27 +130,16 @@ def setExptGlobals(self):
     # AUX CAMERA (Only starts if second camera is exists)
     ################################################################
     self.SIMPLEVIDq = Queue()
-    #simpleVidThread = threading.Thread(target=video_function.runSimpleVid, args=(self.SIMPLEVIDq,))
-    #simpleVidThread.start()
+    simpleVidThread = threading.Thread(target=video_function.runSimpleVid, args=(self.SIMPLEVIDq,))
+    simpleVidThread.start()
 
     ################################################################
-    # More to parse and make sure work
+    # PAUSE
     ################################################################
-    self.cur_time =  time.perf_counter()
-
-    self.Protocol_ln_num = 0
-    self.loop = 0
-    self.Protocol_loops = 0
-    self.LOOP_FIRST_PASS = True
-    self.CONDITONS_NOT_SET = True
-    self.CONDITION_STARTED = False
-    self.RUN_SETUP = False
-    self.VI_index = 0
     self.PAUSE_STARTED = False
-
     self.TOUCHED_TO_START_TRIAL = False
     self.START_IMG_PLACED = False
-    self.FLIP = False
+
 
     ################################################################
     # VIDEO GLOBALS
@@ -157,6 +154,7 @@ def setVidGlobals(self):
     self.ROIstr = ""
     self.ROI = ""
     self.vidSTATE= ''
+    self.FLIP = False
     if "EPHYS-2" in self.computer:
         self.FLIP = True
 

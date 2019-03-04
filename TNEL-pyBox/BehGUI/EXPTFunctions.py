@@ -1,5 +1,5 @@
-#import video_function
-#import whiskerTouch
+import video_function
+import whiskerTouch
 import time
 ####################################################################################
 #   GET BOX INPUTS FROM GUI
@@ -7,22 +7,17 @@ import time
 def checkStatus(self):
     self.LEVER_PRESSED_L = self.GUI.LEVER_PRESSED_L
     if self.LEVER_PRESSED_L:
-        #self.num_L_lever_preses += 1
         self.log_event("Lever_Pressed_L")
     self.LEVER_PRESSED_R = self.GUI. LEVER_PRESSED_R
     if self.LEVER_PRESSED_R:
-        #self.num_R_lever_preses += 1
         self.log_event("Lever_Pressed_R")
     self.NOSE_POKED_L = self.GUI.NOSE_POKED_L
     if self.NOSE_POKED_L:
-        #self.num_L_nose_pokes += 1
         self.log_event("Nose_Poke_L")
     self.NOSE_POKED_R = self.GUI.NOSE_POKED_R
     if self.NOSE_POKED_R:
-        #self.num_R_nose_pokes += 1
         self.log_event("Nose_Poke_R")
     if self.GUI.FOOD_EATEN:
-        #self.num_eaten += 1
         self.log_event("Food_Eaten")
         self.GUI.FOOD_EATEN = False
 
@@ -81,18 +76,13 @@ def checkQs(self):
 #  START THREADS FOR VID/TOUCHSCREEN
 ###########################################################################################################
 def StartTouchScreen(self):
-    i = 0
-    '''
     if not self.TOUCH_TRHEAD_STARTED:
         whiskerThread = threading.Thread(target = whiskerTouch.main, args=(self.TSBack_q,self.TSq), kwargs={'media_dir' : self.resourcepath})
         whiskerThread.daemon = True
         whiskerThread.start()
         self.TOUCH_TRHEAD_STARTED = True
-    '''
 
 def MyVideo(self):
-    i = 0
-    '''
     vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q,))
     vid_thread.daemon = True
     self.VIDq.pop()
@@ -105,7 +95,7 @@ def MyVideo(self):
           msg = self.VIDBack_q.get()
           if msg == 'vid ready':
               return
-    '''
+
 ####################################################################################
 #   LOG EVENTS
 ####################################################################################
