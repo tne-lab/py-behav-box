@@ -128,7 +128,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
         bg_col = (0, 0, 100)
         self.whisker.display_blank(DISPLAY)
         # Draw stuff to finish up with setting up connection
-        self.RECVCMD()
+        self.RECVFIRST()
 
 
     def draw(self):
@@ -229,6 +229,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
     # Need to wait for first msg from GUI before proceeding
     def RECVFIRST(self): # Note: runs once
         while True:
+            time.sleep(0.01)
             if not self.q.empty():
                 self.parseMsg(self.q.get())
                 break

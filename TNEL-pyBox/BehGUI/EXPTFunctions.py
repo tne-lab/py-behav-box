@@ -82,6 +82,7 @@ def StartTouchScreen(self):
         whiskerThread.daemon = True
         whiskerThread.start()
         self.TOUCH_TRHEAD_STARTED = True
+        self.TSq.put('') # Send an emtpy string so it draws a blank screen to start!
 
 def MyVideo(self):
     vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q,))

@@ -27,7 +27,7 @@ class Vid:
             self.timeFrozen = 0
             self.text = ''
             self.capError = False
-            self.freezeFile = open('freezes2.txt','w')
+            #self.freezeFile = open('freezes2.txt','w')
             self.isFrozen = False
             self.threshold = 8
             # in milliseconds (2000 = 2 seconds)
@@ -161,12 +161,12 @@ class Vid:
                     self.timeFrozen = 0
                     if self.isFrozen:
                         self.isFrozen = False
-                        self.freezeFile.write('end freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
+                        #self.freezeFile.write('end freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
                         #back_q.put({'FREEZE' : False, 'TIME' : time_from_GUI})
                 else:
                     if self.checkFreeze() and not self.isFrozen:
                         self.isFrozen = True
-                        self.freezeFile.write('freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
+                        #self.freezeFile.write('freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
                         #back_q.put({'FREEZE' : True, 'TIME' : time_from_GUI})
                         self.text = 'freeze'
 
@@ -186,7 +186,7 @@ class Vid:
             if msg['STATE'] == 'REC_STOP': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                 try: # In case we get an unwanted REC_STOP before vid file is created
                     self.out.release() # CLOSE VIDEO FILE
-                    self.freezeFile.close()
+                    #self.freezeFile.close()
                 except: pass
 
 
@@ -229,7 +229,7 @@ class Vid:
 
     # Close everything
     def close(self):
-        self.freezeFile.close()
+        #self.freezeFile.close()
         self.cap.release()
         try: self.out.release()
         except: pass

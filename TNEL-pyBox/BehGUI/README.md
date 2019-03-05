@@ -12,11 +12,8 @@ zmq
 
 ## Usage
 
-```python
-import BEH_GUI
-
-foo = BEH_GUI()
-foo.BehavioralChamber()
+```
+python BEH_GUI.py 
 ```
 
 ## Info
@@ -24,7 +21,3 @@ foo.BehavioralChamber()
 This is being actively developed by the TNE-Lab at the University of Minnesota - Twin Cities.
 
 Contact dasilvaf@umn.edu or schat107@umn.edu for more information
-
-## License
-
-???

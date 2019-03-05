@@ -70,7 +70,6 @@ def PLAY_TONE_LAF(self, TONE_ID):  # Plays tone using lafayette Tone generator
     # NOTE: Tone_OFF logged while drawing speeker above in main loop
     if TONE_ID == 'TONE1':
         if self.EXPT_LOADED: self.expt.log_event("Tone_ON using Lafayette")
-
         if self.NIDAQ_AVAILABLE:  self.low_tone.sendDBit(True)
 
 #    elif TONE_ID == 'TONE2':
@@ -106,7 +105,6 @@ def PLAY_TONE(self, TONE_ID):  # Plays tone using computer speaker
             self.TONE_ON = True
         else:
             if self.EXPT_LOADED: self.expt.log_event("Could not play TONE (already on)")
-
 
 
 def CAB_LIGHT(self, ON_OFF):

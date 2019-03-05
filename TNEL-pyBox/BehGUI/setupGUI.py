@@ -194,10 +194,7 @@ def setupGUI(self):
         elif user_input.label == "SUBJECT":
              user_input.text = str(self.Subject)
         elif user_input.label == "TRIAL":
-             if self.START_EXPT:
-                 info.text = "0"
-             else:
-              user_input.text  = str(self.expt.trial_num)
+             user_input.text = "0"
         elif user_input.label == "EXPT PATH":
              user_input.text = str(self.datapath)
         elif user_input.label == "EXPT FILE NAME":
