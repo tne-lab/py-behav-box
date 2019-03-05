@@ -14,6 +14,7 @@ class Vid:
         self.ROIGEN = True
         #self.ROI = (0,0,0,0)
         self.freezeEnable = False
+        self.FLIP = False
         cv2.namedWindow('vid')
         if self.cap.isOpened():
             if not self.vidOrLive(videoPath):
@@ -230,7 +231,8 @@ class Vid:
     def close(self):
         self.freezeFile.close()
         self.cap.release()
-        self.out.release()
+        try: self.out.release()
+        except: pass
         cv2.destroyAllWindows()
         for i in range(1,10):
             cv2.waitKey(1)
@@ -394,7 +396,8 @@ class SimpleVid:
                 if msg['STATE'] == 'OFF':
                     cv2.destroyAllWindows()
                     self.cap.release()
-                    self.out.release()
+                    try: self.out.release()
+                    except: pass
                     return
                 if msg['PATH_FILE'] != self.outPath:
                     self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))

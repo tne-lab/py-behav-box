@@ -87,7 +87,7 @@ def MyVideo(self):
     vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q,))
     vid_thread.daemon = True
     self.VIDq.pop()
-    updateVideoQ(self)
+    self.checkQs()
     vid_thread.start()
 
     while True:

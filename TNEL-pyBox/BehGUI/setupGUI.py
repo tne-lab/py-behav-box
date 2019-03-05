@@ -142,7 +142,6 @@ def setupGUI(self):
     self.TNElogo = pygame.transform.scale(self.TNElogo, (70, 50))
     pygame.display.set_caption('Behavioral Chamber Control 1.0 by F. da Silva and M. Shatza Oct. 30, 2018') # Enter your window caption here
     pygame.init()
-
     #############
     #
     #  Create Menu GUI elements
@@ -196,7 +195,7 @@ def setupGUI(self):
              user_input.text = str(self.Subject)
         elif user_input.label == "TRIAL":
              if self.START_EXPT:
-                 info.text = 0
+                 info.text = "0"
              else:
               user_input.text  = str(self.expt.trial_num)
         elif user_input.label == "EXPT PATH":

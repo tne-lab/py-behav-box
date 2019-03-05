@@ -2,6 +2,7 @@ import time
 from queue import Queue
 import threading
 import video_function
+from collections import deque
 def setExptGlobals(self):
     ################################################################
     # DATA FILES
@@ -156,6 +157,9 @@ def setVidGlobals(self):
     self.ROI = ""
     self.vidSTATE= ''
     self.FLIP = False
+    self.FROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
+    self.UNFROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
+    self.FREEZE_DETECTION_ENABLED = False
     if "EPHYS-2" in self.computer:
         self.FLIP = True
 
@@ -185,5 +189,3 @@ def setTouchGlobals(self):
     self.touch_img_files = []
     self.TOUCH_IMAGES_SENT = False
     self.PREVIOUSLY_FROZEN = False #Used to prevent 'unfrozen' from being logged prior to first 'frozen' event
-    self.FROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
-    self.UNFROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video

@@ -128,7 +128,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
         bg_col = (0, 0, 100)
         self.whisker.display_blank(DISPLAY)
         # Draw stuff to finish up with setting up connection
-        self.RECVFIRST()
+        self.RECVCMD()
 
 
     def draw(self):
