@@ -1,6 +1,5 @@
 from RESOURCES.GUI_elements_by_flav import convertString
 import os
-import threading
 import subprocess
 import GUIFunctions
 import time
@@ -337,7 +336,7 @@ def load_expt_file(self):
                             #if line == 'END': self.protocol = False
 
 
-                elif currentlySetting == 'CONDTIONS':
+                elif currentlySetting == 'CONDITIONS':
                     #print("self.conditions: ",line)
                     if "[CONDITIONS]" in str_before_equal: # Condition header line
                         KEY_LINE = True

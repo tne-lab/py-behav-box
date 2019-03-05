@@ -49,6 +49,7 @@ class BEH_GUI():
         self.expt = experiment.Experiment(self)
         self.setupGUI()
 
+
     from setGUIGlobals import setGUIGlobals
     from loadProtocol import load_expt_file, create_expt_file_copy, create_files
     import GUIFunctions

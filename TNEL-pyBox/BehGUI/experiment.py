@@ -39,8 +39,8 @@ class Experiment:
             self.openEphysBack_q = Queue()
             self.openEphysQ = Queue()
             # Start thread
-            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike']})
-            open_ephys_rcv.start()
+            #open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike']})
+            #open_ephys_rcv.start()
 
         self.GUI.EXPT_LOADED = True
 
@@ -97,17 +97,17 @@ class Experiment:
             val = str2bool(setupDict["CAMERA"])
             self.setup_ln_num +=1
             if val:  # TURN CAMERA ON.     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                if not self.CAMERA_ON: # CAMERA WAS OFF
-                    self.CAMERA_ON = True
+                if not self.GUI.CAMERA_ON: # CAMERA WAS OFF
+                    self.GUI.CAMERA_ON = True
                     self.log_event("Camera_ON")
                     self.vidSTATE = 'ON'
-                    self.updateVideoQ()
+                    self.checkQs()
                     self.MyVideo()
                 else: # CAMERA IS ALREADY ON
                     self.log_event("Camera is ALREADY ON")
             else: # TURN CAMERA OFF
-                if self.CAMERA_ON: # CAMERA CURRENTLY ON
-                    self.CAMERA_ON = False
+                if self.GUI.CAMERA_ON: # CAMERA CURRENTLY ON
+                    self.GUI.CAMERA_ON = False
                     self.RECORDING = False
                     self.log_event("Camera_OFF")
                     self.vidSTATE = 'OFF'
@@ -273,18 +273,18 @@ class Experiment:
             val = str2bool(protocolDict[key])
             self.Protocol_ln_num +=1
             if val:  # TURN CAMERA ON
-                if not self.CAMERA_ON: # CAMERA WAS OFF
-                    self.CAMERA_ON = True
+                if not self.GUI.CAMERA_ON: # CAMERA WAS OFF
+                    self.GUI.CAMERA_ON = True
                     self.log_event("Camera_ON")
                     self.vidSTATE = 'ON'
-                    self.updateVideoQ(self)
+                    self.checkQs(self)
                                     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                     self.MyVideo(self)
                 else: # CAMERA IS ALREADY ON
                     self.log_event("Camera is ALREADY ON")
             else: # TURN CAMERA OFF
-                if self.CAMERA_ON: # CAMERA CURRENTLY ON
-                    self.CAMERA_ON = False
+                if self.GUI.CAMERA_ON: # CAMERA CURRENTLY ON
+                    self.GUI.CAMERA_ON = False
                     self.RECORDING = False
                     self.log_event("Camera_OFF")
                     self.vidSTATE = 'OFF'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
@@ -639,7 +639,7 @@ class Experiment:
 ###########################################################################################################
 #   RUN CONDITIONS
 ###########################################################################################################
-    def runConditions(self):
+    def runConditions(self, protocolDict):
         '''
         RUNS CONDITIONS
         '''
@@ -657,6 +657,9 @@ class Experiment:
         # SET CONDITONS HERE
         ###############################
         if self.CONDITONS_NOT_SET:
+            print(self.choose_cond)
+            print(len(self.conditions))
+            print('^^^')
             self.HAS_ALREADY_RESPONDED = False
             self.CONDITONS_NOT_SET = False
             self.cond = self.conditions[self.choose_cond]

@@ -1,6 +1,7 @@
 import video_function
 import whiskerTouch
 import time
+import threading
 ####################################################################################
 #   GET BOX INPUTS FROM GUI
 ####################################################################################
@@ -77,7 +78,7 @@ def checkQs(self):
 ###########################################################################################################
 def StartTouchScreen(self):
     if not self.TOUCH_TRHEAD_STARTED:
-        whiskerThread = threading.Thread(target = whiskerTouch.main, args=(self.TSBack_q,self.TSq), kwargs={'media_dir' : self.resourcepath})
+        whiskerThread = threading.Thread(target = whiskerTouch.main, args=(self.TSBack_q,self.TSq), kwargs={'media_dir' : self.GUI.resourcepath})
         whiskerThread.daemon = True
         whiskerThread.start()
         self.TOUCH_TRHEAD_STARTED = True
@@ -86,7 +87,7 @@ def MyVideo(self):
     vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q,))
     vid_thread.daemon = True
     self.VIDq.pop()
-    updateVideoQ(self)
+    self.checkQs()
     vid_thread.start()
 
     while True:

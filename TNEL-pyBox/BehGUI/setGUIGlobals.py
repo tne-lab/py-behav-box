@@ -2,6 +2,10 @@
 import os
 import pygame
 import time
+try:
+    import daqAPI
+except:
+    pass
 def setGUIGlobals(self):
     self.computer = os.environ['COMPUTERNAME']
 
@@ -59,7 +63,7 @@ def setGUIGlobals(self):
     self.resourcepath = os.path.join(cwd, 'RESOURCES')
 
     #self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN2' #Flav's Machine
-    self.expt_file_name = 'PROTOCOL_BAR_PRESS_TRAIN-Ephys.txt'#Jean's Machine
+    self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN_ANY_OF_2PICS.txt'#Jean's Machine
     self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
 
     self.exptFileLines = []
