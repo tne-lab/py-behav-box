@@ -29,8 +29,8 @@ Volume(0-1)	= 1.0
 IMAGES_PATH = E:\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
 COORDS=(141,100):(582,100)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 # Image name: probability of reward on each trial
-IMG1= SPIDER.bmp:(80x500)
-IMG2= FLOWER.bmp:(20x500)
+IMG1= SPIDER.bmp:(20x500)
+IMG2= FLOWER.bmp:(80x500)
 TOUCH_BANDIT
 
 [SETUP]
