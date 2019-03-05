@@ -1,6 +1,7 @@
 import time
 from queue import Queue
 import threading
+import video_function
 def setExptGlobals(self):
     ################################################################
     # DATA FILES
