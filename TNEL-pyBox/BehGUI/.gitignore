@@ -1,5 +1,7 @@
 *.pyc
 DATA/
-*cpython-37.pyc
+*.cpython-37.pyc
+*.cpython-36.pyc
 OPEN-EPHYS*/
-2019*/
+PROTOCOLS/PROTOCOL_BAR_PRESS_TRAIN_2-Ephys.txt
+PROTOCOLS/PROTOCOL_BAR_PRESS_TRAIN-Ephys.txt
