@@ -313,6 +313,8 @@ def load_expt_file(self):
                             word1,word2 = get_LR_before_hash(line)
                             self.setup.append({word1:word2})
                             print({word1:word2})
+                            if word1 == "CAMERA" and word2:
+                                self.setVidGlobals()
                         except:
                             self.setup.append({line:True}) # For lines without an '=' in them
                             #if line == 'END': PROTOCOL = False
@@ -469,10 +471,10 @@ def create_files(self):
     self.log_file = open(self.log_file_path_name,'w')        # OPEN LOG FILE
 
     ##### MAIN VIDEO #######
-    if self.VID_ENABLED == True:
-        video_file_name = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
-        self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
-        print(self.video_file_path_name)
+    #if self.VID_ENABLED == True: # VID_ENABLED gets set after this function is called. Might change later
+    video_file_name = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
+    self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
+    print(self.video_file_path_name)
     ## AUX VIDEO ##
     if self.GUI.num_cameras == 2:
         video_file_name_aux = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-VIDEO_file_aux' + '.avi'

@@ -17,7 +17,6 @@ class Experiment:
 ####################################################################################
     def __init__(self, GUI):
         self.setExptGlobals()
-        self.computer = GUI.computer
         self.GUI = GUI
         EXPT_FILE_LOADED = self.load_expt_file()
         if EXPT_FILE_LOADED:
@@ -39,8 +38,8 @@ class Experiment:
             self.openEphysBack_q = Queue()
             self.openEphysQ = Queue()
             # Start thread
-            #open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike']})
-            #open_ephys_rcv.start()
+            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike']})
+            open_ephys_rcv.start()
 
         self.GUI.EXPT_LOADED = True
 
@@ -53,7 +52,7 @@ class Experiment:
         self.checkQs()
         if self.RUN_SETUP:
             self.runSetup()
-        if self.START_EXPT:
+        if self.GUI.START_EXPT:
             self.runExpt()
 ###########################################################################################################
 #  SETUP EXPERIMENT
@@ -93,7 +92,7 @@ class Experiment:
             self.GUI.LEDs[4].ONOFF = LEDsONOFF
             self.GUI.LEDs[5].ONOFF = LEDsONOFF
         elif key == "CAMERA":
-            self.setVidGlobals()
+
             val = str2bool(setupDict["CAMERA"])
             self.setup_ln_num +=1
             if val:  # TURN CAMERA ON.     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
@@ -161,18 +160,7 @@ class Experiment:
             self.MAX_EXPT_TIME = float(setupDict["MAX_EXPT_TIME"])
             print("Max Expt Time :", self.MAX_EXPT_TIME * 60.0, " sec")
 
-        ## STUFF FROM MAIN ## NEEDS TO BE UPDATED
-        self.cur_time = time.perf_counter()
-        self.Experiment_Start_time = self.cur_time
-        self.cur_time = self.cur_time-self.Experiment_Start_time
-        self.TPM_start_time = self.cur_time #Screen TOUCHES per Min start time
-        self.START_EXPT = True
-        self.vidSTATE = 'START_EXPT'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-        #print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
-        self.log_event("START_TIME")
-        for LED in self.GUI.LEDs: # Look for EXPT STARTED LED
-              if LED.index == 6: # Expt Started light
-                  LED.ONOFF = "ON"
+
 
         if self.setup_ln_num >= len(self.setup):
             setup_done = False
@@ -196,6 +184,18 @@ class Experiment:
                         pass
                 self.setup_ln_num = 0
                 self.RUN_SETUP = False
+                ## STUFF FROM MAIN ## NEEDS TO BE UPDATED
+                self.cur_time = time.perf_counter()
+                self.Experiment_Start_time = self.cur_time
+                self.cur_time = self.cur_time-self.Experiment_Start_time
+                self.TPM_start_time = self.cur_time #Screen TOUCHES per Min start time
+                self.START_EXPT = True
+                self.vidSTATE = 'START_EXPT'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                #print("BUTTON cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
+                self.log_event("START_TIME")
+                for LED in self.GUI.LEDs: # Look for EXPT STARTED LED
+                      if LED.index == 6: # Expt Started light
+                          LED.ONOFF = "ON"
 ###########################################################################################################
 #  RUN EXPERIMENT
 ###########################################################################################################
@@ -268,8 +268,6 @@ class Experiment:
 
         elif key == "CAMERA":
             #print("CAMERA")
-            if not self.VID_ENABLED:
-                self.setVidGlobals()
             val = str2bool(protocolDict[key])
             self.Protocol_ln_num +=1
             if val:  # TURN CAMERA ON
@@ -277,9 +275,9 @@ class Experiment:
                     self.GUI.CAMERA_ON = True
                     self.log_event("Camera_ON")
                     self.vidSTATE = 'ON'
-                    self.checkQs(self)
+                    self.checkQs()
                                     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                    self.MyVideo(self)
+                    self.MyVideo()
                 else: # CAMERA IS ALREADY ON
                     self.log_event("Camera is ALREADY ON")
             else: # TURN CAMERA OFF
@@ -657,9 +655,6 @@ class Experiment:
         # SET CONDITONS HERE
         ###############################
         if self.CONDITONS_NOT_SET:
-            print(self.choose_cond)
-            print(len(self.conditions))
-            print('^^^')
             self.HAS_ALREADY_RESPONDED = False
             self.CONDITONS_NOT_SET = False
             self.cond = self.conditions[self.choose_cond]
@@ -1001,17 +996,6 @@ class Experiment:
             self.snd.send(self.snd.STOP_REC)
             self.openEphysQ.put('STOP')
 
-        if self.TOUCHSCREEN_USED:
-            self.TSq.put('')
-            self.TOUCHSCREEN_USED = False
-            while not self.TSBack_q.empty():  # EMPTY TSBack_q between Expt Runs.
-                self.touchMsg = self.TSBack_q.get()
-
-        for user_input in self.GUI.user_inputs:
-           if user_input.label == "SUBJECT":
-              self.GUI.Subject = ''
-              self.GUI.prev_Subject = self.GUI.Subject
-
         if self.VID_ENABLED:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
@@ -1020,8 +1004,13 @@ class Experiment:
         if self.TOUCH_TRHEAD_STARTED == True:
             self.TSq.put('STOP')
 
-        self.log_file.close()  # CLOSE LOG FILE
-
+        try: self.log_file.close()  # CLOSE LOG FILE
+        except: pass
+        # Reset GUI Stuff
+        for user_input in self.GUI.user_inputs:
+           if user_input.label == "SUBJECT":
+              self.GUI.Subject = ''
+              self.GUI.prev_Subject = self.GUI.Subject
         self.GUI.START_EXPT = False
         self.GUI.EXPT_LOADED = True
         self.GUI.LEDs[6].ONOFF = False

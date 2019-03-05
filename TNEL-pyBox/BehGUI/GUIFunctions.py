@@ -205,7 +205,7 @@ def shock(self, ON_OFF):
         if self.NIDAQ_AVAILABLE: self.apply_shock.sendDBit(False)
 
 def exit_game(self):
-    if self.START_EXPT: self.expt.endExpt()
+    if self.EXPT_LOADED: self.expt.endExpt()
     #Close all NIDAQ tasks
     if self.NIDAQ_AVAILABLE:
       self.fan.end()

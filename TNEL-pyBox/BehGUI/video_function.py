@@ -114,7 +114,7 @@ class Vid:
                 msg = self.q.pop()
                 time_from_GUI = msg['cur_time']
                 STATE = msg['STATE'] # NOTE: NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                FLIP = msg['FLIP']
+                self.FLIP = msg['FLIP']
                 if STATE == 'START_EXPT':
                     self.exptStarted = True
                 if STATE == 'REC_STOP':
@@ -181,8 +181,7 @@ class Vid:
             #print("STATE",msg['STATE'])
             #if self.ROIenabled:  print("ROI: ", self.ROI)
             if msg['STATE'] == 'REC_VID': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                recframe = cv2.flip(frame,flipCode = 0)# flipcodes: 1 = hflip, 0 = vflip
-                self.out.write(recframe)
+                self.out.write(frame)
             if msg['STATE'] == 'REC_STOP': # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                 try: # In case we get an unwanted REC_STOP before vid file is created
                     self.out.release() # CLOSE VIDEO FILE
