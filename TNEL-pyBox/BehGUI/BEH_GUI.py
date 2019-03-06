@@ -66,8 +66,8 @@ class BEH_GUI():
             if self.START_EXPT:
                 self.expt.run()
             if self.RESTART_EXPT:
-                self.expt = experiment.Experiment(self)
-                self.RESTART_EXPT = False
+                self.expt = experiment.Experiment(self) # Start new expt.
+                self.setupGUI() # Reset GUI visuals to base
 
             ######################################
             #   UPDATE SCREEN

@@ -228,7 +228,6 @@ def setupGUI(self):
     self.TONE_TIME = START_TIME
     self.SHOCK_TIME = START_TIME
 
-
     self.NOSE_POKED_L = False
     self.NOSE_POKED_R = False
     self.LEVER_PRESSED_L = False
@@ -240,4 +239,11 @@ def setupGUI(self):
     self.RECORDING = False
     self.FREEZE_DETECTION_ENABLED = False
 
-    self.Expt_Count = 0
+    self.EXPT_LOADED = False
+    self.Expt_Name = ''
+    self.Subject = ''
+    self.prev_Subject = ''
+    self.NAME_OR_SUBJ_CHANGED = False
+    self.START_EXPT = False
+    self.RESTART_EXPT = False
+    self.TOUCH_TRHEAD_STARTED = False
