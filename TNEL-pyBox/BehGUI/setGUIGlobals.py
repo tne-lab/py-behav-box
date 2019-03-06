@@ -2,6 +2,7 @@
 import os
 import pygame
 import time
+import cv2
 try:
     import daqAPI
 except:
@@ -84,6 +85,7 @@ def setGUIGlobals(self):
     self.NAME_OR_SUBJ_CHANGED = False
     self.START_EXPT = False
     self.RESTART_EXPT = False
+    self.TOUCH_TRHEAD_STARTED = False
 
     ################################################################
     # TONE AND SHOCK DEFAULTS
@@ -108,8 +110,8 @@ def setGUIGlobals(self):
     self.LEVERS_EXTENDED = False
 
     ## Get number of cameras
-    self.num_cameras = 0#count_cameras()
-    '''
+    self.num_cameras = count_cameras()
+
 def count_cameras():
     max_tested = 2
     for i in range(max_tested):
@@ -118,4 +120,3 @@ def count_cameras():
             temp_camera.release()
             continue
         return i + 1
-'''

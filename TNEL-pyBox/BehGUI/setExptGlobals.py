@@ -127,7 +127,6 @@ def setExptGlobals(self):
     self.TOUCHSCREEN_USED = False
     self.BAR_PRESS_INDEPENDENT_PROTOCOL = False
     self.BAR_PRESS_TRAINING = False
-    self.TOUCH_TRHEAD_STARTED = False
 
     ################################################################
     # AUX CAMERA (Only starts if second camera is exists)
@@ -161,6 +160,7 @@ def setVidGlobals(self):
     self.FROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
     self.UNFROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
     self.FREEZE_DETECTION_ENABLED = False
+    self.PREVIOUSLY_FROZEN = False #Used to prevent 'unfrozen' from being logged prior to first 'frozen' event
     if "EPHYS-2" in self.GUI.computer:
         self.FLIP = True
 
@@ -170,9 +170,6 @@ def setVidGlobals(self):
     ################################################################
 def setTouchGlobals(self):
     self.TOUCHSCREEN_USED = True
-    self.TSq = Queue()
-    self.TSBack_q = Queue()
-    self.TOUCH_TRHEAD_STARTED = False
     self.TOUCH_TRAINING = False
     self.TOUCH_BANDIT = False
     self.touchImgCoords = []
@@ -189,4 +186,3 @@ def setTouchGlobals(self):
     self.TOUCH_IMG_PATH = ''
     self.touch_img_files = []
     self.TOUCH_IMAGES_SENT = False
-    self.PREVIOUSLY_FROZEN = False #Used to prevent 'unfrozen' from being logged prior to first 'frozen' event

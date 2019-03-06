@@ -7,6 +7,8 @@ import tkinter as Tk #Note: "Tkinter" in python 2 (capital T)
 from tkinter.filedialog import askopenfilename
 import os
 import giveFood
+from queue import Queue
+import whiskerTouch
 try:
     import win32gui
     LINUX = False
@@ -204,8 +206,20 @@ def shock(self, ON_OFF):
     else:
         if self.NIDAQ_AVAILABLE: self.apply_shock.sendDBit(False)
 
+def StartTouchScreen(self):
+    if not self.TOUCH_TRHEAD_STARTED:
+        self.TSq = Queue()
+        self.TSBack_q = Queue()
+        whiskerThread = threading.Thread(target = whiskerTouch.main, args=(self.TSBack_q,self.TSq), kwargs={'media_dir' : self.resourcepath})
+        whiskerThread.daemon = True
+        whiskerThread.start()
+        self.TOUCH_TRHEAD_STARTED = True
+        self.TSq.put('') # Send an emtpy string so it draws a blank screen to start!
+
 def exit_game(self):
     if self.EXPT_LOADED: self.expt.endExpt()
+    if self.TOUCH_TRHEAD_STARTED == True:
+        self.TSq.put('STOP')
     #Close all NIDAQ tasks
     if self.NIDAQ_AVAILABLE:
       self.fan.end()

@@ -10,7 +10,7 @@ import GUIFunctions
 class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
     import GUIFunctions
-    from EXPTFunctions import checkStatus, checkQs, StartTouchScreen, MyVideo, log_event
+    from EXPTFunctions import checkStatus, checkQs, MyVideo, log_event
     from setExptGlobals import setExptGlobals, setVidGlobals, setTouchGlobals
 ####################################################################################
 #   INITIALIZE EXPERIMENT
@@ -30,7 +30,7 @@ class Experiment:
             print("COULD NOT LOAD EXPT FILE")
             self.log_event("COULD NOT LOAD EXPT FILE")
         if self.TOUCHSCREEN_USED:
-            self.StartTouchScreen()
+            GUIFunctions.StartTouchScreen(self.GUI)
 
         # Open ephys stuff
         if self.EPHYS_ENABLED:
@@ -335,7 +335,7 @@ class Experiment:
                     for key in self.touchImgs.keys():
 
                         imgList[key] = self.touchImgCoords #places images
-                        self.TSq.put(imgList)
+                        self.GUI.TSq.put(imgList)
                         self.Protocol_ln_num +=1
                     print('ImgList', imgList)
 
@@ -364,7 +364,7 @@ class Experiment:
                         imgList[key] = self.touchImgCoords[placementList[i]] #places images
                         print('ImgList', imgList)
                         i+=1
-                        self.TSq.put(imgList)
+                        self.GUI.TSq.put(imgList)
 
                     self.Protocol_ln_num +=1
 
@@ -489,7 +489,7 @@ class Experiment:
                     elif "TOUCH_TO_START" in protocolDict["PAUSE"] and not self.START_IMG_PLACED:
                         self.PAUSE_TIME = 1000.0
                         start_img = {'BLANK.BMP':(392,100)}
-                        self.TSq.put(start_img)
+                        self.GUI.TSq.put(start_img)
                         self.START_IMG_PLACED = True
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
@@ -503,15 +503,15 @@ class Experiment:
                     self.PAUSE_STARTED = False
 
                 if self.TOUCHSCREEN_USED:
-                    if not self.TSBack_q.empty():
-                        self.touchMsg = self.TSBack_q.get()
+                    if not self.GUI.TSBack_q.empty():
+                        self.touchMsg = self.GUI.TSBack_q.get()
                         if self.START_IMG_PLACED and "BLANK" in self.touchMsg['picture']:
                             self.Protocol_ln_num +=1
                             self.PAUSE_STARTED = False
                             self.TOUCHED_TO_START_TRIAL = False
                             self.START_IMG_PLACED = False
                             GUIFunctions.log_event(self.touchMsg['picture'] + " RAT Pressed START, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
-                            self.TSq.put('')
+                            self.GUI.TSq.put('')
                         else:
                             self.log_event(self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
 
@@ -759,8 +759,8 @@ class Experiment:
                ######################
                # SCREEN TOUCHED
                ######################
-               if not self.TSBack_q.empty():
-                   self.touchMsg = self.TSBack_q.get()
+               if not self.GUI.TSBack_q.empty():
+                   self.touchMsg = self.GUI.TSBack_q.get()
                    x = int(self.touchMsg['XY'][0])
                    y = int(self.touchMsg['XY'][1])
                    ##########################################
@@ -980,8 +980,8 @@ class Experiment:
                if self.TOUCHSCREEN_USED:
                    # Want to wait a second before blanking screen
 ##                   if self.cur_time - self.touch_time > 1.0:
-##                       self.TSq.put('')
-                   self.TSq.put('')
+##                       self.GUI.TSq.put('')
+                   self.GUI.TSq.put('')
 
                self.TIME_IS_UP = False
                self.CONDITION_STARTED = False
@@ -1000,9 +1000,6 @@ class Experiment:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
             self.SIMPLEVIDq.put({'STATE':'OFF'})
-
-        if self.TOUCH_TRHEAD_STARTED == True:
-            self.TSq.put('STOP')
 
         try: self.log_file.close()  # CLOSE LOG FILE
         except: pass
