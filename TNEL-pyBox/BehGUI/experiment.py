@@ -989,6 +989,12 @@ class Experiment:
     def endExpt(self):
         # Tell open ephys to stop acquistion and recording?
         # Maybe we want to wait and continue getting data for awhile. Just send some sort of event
+        note_file = fopen(self.note_file_path,'r')
+        self.log_event('NOTES BELOW')
+        for ln in note_file:
+            self.log_event(ln)
+        fclose(note_file)
+
         if self.EPHYS_ENABLED:
             self.snd.send(self.snd.STOP_ACQ)
             self.snd.send(self.snd.STOP_REC)

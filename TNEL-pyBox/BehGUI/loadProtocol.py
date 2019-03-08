@@ -3,6 +3,7 @@ import os
 import subprocess
 import GUIFunctions
 import time
+import webbrowser
 
 def get_val_between_equal_sign_and_hash(line):
     try:
@@ -487,6 +488,13 @@ def create_files(self):
         self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.GUI.Subject)
         self.snd.send(self.snd.START_REC)
         time.sleep(3) # Let Open Ephys record for a bit (maybe remove?)
+
+    ###### Notes
+    note_file_name = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-NOTES'  + '.txt'
+    self.note_file_path = os.path.join(self.GUI.newdatapath, note_file_name)
+    notes = fopen(note_file,'a+')
+    fclose(notes)
+    webbrowser.open(note_file)
 
 # COPY EXPT FILE TO EXPT FILE DATAPATH
 def create_expt_file_copy(self):
