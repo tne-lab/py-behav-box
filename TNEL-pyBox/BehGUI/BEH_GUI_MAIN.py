@@ -41,6 +41,7 @@ import experiment
 import win32gui, win32con
 from tkinter import *
 from tkinter import messagebox
+Tk().wm_withdraw() #to hide the main window
 
 class BEH_GUI():
     def __init__(self, NIDAQ_AVAILABLE):
@@ -48,19 +49,17 @@ class BEH_GUI():
         self.setGUIGlobals()
         self.computer = os.environ['COMPUTERNAME']
         random.seed()
-        self.expt = experiment.Experiment(self)
-        self.setupGUI()
+        #self.expt = experiment.Experiment(self)
+        self.setupExpt()
 
 
     from setGUIGlobals import setGUIGlobals
     from loadProtocol import load_expt_file, create_expt_file_copy, create_files
     import GUIFunctions
-    from setupGUI import setupGUI
+    from setupGUI import setupExpt
 
     def BehavioralChamber(self):
         while True:
-            self.cur_time =  time.perf_counter()
-
             self.drawScreen()
             self.checkSystemEvents()
             self.checkNIDAQEvents()
@@ -68,8 +67,7 @@ class BEH_GUI():
             if self.START_EXPT:
                 self.expt.run()
             if self.RESTART_EXPT:
-                self.expt = experiment.Experiment(self) # Start new expt.
-                self.setupGUI() # Reset GUI visuals to base
+                self.setupExpt() # Setups experiment and GUI!
 
             ######################################
             #   UPDATE SCREEN
@@ -80,7 +78,8 @@ class BEH_GUI():
     def drawScreen(self):
         if self.START_EXPT:
             self.cur_time = time.perf_counter()-self.expt.Experiment_Start_time
-        #print("cur_time : Experiment_Start_time-->",self.cur_time, self.Experiment_Start_time)
+        else:
+            self.cur_time = time.perf_counter()
         #######################
         # DRAW SCREEN AND GUI ELEMENTS
         #######################
@@ -122,7 +121,7 @@ class BEH_GUI():
             # Leaves nose poke LED ON for 1 sec so user can see it (NOTE: PROGRAM IS NOT PAUSED!)
             if LED.index == 2: #Left NOSE POKE
                if self.NOSE_POKED_L:
-                   if (self.cur_time - self.NOSE_POKE_TIME) > 0.25: #Leaves on for 0.25 sec
+                   if (time.perf_counter() - self.NOSE_POKE_TIME) > 0.25: #Leaves on for 0.25 sec
                          LED.ONOFF = "OFF"  # NOW OFF
                          self.NOSE_POKED_L = False
                    else:
@@ -130,7 +129,7 @@ class BEH_GUI():
 
             elif LED.index == 3: #Right NOSE POKE
                 if self.NOSE_POKED_R:
-                   if (self.cur_time - self.NOSE_POKE_TIME) > 0.25: #Leaves on for 0.25 sec
+                   if (time.perf_counter() - self.NOSE_POKE_TIME) > 0.25: #Leaves on for 0.25 sec
                          LED.ONOFF = "OFF"  # NOW OFF
                          self.NOSE_POKED_R = False
                    else:
@@ -246,7 +245,7 @@ class BEH_GUI():
 
         if self.TONE_ON:
               # Note: This just draws the speeker on GUI. Tone turned on during GUI mousedown events.
-              if (self.cur_time - self.TONE_TIME) > float(self.Tone1_Duration): # seconds
+              if (time.perf_counter() - self.TONE_TIME) > float(self.Tone1_Duration): # seconds
                   #print("TONE OFF")
                   self.TONE_ON = False
                   if "EPHYS-1" in self.computer:
@@ -258,7 +257,6 @@ class BEH_GUI():
         if self.SHOCK_ON:
               if (self.cur_time - self.SHOCK_TIME) <= self.Shock_Duration: # seconds
                   if self.NIDAQ_AVAILABLE: self.apply_shock.sendDBit(True)
-                  if self.EXPT_LOADED: self.expt.log_event("Shock_ON")
               else:
                   self.SHOCK_ON = False
                   if self.NIDAQ_AVAILABLE: self.apply_shock.sendDBit(False)
@@ -385,7 +383,7 @@ class BEH_GUI():
                                elif button.text == "FEED":
                                     button.UP_DN = "DN"
                                     self.FEED = True
-                                    GUIFunctions.FOOD_REWARD(self,"Food_Pellet_by_GUI", self.cur_time)
+                                    GUIFunctions.FOOD_REWARD(self,"Food_Pellet_by_GUI")
                                     # NOTE: Food reward needs time after High bit, before low bit is sent.
                                     #       So rather than putting a sleep in the FOOD_REWARD function, a low bit
                                     #       is sent when button is released using FOOD_REWARD_RESET(self)
@@ -459,16 +457,13 @@ class BEH_GUI():
                                         self.START_EXPT = False
                                         button.UP_DN = "DN"
                                         self.events = []
-                                        self.expt = experiment.Experiment(self)
-                                        self.setupGUI()
+                                        self.setupExpt()
                                         self.EXPT_LOADED = True
                                         for LED in self.LEDs: # Look for EXPT STARTED LED
                                               if LED.index == 6: # Expt Started light
                                                   LED.ONOFF = "OFF"
-                                        self.setupGUI()
                                     else:
-                                        Tk().wm_withdraw() #to hide the main window
-                                        messagebox.showinfo('Stop Experiment First!', 'OK')
+                                        messagebox.showinfo('WARNING', 'Stop experiment first!')
 
 
                                #######################################
@@ -492,6 +487,7 @@ class BEH_GUI():
                                         #if self.EXPT_FILE_LOADED:
                                         if self.Subject == "" or "?" in self.Subject or self.Subject == " " or len(self.Subject) == 0 :
                                             print('SUBJECT = "" or "?" or same as last time')
+                                            messagebox.showinfo('WARNING', 'SUBJECT = "" or "?" or same as last time')
                                             # HIGHLIGHT USER INPUT BOXES
                                             for user_input in self.user_inputs:
                                                 if user_input.label == "EXPT":
@@ -608,11 +604,12 @@ class BEH_GUI():
                     # SPEEKER PRESSED
                     if self.speeker.collidepoint(cur_x,cur_y):
                           # NOTE: Tone_OFF logged while drawing speeker above in main loop
-                          print("TONE1 DURATION: ", self.Tone1_Duration)
                           if "EPHYS-2" in self.computer:
-                             self.GUIFunctions.PLAY_TONE(self,"TONE1") #using computer speeker
+                             GUIFunctions.PLAY_TONE(self,"TONE1") #using computer speeker
                           elif "EPHYS-1" in self.computer:
-                             self.GUIFunctions.PLAY_TONE_LAF(self,"TONE1") #using computer speeker
+                             GUIFunctions.PLAY_TONE_LAF(self,"TONE1") #using computer speeker
+                          else:
+                              messagebox.showinfo('WARNING','Unknown device, need to set how to play tone. \nLine 605 in BEH_GUI_MAIN')
 
 
                     # SHOCK PRESSED
@@ -735,7 +732,6 @@ class BEH_GUI():
                         if self.EXPT_LOADED: self.expt.log_event("Lever_Pressed_R")
                         self.LEVER_PRESSED_R = True
                         #print("RIGHT LEVER PRESSED")
-                        if self.START_EXPT: self.expt.self.num_R_lever_preses += 1
                         self.levers[1].STATE = "DN"
 
                   if  wasleverPressed == 'Left':
@@ -755,7 +751,6 @@ class BEH_GUI():
                 #events.append("LEFT Nose Poke: " + str(cur_time))
                 if self.EXPT_LOADED: self.expt.log_event("Nose_Poke_L")
                 self.NOSE_POKED_L = True
-                if self.START_EXPT: self.expt.self.num_L_nose_pokes += 1
                 for LED in self.LEDs:
                     if LED.index == 2: # R NOSE POKES
                           LED.ONOFF = "ON"
@@ -771,7 +766,6 @@ class BEH_GUI():
                 if self.EXPT_LOADED: self.expt.log_event("Nose_Poke_R")
                 self.NOSE_POKE_TIME = time.perf_counter()
                 self.NOSE_POKED_R = True
-                if self.START_EXPT: self.expt.self.num_R_nose_pokes += 1
                 for LED in self.LEDs:
                     if LED.index == 3: # R NOSE POKES
                       LED.ONOFF = "ON"
@@ -787,7 +781,6 @@ class BEH_GUI():
             if foodEaten:
                 self.FOOD_EATEN = True
                 event = 'Food_Eaten'
-                if self.START_EXPT: self.expt.self.num_eaten +=1
                 #events.append("Food Eaten: " + str(cur_time))
                 if self.EXPT_LOADED: self.expt.log_event("Food_Eaten")
                 print("Yum!")

@@ -1,7 +1,7 @@
 import time
 from queue import Queue
 import threading
-import video_function
+#import video_function
 from collections import deque
 def setExptGlobals(self):
     ################################################################
@@ -131,10 +131,11 @@ def setExptGlobals(self):
     ################################################################
     # AUX CAMERA (Only starts if second camera is exists)
     ################################################################
+    '''
     self.SIMPLEVIDq = Queue()
     simpleVidThread = threading.Thread(target=video_function.runSimpleVid, args=(self.SIMPLEVIDq,))
     simpleVidThread.start()
-
+    '''
     ################################################################
     # PAUSE
     ################################################################

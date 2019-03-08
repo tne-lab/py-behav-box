@@ -10,7 +10,7 @@ import GUIFunctions
 class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
     import GUIFunctions
-    from EXPTFunctions import checkStatus, checkQs, MyVideo, log_event
+    from EXPTFunctions import checkStatus, checkQs,  log_event
     from setExptGlobals import setExptGlobals, setVidGlobals, setTouchGlobals
 ####################################################################################
 #   INITIALIZE EXPERIMENT
@@ -47,7 +47,7 @@ class Experiment:
 #   MAIN LOOP FOR EXPERIMENT
 ####################################################################################
     def run(self):
-        self.cur_time = time.perf_counter()
+        self.cur_time = time.perf_counter() - self.Experiment_Start_time
         self.checkStatus()
         self.checkQs()
         if self.RUN_SETUP:
@@ -899,7 +899,7 @@ class Experiment:
                if self.CORRECT:
                   print("TONE1 DuRATION: ", self.Tone1_Duration)
                   #self.TONE_ON = True
-                  self.GUIFunctions.PLAY_TONE(self.GUI,'TONE1 for Correct Response') #THIS IS DONE EVERY CORRECT RESPOSE EVEN IF REWARD NOT GIVEN
+                  GUIFunctions.PLAY_TONE(self.GUI,'TONE1 for Correct Response') #THIS IS DONE EVERY CORRECT RESPOSE EVEN IF REWARD NOT GIVEN
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
                   self.correctPercentage = self.num_correct/self.trial_num * 100

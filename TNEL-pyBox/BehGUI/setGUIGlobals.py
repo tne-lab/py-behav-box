@@ -2,14 +2,13 @@
 import os
 import pygame
 import time
-import cv2
 try:
     import daqAPI
 except:
     pass
 def setGUIGlobals(self):
     self.computer = os.environ['COMPUTERNAME']
-
+    self.cur_time = time.perf_counter()
     ################################################################
     # GUI GLOBALS
     ################################################################
@@ -64,7 +63,7 @@ def setGUIGlobals(self):
     self.resourcepath = os.path.join(cwd, 'RESOURCES')
 
     #self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN2' #Flav's Machine
-    self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN_ANY_OF_2PICS.txt'#Jean's Machine
+    self.expt_file_name = 'PROTOCOL_BAR_PRESS_TRAIN-Ephys.txt'#Jean's Machine
     self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
 
     self.exptFileLines = []
@@ -111,8 +110,8 @@ def setGUIGlobals(self):
     self.LEVERS_EXTENDED = False
 
     ## Get number of cameras
-    self.num_cameras = count_cameras()
-
+    self.num_cameras = 0#count_cameras()
+'''
 def count_cameras():
     max_tested = 2
     for i in range(max_tested):
@@ -121,3 +120,4 @@ def count_cameras():
             temp_camera.release()
             continue
         return i + 1
+'''

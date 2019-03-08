@@ -8,7 +8,7 @@ from tkinter.filedialog import askopenfilename
 import os
 import giveFood
 from queue import Queue
-import whiskerTouch
+#import whiskerTouch
 try:
     import win32gui
     LINUX = False
@@ -191,7 +191,7 @@ def Food_Light_ONOFF(self, ON_OFF):
 def FOOD_REWARD(self, text):
     if self.EXPT_LOADED:
         self.expt.log_event(text)
-        self.num_pellets +=1
+        self.expt.num_pellets +=1
     if self.NIDAQ_AVAILABLE:
         #self.give_food.sendDBit(True) # Note:  Needs a delay (1 sec works)
                                       #  prior to high bit. But we don't want to
@@ -206,6 +206,7 @@ def shock(self, ON_OFF):
     else:
         if self.NIDAQ_AVAILABLE: self.apply_shock.sendDBit(False)
 
+'''
 def StartTouchScreen(self):
     if not self.TOUCH_TRHEAD_STARTED:
         self.TSq = Queue()
@@ -215,6 +216,7 @@ def StartTouchScreen(self):
         whiskerThread.start()
         self.TOUCH_TRHEAD_STARTED = True
         self.TSq.put('') # Send an emtpy string so it draws a blank screen to start!
+'''
 
 def exit_game(self):
     if self.EXPT_LOADED: self.expt.endExpt()

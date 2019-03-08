@@ -2,6 +2,7 @@ from RESOURCES.GUI_elements_by_flav import *
 import zmqClasses
 from queue import Queue
 import eventRECV
+import experiment
 
 def checkForTouch(self):
     if self.EXPT_LOADED:
@@ -132,7 +133,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     return buttons, levers, boxes, circles, LEDs, toggles, info_boxes, user_inputs, labels, sliders
 
 
-def setupGUI(self):
+def setupExpt(self):
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (20,40)
     self.myscreen = pygame.display.set_mode((500,990),pygame.RESIZABLE,32)
     #self.myscreen = pygame.display.set_mode((500,990),32)
@@ -176,42 +177,6 @@ def setupGUI(self):
 
     self.events = []
 
-    self.buttons,self.levers,self.boxes,self.circles,self.LEDs,self.toggles,self.info_boxes,self.user_inputs,self.labels,self.sliders = NIDAQ_GUI_ELEMENT(self, self.myscreen )
-    self.feederBox = self.boxes[0]
-##    print(len(self.buttons), " buttons")
-##    print(len(self.levers), " levers")
-##    print(len(self.boxes), " boxes")
-##    print(len(self.circles), " circles")
-##    print(len(self.LEDs), " LEDs")
-##    print(len(self.toggles), " toggles" )
-##    print(len(self.labels), " labels")
-##    print(len(self.info_boxes), " info_boxes")
-##    print(len(self.info_boxes), " user_imputs")
-    # USER INPUTS DEFAULT VALUES
-    for user_input in self.user_inputs:
-        if user_input.label == "EXPT":
-             user_input.text = str(self.Expt_Name)
-        elif user_input.label == "SUBJECT":
-             user_input.text = str(self.Subject)
-        elif user_input.label == "TRIAL":
-             user_input.text = "0"
-        elif user_input.label == "EXPT PATH":
-             user_input.text = str(self.datapath)
-        elif user_input.label == "EXPT FILE NAME":
-             user_input.text = str(self.expt_file_name)
-        elif user_input.label == "Spk(S)":
-             user_input.text  = str(self.Tone1_Duration)
-        elif user_input.label == "Freq(Hz)":
-             user_input.text  = str(self.Tone1_Freq)
-        elif user_input.label == "Vol(0-1)":
-             user_input.text  = str(self.Tone1_Vol)
-        elif user_input.label == "Shck(S)":
-             user_input.text = str(self.Shock_Duration)
-        elif user_input.label == "V":
-             user_input.text = str(self.Shock_V)
-        elif user_input.label == "Amps":
-             user_input.text = str(self.Shock_Amp)
-
     # MAIN LOOP
     self.start_line = len(self.events)
     #self.y_per_line = int(self.sliders[0].slotL / 14.0)
@@ -247,3 +212,41 @@ def setupGUI(self):
     self.START_EXPT = False
     self.RESTART_EXPT = False
     self.TOUCH_TRHEAD_STARTED = False
+
+    self.expt = experiment.Experiment(self)
+
+    self.buttons,self.levers,self.boxes,self.circles,self.LEDs,self.toggles,self.info_boxes,self.user_inputs,self.labels,self.sliders = NIDAQ_GUI_ELEMENT(self, self.myscreen )
+    self.feederBox = self.boxes[0]
+    ##    print(len(self.buttons), " buttons")
+    ##    print(len(self.levers), " levers")
+    ##    print(len(self.boxes), " boxes")
+    ##    print(len(self.circles), " circles")
+    ##    print(len(self.LEDs), " LEDs")
+    ##    print(len(self.toggles), " toggles" )
+    ##    print(len(self.labels), " labels")
+    ##    print(len(self.info_boxes), " info_boxes")
+    ##    print(len(self.info_boxes), " user_imputs")
+    # USER INPUTS DEFAULT VALUES
+    for user_input in self.user_inputs:
+        if user_input.label == "EXPT":
+             user_input.text = str(self.Expt_Name)
+        elif user_input.label == "SUBJECT":
+             user_input.text = str(self.Subject)
+        elif user_input.label == "TRIAL":
+             user_input.text = "0"
+        elif user_input.label == "EXPT PATH":
+             user_input.text = str(self.datapath)
+        elif user_input.label == "EXPT FILE NAME":
+             user_input.text = str(self.expt_file_name)
+        elif user_input.label == "Spk(S)":
+             user_input.text  = str(self.Tone1_Duration)
+        elif user_input.label == "Freq(Hz)":
+             user_input.text  = str(self.Tone1_Freq)
+        elif user_input.label == "Vol(0-1)":
+             user_input.text  = str(self.Tone1_Vol)
+        elif user_input.label == "Shck(S)":
+             user_input.text = str(self.Shock_Duration)
+        elif user_input.label == "V":
+             user_input.text = str(self.Shock_V)
+        elif user_input.label == "Amps":
+             user_input.text = str(self.Shock_Amp)

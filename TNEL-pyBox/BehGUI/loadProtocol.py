@@ -85,8 +85,8 @@ def load_expt_file(self):
                         print("#####################")
                         print("#    EXPERIMENT     #")
                         print("#####################")
-                        if self.GUI.Expt_Name == "": #Change only if it does not already exist
-                            self.GUI.Expt_Name = str_after_equal
+                        #if self.GUI.Expt_Name == "": #Change only if it does not already exist
+                        self.GUI.Expt_Name = str_after_equal
                         print(self.GUI.Expt_Name)
 
                     elif 'SUBJECT' in str_before_equal:
