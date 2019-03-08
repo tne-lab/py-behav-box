@@ -211,8 +211,8 @@ def setupExpt(self):
     self.NAME_OR_SUBJ_CHANGED = False
     self.START_EXPT = False
     self.RESTART_EXPT = False
-    self.TOUCH_TRHEAD_STARTED = False
 
+    time.sleep(0.5)
     self.expt = experiment.Experiment(self)
 
     self.buttons,self.levers,self.boxes,self.circles,self.LEDs,self.toggles,self.info_boxes,self.user_inputs,self.labels,self.sliders = NIDAQ_GUI_ELEMENT(self, self.myscreen )

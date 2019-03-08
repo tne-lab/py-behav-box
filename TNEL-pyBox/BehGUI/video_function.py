@@ -58,7 +58,6 @@ class Vid:
         elif isinstance(videoPath, int): # Calculates Frames Per Sec (FPS)
             # Number of frames to capture
             numFrames = 60;
-
             # Start time
             start = time.time()
             # Grab a few frames

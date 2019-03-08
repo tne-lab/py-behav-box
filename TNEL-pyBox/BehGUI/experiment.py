@@ -10,7 +10,7 @@ import GUIFunctions
 class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
     import GUIFunctions
-    from EXPTFunctions import checkStatus, checkQs,  log_event
+    from EXPTFunctions import checkStatus, checkQs,  log_event, MyVideo
     from setExptGlobals import setExptGlobals, setVidGlobals, setTouchGlobals
 ####################################################################################
 #   INITIALIZE EXPERIMENT
@@ -29,8 +29,6 @@ class Experiment:
         else:
             print("COULD NOT LOAD EXPT FILE")
             self.log_event("COULD NOT LOAD EXPT FILE")
-        if self.TOUCHSCREEN_USED:
-            GUIFunctions.StartTouchScreen(self.GUI)
 
         # Open ephys stuff
         if self.EPHYS_ENABLED:

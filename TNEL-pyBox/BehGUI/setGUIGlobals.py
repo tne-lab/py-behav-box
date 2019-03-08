@@ -2,6 +2,7 @@ import cv2
 import os
 import pygame
 import time
+import GUIFunctions
 try:
     import daqAPI
 except:
@@ -19,7 +20,6 @@ def setGUIGlobals(self):
     WINDOW_HEIGHT = SCREEN_HEIGHT -100
     WINDOW_HCENTER = WINDOW_HEIGHT/2
     self.GAME_AREA = pygame.Rect(20, 10, WINDOW_WIDTH, WINDOW_HEIGHT)
-
 
     ################################################################
     # NIDAQ GLOBALS
@@ -47,7 +47,6 @@ def setGUIGlobals(self):
         self.R_nose_poke = daqAPI.rightNoseInputSetup()
         self.checkPressLeft, self.checkPressRight = daqAPI.leverInputSetup()
         self.eaten = daqAPI.foodEatInputSetup()
-
         # Create stim thread
         #self.STIM_ENABLED = True
         #self.stimQ = Queue()
@@ -63,7 +62,7 @@ def setGUIGlobals(self):
     self.resourcepath = os.path.join(cwd, 'RESOURCES')
 
     #self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN2' #Flav's Machine
-    self.expt_file_name = 'PROTOCOL_BAR_PRESS_TRAIN-Ephys.txt'#Jean's Machine
+    self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN_1_OF_2_PICS.txt'#Jean's Machine
     self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
 
     self.exptFileLines = []
@@ -84,7 +83,6 @@ def setGUIGlobals(self):
     self.NAME_OR_SUBJ_CHANGED = False
     self.START_EXPT = False
     self.RESTART_EXPT = False
-    self.TOUCH_TRHEAD_STARTED = False
     self.Expt_Count = 0
 
     ################################################################
@@ -109,6 +107,9 @@ def setGUIGlobals(self):
     self.R_LEVER_EXTENDED = False
     self.LEVERS_EXTENDED = False
 
+    self.TOUCH_TRHEAD_STARTED = False
+    GUIFunctions.StartTouchScreen(self)
+
     ## Get number of cameras
     self.num_cameras = count_cameras()
 
@@ -120,3 +121,4 @@ def count_cameras():
             temp_camera.release()
             continue
         return i + 1
+    return i + 1

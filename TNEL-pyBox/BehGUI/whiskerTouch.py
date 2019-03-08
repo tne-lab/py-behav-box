@@ -270,12 +270,12 @@ def main(back_q, q, display_num = DEFAULT_DISPLAY_NUM, media_dir = DEFAULT_MEDIA
         q = q
     )
     w.connect('localhost', port)
-    print('trying to start touchscreen, if stuck check whiskerTouch main')
+
     while True:
         try:
             reactor.run() # starts Twisted and thus network processing
             break
-        except: pass
+        except: print('trying to start touchscreen, if stuck check whiskerTouch main')
     # ***
     # Note: This is BAD programming in my opinion. The logical flow is interrupted.
     # The Reactor is basically an event alarm. The program sits and waits until an event is
