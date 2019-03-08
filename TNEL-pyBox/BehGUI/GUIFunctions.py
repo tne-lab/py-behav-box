@@ -8,7 +8,7 @@ from tkinter.filedialog import askopenfilename
 import os
 import giveFood
 from queue import Queue
-#import whiskerTouch
+import whiskerTouch
 try:
     import win32gui
     LINUX = False
@@ -206,7 +206,7 @@ def shock(self, ON_OFF):
     else:
         if self.NIDAQ_AVAILABLE: self.apply_shock.sendDBit(False)
 
-'''
+
 def StartTouchScreen(self):
     if not self.TOUCH_TRHEAD_STARTED:
         self.TSq = Queue()
@@ -216,7 +216,6 @@ def StartTouchScreen(self):
         whiskerThread.start()
         self.TOUCH_TRHEAD_STARTED = True
         self.TSq.put('') # Send an emtpy string so it draws a blank screen to start!
-'''
 
 def exit_game(self):
     if self.EXPT_LOADED: self.expt.endExpt()

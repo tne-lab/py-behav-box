@@ -1,5 +1,5 @@
-#import video_function
-#import whiskerTouch
+import video_function
+import whiskerTouch
 import time
 import threading
 ####################################################################################
@@ -95,7 +95,6 @@ def checkQs(self):
 ###########################################################################################################
 #  START THREADS FOR VID/TOUCHSCREEN
 ###########################################################################################################
-'''
 def MyVideo(self):
     vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q,))
     vid_thread.daemon = True
@@ -109,7 +108,7 @@ def MyVideo(self):
           msg = self.VIDBack_q.get()
           if msg == 'vid ready':
               return
-'''
+
 ####################################################################################
 #   LOG EVENTS
 ####################################################################################

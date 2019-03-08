@@ -1,4 +1,4 @@
-#import cv2
+import cv2
 import os
 import pygame
 import time
@@ -110,8 +110,8 @@ def setGUIGlobals(self):
     self.LEVERS_EXTENDED = False
 
     ## Get number of cameras
-    self.num_cameras = 0#count_cameras()
-'''
+    self.num_cameras = count_cameras()
+
 def count_cameras():
     max_tested = 2
     for i in range(max_tested):
@@ -120,4 +120,3 @@ def count_cameras():
             temp_camera.release()
             continue
         return i + 1
-'''
