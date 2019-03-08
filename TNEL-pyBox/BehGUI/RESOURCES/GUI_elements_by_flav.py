@@ -1025,7 +1025,7 @@ class get_user_input:
     # Get user keyboard input
 
     def get_key_input(self):
-        pygame.draw.rect(self.surface, (255,0,0), self.border)
+        pygame.draw.rect(self.surface, (0,255,0), self.border)
         surface = self.surface
         fsize = self.fsize
         text_input = self.text
