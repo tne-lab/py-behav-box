@@ -491,10 +491,10 @@ def create_files(self):
 
     ###### Notes
     note_file_name = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-NOTES'  + '.txt'
-    self.note_file_path = os.path.join(self.GUI.newdatapath, note_file_name)
-    notes = fopen(note_file,'a+')
-    fclose(notes)
-    webbrowser.open(note_file)
+    self.note_file_path = os.path.join(self.newdatapath, note_file_name)
+    note_file = open(self.note_file_path,'a+')
+    note_file.close()
+    webbrowser.open(self.note_file_path)
 
 # COPY EXPT FILE TO EXPT FILE DATAPATH
 def create_expt_file_copy(self):
