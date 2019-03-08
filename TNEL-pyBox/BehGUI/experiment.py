@@ -775,7 +775,7 @@ class Experiment:
                    #  IMAGE TOUCHED
                    ###################
                    elif not self.HAS_ALREADY_RESPONDED: # Target touched
-                       self.touch_time = cur_time
+                       self.touch_time = self.cur_time
                        self.HAS_ALREADY_RESPONDED = True
                        self.any_image_touches += 1
                        # Check probability for pic/trial
@@ -895,7 +895,6 @@ class Experiment:
            if self.TIME_IS_UP: # TIME IS UP FOR LOOP
                # SET OUTCOMES
                if self.CORRECT:
-                  print("TONE1 DuRATION: ", self.Tone1_Duration)
                   #self.TONE_ON = True
                   GUIFunctions.PLAY_TONE(self.GUI,'TONE1 for Correct Response') #THIS IS DONE EVERY CORRECT RESPOSE EVEN IF REWARD NOT GIVEN
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
