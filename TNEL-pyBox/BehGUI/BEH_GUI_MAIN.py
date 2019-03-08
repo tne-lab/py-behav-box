@@ -457,6 +457,7 @@ class BEH_GUI():
                                     button.UP_DN = "DN"
                                     self.events = []
                                     self.expt = experiment.Experiment(self)
+                                    self.setupGUI()
                                     self.EXPT_LOADED = True
                                     for LED in self.LEDs: # Look for EXPT STARTED LED
                                           if LED.index == 6: # Expt Started light
