@@ -39,6 +39,8 @@ import GUIFunctions
 import subprocess
 import experiment
 import win32gui, win32con
+from tkinter import *
+from tkinter import messagebox
 
 class BEH_GUI():
     def __init__(self, NIDAQ_AVAILABLE):
@@ -452,17 +454,21 @@ class BEH_GUI():
                                #
                                #######################################
                                elif button.text == "LOAD FILE":
-                                    self.RUN_SETUP = False
-                                    self.START_EXPT = False
-                                    button.UP_DN = "DN"
-                                    self.events = []
-                                    self.expt = experiment.Experiment(self)
-                                    self.setupGUI()
-                                    self.EXPT_LOADED = True
-                                    for LED in self.LEDs: # Look for EXPT STARTED LED
-                                          if LED.index == 6: # Expt Started light
-                                              LED.ONOFF = "OFF"
-                                    self.setupGUI()
+                                    if not self.START_EXPT:
+                                        self.RUN_SETUP = False
+                                        self.START_EXPT = False
+                                        button.UP_DN = "DN"
+                                        self.events = []
+                                        self.expt = experiment.Experiment(self)
+                                        self.setupGUI()
+                                        self.EXPT_LOADED = True
+                                        for LED in self.LEDs: # Look for EXPT STARTED LED
+                                              if LED.index == 6: # Expt Started light
+                                                  LED.ONOFF = "OFF"
+                                        self.setupGUI()
+                                    else:
+                                        Tk().wm_withdraw() #to hide the main window
+                                        messagebox.showinfo('Stop Experiment First!', 'OK')
 
 
                                #######################################
@@ -472,6 +478,7 @@ class BEH_GUI():
                                #######################################
                                elif button.text == "STOP EXPT":
                                     self.expt.endExpt()
+                                    self.RESTART_EXPT = True
 
                                #######################################
                                #
