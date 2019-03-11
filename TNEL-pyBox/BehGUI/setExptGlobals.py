@@ -26,6 +26,7 @@ def setExptGlobals(self):
     ################################################################
     self.trial_num = 0
     self.EXPT_FILE_LOADED = False
+    self.RECORDING = False
 
     ################################################################
     # EXPERIMENT PARAMETERS

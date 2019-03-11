@@ -218,9 +218,10 @@ def StartTouchScreen(self):
         self.TSq.put('') # Send an emtpy string so it draws a blank screen to start!
 
 def exit_game(self):
+    #Exit things
     if self.EXPT_LOADED: self.expt.endExpt()
-    if self.TOUCH_TRHEAD_STARTED == True:
-        self.TSq.put('STOP')
+    if self.TOUCH_TRHEAD_STARTED == True: self.TSq.put('STOP')
+
     #Close all NIDAQ tasks
     if self.NIDAQ_AVAILABLE:
       self.fan.end()

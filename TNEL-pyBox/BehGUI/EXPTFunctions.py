@@ -6,14 +6,14 @@ import threading
 #   GET BOX INPUTS FROM GUI
 ####################################################################################
 def checkStatus(self):
-    '''
+
     # Maybe reset inputs?
     self.FOOD_EATEN = False
     self.LEVER_PRESSED_L = False
     self.LEVER_PRESSED_R = False
     self.NOSE_POKED_L = False
     self.NOSE_POKED_R = False
-    '''
+
 
     # Get info from GUI
     self.LEVER_PRESSED_L = self.GUI.LEVER_PRESSED_L
@@ -37,14 +37,14 @@ def checkStatus(self):
         self.num_eaten +=1
         self.log_event("Food_Eaten")
 
-    '''
+
     # Not sure what to do here. Reset self.GUI inputs?
     self.GUI.FOOD_EATEN = False
     self.GUI.LEVER_PRESSED_L = False
     self.GUI.LEVER_PRESSED_R = False
     self.GUI.NOSE_POKED_L = False
     self.GUI.NOSE_POKED_R = False
-    '''
+
 ###########################################################################################################
 # CHECK Qs
 ###########################################################################################################
@@ -84,6 +84,7 @@ def checkQs(self):
         self.vidDict['STATE'] = self.vidSTATE
         self.vidDict['PATH_FILE'] = self.video_file_path_name
         self.vidDict['FLIP'] = self.FLIP
+        self.vidDict['REC'] = self.RECORDING
         self.VIDq.append(self.vidDict)
 
     if self.EPHYS_ENABLED:

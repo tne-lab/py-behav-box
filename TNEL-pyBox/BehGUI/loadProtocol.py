@@ -297,7 +297,6 @@ def load_expt_file(self):
 
                     if 'ROI' in str_before_equal:  #key == 'ROI':  # THIS SHOULD BE IN LOAD PROTOCOL ONLY WHEN and WHERE FREEZE INFO IS GIVEN
                         self.ROI = str_after_equal
-                        self.vidDict['ROI'] = self.ROI
                         if "GENERATE" in self.ROI:
                             print("ROI: ",self.ROI)
                         else:

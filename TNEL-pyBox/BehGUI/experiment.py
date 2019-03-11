@@ -528,8 +528,8 @@ class Experiment:
                 self.VI = self.var_interval_reward
 
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
+                print('checking some vis')
                 self.num_bar_presses +=1
-                self.VI_start = self.cur_time
                 # Calculate Bar Presses Per Minute
                 BPPM_time_interval = self.cur_time - self.VI_calc_start
                 if BPPM_time_interval >= 60.0:  #Calculate BPPM every minute (60 sec)
@@ -561,6 +561,7 @@ class Experiment:
                                 print ("NEW VI: ",str(self.var_interval_reward))
 
                 # Check if amount of VI has passed
+                print('cur:', self.cur_time, ' start: ', self.VI_start,' vi:', self.VI)
                 if self.cur_time > (self.VI_start + self.VI):
                    GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
                    if self.var_interval_reward <= 1:
@@ -568,7 +569,7 @@ class Experiment:
                    else:
                        self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
                    self.log_event( "Cur VI:" + str(self.VI) + " (sec)" )
-                   self.VI_START = self.cur_time
+                   self.VI_start= self.cur_time
 
 
 
@@ -606,11 +607,6 @@ class Experiment:
 #                            if self.VR < 35: #VR will stay at 30 and no more until END_LOOP is reached.
 #                                self.VR +=5 #VR = 10, 15, 20, 25, 30
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-
-        # Clean up vars
-        self.LEVER_PRESSED_R = False
-        self.LEVER_PRESSED_L = False
 
         #########################################################
         #  PROTOCOL ENDED (Reset everything for next run
@@ -1010,6 +1006,9 @@ class Experiment:
             self.VIDq.append(self.vidDict)
             self.SIMPLEVIDq.put({'STATE':'OFF'})
 
+        if self.GUI.num_cameras == 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
+
+
         try: self.log_file.close()  # CLOSE LOG FILE
         except: pass
         # Reset GUI Stuff
@@ -1020,6 +1019,9 @@ class Experiment:
         self.GUI.START_EXPT = False
         self.GUI.EXPT_LOADED = True
         self.GUI.LEDs[6].ONOFF = False
+
+        if self.TOUCHSCREEN_USED:
+            self.GUI.TSq.put('')
         for button in self.GUI.buttons:
             if button.text == 'STOP EXPT':
                 button.text = 'START EXPT'
