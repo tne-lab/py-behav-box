@@ -112,7 +112,6 @@ class Vid:
             # Run video
             try:
                 msg = self.q.pop()
-                print(msg)
                 time_from_GUI = msg['cur_time']
                 STATE = msg['STATE'] # NOTE: NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                 self.FLIP = msg['FLIP']

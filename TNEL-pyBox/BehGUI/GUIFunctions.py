@@ -31,7 +31,8 @@ def lookForProgram(hwnd, programName):
         win32gui.CloseWindow(hwnd) # Minimize Window
         if 'Whisker' in programName:
             IsWhiskerRunning = True
-        if 'Ephys' in programName:
+        elif 'Ephys' in programName:
+            print('found ephys!')
             IsOpenEphysRunning = True
 
 def openWhiskerEphys(NIDAQ_AVAILABLE):

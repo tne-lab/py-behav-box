@@ -4,6 +4,7 @@ import subprocess
 import GUIFunctions
 import time
 import webbrowser
+import win32gui
 
 def get_val_between_equal_sign_and_hash(line):
     try:
@@ -132,11 +133,12 @@ def load_expt_file(self):
                         self.EPHYS_ENABLED = True
                         if self.GUI.NIDAQ_AVAILABLE:
                             ephys = 'Open Ephys GUI'
-                            if not win32gui.EnumWindows(lookForProgram, ephys):
+                            win32gui.EnumWindows(GUIFunctions.lookForProgram, ephys)
+                            if not GUIFunctions.IsOpenEphysRunning:
                                 oe = str_after_equal
                                 window = subprocess.Popen(oe)# # doesn't capture output
                                 time.sleep(2)
-                                win32gui.EnumWindows(lookForProgram, ephys)
+                                win32gui.EnumWindows(GUIFunctions.lookForProgram, ephys)
                                 #except:
                                 #    print("Could not start Open Ephys")
                             else: print("Open Ephysis already RUNNING")

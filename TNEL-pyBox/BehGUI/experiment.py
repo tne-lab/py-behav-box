@@ -204,7 +204,6 @@ class Experiment:
         protocolDict = self.protocol[self.Protocol_ln_num]
         key = list(protocolDict.keys())[0] # First key in protocolDict
         #cur_time = time.perf_counter()
-
         if key == "":
             self.Protocol_ln_num +=1
         elif key == "FAN_ON":
@@ -508,7 +507,7 @@ class Experiment:
                             self.PAUSE_STARTED = False
                             self.TOUCHED_TO_START_TRIAL = False
                             self.START_IMG_PLACED = False
-                            GUIFunctions.log_event(self.touchMsg['picture'] + " RAT Pressed START, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
+                            self.log_event(self.touchMsg['picture'] + " RAT Pressed START, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
                             self.GUI.TSq.put('')
                         else:
                             self.log_event(self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
