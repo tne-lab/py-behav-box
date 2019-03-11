@@ -96,7 +96,7 @@ def checkQs(self):
 #  START THREADS FOR VID/TOUCHSCREEN
 ###########################################################################################################
 def MyVideo(self):
-    vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q,))
+    vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q, self.freeze_file_path))
     vid_thread.daemon = True
     self.VIDq.pop()
     self.checkQs()

@@ -986,6 +986,8 @@ class Experiment:
                self.Protocol_ln_num +=1
     ### END EXPT ###
     def endExpt(self):
+        '''
+        # Probably get rid of..
         self.log_event("END TIME")
         try: #Close up our note files
             note_file = open(self.note_file_path,'r')
@@ -995,6 +997,7 @@ class Experiment:
                 self.log_event(ln)
             note_file.close()
         except: pass
+        '''
 
         # Tell open ephys to stop acquistion and recording?
         if self.EPHYS_ENABLED:

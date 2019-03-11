@@ -476,8 +476,12 @@ def create_files(self):
     video_file_name = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-VIDEO_file' + '.avi'
     self.video_file_path_name = os.path.join(self.newdatapath,video_file_name)
     print(self.video_file_path_name)
+
+    freeze_file = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-FREEZES' + '.csv'
+    self.freeze_file_path = os.path.join(self.newdatapath, freeze_file)
+    print(self.freeze_file_path)
     ## AUX VIDEO ##
-    if self.GUI.num_cameras == 2:
+    if self.GUI.num_cameras == 2: # Need two cameras
         video_file_name_aux = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-VIDEO_file_aux' + '.avi'
         self.video_file_path_name_aux = os.path.join(self.newdatapath,video_file_name_aux)
         print(self.video_file_path_name_aux)
