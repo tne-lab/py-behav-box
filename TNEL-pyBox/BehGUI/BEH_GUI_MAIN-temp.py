@@ -300,10 +300,11 @@ class BEH_GUI():
 
         # GUI TOUCH SCREEN
         for x,y in self.background_hits:
-            #print(x,y)
+            # BackGround Touches
             draw_plus_sign(self.myscreen, x + 40, y +320, 5, (255,0,0) ) # (40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                      self.touch_time = cur_time
 
         for x,y in self.correct_img_hits:
+            # High Prob or good hits
             draw_plus_sign(self.myscreen, x + 40, y +320, 5, (0,255,0) ) # (40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                      self.touch_time = cur_time
 
         for x,y in self.wrong_img_hits:
@@ -312,8 +313,9 @@ class BEH_GUI():
         try:
             #print(self.touchImgCoords)
             for coords in self.touchImgCoords:
-                #print (coords)
-                x,y = int(coords[0]/4 + 40), int(coords[1]/4 + 320)   # NOTE: 40,320 is top-left of gui touch representation. 1/4 is its scale
+                # Low Prob or Bad hits
+                x,y = int(coords[0]/4 + 40), int(coords[1]/4 + 320)   # NOTE: 40,320 is top-left of gui touch representation.
+                                                                      # 1/4 is GUI scale
                 pygame.draw.rect(self.myscreen, (0,0,255) , (x,y,60,60),  1)
 
 
