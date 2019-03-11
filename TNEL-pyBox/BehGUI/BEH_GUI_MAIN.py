@@ -637,10 +637,12 @@ class BEH_GUI():
 
                           else: #TURN CAMERA ON # NOTE: STATE = (ON,OFF,REC, START_EXPT,STOP_EXPT)
                                 self.CAMERA_ON = True
-                                if self.EXPT_LOADED: self.expt.log_event("Camera_ON")
+                                if self.EXPT_LOADED:
+                                    self.expt.MyVideo(self)
+                                    self.expt.log_event("Camera_ON")
                                 #print("CAMERA ON")
                                 self.vidSTATE = 'ON'
-                                GUIFunctions.MyVideo(self)
+
 
                     # USER KEYBOARD INPUTS
                     for user_input in self.user_inputs:
