@@ -121,7 +121,7 @@ class Vid:
                     self.rec = True
                 else:
                     self.rec = False
-                if 'ROI' in msg and not self.ROIenabled:
+                if msg['ROI'] != '' and not self.ROIenabled:
                     if msg['ROI'] in 'GENERATE':
                         self.ROIGEN = True
                         self.initROIFrames()

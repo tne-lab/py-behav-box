@@ -67,100 +67,101 @@ class Experiment:
             self.log_event("EXPT STARTED USING " + self.expt_file_path_name_COPY)
             self.trial_num = 0
         #cur_time = time.perf_counter()
-        print("SETUPDICT:....................",self.setup,"length: ",len(self.setup),"linenum: ",self.setup_ln_num)
-        setupDict = self.setup[self.setup_ln_num]
-        key = list(setupDict.keys())[0] # First key in protocolDict
-        if key == "":
-            self.setup_ln_num +=1
-        elif key == "FAN_ON":
-           val = str2bool(setupDict[key])
-           print("FAN")
-           GUIFunctions.FAN_ON_OFF(self.GUI,val) # {'FAN_ON': True} or {'FAN_ON': False}
-           self.setup_ln_num +=1
-        elif key == "CAB_LIGHT":
-           val = str2bool(setupDict[key])
-           print("CAB_LIGHT")
-           self.Background_color = GUIFunctions.CAB_LIGHT(self.GUI,val)
-           self.setup_ln_num +=1
-        elif key == "FOOD_LIGHT":
-            print("FOOD LIGHT: ",setupDict["FOOD_LIGHT"])
-            val = str2bool(setupDict[key])
-            self.setup_ln_num +=1
-            self.GUI.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self.GUI,val)
-            self.GUI.LEDs[4].ONOFF = LEDsONOFF
-            self.GUI.LEDs[5].ONOFF = LEDsONOFF
-        elif key == "CAMERA":
-
-            val = str2bool(setupDict["CAMERA"])
-            self.setup_ln_num +=1
-            if val:  # TURN CAMERA ON.     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                if not self.GUI.CAMERA_ON: # CAMERA WAS OFF
-                    self.GUI.CAMERA_ON = True
-                    self.log_event("Camera_ON")
-                    self.vidSTATE = 'ON'
-                    self.checkQs()
-                    self.MyVideo()
-                else: # CAMERA IS ALREADY ON
-                    self.log_event("Camera is ALREADY ON")
-            else: # TURN CAMERA OFF
-                if self.GUI.CAMERA_ON: # CAMERA CURRENTLY ON
-                    self.GUI.CAMERA_ON = False
-                    self.RECORDING = False
-                    self.log_event("Camera_OFF")
-                    self.vidSTATE = 'OFF'
-
-
-        elif key == "REC":
-            print ("recording ....")
-            self.RECORDING = True
-            val = str2bool(setupDict[key])
-            self.setup_ln_num +=1
-            if val:  # REC == TRUE.  Remember Camera NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-                if self.EPHYS_ENABLED:
-                    self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
-                    self.snd.send(self.snd.START_REC) # OPEN_EPHYS
-                self.vidSTATE = 'REC_VID'
-                if self.FREEZE_DETECTION_ENABLED:
-                    print("\nFREEZE DETECTION ENABLED")
-                    print(self.ROI)
-                    self.vidROI = self.ROI
-                    print("Slef.ROI: ",self.ROI,"\n")
-            else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
-                self.vidSTATE = 'REC_STOP'
-                print("\nREC = False, Self.ROI: ",self.ROI,"\n")
-
-        elif "EXTEND_LEVERS" in key:
-            self.setup_ln_num +=1
-            if setupDict[key] == "L_LVR":
-                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Left Lever Extended",True,False)
-            elif setupDict[key] == "R_LVR":
-               GUIFunctions.EXTEND_LEVERS(self.GUI,"Right Lever Extended",False,True)
-            else:
+        #print("SETUPDICT:....................",self.setup,"length: ",len(self.setup),"linenum: ",self.setup_ln_num)
+        if self.setup_ln_num < len(self.setup):
+            setupDict = self.setup[self.setup_ln_num]
+            key = list(setupDict.keys())[0] # First key in protocolDict
+            if key == "":
+                self.setup_ln_num +=1
+            elif key == "FAN_ON":
+               val = str2bool(setupDict[key])
+               print("FAN")
+               GUIFunctions.FAN_ON_OFF(self.GUI,val) # {'FAN_ON': True} or {'FAN_ON': False}
+               self.setup_ln_num +=1
+            elif key == "CAB_LIGHT":
+               val = str2bool(setupDict[key])
+               print("CAB_LIGHT")
+               self.Background_color = GUIFunctions.CAB_LIGHT(self.GUI,val)
+               self.setup_ln_num +=1
+            elif key == "FOOD_LIGHT":
+                print("FOOD LIGHT: ",setupDict["FOOD_LIGHT"])
                 val = str2bool(setupDict[key])
-                if val: # EXTEND_LEVERS == True
-                   print ("LEVERS EXTENDED")
-                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,True)
-                   for lever in self.GUI.levers:
-                         lever.STATE = "OUT"
-                   for button in self.GUI.buttons:
-                        if button.text == "EXTEND": button.text = "RETRACT"
-                else: # RETRACT LEVERS (EXTEND_LEVERS == False)
-                   #print ("RETRACT LEVERS")
-                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
-                   for lever in self.GUI.levers:
-                        lever.STATE = "IN"
-                   for button in self.GUI.buttons:
-                        if button.text == "RETRACT": button.text = "EXTEND"
+                self.setup_ln_num +=1
+                self.GUI.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self.GUI,val)
+                self.GUI.LEDs[4].ONOFF = LEDsONOFF
+                self.GUI.LEDs[5].ONOFF = LEDsONOFF
+            elif key == "CAMERA":
+
+                val = str2bool(setupDict["CAMERA"])
+                self.setup_ln_num +=1
+                if val:  # TURN CAMERA ON.     # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                    if not self.GUI.CAMERA_ON: # CAMERA WAS OFF
+                        self.GUI.CAMERA_ON = True
+                        self.log_event("Camera_ON")
+                        self.vidSTATE = 'ON'
+                        self.checkQs()
+                        self.MyVideo()
+                    else: # CAMERA IS ALREADY ON
+                        self.log_event("Camera is ALREADY ON")
+                else: # TURN CAMERA OFF
+                    if self.GUI.CAMERA_ON: # CAMERA CURRENTLY ON
+                        self.GUI.CAMERA_ON = False
+                        self.RECORDING = False
+                        self.log_event("Camera_OFF")
+                        self.vidSTATE = 'OFF'
 
 
-        elif "MAX_EXPT_TIME" in key:
-            self.setup_ln_num +=1
-            self.MAX_EXPT_TIME = float(setupDict["MAX_EXPT_TIME"])
-            print("Max Expt Time :", self.MAX_EXPT_TIME * 60.0, " sec")
+            elif key == "REC":
+                print ("recording ....")
+                self.RECORDING = True
+                val = str2bool(setupDict[key])
+                self.setup_ln_num +=1
+                if val:  # REC == TRUE.  Remember Camera NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                    if self.EPHYS_ENABLED:
+                        self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
+                        self.snd.send(self.snd.START_REC) # OPEN_EPHYS
+                    self.vidSTATE = 'REC_VID'
+                    if self.FREEZE_DETECTION_ENABLED:
+                        print("\nFREEZE DETECTION ENABLED")
+                        print(self.ROI)
+                        self.vidROI = self.ROI
+                        print("Slef.ROI: ",self.ROI,"\n")
+                else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
+                    self.vidSTATE = 'REC_STOP'
+                    print("\nREC = False, Self.ROI: ",self.ROI,"\n")
+
+            elif "EXTEND_LEVERS" in key:
+                self.setup_ln_num +=1
+                if setupDict[key] == "L_LVR":
+                       GUIFunctions.EXTEND_LEVERS(self.GUI,"Left Lever Extended",True,False)
+                elif setupDict[key] == "R_LVR":
+                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Right Lever Extended",False,True)
+                else:
+                    val = str2bool(setupDict[key])
+                    if val: # EXTEND_LEVERS == True
+                       print ("LEVERS EXTENDED")
+                       GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,True)
+                       for lever in self.GUI.levers:
+                             lever.STATE = "OUT"
+                       for button in self.GUI.buttons:
+                            if button.text == "EXTEND": button.text = "RETRACT"
+                    else: # RETRACT LEVERS (EXTEND_LEVERS == False)
+                       #print ("RETRACT LEVERS")
+                       GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
+                       for lever in self.GUI.levers:
+                            lever.STATE = "IN"
+                       for button in self.GUI.buttons:
+                            if button.text == "RETRACT": button.text = "EXTEND"
+
+
+            elif "MAX_EXPT_TIME" in key:
+                self.setup_ln_num +=1
+                self.MAX_EXPT_TIME = float(setupDict["MAX_EXPT_TIME"])
+                print("Max Expt Time :", self.MAX_EXPT_TIME * 60.0, " sec")
 
 
 
-        if self.setup_ln_num >= len(self.setup):
+        else:
             setup_done = False
             # Start bar_press if using
             if self.GUI.CAMERA_ON and self.ROI == 'GENERATE':
@@ -981,19 +982,6 @@ class Experiment:
                self.Protocol_ln_num +=1
     ### END EXPT ###
     def endExpt(self):
-        '''
-        # Probably get rid of..
-        self.log_event("END TIME")
-        try: #Close up our note files
-            note_file = open(self.note_file_path,'r')
-            self.log_event('NOTES BELOW')
-            for ln in note_file:
-                ln = ln.rstrip()
-                self.log_event(ln)
-            note_file.close()
-        except: pass
-        '''
-
         # Tell open ephys to stop acquistion and recording?
         if self.EPHYS_ENABLED:
             self.snd.send(self.snd.STOP_ACQ)
@@ -1007,6 +995,10 @@ class Experiment:
 
         if self.GUI.num_cameras == 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
 
+        ### MAKE THIS CLEANER
+        GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
+        for lever in self.GUI.levers:
+            lever.STATE = "IN"
 
         try: self.log_file.close()  # CLOSE LOG FILE
         except: pass

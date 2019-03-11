@@ -85,6 +85,7 @@ def checkQs(self):
         self.vidDict['PATH_FILE'] = self.video_file_path_name
         self.vidDict['FLIP'] = self.FLIP
         self.vidDict['REC'] = self.RECORDING
+        self.vidDict['ROI'] = self.ROI
         self.VIDq.append(self.vidDict)
 
     if self.EPHYS_ENABLED:

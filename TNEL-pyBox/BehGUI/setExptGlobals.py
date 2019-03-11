@@ -136,12 +136,16 @@ def setExptGlobals(self):
     simpleVidThread = threading.Thread(target=video_function.runSimpleVid, args=(self.SIMPLEVIDq,))
     simpleVidThread.start()
 
+    self.ROI = ""
+    self.ROI_RECEIVED = False
+
     ################################################################
     # PAUSE
     ################################################################
     self.PAUSE_STARTED = False
     self.TOUCHED_TO_START_TRIAL = False
     self.START_IMG_PLACED = False
+
 
 
     ################################################################
@@ -155,7 +159,6 @@ def setVidGlobals(self):
     self.video_file_name = ''
     self.video_file_path_name = ''
     self.ROIstr = ""
-    self.ROI = ""
     self.vidSTATE= ''
     self.FLIP = False
     self.FROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
