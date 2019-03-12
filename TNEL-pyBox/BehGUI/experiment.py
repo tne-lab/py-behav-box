@@ -620,7 +620,7 @@ class Experiment:
            self.RECORDING = False
            self.log_event("Camera_OFF")
            self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-           self.end_expt()
+           self.endExpt()
 
         if self.Protocol_ln_num >= len(self.protocol):
            self.log_event("PROTOCOL ENDED")
