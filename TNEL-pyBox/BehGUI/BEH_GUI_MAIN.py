@@ -452,7 +452,8 @@ class BEH_GUI():
                                #
                                #######################################
                                elif button.text == "LOAD FILE":
-                                    if not self.START_EXPT:
+                                    if not self.START_EXPT or self.exptEnded:
+                                        self.exptEnded = False
                                         self.RUN_SETUP = False
                                         self.START_EXPT = False
                                         button.UP_DN = "DN"
@@ -481,6 +482,9 @@ class BEH_GUI():
                                #
                                #######################################
                                elif button.text == "START EXPT":
+                                    if self.exptEnded == True:
+                                        self.exptEnded = False
+                                        self.setupExpt()
                                     if self.EXPT_LOADED:
                                         button.UP_DN = "DN"
                                         self.Expt_Count +=1

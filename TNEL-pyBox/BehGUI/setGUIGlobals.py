@@ -84,6 +84,7 @@ def setGUIGlobals(self):
     self.START_EXPT = False
     self.RESTART_EXPT = False
     self.Expt_Count = 0
+    self.exptEnded = False
 
     ################################################################
     # TONE AND SHOCK DEFAULTS

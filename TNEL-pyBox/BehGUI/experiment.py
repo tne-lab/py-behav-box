@@ -1016,4 +1016,8 @@ class Experiment:
             if button.text == 'STOP EXPT':
                 button.text = 'START EXPT'
         self.GUI.events = []
-        self.GUI.RESTART_EXPT = True
+
+        self.GUI.exptEnded = True
+
+        #DONT RESET RIGHT AWAY
+        #self.GUI.RESTART_EXPT = True
