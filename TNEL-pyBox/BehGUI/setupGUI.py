@@ -211,7 +211,7 @@ def setupExpt(self):
     self.NAME_OR_SUBJ_CHANGED = False
     self.START_EXPT = False
     self.RESTART_EXPT = False
-    self.GUI.events = []
+    self.events = []
 
     time.sleep(0.5)
     self.expt = experiment.Experiment(self)
