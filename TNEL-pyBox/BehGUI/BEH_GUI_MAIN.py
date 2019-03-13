@@ -474,7 +474,6 @@ class BEH_GUI():
                                #######################################
                                elif button.text == "STOP EXPT":
                                     self.expt.endExpt()
-                                    self.RESTART_EXPT = True
 
                                #######################################
                                #
