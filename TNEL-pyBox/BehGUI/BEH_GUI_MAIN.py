@@ -516,7 +516,7 @@ class BEH_GUI():
                                     else:
                                         #self.EXPT_FILE_LOADED = False
                                         print("Experiment not loaded yet")
-                                        if self.EXPT_LOADED: self.expt.log_event("Expt File name or path DOES NOT EXIST")
+                                        #if self.EXPT_LOADED: self.expt.log_event("Expt File name or path DOES NOT EXIST")
 
                                self.LEFT_MOUSE_DOWN = False
                                self.BUTTON_SELECTED = True
