@@ -145,32 +145,32 @@ class BEH_GUI():
 
         for info in self.info_boxes: # Last so on top
             if info.label == "L NOSE POKES":
-                if not self.START_EXPT:
+                if not self.EXPT_LOADED:
                     info.text = "0"
                 else:
                   info.text = [str(self.expt.num_L_nose_pokes)]
             elif info.label == "R NOSE POKES":
-                if not self.START_EXPT:
+                if not self.EXPT_LOADED:
                     info.text = "0"
                 else:
                   info.text = [str(self.expt.num_R_nose_pokes)]
             elif info.label == "L PRESSES":
-                if not self.START_EXPT:
+                if not self.EXPT_LOADED:
                     info.text = "0"
                 else:
                   info.text = [str(self.expt.num_L_lever_preses)]
             elif info.label == "R PRESSES":
-                if not self.START_EXPT:
+                if not self.EXPT_LOADED:
                     info.text = "0"
                 else:
                   info.text = [str(self.expt.num_R_lever_preses) ]
             elif info.label == "PELLETS":
-                if not self.START_EXPT:
+                if not self.EXPT_LOADED:
                     info.text = "0"
                 else:
                   info.text = [str(self.expt.num_pellets)]
             elif info.label == "EATEN":
-                if not self.START_EXPT:
+                if not self.EXPT_LOADED:
                     info.text = "0"
                 else:
                   info.text = [str(self.expt.num_eaten)]
@@ -217,7 +217,7 @@ class BEH_GUI():
             elif user_input.label == "SUBJECT":
                  user_input.text = str(self.Subject)
             elif user_input.label == "TRIAL":
-                if not self.START_EXPT:
+                if not self.EXPT_LOADED:
                     user_input.text = "0"
                 else:
                  user_input.text  = str(self.expt.trial_num)
@@ -269,7 +269,7 @@ class BEH_GUI():
         self.camera = GUIFunctions.draw_camera(self.myscreen, (100,100,100),self.CAMERA_ON,self.RECORDING,235, 245, 30,20, 2)
 
         # GUI TOUCH SCREEN
-        if self.START_EXPT and self.expt.TOUCHSCREEN_USED:
+        if self.EXPT_LOADED and self.expt.TOUCHSCREEN_USED:
             for x,y in self.expt.background_hits:
                 #print(x,y)
                 draw_plus_sign(self.myscreen, x + 40, y +320, 5, (255,0,0) ) # (40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                      self.touch_time = cur_time

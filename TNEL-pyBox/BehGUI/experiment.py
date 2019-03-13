@@ -1006,16 +1006,17 @@ class Experiment:
            if user_input.label == "SUBJECT":
               self.GUI.Subject = ''
               self.GUI.prev_Subject = self.GUI.Subject
-        self.GUI.START_EXPT = False
-        self.GUI.EXPT_LOADED = True
+
         self.GUI.LEDs[6].ONOFF = False
 
+        self.GUI.START_EXPT = False
+        #self.GUI.EXPT_LOADED = True
         if self.TOUCHSCREEN_USED:
             self.GUI.TSq.put('')
         for button in self.GUI.buttons:
             if button.text == 'STOP EXPT':
                 button.text = 'START EXPT'
-        self.GUI.events = []
+        
 
         self.GUI.exptEnded = True
 
