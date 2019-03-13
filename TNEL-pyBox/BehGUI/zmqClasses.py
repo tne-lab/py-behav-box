@@ -19,7 +19,8 @@ class RCVEvent:
         #Get raw input from socket
         msg = self.poller.poll(1000)
         #print(envelope)
-        if len(msg)>2:
+        if len(msg)==2:
+            envelope, jsonStr = msg
             #Our actual json object (last part)
             jsonStr = json.loads(jsonStr);
             #print(self.parseJson(jsonStr))
