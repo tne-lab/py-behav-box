@@ -147,8 +147,6 @@ def setExptGlobals(self):
     self.TOUCHED_TO_START_TRIAL = False
     self.START_IMG_PLACED = False
 
-
-
     ################################################################
     # VIDEO GLOBALS
     ################################################################

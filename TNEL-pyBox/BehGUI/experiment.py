@@ -23,9 +23,8 @@ class Experiment:
             print("\n###########################")
             print("#   EXPT FILE LOADED!!    #")
             print("###########################")
-            if len(self.setup) > 0:
-                self.RUN_SETUP = True
-                self.setup_ln_num = 0
+            self.RUN_SETUP = True
+            self.setup_ln_num = 0
         else:
             print("COULD NOT LOAD EXPT FILE")
             self.log_event("COULD NOT LOAD EXPT FILE")
@@ -50,7 +49,7 @@ class Experiment:
         self.checkQs()
         if self.RUN_SETUP:
             self.runSetup()
-        if self.GUI.START_EXPT:
+        if self.GUI.START_EXPT and self.START_EXPT:
             self.runExpt()
 ###########################################################################################################
 #  SETUP EXPERIMENT
@@ -184,9 +183,9 @@ class Experiment:
                 self.setup_ln_num = 0
                 self.RUN_SETUP = False
                 ## STUFF FROM MAIN ## NEEDS TO BE UPDATED
-                self.cur_time = time.perf_counter()
-                self.Experiment_Start_time = self.cur_time
-                self.cur_time = self.cur_time-self.Experiment_Start_time
+                cur_time = time.perf_counter()
+                self.Experiment_Start_time = cur_time
+                self.cur_time = cur_time-self.Experiment_Start_time
                 self.TPM_start_time = self.cur_time #Screen TOUCHES per Min start time
                 self.START_EXPT = True
                 self.vidSTATE = 'START_EXPT'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
