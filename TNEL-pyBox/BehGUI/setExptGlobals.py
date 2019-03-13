@@ -42,7 +42,7 @@ def setExptGlobals(self):
     self.CONDITONS_NOT_SET = True
     self.CONDITION_STARTED = False
     self.RUN_SETUP = False
-    #self.START_EXPT = False
+    self.START_EXPT = False
 
     ################################################################
     # OUTCOME STATS
