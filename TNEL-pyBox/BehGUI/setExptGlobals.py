@@ -20,6 +20,7 @@ def setExptGlobals(self):
     self.log_file_path_name = ''
     self.data_file_name = ''
     self.data_file_path_name = ''
+    self.freeze_file_path = ''
 
     ################################################################
     # GENERAL GLOBALS

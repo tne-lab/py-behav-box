@@ -13,7 +13,8 @@ class Vid:
         self.ROIstr = ""
         self.ROIGEN = True
         #self.ROI = (0,0,0,0)
-        self.freezeEnable = False
+        if freeze_file_path != '': self.freezeEnable = True
+        else: self.freezeEnable = False
         self.FLIP = False
         self.rec = False
         cv2.namedWindow('vid')
@@ -28,7 +29,8 @@ class Vid:
             self.timeFrozen = 0
             self.text = ''
             self.capError = False
-            self.freezeFile = open(freeze_file_path,'w')
+            if self.freezeEnable:
+                self.freezeFile = open(freeze_file_path,'w')
             self.isFrozen = False
             self.threshold = 8
             # in milliseconds (2000 = 2 seconds)
@@ -96,7 +98,7 @@ class Vid:
         newFrameROI = newFrame[int(self.ROI[1]):int(self.ROI[1]+self.ROI[3]),int(self.ROI[0]):int(self.ROI[0] + self.ROI[2])]
         self.genPrev(newFrameROI, frameROI)
         self.ROIenabled = True
-        self.freezeEnable = True
+
 
 #######################################################################################
 #######################################################################################
@@ -163,12 +165,12 @@ class Vid:
                     self.timeFrozen = 0
                     if self.isFrozen:
                         self.isFrozen = False
-                        self.freezeFile.write('end freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
+                        if self.freezeEnable: self.freezeFile.write('end freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
                         #back_q.put({'FREEZE' : False, 'TIME' : time_from_GUI})
                 else:
                     if self.checkFreeze() and not self.isFrozen:
                         self.isFrozen = True
-                        self.freezeFile.write('freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
+                        if self.freezeEnable: self.freezeFile.write('freeze: ' + str(self.milliToTime(self.cap.get(0))) + '\n')
                         #back_q.put({'FREEZE' : True, 'TIME' : time_from_GUI})
                         self.text = 'freeze'
 
@@ -221,7 +223,7 @@ class Vid:
 
     # Close everything
     def close(self):
-        self.freezeFile.close()
+        if self.freezeEnable: self.freezeFile.close()
         self.cap.release()
         try: self.out.release()
         except: print('failed to release video outfile')
