@@ -16,13 +16,13 @@ EXTEND_LEVERS=R_LVR  # NOTE:   =R_LVR, L_LVR, or TRUE for both
 #NOTE: PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
 # VIs are random integers between 0 and 2 x a)
 # note: VI(a,b).  a = initial VI for bar PRESS, b = final VI for session. if a < 1, VI = 1. if VI = 1.0, VI between 0 and 2
-BAR_PRESS_TRAIN=VI(0,15)  
+BAR_PRESS_TRAIN=VI(60,60)  
 
 
 
 [PROTOCOL]
 START_LOOP = 1          # Loops are trials
-  PAUSE = 3600            #1 hour in seconds
+  PAUSE = 2400            #40 min in seconds
 END_LOOP
 
 EXTEND_LEVERS=FALSE
