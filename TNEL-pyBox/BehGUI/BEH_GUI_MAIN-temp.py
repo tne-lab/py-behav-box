@@ -209,6 +209,10 @@ class BEH_GUI():
             elif info.label == "TIME":
                 if self.START_EXPT: info.text = [str(round(self.cur_time/60.0,3))]
                 #else: info.text = ['0.000']
+            elif "VI" in info.label: # VI Countdown
+                if self.VI_start + self.VI - self.cur_time > 0.0:
+                    info.text = [str(int(self.VI_start + self.VI - self.cur_time))]
+                else: info.text = [str(0)]
             elif info.label == "EVENT LOG":
                 lines_in_txt = len(self.events)
                 y_per_line = int(self.sliders[0].slotL / 14.0)
@@ -300,10 +304,11 @@ class BEH_GUI():
 
         # GUI TOUCH SCREEN
         for x,y in self.background_hits:
-            #print(x,y)
+            # BackGround Touches
             draw_plus_sign(self.myscreen, x + 40, y +320, 5, (255,0,0) ) # (40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                      self.touch_time = cur_time
 
         for x,y in self.correct_img_hits:
+            # High Prob or good hits
             draw_plus_sign(self.myscreen, x + 40, y +320, 5, (0,255,0) ) # (40,320) is top left of gui touchscreen, 1/4 is the gui scale factor                      self.touch_time = cur_time
 
         for x,y in self.wrong_img_hits:
@@ -312,8 +317,9 @@ class BEH_GUI():
         try:
             #print(self.touchImgCoords)
             for coords in self.touchImgCoords:
-                #print (coords)
-                x,y = int(coords[0]/4 + 40), int(coords[1]/4 + 320)   # NOTE: 40,320 is top-left of gui touch representation. 1/4 is its scale
+                # Low Prob or Bad hits
+                x,y = int(coords[0]/4 + 40), int(coords[1]/4 + 320)   # NOTE: 40,320 is top-left of gui touch representation.
+                                                                      # 1/4 is GUI scale
                 pygame.draw.rect(self.myscreen, (0,0,255) , (x,y,60,60),  1)
 
 
@@ -1208,7 +1214,7 @@ class BEH_GUI():
                             idx = log_string.find[:idx+2](")")
                             print("IDX: ", idx, "logstring: ", log_string)
                         except:
-                            print("\n\n IDX: ",idx,"  FAILED creating log string\n\n")
+                            #print("\n\n IDX: ",idx,"  FAILED creating log string\n\n")
                             break
                     print('log_string', log_string)
                     GUIFunctions.log_event(self, self.events, log_string, self.cur_time)
@@ -1309,31 +1315,62 @@ class BEH_GUI():
         ###############################
         elif key == "PAUSE":
             try: # WAS A NUMBER
+                #print("1")
                 self.PAUSE_TIME = float(protocolDict["PAUSE"])
             except: # NOT A NUMBER. MUST BE VI_TIMES
                 #print(protocolDict["PAUSE"])
                 #print(habituation_vi_times)
+                #print("2")
                 if "HABITUATION" in protocolDict["PAUSE"]:
                     self.PAUSE_TIME = self.habituation_vi_times[self.VI_index]
-                if "CONDITIONING" in protocolDict["PAUSE"]:
+                elif "CONDITIONING" in protocolDict["PAUSE"]:
                     self.PAUSE_TIME = self.conditioning_vi_times[self.VI_index]
+
+                elif "TOUCH_TO_START" in protocolDict["PAUSE"] and not self.START_IMG_PLACED: #
+                    self.PAUSE_TIME = 1000.0
+                    #self.TOUCHED_TO_START_TRIAL = True
+
+    #####
+                    start_img = {'BLANK.BMP':(392,100)}
+                    self.TSq.put(start_img)
+                    self.START_IMG_PLACED = True
+
+    #####
 
             if not self.PAUSE_STARTED:
                 GUIFunctions.log_event(self, self.events,"PAUSEING FOR "+str(self.PAUSE_TIME)+" sec",self.cur_time)
                 self.PAUSE_STARTED = True
                 self.pause_start_time = self.cur_time
+                print("PAUSE STARTED")
 
             else: #PAUSE_STARTED
                 time_elapsed = self.cur_time - self.pause_start_time
                 if time_elapsed >= self.PAUSE_TIME:
-                    self.Protocol_ln_num +=1 #Go to next protocol item
+                    self.Protocol_ln_num +=1 # Go to next protocol item (That is, whatever comes after PAUSE in protocol)
                     self.PAUSE_STARTED = False
+                    print("PAUSE ENDED")
 
+            #print("self.TOUCHSCREEN_USED: ", self.TOUCHSCREEN_USED)
             if self.TOUCHSCREEN_USED:
                 if not self.TSBack_q.empty():
-                       self.touchMsg = self.TSBack_q.get()
-                       GUIFunctions.log_event(self, self.events, self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" , self.cur_time)
 
+                   self.touchMsg = self.TSBack_q.get()
+                   print("self.touchMsg: ", self.touchMsg)
+                   if self.START_IMG_PLACED and "BLANK" in self.touchMsg['picture']:
+                      self.Protocol_ln_num +=1
+                      self.PAUSE_STARTED = False
+                      self.TOUCHED_TO_START_TRIAL = False
+                      self.START_IMG_PLACED = False
+                      print("ready to draw test images")
+                      GUIFunctions.log_event(self, self.events, self.touchMsg['picture'] + " RAT Pressed START, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" , self.cur_time)
+                      self.TSq.put('')
+                   else:
+                      GUIFunctions.log_event(self, self.events, self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" , self.cur_time)
+
+
+        ###############################
+        # CONDITIONS
+        ###############################
         elif key == "CONDITIONS":
             self.runConditions(protocolDict, self.cur_time)
 

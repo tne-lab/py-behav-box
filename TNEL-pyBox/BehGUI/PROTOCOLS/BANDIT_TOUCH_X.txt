@@ -6,31 +6,31 @@ OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStu
 
 
 [TONE1] # Need TONE1, TONE2
-Duration(s) 	= 3
+Duration(s) 	= 1
 Freq(Hz)	= 1800
 Volume(0-1)	= 1.0
 
 [TONE2] # Need TONE1, TONE2
-Duration(s) 	= 3
+Duration(s) 	= 1
 Freq(Hz)	= 400
 Volume(0-1)	= 1.0
 
-[SHOCK]
-Duration(s) 	= 3
-Volts		= 5.5  # NOTE:  only duration is controlled here.
-Amps(mA)	= 100  # V and amps are set manually on scrambled grid generator
+#[SHOCK]
+#Duration(s) 	= 3
+#Volts		= 5.5  # NOTE:  only duration is controlled here.
+#Amps(mA)	= 100  # V and amps are set manually on scrambled grid generator
 
-[FREEZE]
-Min Duration(s)	= 2
-Min Moving Pix	= 5000
-ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also starts FREEZE detection  FREEZE=TRUE
+#[FREEZE]
+#Min Duration(s)	= 2
+#Min Moving Pix	= 5000
+#ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also starts FREEZE detection  FREEZE=TRUE
 
 [TOUCHSCREEN]
 IMAGES_PATH = E:\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
-COORDS=(181,100):(602,100)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+COORDS=(141,100):(582,100)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 # Image name: probability of reward on each trial
-IMG1= SPIDER_REAL.bmp:(80x500)
-IMG2= FLOWER_REAL.bmp:(20x500)
+IMG1= SPIDER.bmp:(80x500)
+IMG2= FLOWER.bmp:(20x500)
 TOUCH_BANDIT
 
 [SETUP]
@@ -41,74 +41,13 @@ CAMERA=TRUE
 REC=TRUE
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
-START_LOOP1 = 50 #NOTE: 1st 50 reward probabilities next to img name under [TOUCH]
-  PAUSE = 5 # sec
+START_LOOP1 = 500 #NOTE: 1st 50 reward probabilities next to img name under [TOUCH]
+  PAUSE = TOUCH_TO_START #5
   TONE1
-  DRAW_IMAGES=True
-  CONDITIONS=0
-END_LOOP
-
-START_LOOP2 = 50 #NOTE: 2nt 50 reward probabilities next to img name  under [TOUCH]
   PAUSE = 5
-  TONE2
   DRAW_IMAGES=True
   CONDITIONS=0
-END_LOOP
-
-START_LOOP3 = 50 #NOTE: 3rd 50 reward probabilities next to img name under [TOUCH]
-  PAUSE = 5
-  TONE1
-  DRAW_IMAGES=True
-  CONDITIONS=0
-END_LOOP
-
-START_LOOP4 = 50 #NOTE: 4th 50 reward probabilities next to img name  under [TOUCH]
-  PAUSE = 5
-  TONE2
-  DRAW_IMAGES=True
-  CONDITIONS=0
-END_LOOP
-
-START_LOOP5 = 50 #NOTE: 5th 50 reward probabilities next to img name under [TOUCH]
-  PAUSE = 5
-  TONE1
-  DRAW_IMAGES=True
-  CONDITIONS=0
-END_LOOP
-
-START_LOOP6 = 50 #NOTE: 6th 50 reward probabilities next to img name  under [TOUCH]
-  PAUSE = 5
-  TONE2
-  DRAW_IMAGES=True
-  CONDITIONS=0
-END_LOOP
-
-START_LOOP7 = 50 #NOTE: 7th 50 reward probabilities next to img name under [TOUCH]
-  PAUSE = 5
-  TONE1
-  DRAW_IMAGES=True
-  CONDITIONS=0
-END_LOOP
-
-START_LOOP8 = 50 #NOTE: 8th 50 reward probabilities next to img name  under [TOUCH]
-  PAUSE = 5
-  TONE2
-  DRAW_IMAGES=True
-  CONDITIONS=0
-END_LOOP
-
-START_LOOP9 = 50 #NOTE: 9th 50 reward probabilities next to img name under [TOUCH]
-  PAUSE = 5
-  TONE1
-  DRAW_IMAGES=True
-  CONDITIONS=0
-END_LOOP
-
-START_LOOP10 = 50 #NOTE: 10th 50 reward probabilities next to img name  under [TOUCH]
-  PAUSE = 5
-  TONE2
-  DRAW_IMAGES=True
-  CONDITIONS=0
+  PAUSE = 10    # sec
 END_LOOP
 
 FOOD_LIGHT=False

@@ -163,7 +163,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
                 bit = self.whisker.display_add_obj_bitmap(
                     DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
-                    stretch = True , height =240, width = 240) # Returns T or F
+                    stretch = True , height =300, width = 300) # Returns T or F
                 if not bit:
                     pass
             self.whisker.display_send_to_back(DOC, "background")
@@ -204,7 +204,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             if "missedClick" == event:
                 if int(y) <= self.background_ht:
                     sendDict = {'picture' : 'missed', 'XY' : (x,y)}
-                    #print(sendDict)
+                    print(sendDict)
                     self.back_q.put(sendDict)
                 #self.whisker.audio_play_wav(AUDIO, DEFAULT_WAV)
             # Or a picture
@@ -212,7 +212,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
                 for picName in self.pics:
                     if picName == event:
                         sendDict = {'picture' : picName, 'XY' : (x,y)}
-                        #print(sendDict)
+                        print(sendDict)
                         self.back_q.put(sendDict)
                         self.RECVCMD()
         except ValueError:

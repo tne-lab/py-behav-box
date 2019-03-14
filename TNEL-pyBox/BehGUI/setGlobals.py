@@ -75,7 +75,8 @@ def setGlobals(self):
         self.expt_file_name = 'BANDIT_TOUCH_X.txt' # Default protocol
     elif 'EPHYS-1' in self.computer:
         self.expt_file_name = 'PROTOCOL_BAR_PRESS_TRAIN-Ephys1.txt' # Default
-
+    else:
+        self.expt_file_name = 'PROTOCOL.txt' # Default 
     self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
     print("EXPT FILE TO LOAD: in set globals ", self.expt_file_path_name)
 
@@ -129,9 +130,12 @@ def setGlobals(self):
     self.TOUCH_TRHEAD_STARTED = False
     self.TOUCH_TRAINING = False
     self.TOUCH_BANDIT = False
+    self.TOUCH_INITIATED = False
     self.touchImgCoords = []
     self.touchImgs = {}
     self.touch_time = 0.0
+    #self.TOUCHED_TO_START_TRIAL=False
+    self.START_IMG_PLACED = False
     ################################################################
     # GENERAL GLOBALS
     ################################################################
