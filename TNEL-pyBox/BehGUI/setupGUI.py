@@ -91,6 +91,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     info_boxes.append(InfoBox( myscreen,20,730,460,250,"EVENT LOG",'TOP'," "))
     info_boxes.append(InfoBox( myscreen,20,620,70,17,"DATE",'RIGHT'," "))
     info_boxes.append(InfoBox( myscreen,401,620,75,17,"TIME",'LEFT',"0.0"))
+    info_boxes.append(InfoBox( myscreen,290,502,40,17,"VI Countdn",'RIGHT',"0"))
 
     #buttons.append(MyButton(myscreen,7,360, 525, 75,70,"START EXPT",12))  # 7
     # USER INPUT BOXES

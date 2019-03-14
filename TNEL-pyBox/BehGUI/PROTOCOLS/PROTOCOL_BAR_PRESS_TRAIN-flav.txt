@@ -1,0 +1,35 @@
+[EXPERIMENT]
+EXPT_NAME = BAR_PRESS_TRAIN
+#EXPT_PATH 	=  E:\py-behav-box\TNEL-pyBox\BehGUI\DATA
+EXPT_PATH 	= D:\py-behav-box\TNEL-pyBox\BehGUI\DATA
+### OPEN_EPHYS_PATH = E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe # on Jean's PC Ephys-1
+###                C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe # on Flav's PC Ephys-2
+
+[SETUP]
+FAN_ON=True
+CAB_LIGHT=True
+CAMERA=True
+REC=True
+#FOOD_LIGHT=True
+EXTEND_LEVERS=R_LVR  # NOTE:   =R_LVR, L_LVR, or TRUE for both
+
+[BAR_PRESS]
+#NOTE: PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
+# VIs are random integers between 0 and 2 x a)
+# note: VI(a,b).  a = initial VI for bar PRESS, b = final VI for session. if a < 1, VI = 1. if VI = 1.0, VI between 0 and 2
+BAR_PRESS_TRAIN=VI(0,15)
+
+
+
+[PROTOCOL]
+START_LOOP = 1          # Loops are trials
+  PAUSE = 3600            #1 hour in seconds
+END_LOOP
+
+EXTEND_LEVERS=FALSE
+#FOOD_LIGHT=FALSE
+REC=FALSE
+CAMERA= FALSE
+CAB_LIGHT=FALSE
+FAN_ON=FALSE
+[END PROTOCOL]

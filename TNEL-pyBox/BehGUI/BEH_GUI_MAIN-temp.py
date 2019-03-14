@@ -209,6 +209,10 @@ class BEH_GUI():
             elif info.label == "TIME":
                 if self.START_EXPT: info.text = [str(round(self.cur_time/60.0,3))]
                 #else: info.text = ['0.000']
+            elif "VI" in info.label: # VI Countdown
+                if self.VI_start + self.VI - self.cur_time > 0.0:
+                    info.text = [str(int(self.VI_start + self.VI - self.cur_time))]
+                else: info.text = [str(0)]
             elif info.label == "EVENT LOG":
                 lines_in_txt = len(self.events)
                 y_per_line = int(self.sliders[0].slotL / 14.0)
@@ -1321,18 +1325,18 @@ class BEH_GUI():
                     self.PAUSE_TIME = self.habituation_vi_times[self.VI_index]
                 elif "CONDITIONING" in protocolDict["PAUSE"]:
                     self.PAUSE_TIME = self.conditioning_vi_times[self.VI_index]
-                    
+
                 elif "TOUCH_TO_START" in protocolDict["PAUSE"] and not self.START_IMG_PLACED: #
                     self.PAUSE_TIME = 1000.0
                     #self.TOUCHED_TO_START_TRIAL = True
-                    
+
     #####
                     start_img = {'BLANK.BMP':(392,100)}
                     self.TSq.put(start_img)
                     self.START_IMG_PLACED = True
 
     #####
-                
+
             if not self.PAUSE_STARTED:
                 GUIFunctions.log_event(self, self.events,"PAUSEING FOR "+str(self.PAUSE_TIME)+" sec",self.cur_time)
                 self.PAUSE_STARTED = True
@@ -1346,10 +1350,10 @@ class BEH_GUI():
                     self.PAUSE_STARTED = False
                     print("PAUSE ENDED")
 
-            #print("self.TOUCHSCREEN_USED: ", self.TOUCHSCREEN_USED)        
+            #print("self.TOUCHSCREEN_USED: ", self.TOUCHSCREEN_USED)
             if self.TOUCHSCREEN_USED:
                 if not self.TSBack_q.empty():
-                   
+
                    self.touchMsg = self.TSBack_q.get()
                    print("self.touchMsg: ", self.touchMsg)
                    if self.START_IMG_PLACED and "BLANK" in self.touchMsg['picture']:
@@ -1362,11 +1366,11 @@ class BEH_GUI():
                       self.TSq.put('')
                    else:
                       GUIFunctions.log_event(self, self.events, self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" , self.cur_time)
-                        
+
 
         ###############################
         # CONDITIONS
-        ###############################        
+        ###############################
         elif key == "CONDITIONS":
             self.runConditions(protocolDict, self.cur_time)
 
