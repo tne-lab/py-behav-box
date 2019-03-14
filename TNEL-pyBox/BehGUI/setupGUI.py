@@ -93,7 +93,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
         info_boxes.append(InfoBox( myscreen,405,330,50,15,"R PRESSES",'BOTTOM','0'))
         info_boxes.append(InfoBox( myscreen,225,400,50,15,"EATEN",'BOTTOM','0'))
         info_boxes.append(InfoBox( myscreen,225,455,50,15,"PELLETS",'BOTTOM','0'))
-
+        info_boxes.append(InfoBox( myscreen,290,502,40,17,"VI CountDn",'RIGHT',"0"))
     else:
         info_boxes.append(InfoBox( myscreen,415,420,40,15,"EATEN",'BOTTOM','0'))
         info_boxes.append(InfoBox( myscreen,320,420,40,15,"PELLETS",'BOTTOM','0'))

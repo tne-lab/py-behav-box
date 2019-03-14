@@ -247,6 +247,7 @@ def load_expt_file(self):
                         self.BAR_PRESS_TRAINING = True
                         vis = str_after_equal
                         if len(vis) > 0 and "VI(" in vis: #BAR_PRESS_TRAIN=VI(1,15) needs to line after = sign
+                            self.VI_REWARDING = True
                             VIs = vis.split(",")
                             VI_intial = VIs[0][3:]
                             print("VI_INITIAL: ",VI_intial)
