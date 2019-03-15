@@ -172,14 +172,6 @@ class Experiment:
                 setup_done = True
 
             if setup_done:
-                if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
-                    # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
-                    if self.VI_REWARDING:
-                        self.VI_start = 0.0 #self.cur_time
-                        self.VI = random.randint(0,int(self.var_interval_reward*2))
-                        self.log_event("New VI: " + str(self.VI))
-                    if self.BAR_PRESS_TRAINING:
-                        pass
                 self.setup_ln_num = 0
                 self.RUN_SETUP = False
                 ## STUFF FROM MAIN ## NEEDS TO BE UPDATED
@@ -194,6 +186,16 @@ class Experiment:
                 for LED in self.GUI.LEDs: # Look for EXPT STARTED LED
                       if LED.index == 6: # Expt Started light
                           LED.ONOFF = "ON"
+                if  self.BAR_PRESS_INDEPENDENT_PROTOCOL:
+                    # NOTE: THIS IS USED IF REWARDING FOR BAR PRESS (AFTER VI) IS THE ONLY CONDITION (HABITUATION AND CONDITIONING ARE RUNNING CONCURRENTLY)
+                    if self.VI_REWARDING:
+                        self.VI_start = 0.0#self.cur_time
+                        self.VI = random.randint(0,int(self.var_interval_reward*2))
+                        self.log_event("New VI: " + str(self.VI))
+                    if self.BAR_PRESS_TRAINING:
+                        self.VI_start = 0.0#self.cur_time
+                        self.VI = random.randint(0,int(self.var_interval_reward*2))
+                        self.log_event("New VI: " + str(self.VI))
 ###########################################################################################################
 #  RUN EXPERIMENT
 ###########################################################################################################
@@ -525,7 +527,6 @@ class Experiment:
             if self.VI_REWARDING:  # [BAR_PRESS] in protocol
                                    #  VI=15
                 self.VI = self.var_interval_reward
-
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 print('checking some vis')
                 self.num_bar_presses +=1
@@ -1016,7 +1017,7 @@ class Experiment:
         for button in self.GUI.buttons:
             if button.text == 'STOP EXPT':
                 button.text = 'START EXPT'
-        
+
 
         self.GUI.exptEnded = True
 

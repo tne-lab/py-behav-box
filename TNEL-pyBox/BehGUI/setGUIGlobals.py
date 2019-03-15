@@ -62,7 +62,7 @@ def setGUIGlobals(self):
     self.resourcepath = os.path.join(cwd, 'RESOURCES')
 
     #self.expt_file_name = 'PROTOCOL_TOUCH_SCRN_TRAIN2' #Flav's Machine
-    self.expt_file_name = 'BANDIT_TOUCH_X.txt'#Jean's Machine
+    self.expt_file_name = 'PROTOCOL_BAR_PRESS_TRAIN-Ephys1.txt'#Jean's Machine
     self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
 
     self.exptFileLines = []
