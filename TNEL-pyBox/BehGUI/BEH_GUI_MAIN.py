@@ -210,10 +210,10 @@ class BEH_GUI():
                         new_y = slotL - bh
                     self.sliders[0].sliderY = new_y
                     # Draw it
-					self.sliders[0].draw()
+                    self.sliders[0].draw()
 
                     # Get event that lines up with scroll bar location
-					perc_y = float(new_y/slotL)
+                    perc_y = float(new_y/slotL)
                     start_line = int(lines_in_txt*perc_y)
                     #start_line = int(bottom_start_line - user_slide )
                     info.text = self.events[start_line:start_line+14]
@@ -358,9 +358,9 @@ class BEH_GUI():
 
                 elif event.button == 5: #Wheel roll Down
                      self.MOUSE_WHEEL_SCROLL_DN = True
-				     self.new_slider_y += int(self.sliders[0].slotL/len(self.events)*3) # SCROLL DOWN
-					   if self.new_slider_y >= self.sliders[0].slotL:
-                       self.new_slider_y = self.sliders[0].slotL
+                     self.new_slider_y += int(self.sliders[0].slotL/len(self.events)*3) # SCROLL DOWN
+                     if self.new_slider_y >= self.sliders[0].slotL:
+                         self.new_slider_y = self.sliders[0].slotL
 
                      #self.new_slider_y = self.sliders[0].sliderY + (1 + int( self.sliders[0].slotL/self.sliders[0].bh))
                      # Limit possible slider position
