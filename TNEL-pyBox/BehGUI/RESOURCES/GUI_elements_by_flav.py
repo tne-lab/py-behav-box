@@ -1059,6 +1059,9 @@ class get_user_input:
                     if sys_event.key == K_BACKSPACE:
                         text_input = text_input[0:-1] #REMOVE LAST CHAR
 
+                    if sys_event.key == K_DELETE:
+                        text_input = ''
+                        
                     elif sys_event.key == K_RETURN:
                         NEED_USER_INFO = False
                         self.text = text_input

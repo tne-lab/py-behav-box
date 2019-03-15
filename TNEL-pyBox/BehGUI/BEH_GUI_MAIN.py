@@ -41,6 +41,7 @@ import experiment
 import win32gui, win32con
 from tkinter import *
 from tkinter import messagebox
+
 Tk().wm_withdraw() #to hide the main window
 
 class BEH_GUI():
@@ -179,6 +180,11 @@ class BEH_GUI():
             elif info.label == "TIME":
                 if self.START_EXPT: info.text = [str(round(self.cur_time/60.0,3))]
                 #else: info.text = ['0.000']
+            elif "VI" in info.label: # VI Countdown
+                if self.expt.VI_REWARDING:
+                    if self.expt.VI_start + self.expt.VI -self.cur_time >0.0:
+                        info.text = [str(int(self.expt.VI_start + self.expt.VI - self.cur_time))]
+
             elif info.label == "EVENT LOG":
                 lines_in_txt = len(self.events)
                 y_per_line = int(self.sliders[0].slotL / 14.0)

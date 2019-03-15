@@ -237,21 +237,21 @@ class Vid:
         if self.exptStarted:
             cv2.circle(frame, (30,455), 20, (0,255,0) ,thickness = -1)
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"NIDAQ time = " + str(round(time_from_GUI,3)),(20,405), font, 0.5,( 255,0,0),2,cv2.LINE_AA)
-        cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
-        cv2.putText(frame, "Trial Number = " + str(trial_num), (20, 425),font, .5, ( 255, 0,0), 2,cv2.LINE_AA)
+        cv2.putText(frame,"NIDAQ time = " + str(round(time_from_GUI,3)),(10,20), font, 0.5,( 255,0,0),2,cv2.LINE_AA)
+        cv2.putText(frame, "Trial Num = " + str(trial_num), (220, 20),font, .5, ( 255, 0,0), 2,cv2.LINE_AA)
+        cv2.putText(frame, self.text, (330, 20),font, .5, (255, 255, 255), 2)
 
-    # Wrtie a ton of stuff on frames...
+    # DEPRICATED Write a ton of stuff on frames...
     def writeStuff(self, time_from_GUI, vid_time, time_diff, movingPxls, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame,"NIDAQ time = " + str(round(time_from_GUI,3)),(20,405), font, 0.5,(255,0,0),2,cv2.LINE_AA)
-        cv2.putText(frame,"Video time = " + str(round(vid_time,3)),(20,430), font, 0.5,(255,0,0),2,cv2.LINE_AA)
-        cv2.putText(frame,"time diff = " + str(time_diff),(20,455), font, 0.5,(255,0,0),2,cv2.LINE_AA)
-        cv2.putText(frame, self.text, (10, 50),font, .5, (255, 255, 255), 2)
-        cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(20,430), font, 0.5,(255,0,0),2,cv2.LINE_AA)
-        cv2.putText(self.prevThresh, "Time frozen = " + str(self.timeFrozen), (100, 50),font, .5, ( 255,0,0), 2)
-        cv2.putText(self.prevThresh, "Current frame = " + str(self.startFrame), (10,95), font, .5,( 255,0,255),2)
-        cv2.putText(self.prevThresh, "Number of frames = " + str(self.length), (10,110), font, .5, ( 255,0,0),2)
+        cv2.putText(frame,"NIDAQ time = " + str(round(time_from_GUI,3)),(10,20), font, 0.5,(255,0,0),2,cv2.LINE_AA)
+        cv2.putText(frame,"Video time = " + str(round(vid_time,3)),(10,50), font, 0.5,(255,0,0),2,cv2.LINE_AA)
+        cv2.putText(frame,"time diff = " + str(time_diff),(10,80), font, 0.5,(255,0,0),2,cv2.LINE_AA)
+        cv2.putText(frame, self.text, (10, 100),font, .5, (255, 255, 255), 2)
+        cv2.putText(self.prevThresh,"Moving Pixels = " + str(movingPxls),(10,130), font, 0.5,(255,0,0),2,cv2.LINE_AA)
+        cv2.putText(self.prevThresh, "Time frozen = " + str(self.timeFrozen), (10, 160),font, .5, ( 255,0,0), 2)
+        cv2.putText(self.prevThresh, "Current frame = " + str(self.startFrame), (10,190), font, .5,( 255,0,255),2)
+        cv2.putText(self.prevThresh, "Number of frames = " + str(self.length), (10,220), font, .5, ( 255,0,0),2)
 
     # Creates a trackbar to scroll through frames. Could use some work
     # to account for any trackbar
