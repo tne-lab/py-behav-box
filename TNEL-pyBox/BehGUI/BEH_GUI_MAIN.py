@@ -184,7 +184,7 @@ class BEH_GUI():
                 if self.expt.BAR_PRESS_INDEPENDENT_PROTOCOL:
                     if self.expt.VI_start + self.expt.VI -self.cur_time >0.0:
                         info.text = [str(int(self.expt.VI_start + self.expt.VI - self.cur_time))]
-                        
+
             elif info.label == "EVENT LOG":
                 lines_in_txt = len(self.events)
                 y_per_line = int(self.sliders[0].slotL / 14.0)
@@ -200,16 +200,24 @@ class BEH_GUI():
                     else:
                         self.sliders[0].bh = slider_Button_ht
 
-                    # Set Slider location
-                    self.sliders[0].sliderY = self.new_slider_y #+ self.start_line * self.y_per_line
-                    #self.sliders[0].sliderY = self.new_slider_y + (self.sliders[0].slotL - self.sliders[0].bh) - self.start_line * self.y_per_line
+                    # Set slider location
+                    bh = self.sliders[0].bh
+                    slotL = self.sliders[0].slotL
+                    new_y =  self.new_slider_y - bh
+                    if new_y < 0:
+                        new_y = 0
+                    elif new_y > slotL - bh:
+                        new_y = slotL - bh
+                    self.sliders[0].sliderY = new_y
+                    # Draw it
+					self.sliders[0].draw()
 
-                    self.sliders[0].draw()
-                    #info.text = self.events[self.start_line:self.start_line+14]
-                    # Proportion of events to display
-                    self.start_line = int(len(self.events) * (self.sliders[0].sliderY/(self.sliders[0].slotL  -  self.sliders[0].bh) ))
-                    #self.start_line = int(len(self.events) * (self.sliders[0].sliderY-self.sliders[0].bh)/(self.sliders[0].slotL ))
-                    info.text = self.events[self.start_line:self.start_line+14]
+                    # Get event that lines up with scroll bar location
+					perc_y = float(new_y/slotL)
+                    start_line = int(lines_in_txt*perc_y)
+                    #start_line = int(bottom_start_line - user_slide )
+                    info.text = self.events[start_line:start_line+14]
+
 
 
                 else: info.text = self.events
@@ -316,13 +324,13 @@ class BEH_GUI():
                 if self.LEFT_MOUSE_DOWN:
                     if self.SLIDER_SELECTED:
                         new_slider_y = cur_y - self.cur_Vslider.y # relative to top of slider slot
-                        if new_slider_y <= 0:
-                           new_slider_y = 0
-                        if new_slider_y >= self.cur_Vslider.slotL - self.cur_Vslider.bh:
-                           new_slider_y = self.cur_Vslider.slotL - self.cur_Vslider.bh
+                        #if new_slider_y <= 0:
+                         #  new_slider_y = 0
+                        #if new_slider_y >= self.cur_Vslider.slotL - self.cur_Vslider.bh:
+                        #   new_slider_y = self.cur_Vslider.slotL - self.cur_Vslider.bh
 
-                        self.cur_Vslider.sliderY = new_slider_y # relative to top of slider slot
-                        self.new_slider_y = new_slider_y
+                        #self.cur_Vslider.sliderY = new_slider_y # relative to top of slider slot
+                        #self.new_slider_y = new_slider_y
                         #self.start_line = int(new_slider_y/self.y_per_line)
                         #print("new_slider_y: ",new_slider_y, "start_line: ",self.start_line)
 
@@ -339,19 +347,25 @@ class BEH_GUI():
 
                 elif event.button == 4:  #Wheel roll UP
                      self.MOUSE_WHEEL_SCROLL_UP = True
-                     self.new_slider_y = self.sliders[0].sliderY - (1 + int( self.sliders[0].slotL/self.sliders[0].bh))
+                     self.new_slider_y -= int(self.sliders[0].slotL/len(self.events)*3) # SCrool up
+                     if self.new_slider_y <= self.sliders[0].bh: self.new_slider_y = self.sliders[0].bh
+                     #self.new_slider_y = self.sliders[0].sliderY - (1 + int( self.sliders[0].slotL/self.sliders[0].bh))
                      # Limit possible slider position
-                     if self.new_slider_y <= 0: self.new_slider_y = 0
-                     elif self.new_slider_y >= self.sliders[0].slotL-self.sliders[0].bh:
-                         self.new_slider_y = self.sliders[0].slotL-self.sliders[0].bh
+                     #if self.new_slider_y <= 0: self.new_slider_y = 0
+                     #elif self.new_slider_y >= self.sliders[0].slotL-self.sliders[0].bh:
+                    #     self.new_slider_y = self.sliders[0].slotL-self.sliders[0].bh
                      #print("SCROLLING UP",self.sliders[0].sliderY )
 
                 elif event.button == 5: #Wheel roll Down
                      self.MOUSE_WHEEL_SCROLL_DN = True
-                     self.new_slider_y = self.sliders[0].sliderY + (1 + int( self.sliders[0].slotL/self.sliders[0].bh))
+				     self.new_slider_y += int(self.sliders[0].slotL/len(self.events)*3) # SCROLL DOWN
+					   if self.new_slider_y >= self.sliders[0].slotL:
+                       self.new_slider_y = self.sliders[0].slotL
+
+                     #self.new_slider_y = self.sliders[0].sliderY + (1 + int( self.sliders[0].slotL/self.sliders[0].bh))
                      # Limit possible slider position
-                     if self.new_slider_y >= self.sliders[0].slotL - self.sliders[0].bh:
-                       self.new_slider_y = self.sliders[0].slotL - self.sliders[0].bh
+                     #if self.new_slider_y >= self.sliders[0].slotL - self.sliders[0].bh:
+                     #  self.new_slider_y = self.sliders[0].slotL - self.sliders[0].bh
                      #print("SCROLLING DOWN",self.sliders[0].sliderY )
 
 

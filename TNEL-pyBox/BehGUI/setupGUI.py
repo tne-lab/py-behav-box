@@ -180,7 +180,7 @@ def setupExpt(self):
     # MAIN LOOP
     self.start_line = len(self.events)
     #self.y_per_line = int(self.sliders[0].slotL / 14.0)
-    self.new_slider_y = 0
+
     self.clk_time_start = time.perf_counter()
     self.FAN_0N = False
     self.CAB_LIGHT_ON = False
@@ -218,6 +218,7 @@ def setupExpt(self):
 
     self.buttons,self.levers,self.boxes,self.circles,self.LEDs,self.toggles,self.info_boxes,self.user_inputs,self.labels,self.sliders = NIDAQ_GUI_ELEMENT(self, self.myscreen )
     self.feederBox = self.boxes[0]
+    self.new_slider_y = self.sliders[0].slotL # SETUPGUI
     ##    print(len(self.buttons), " buttons")
     ##    print(len(self.levers), " levers")
     ##    print(len(self.boxes), " boxes")
