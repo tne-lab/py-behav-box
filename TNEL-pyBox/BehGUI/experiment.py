@@ -1006,7 +1006,7 @@ class Experiment:
         for user_input in self.GUI.user_inputs:
            if user_input.label == "SUBJECT":
               self.GUI.Subject = ''
-              self.GUI.prev_Subject = self.GUI.Subject
+              #self.GUI.prev_Subject = self.GUI.Subject
 
         self.GUI.LEDs[6].ONOFF = False
 
