@@ -504,7 +504,7 @@ class BEH_GUI():
                                     if self.exptEnded == True:
                                         self.exptEnded = False
                                         self.setupExpt()
-                                    if self.EXPT_LOADED:
+                                    elif self.EXPT_LOADED:
                                         button.UP_DN = "DN"
                                         self.Expt_Count +=1
                                         #if self.EXPT_FILE_LOADED:
