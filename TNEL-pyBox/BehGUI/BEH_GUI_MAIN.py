@@ -178,7 +178,7 @@ class BEH_GUI():
             elif info.label == "DATE":
                   info.text = [str(self.date)]
             elif info.label == "TIME":
-                if self.START_EXPT: info.text = [str(round(self.cur_time/60.0,3))]
+                if self.START_EXPT: info.text = [str(round(self.expt.cur_time/60.0,3))]
                 #else: info.text = ['0.000']
             elif "VI" in info.label: # VI Countdown
                 if self.expt.BAR_PRESS_INDEPENDENT_PROTOCOL:
