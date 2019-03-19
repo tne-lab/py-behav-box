@@ -939,6 +939,11 @@ class Experiment:
 
 
                        elif "VAR" in left_of_outcome_str: # if "PELLET_VAR" in conditions portion of protocol
+                           if self.cur_probability > 50.0:  # High probability of reward image touched,
+                                                           # give a tone to associate with good response
+                               GUIFunctions.PLAY_TONE(self.GUI,"TONE1")
+                           else:  # Low prob image pressed, so different tone.
+                               GUIFunctions.PLAY_TONE(self.GUI,"TONE2")
                            rand = random.random() * 100
                            #print("our random number", rand)
                            if rand <= self.cur_probability:
