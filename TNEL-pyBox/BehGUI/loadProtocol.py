@@ -67,7 +67,6 @@ def load_expt_file(self):
                     currentlySetting = 'FREEZE'
                 elif '[TOUCHSCREEN]' in str_before_equal:
                     currentlySetting = 'TOUCHSCREEN'
-                    self.setTouchGlobals()
                 elif '[BAR_PRESS]' in str_before_equal:
                     currentlySetting = 'BARPRESS'
                 elif '[PROTOCOL' in str_before_equal:
@@ -315,8 +314,6 @@ def load_expt_file(self):
                             word1,word2 = get_LR_before_hash(line)
                             self.setup.append({word1:word2})
                             print({word1:word2})
-                            if word1 == "CAMERA" and word2:
-                                self.setVidGlobals()
                         except:
                             self.setup.append({line:True}) # For lines without an '=' in them
                             #if line == 'END': PROTOCOL = False

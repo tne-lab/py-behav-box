@@ -130,6 +130,8 @@ def setExptGlobals(self):
     self.BAR_PRESS_INDEPENDENT_PROTOCOL = False
     self.BAR_PRESS_TRAINING = False
 
+    setVidGlobals(self)
+
     ################################################################
     # AUX CAMERA (Only starts if second camera is exists)
     ################################################################
@@ -137,15 +139,14 @@ def setExptGlobals(self):
     simpleVidThread = threading.Thread(target=video_function.runSimpleVid, args=(self.SIMPLEVIDq,))
     simpleVidThread.start()
 
-    self.ROI = ""
-    self.ROI_RECEIVED = False
-
     ################################################################
     # PAUSE
     ################################################################
     self.PAUSE_STARTED = False
     self.TOUCHED_TO_START_TRIAL = False
     self.START_IMG_PLACED = False
+
+    setTouchGlobals(self)
 
     ################################################################
     # VIDEO GLOBALS
@@ -164,6 +165,8 @@ def setVidGlobals(self):
     self.UNFROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
     self.FREEZE_DETECTION_ENABLED = False
     self.PREVIOUSLY_FROZEN = False #Used to prevent 'unfrozen' from being logged prior to first 'frozen' event
+    self.ROI = ""
+    self.ROI_RECEIVED = False
     if "EPHYS-2" in self.GUI.computer:
         self.FLIP = True
 

@@ -11,7 +11,7 @@ class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
     import GUIFunctions
     from EXPTFunctions import checkStatus, checkQs,  log_event, MyVideo
-    from setExptGlobals import setExptGlobals, setVidGlobals, setTouchGlobals
+    from setExptGlobals import setExptGlobals
 ####################################################################################
 #   INITIALIZE EXPERIMENT
 ####################################################################################
