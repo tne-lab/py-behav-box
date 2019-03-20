@@ -17,9 +17,11 @@ print(len(y))
 plt.plot(x,y,'o')
 axes = plt.gca()
 axes.set_ylim([-.20,.15])
+axes.set_xlim([-11,30])
 plt.xlabel('Discrimination Scale')
 plt.ylabel('mPFC-BLA Theta Coherence')
 plt.title('CS+ - CS- Subtraction')
+plt.hlines(0,-11,30,'r')
 
 
 x = linregress(x,y)
