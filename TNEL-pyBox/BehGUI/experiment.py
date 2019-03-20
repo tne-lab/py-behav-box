@@ -1007,18 +1007,13 @@ class Experiment:
 
         try: self.log_file.close()  # CLOSE LOG FILE
         except: pass
+
+        EXPTFunctions.resetBox(self)
+
         # Reset GUI Stuff
-        for user_input in self.GUI.user_inputs:
-           if user_input.label == "SUBJECT":
-              self.GUI.Subject = ''
-              #self.GUI.prev_Subject = self.GUI.Subject
-
         self.GUI.LEDs[6].ONOFF = False
-
         self.GUI.START_EXPT = False
-        #self.GUI.EXPT_LOADED = True
-        if self.TOUCHSCREEN_USED:
-            self.GUI.TSq.put('')
+
         for button in self.GUI.buttons:
             if button.text == 'STOP EXPT':
                 button.text = 'START EXPT'
