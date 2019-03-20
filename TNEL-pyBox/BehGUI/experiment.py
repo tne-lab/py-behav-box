@@ -1000,15 +1000,10 @@ class Experiment:
 
         if self.GUI.num_cameras == 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
 
-        ### MAKE THIS CLEANER
-        GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
-        for lever in self.GUI.levers:
-            lever.STATE = "IN"
+        EXPTFunctions.resetBox(self)
 
         try: self.log_file.close()  # CLOSE LOG FILE
         except: pass
-
-        EXPTFunctions.resetBox(self)
 
         # Reset GUI Stuff
         self.GUI.LEDs[6].ONOFF = False
