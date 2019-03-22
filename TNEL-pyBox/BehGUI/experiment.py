@@ -11,7 +11,7 @@ class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
     import GUIFunctions
     from EXPTFunctions import checkStatus, checkQs,  log_event, MyVideo
-    from setExptGlobals import setExptGlobals, setVidGlobals, setTouchGlobals
+    from setExptGlobals import setExptGlobals
 ####################################################################################
 #   INITIALIZE EXPERIMENT
 ####################################################################################
@@ -1000,25 +1000,15 @@ class Experiment:
 
         if self.GUI.num_cameras == 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
 
-        ### MAKE THIS CLEANER
-        GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
-        for lever in self.GUI.levers:
-            lever.STATE = "IN"
+        EXPTFunctions.resetBox(self)
 
         try: self.log_file.close()  # CLOSE LOG FILE
         except: pass
+
         # Reset GUI Stuff
-        for user_input in self.GUI.user_inputs:
-           if user_input.label == "SUBJECT":
-              self.GUI.Subject = ''
-              #self.GUI.prev_Subject = self.GUI.Subject
-
         self.GUI.LEDs[6].ONOFF = False
-
         self.GUI.START_EXPT = False
-        #self.GUI.EXPT_LOADED = True
-        if self.TOUCHSCREEN_USED:
-            self.GUI.TSq.put('')
+
         for button in self.GUI.buttons:
             if button.text == 'STOP EXPT':
                 button.text = 'RESET EXPT'
