@@ -131,14 +131,14 @@ def log_event(self,event, event_other=''):
 
 
 ####################################################################################
-#   Make sure everything in box is back to false
+#   Make sure everything in box is back to false (Called with self.GUI)
 ####################################################################################
 def resetBox(self):
     self.fan.sendDBit(False)
     self.cabin_light.sendDBit(False)
     if 'EPHYS-2' in self.computer:
         self.food_light.sendDBit(False)
-        if self.TOUCHSCREEN_USED:
+        if self.expt.TOUCHSCREEN_USED:
             self.GUI.TSq.put('')
     if 'EPHYS-1' in self.computer:
         self.low_tone.sendDByte(0)
@@ -146,4 +146,4 @@ def resetBox(self):
     self.L_condition_Lt.sendDBit(False)
     self.R_condition_Lt.sendDBit(False)
 
-    GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
+    GUIFunctions.EXTEND_LEVERS(self,"Levers_Retracted",False,False)

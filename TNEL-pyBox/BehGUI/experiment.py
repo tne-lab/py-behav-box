@@ -6,18 +6,19 @@ import eventRECV
 import random
 from RESOURCES.GUI_elements_by_flav import *
 import GUIFunctions
+import EXPTFunctions
 
 class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
     import GUIFunctions
     from EXPTFunctions import checkStatus, checkQs,  log_event, MyVideo
-    from setExptGlobals import setExptGlobals
+    from setExptGlobals import setExptGlobals, setVidGlobals, setTouchGlobals
 ####################################################################################
 #   INITIALIZE EXPERIMENT
 ####################################################################################
     def __init__(self, GUI):
-        self.setExptGlobals()
         self.GUI = GUI
+        self.setExptGlobals()
         EXPT_FILE_LOADED = self.load_expt_file()
         if EXPT_FILE_LOADED:
             print("\n###########################")
@@ -1000,7 +1001,7 @@ class Experiment:
 
         if self.GUI.num_cameras == 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
 
-        EXPTFunctions.resetBox(self)
+        EXPTFunctions.resetBox(self.GUI)
 
         try: self.log_file.close()  # CLOSE LOG FILE
         except: pass

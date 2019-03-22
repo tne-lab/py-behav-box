@@ -130,8 +130,6 @@ def setExptGlobals(self):
     self.BAR_PRESS_INDEPENDENT_PROTOCOL = False
     self.BAR_PRESS_TRAINING = False
 
-    setVidGlobals(self)
-
     ################################################################
     # AUX CAMERA (Only starts if second camera is exists)
     ################################################################
@@ -145,8 +143,6 @@ def setExptGlobals(self):
     self.PAUSE_STARTED = False
     self.TOUCHED_TO_START_TRIAL = False
     self.START_IMG_PLACED = False
-
-    setTouchGlobals(self)
 
     ################################################################
     # VIDEO GLOBALS
