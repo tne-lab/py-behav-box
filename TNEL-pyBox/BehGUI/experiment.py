@@ -1021,7 +1021,7 @@ class Experiment:
             self.GUI.TSq.put('')
         for button in self.GUI.buttons:
             if button.text == 'STOP EXPT':
-                button.text = 'START EXPT'
+                button.text = 'RESET EXPT'
 
 
         self.GUI.exptEnded = True

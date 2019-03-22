@@ -495,16 +495,17 @@ class BEH_GUI():
                                elif button.text == "STOP EXPT":
                                     self.expt.endExpt()
 
+                               elif button.text == "RESET EXPT":
+                                    self.exptEnded = False
+                                    self.setupExpt()
+
                                #######################################
                                #
                                #   START EXPERIMENT
                                #
                                #######################################
                                elif button.text == "START EXPT":
-                                    if self.exptEnded == True:
-                                        self.exptEnded = False
-                                        self.setupExpt()
-                                    elif self.EXPT_LOADED:
+                                    if self.EXPT_LOADED:
                                         button.UP_DN = "DN"
                                         self.Expt_Count +=1
                                         #if self.EXPT_FILE_LOADED:
