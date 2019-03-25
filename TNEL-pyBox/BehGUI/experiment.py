@@ -491,6 +491,9 @@ class Experiment:
                         start_img = {'BLANK.BMP':(392,100)}
                         self.GUI.TSq.put(start_img)
                         self.START_IMG_PLACED = True
+                    elif "EAT_TO_START" in protocolDict["PAUSE"]:
+                        self.PAUSE_TIME = 1000.0
+                        self.EAT_TO_START = True
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
                 self.pause_start_time = time.perf_counter()
@@ -501,6 +504,12 @@ class Experiment:
                     print("cur ", self.cur_time, "\n puase start: ",self.pause_start_time)
                     self.Protocol_ln_num +=1 #Go to next protocol item
                     self.PAUSE_STARTED = False
+
+                elif self.EAT_TO_START:
+                    if self.FOOD_EATEN:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+                        self.EAT_TO_START = False
 
                 if self.TOUCHSCREEN_USED:
                     if not self.GUI.TSBack_q.empty():
