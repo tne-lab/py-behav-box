@@ -494,6 +494,9 @@ class Experiment:
                     elif "EAT_TO_START" in protocolDict["PAUSE"]:
                         self.PAUSE_TIME = 1000.0
                         self.EAT_TO_START = True
+                    elif "BARPRESS_TO_START" in protocolDict["PAUSE"]:
+                        self.PAUSE_TIME = 1000.0
+                        self.BARPRESS_TO_START = True
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
                 self.pause_start_time = time.perf_counter()
@@ -510,6 +513,11 @@ class Experiment:
                         self.Protocol_ln_num += 1
                         self.PAUSE_STARTED = False
                         self.EAT_TO_START = False
+                elif self.BARPRESS_TO_START:
+                    if self.LEVER_PRESSED_L or self.LEVER_PRESSED_R:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+                        self.BARPRESS_TO_START = False
 
                 if self.TOUCHSCREEN_USED:
                     if not self.GUI.TSBack_q.empty():

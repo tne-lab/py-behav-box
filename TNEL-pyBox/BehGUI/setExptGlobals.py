@@ -125,6 +125,7 @@ def setExptGlobals(self):
     # PAUSE
     ################################################################
     self.EAT_TO_START = False
+    self.BARPRESS_TO_START
 
     ################################################################
     # What are we using for this EXPT? (Gets set in load_expt_file())
