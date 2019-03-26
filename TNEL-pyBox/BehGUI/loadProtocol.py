@@ -493,8 +493,8 @@ def create_files(self):
     ###### Change open ephys recoding dir #####
     if self.EPHYS_ENABLED:
         self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.GUI.Subject)
-        self.snd.send(self.snd.START_REC)
-        time.sleep(3) # Let Open Ephys record for a bit (maybe remove?)
+        #self.snd.send(self.snd.START_REC)
+        #time.sleep(0.5) # Let Open Ephys record for a bit (maybe remove?)
 
     ###### Notes
     note_file_name = self.GUI.Expt_Name + "-" + self.GUI.Subject + '-' +  self.dateTm + '-NOTES'  + '.txt'

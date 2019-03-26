@@ -8,7 +8,7 @@ def rcv(back_q, q, flags = [b'event']):
         if msg:
             back_q.put(msg)
         if not q.empty():
-            break
+            return
 
 if __name__ == "__main__":
     rcv()

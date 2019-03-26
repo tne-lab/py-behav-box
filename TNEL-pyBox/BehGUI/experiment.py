@@ -123,7 +123,6 @@ class Experiment:
                     self.vidSTATE = 'REC_VID'
                     if self.FREEZE_DETECTION_ENABLED:
                         print("\nFREEZE DETECTION ENABLED")
-                        print(self.ROI)
                         self.vidROI = self.ROI
                         print("Slef.ROI: ",self.ROI,"\n")
                 else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
@@ -1008,7 +1007,7 @@ class Experiment:
         # Tell open ephys to stop acquistion and recording?
         if self.EPHYS_ENABLED:
             self.snd.send(self.snd.STOP_ACQ)
-            self.snd.send(self.snd.STOP_REC)
+            #self.snd.send(self.snd.STOP_REC)
             self.openEphysQ.put('STOP')
 
         if self.VID_ENABLED:

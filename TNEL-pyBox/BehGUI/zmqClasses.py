@@ -17,7 +17,7 @@ class RCVEvent:
 
     def rcv(self):
         #Get raw input from socket
-        msg = self.poller.poll(1000)
+        msg = self.poller.poll(200)
         #print(envelope)
         if len(msg)==2:
             envelope, jsonStr = msg
