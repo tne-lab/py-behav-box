@@ -1013,7 +1013,8 @@ class Experiment:
         if self.VID_ENABLED:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
-            self.SIMPLEVIDq.put({'STATE':'OFF'})
+
+        self.SIMPLEVIDq.put({'STATE':'OFF'})
 
         if self.GUI.num_cameras == 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
 
