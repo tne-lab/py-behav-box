@@ -345,7 +345,7 @@ class BEH_GUI():
 
                 elif event.button == 4:  #Wheel roll UP
                      self.MOUSE_WHEEL_SCROLL_UP = True
-                     self.new_slider_y -= int(self.sliders[0].slotL/len(self.events)*3) # SCrool up
+                     if len(self.events) > 0: self.new_slider_y -= int(self.sliders[0].slotL/len(self.events)*3) # SCrool up
                      if self.new_slider_y <= self.sliders[0].bh: self.new_slider_y = self.sliders[0].bh
                      #self.new_slider_y = self.sliders[0].sliderY - (1 + int( self.sliders[0].slotL/self.sliders[0].bh))
                      # Limit possible slider position
@@ -356,7 +356,7 @@ class BEH_GUI():
 
                 elif event.button == 5: #Wheel roll Down
                      self.MOUSE_WHEEL_SCROLL_DN = True
-                     self.new_slider_y += int(self.sliders[0].slotL/len(self.events)*3) # SCROLL DOWN
+                     if len(self.events) > 0: self.new_slider_y += int(self.sliders[0].slotL/len(self.events)*3) # SCROLL DOWN
                      if self.new_slider_y >= self.sliders[0].slotL:
                          self.new_slider_y = self.sliders[0].slotL
 

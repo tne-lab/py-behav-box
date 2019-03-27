@@ -29,7 +29,6 @@ class Experiment:
         else:
             print("COULD NOT LOAD EXPT FILE")
             self.log_event("COULD NOT LOAD EXPT FILE")
-
         # Open ephys stuff
         if self.EPHYS_ENABLED:
             self.snd = zmqClasses.SNDEvent(5556) # subject number or something
@@ -40,7 +39,6 @@ class Experiment:
             open_ephys_rcv.start()
 
         self.GUI.EXPT_LOADED = True
-
 ####################################################################################
 #   MAIN LOOP FOR EXPERIMENT
 ####################################################################################
@@ -1007,17 +1005,13 @@ class Experiment:
         # Tell open ephys to stop acquistion and recording?
         if self.EPHYS_ENABLED:
             self.snd.send(self.snd.STOP_ACQ)
-            #self.snd.send(self.snd.STOP_REC)
             self.openEphysQ.put('STOP')
 
         if self.VID_ENABLED:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
 
-        self.SIMPLEVIDq.put({'STATE':'OFF'})
-
         if self.GUI.num_cameras >= 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
-
         EXPTFunctions.resetBox(self.GUI)
 
         try: self.log_file.close()  # CLOSE LOG FILE
@@ -1031,8 +1025,4 @@ class Experiment:
             if button.text == 'STOP EXPT':
                 button.text = 'RESET EXPT'
 
-
         self.GUI.exptEnded = True
-
-        #DONT RESET RIGHT AWAY
-        #self.GUI.RESTART_EXPT = True

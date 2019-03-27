@@ -4,7 +4,6 @@ import threading
 import video_function
 from collections import deque
 def setExptGlobals(self):
-    print('Creating new Expt')
     ################################################################
     # DATA FILES
     ################################################################
