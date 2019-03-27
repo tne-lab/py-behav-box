@@ -999,7 +999,7 @@ class Experiment:
             self.VIDq.append(self.vidDict)
             self.SIMPLEVIDq.put({'STATE':'OFF'})
 
-        if self.GUI.num_cameras == 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
+        if self.GUI.num_cameras >= 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
 
         EXPTFunctions.resetBox(self.GUI)
 

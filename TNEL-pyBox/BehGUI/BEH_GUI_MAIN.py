@@ -67,8 +67,6 @@ class BEH_GUI():
 
             if self.START_EXPT:
                 self.expt.run()
-            if self.RESTART_EXPT:
-                self.setupExpt() # Setups experiment and GUI!
 
             ######################################
             #   UPDATE SCREEN
@@ -764,7 +762,6 @@ class BEH_GUI():
                         if self.EXPT_LOADED: self.expt.log_event("Lever_Pressed_L")
                         self.LEVER_PRESSED_L = True
                         #print("LEFT LEVER PRESSED")
-                        if self.START_EXPT: self.expt.num_L_lever_preses += 1
                         self.levers[0].STATE = "DN"
 
             # nose pokes
