@@ -123,7 +123,6 @@ class Experiment:
                     self.vidSTATE = 'REC_VID'
                     if self.FREEZE_DETECTION_ENABLED:
                         print("\nFREEZE DETECTION ENABLED")
-                        print(self.ROI)
                         self.vidROI = self.ROI
                         print("Slef.ROI: ",self.ROI,"\n")
                 else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
@@ -491,6 +490,12 @@ class Experiment:
                         start_img = {'BLANK.BMP':(392,100)}
                         self.GUI.TSq.put(start_img)
                         self.START_IMG_PLACED = True
+                    elif "EAT_TO_START" in protocolDict["PAUSE"]:
+                        self.PAUSE_TIME = 1000.0
+                        self.EAT_TO_START = True
+                    elif "BARPRESS_TO_START" in protocolDict["PAUSE"]:
+                        self.PAUSE_TIME = 1000.0
+                        self.BARPRESS_TO_START = True
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
                 self.pause_start_time = time.perf_counter()
@@ -501,6 +506,17 @@ class Experiment:
                     print("cur ", self.cur_time, "\n puase start: ",self.pause_start_time)
                     self.Protocol_ln_num +=1 #Go to next protocol item
                     self.PAUSE_STARTED = False
+
+                elif self.EAT_TO_START:
+                    if self.FOOD_EATEN:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+                        self.EAT_TO_START = False
+                elif self.BARPRESS_TO_START:
+                    if self.LEVER_PRESSED_L or self.LEVER_PRESSED_R:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+                        self.BARPRESS_TO_START = False
 
                 if self.TOUCHSCREEN_USED:
                     if not self.GUI.TSBack_q.empty():
@@ -991,13 +1007,14 @@ class Experiment:
         # Tell open ephys to stop acquistion and recording?
         if self.EPHYS_ENABLED:
             self.snd.send(self.snd.STOP_ACQ)
-            self.snd.send(self.snd.STOP_REC)
+            #self.snd.send(self.snd.STOP_REC)
             self.openEphysQ.put('STOP')
 
         if self.VID_ENABLED:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
-            self.SIMPLEVIDq.put({'STATE':'OFF'})
+
+        self.SIMPLEVIDq.put({'STATE':'OFF'})
 
         if self.GUI.num_cameras >= 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
 

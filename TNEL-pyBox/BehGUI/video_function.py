@@ -375,7 +375,8 @@ class SimpleVid:
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
                 self.cap.release()
-                self.out.release()
+                try: self.out.release()
+                except: pass
                 return
 
             if not self.q.empty():
