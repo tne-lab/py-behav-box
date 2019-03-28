@@ -45,6 +45,7 @@ START_LOOP1 = 500 #NOTE: 1st 50 reward probabilities next to img name under [TOU
   PAUSE = TOUCH_TO_START
 #  TONE1 # When Spider is high prob img
 #  PAUSE = 1  # to wait for tone to finish
+  PAUSE = 1  # time between start and presentation
   DRAW_IMAGES=True
   CONDITIONS=0
   PAUSE = 4    # sec
