@@ -18,18 +18,19 @@ class RCVEvent:
         #Get raw input from socket
         sockets = self.poller.poll(200)
         for socket in sockets:
-            #msg = socket.recv()
-            bmsg = socket[0].recv()
-            msg = bmsg.decode('utf-8')
+        #msg = self.socket.recv_multipart()
+            msg = socket[0].recv_multipart()
+            #msg = bmsg.decode('utf-8')
+            #print('event recv', len(msg))
             if len(msg) == 1:
                 envelope = msg
-                print(envelope)
-            if len(msg)==2:
+                #print(envelope, 'header')
+            elif len(msg)==2:
                 envelope, jsonStr = msg
                 #Our actual json object (last part)
                 jsonStr = json.loads(jsonStr);
                 #print(self.parseJson(jsonStr))
-                #print(jsonStr)
+                #print(jsonStr, 'just json')
                 #print('\n')
                 return jsonStr
 

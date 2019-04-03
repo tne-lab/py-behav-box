@@ -61,6 +61,7 @@ from whisker.api import (
     BrushHatchStyle,
     Brush,
     Rectangle,
+    DocEventType,
 )
 from whisker.constants import DEFAULT_PORT
 from whisker.twistedclient import WhiskerTwistedTask
@@ -147,6 +148,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             self.whisker.display_add_obj_rectangle(DOC, "background",
                 Rectangle(left = 0, top = 0, width = self.display_size[0], height = self.background_ht),
                 self.pen, self.brush1)
+
             # Draw dead zone at bottom of screen.
             # Lock out botton 100 pixels of display to minimze tail Touches
             self.whisker.display_add_obj_rectangle(DOC, "background",
@@ -173,9 +175,14 @@ class MyWhiskerTask(WhiskerTwistedTask):
     def setEvents(self):
         # Set events for all pictures
         for i in range(0,len(self.pics)):
-            self.whisker.display_set_event(DOC, "picture" + str(i), self.pics[i])
+            print(self.pics)
+            if self.pics[i] == "BLANK.BMP":
+                print('LOOKING FOR UP\n\n')
+                self.whisker.display_set_event(DOC, "picture" + str(i), self.pics[i], DocEventType.touch_up)
+            else:
+                self.whisker.display_set_event(DOC, "picture" + str(i), self.pics[i], DocEventType.touch_down)
         # Set event for background and end of task
-        self.whisker.display_set_event(DOC, "background", "missedClick")
+        self.whisker.display_set_event(DOC, "background", "missedClick",DocEventType.touch_down)
         self.whisker.timer_set_event("checkZMQ", 5, -1)
 
     def clearEvents(self):

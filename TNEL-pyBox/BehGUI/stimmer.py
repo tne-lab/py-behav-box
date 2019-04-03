@@ -14,7 +14,7 @@ class Stim:
         # --------------------- INPUTS --------------------------------
         sr = 100000 # Sampling Rate (Hz)
         amplitude = 1 # Amplitude (Volts)
-        width = 10 # Width of pulse (ms)
+        width = 10 # duration of pulse (ms)
         ipi = 30 # inter-pulse interval (ms). output zero during this period,
         # if muliple waveforms, period = width + ipi
         numPulse = 1

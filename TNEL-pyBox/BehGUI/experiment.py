@@ -35,7 +35,7 @@ class Experiment:
             self.openEphysBack_q = Queue()
             self.openEphysQ = Queue()
             # Start thread
-            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike']})
+            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike',b'ttl']})
             open_ephys_rcv.start()
 
         self.GUI.EXPT_LOADED = True

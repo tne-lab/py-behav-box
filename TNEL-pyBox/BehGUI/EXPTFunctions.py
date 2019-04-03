@@ -93,7 +93,7 @@ def checkQs(self):
         ### CHECK OE Q ###
         if not self.openEphysBack_q.empty():
             OEMsg = self.openEphysBack_q.get()
-            self.log_event(OEMsg)
+            self.log_event(str(OEMsg))
 
 
 ###########################################################################################################
