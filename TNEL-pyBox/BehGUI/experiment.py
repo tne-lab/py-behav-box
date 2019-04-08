@@ -542,17 +542,21 @@ class Experiment:
         # RUN BAR PRESS INDEPENDENT OF PROTOCOLS OR CONDTIONS
         #########################################################################################
         if self.BAR_PRESS_INDEPENDENT_PROTOCOL: #Running independently of CONDITIONS. Used for conditioning, habituation, extinction, and recall
+            if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
+               self.num_bar_presses +=1
+
             if self.VI_REWARDING:  # [BAR_PRESS] in protocol
                                    #  VI=15
                 self.VI = self.var_interval_reward
-            if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
-                print('checking some vis')
-                self.num_bar_presses +=1
+
+            elif self.BAR_PRESS_TRAINING: # BAR_PRESS_TRAIN=VI(1,15) in protocol
+
                 # Calculate Bar Presses Per Minute
                 BPPM_time_interval = self.cur_time - self.VI_calc_start
+
                 if BPPM_time_interval >= 60.0:  #Calculate BPPM every minute (60 sec)
                     self.BPPM =  self.num_bar_presses#   0.0
-                    self.log_event( "Bar Presses Per Min:,"+ str(self.BPPM ) )
+                    GUIFunctions.log_event(self, self.events, "Bar Presses Per Min:,"+ str(self.BPPM ) , self.cur_time)
                     print ("\n\n\nnum_bar_presses:: ",self.num_bar_presses, "BPPM: ",self.BPPM)
                     self.BPPMs.append(self.BPPM) # Add a BPPM calcualtion to list every minute
                     # Reset for next minute  TPM_start_time
@@ -561,10 +565,10 @@ class Experiment:
 
                     # Calculate MEAN Bar Presses Per Minute over 10 min
                     #if len(self.BPPMs)> 10:#10: # after every 10 minutes (That is, 10 one minute evaluations convolved every minute)
-                    if len(self.BPPMs)== 2:#10: # after first 10 minutes only!!
+                    if len(self.BPPMs)== 10:#10: # after first 10 minutes only!!
                         print("BPPMs: ",self.BPPMs)
-                        self.meanBPPM10 = sum(self.BPPMs[-10:])/2.0#10.0       # Mean Bar PRESSES per minute over last 10 minutes
-                        self.log_event( "MEAN Bar Presses Per Min:,"+ str(self.BPPM )+",Over 1st 10 min" )
+                        self.meanBPPM10 = sum(self.BPPMs[-10:])/10.0#10.0       # Mean Bar PRESSES per minute over last 10 minutes
+                        GUIFunctions.log_event(self, self.events, "MEAN Bar Presses Per Min:,"+ str(self.BPPM )+",Over 1st 10 min" , self.cur_time)
                         print ("MEAN BPPM over ist 10 min: ",self.meanBPPM10)
                         #self.BPPMs.pop(0)                                  # Removes first item of list for running list
                         if self.BAR_PRESS_TRAINING: # [BAR_PRESS] in protocol
@@ -575,21 +579,25 @@ class Experiment:
                                 self.var_interval_reward += 15 # Increases VI by 15
                                 if self.var_interval_reward >=  self.VI_final:
                                     self.var_interval_reward =  self.VI_final # Limit VI to final value (b above)
-                                self.log_event( "NEW VI between: 0 and "+ str(2*self.var_interval_reward) + " (sec)" )
-                                print ("NEW VI: ",str(self.var_interval_reward))
+                                GUIFunctions.log_event(self, self.events, "NEW VI between: 0 and "+ str(2*self.var_interval_reward) + " (sec)" , self.cur_time)
+                                print ("NEW VI between: 0 and "+ str(2*self.var_interval_reward) + " (sec)" )
 
-                # Check if amount of VI has passed
-                print('cur:', self.cur_time, ' start: ', self.VI_start,' vi:', self.VI)
+            # Check if amount of VI has passed. If so, reward. Recalc VI
+            if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 if self.cur_time > (self.VI_start + self.VI):
-                   GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
+
+                   GUIFunctions.FOOD_REWARD(self, self.events,"Food_Pellet",self.cur_time)
+                   # Calculate self.VI for next time
                    if self.var_interval_reward <= 1:
                        self.VI = 0
                    else:
                        self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
-                   self.log_event( "Cur VI:" + str(self.VI) + " (sec)" )
-                   self.VI_start= self.cur_time
 
+                   GUIFunctions.log_event(self, self.events, "Current VI now: "+ str(self.VI) + " (sec)" , self.cur_time)
+                   self.VI_start = self.cur_time
 
+                self.LEVER_PRESSED_R = False
+                self.LEVER_PRESSED_L = False
 
 #Variable Ratio rewards.
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
