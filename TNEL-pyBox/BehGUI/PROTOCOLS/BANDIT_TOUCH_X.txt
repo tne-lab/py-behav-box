@@ -27,7 +27,7 @@ Volume(0-1)	= 1.0
 
 [TOUCHSCREEN]
 IMAGES_PATH = E:\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
-COORDS=(141,100):(582,100)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+COORDS=(141,150):(582,150)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 # Image name: probability of reward on each trial
 IMG1= SPIDER.bmp:(20x500)
 IMG2= FLOWER.bmp:(80x500)
@@ -43,9 +43,10 @@ REC=TRUE
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 START_LOOP1 = 500 #NOTE: 1st 50 reward probabilities next to img name under [TOUCH]
   PAUSE = TOUCH_TO_START
+  PELLET
 #  TONE1 # When Spider is high prob img
 #  PAUSE = 1  # to wait for tone to finish
-  PAUSE = 1  # time between start and presentation
+  PAUSE = 3  # time between start and presentation
   DRAW_IMAGES=True
   CONDITIONS=0
   PAUSE = 4    # sec

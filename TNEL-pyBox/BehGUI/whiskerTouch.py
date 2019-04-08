@@ -213,6 +213,8 @@ class MyWhiskerTask(WhiskerTwistedTask):
                     sendDict = {'picture' : 'missed', 'XY' : (x,y)}
                     #print(sendDict)
                     self.back_q.put(sendDict)
+                else:
+                    print('deadzone hit')
                 #self.whisker.audio_play_wav(AUDIO, DEFAULT_WAV)
             # Or a picture
             else:

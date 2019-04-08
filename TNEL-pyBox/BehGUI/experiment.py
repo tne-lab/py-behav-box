@@ -237,6 +237,9 @@ class Experiment:
             self.GUI.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self.GUI,val)
             self.GUI.LEDs[4].ONOFF = LEDsONOFF
             self.GUI.LEDs[5].ONOFF = LEDsONOFF
+        elif key == "PELLET":
+            self.Protocol_ln_num +=1
+            GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
 
         elif key  == 'SHOCK':
             self.log_event("Shock_ON",("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
