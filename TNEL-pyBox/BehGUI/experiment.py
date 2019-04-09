@@ -543,9 +543,9 @@ class Experiment:
 
                     # Calculate MEAN Bar Presses Per Minute over 10 min
                     #if len(self.BPPMs)> 10:#10: # after every 10 minutes (That is, 10 one minute evaluations convolved every minute)
-                    if len(self.BPPMs)== 2:#10: # after first 10 minutes only!!
+                    if len(self.BPPMs)== 10:#10: # after first 10 minutes only!!
                         print("BPPMs: ",self.BPPMs)
-                        self.meanBPPM10 = sum(self.BPPMs[-10:])/2.0#10.0       # Mean Bar PRESSES per minute over last 10 minutes
+                        self.meanBPPM10 = sum(self.BPPMs[-10:])/10.0       # Mean Bar PRESSES per minute over last 10 minutes
                         self.log_event( "MEAN Bar Presses Per Min:,"+ str(self.BPPM )+",Over 1st 10 min" )
                         print ("MEAN BPPM over ist 10 min: ",self.meanBPPM10)
                         #self.BPPMs.pop(0)                                  # Removes first item of list for running list
