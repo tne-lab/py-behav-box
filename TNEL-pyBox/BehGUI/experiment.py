@@ -6,6 +6,7 @@ import eventRECV
 import random
 from RESOURCES.GUI_elements_by_flav import *
 import GUIFunctions
+import EXPTFunctions
 
 class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
@@ -16,8 +17,8 @@ class Experiment:
 #   INITIALIZE EXPERIMENT
 ####################################################################################
     def __init__(self, GUI):
-        self.setExptGlobals()
         self.GUI = GUI
+        self.setExptGlobals()
         EXPT_FILE_LOADED = self.load_expt_file()
         if EXPT_FILE_LOADED:
             print("\n###########################")
@@ -28,18 +29,16 @@ class Experiment:
         else:
             print("COULD NOT LOAD EXPT FILE")
             self.log_event("COULD NOT LOAD EXPT FILE")
-
         # Open ephys stuff
         if self.EPHYS_ENABLED:
             self.snd = zmqClasses.SNDEvent(5556) # subject number or something
             self.openEphysBack_q = Queue()
             self.openEphysQ = Queue()
             # Start thread
-            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike']})
+            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike',b'ttl']})
             open_ephys_rcv.start()
 
         self.GUI.EXPT_LOADED = True
-
 ####################################################################################
 #   MAIN LOOP FOR EXPERIMENT
 ####################################################################################
@@ -122,7 +121,6 @@ class Experiment:
                     self.vidSTATE = 'REC_VID'
                     if self.FREEZE_DETECTION_ENABLED:
                         print("\nFREEZE DETECTION ENABLED")
-                        print(self.ROI)
                         self.vidROI = self.ROI
                         print("Slef.ROI: ",self.ROI,"\n")
                 else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
@@ -239,6 +237,9 @@ class Experiment:
             self.GUI.feederBox.fill_color,LEDsONOFF = GUIFunctions.Food_Light_ONOFF(self.GUI,val)
             self.GUI.LEDs[4].ONOFF = LEDsONOFF
             self.GUI.LEDs[5].ONOFF = LEDsONOFF
+        elif key == "PELLET":
+            self.Protocol_ln_num +=1
+            GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
 
         elif key  == 'SHOCK':
             self.log_event("Shock_ON",("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
@@ -490,6 +491,12 @@ class Experiment:
                         start_img = {'BLANK.BMP':(392,100)}
                         self.GUI.TSq.put(start_img)
                         self.START_IMG_PLACED = True
+                    elif "EAT_TO_START" in protocolDict["PAUSE"]:
+                        self.PAUSE_TIME = 1000.0
+                        self.EAT_TO_START = True
+                    elif "BARPRESS_TO_START" in protocolDict["PAUSE"]:
+                        self.PAUSE_TIME = 1000.0
+                        self.BARPRESS_TO_START = True
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
                 self.pause_start_time = time.perf_counter()
@@ -500,6 +507,17 @@ class Experiment:
                     print("cur ", self.cur_time, "\n puase start: ",self.pause_start_time)
                     self.Protocol_ln_num +=1 #Go to next protocol item
                     self.PAUSE_STARTED = False
+
+                elif self.EAT_TO_START:
+                    if self.FOOD_EATEN:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+                        self.EAT_TO_START = False
+                elif self.BARPRESS_TO_START:
+                    if self.LEVER_PRESSED_L or self.LEVER_PRESSED_R:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+                        self.BARPRESS_TO_START = False
 
                 if self.TOUCHSCREEN_USED:
                     if not self.GUI.TSBack_q.empty():
@@ -524,17 +542,21 @@ class Experiment:
         # RUN BAR PRESS INDEPENDENT OF PROTOCOLS OR CONDTIONS
         #########################################################################################
         if self.BAR_PRESS_INDEPENDENT_PROTOCOL: #Running independently of CONDITIONS. Used for conditioning, habituation, extinction, and recall
+            if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
+               self.num_bar_presses +=1
+
             if self.VI_REWARDING:  # [BAR_PRESS] in protocol
                                    #  VI=15
                 self.VI = self.var_interval_reward
-            if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
-                print('checking some vis')
-                self.num_bar_presses +=1
+
+            elif self.BAR_PRESS_TRAINING: # BAR_PRESS_TRAIN=VI(1,15) in protocol
+
                 # Calculate Bar Presses Per Minute
                 BPPM_time_interval = self.cur_time - self.VI_calc_start
+
                 if BPPM_time_interval >= 60.0:  #Calculate BPPM every minute (60 sec)
                     self.BPPM =  self.num_bar_presses#   0.0
-                    self.log_event( "Bar Presses Per Min:,"+ str(self.BPPM ) )
+                    self.log_event("Bar Presses Per Min:,"+ str(self.BPPM ))
                     print ("\n\n\nnum_bar_presses:: ",self.num_bar_presses, "BPPM: ",self.BPPM)
                     self.BPPMs.append(self.BPPM) # Add a BPPM calcualtion to list every minute
                     # Reset for next minute  TPM_start_time
@@ -557,21 +579,25 @@ class Experiment:
                                 self.var_interval_reward += 15 # Increases VI by 15
                                 if self.var_interval_reward >=  self.VI_final:
                                     self.var_interval_reward =  self.VI_final # Limit VI to final value (b above)
-                                self.log_event( "NEW VI between: 0 and "+ str(2*self.var_interval_reward) + " (sec)" )
-                                print ("NEW VI: ",str(self.var_interval_reward))
+                                self.log_event("NEW VI between: 0 and "+ str(2*self.var_interval_reward) + " (sec)")
+                                print ("NEW VI between: 0 and "+ str(2*self.var_interval_reward) + " (sec)" )
 
-                # Check if amount of VI has passed
-                print('cur:', self.cur_time, ' start: ', self.VI_start,' vi:', self.VI)
+            # Check if amount of VI has passed. If so, reward. Recalc VI
+            if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 if self.cur_time > (self.VI_start + self.VI):
-                   GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
+
+                   GUIFunctions.FOOD_REWARD(self.GUI, "Food_Pellet")
+                   # Calculate self.VI for next time
                    if self.var_interval_reward <= 1:
                        self.VI = 0
                    else:
                        self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
-                   self.log_event( "Cur VI:" + str(self.VI) + " (sec)" )
-                   self.VI_start= self.cur_time
 
+                   self.log_event("Current VI now: "+ str(self.VI) + " (sec)")
+                   self.VI_start = self.cur_time
 
+                self.LEVER_PRESSED_R = False
+                self.LEVER_PRESSED_L = False
 
 #Variable Ratio rewards.
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -939,6 +965,11 @@ class Experiment:
 
 
                        elif "VAR" in left_of_outcome_str: # if "PELLET_VAR" in conditions portion of protocol
+                           if self.cur_probability > 50.0:  # High probability of reward image touched,
+                                                           # give a tone to associate with good response
+                               GUIFunctions.PLAY_TONE(self.GUI,"TONE1")
+                           else:  # Low prob image pressed, so different tone.
+                               GUIFunctions.PLAY_TONE(self.GUI,"TONE2")
                            rand = random.random() * 100
                            #print("our random number", rand)
                            if rand <= self.cur_probability:
@@ -985,41 +1016,24 @@ class Experiment:
         # Tell open ephys to stop acquistion and recording?
         if self.EPHYS_ENABLED:
             self.snd.send(self.snd.STOP_ACQ)
-            self.snd.send(self.snd.STOP_REC)
             self.openEphysQ.put('STOP')
 
         if self.VID_ENABLED:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
-            self.SIMPLEVIDq.put({'STATE':'OFF'})
 
-        if self.GUI.num_cameras == 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
-
-        ### MAKE THIS CLEANER
-        GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
-        for lever in self.GUI.levers:
-            lever.STATE = "IN"
+        if self.GUI.num_cameras >= 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
+        EXPTFunctions.resetBox(self.GUI)
 
         try: self.log_file.close()  # CLOSE LOG FILE
         except: pass
+
         # Reset GUI Stuff
-        for user_input in self.GUI.user_inputs:
-           if user_input.label == "SUBJECT":
-              self.GUI.Subject = ''
-              self.GUI.prev_Subject = self.GUI.Subject
-
         self.GUI.LEDs[6].ONOFF = False
-
         self.GUI.START_EXPT = False
-        #self.GUI.EXPT_LOADED = True
-        if self.TOUCHSCREEN_USED:
-            self.GUI.TSq.put('')
+
         for button in self.GUI.buttons:
             if button.text == 'STOP EXPT':
-                button.text = 'START EXPT'
-
+                button.text = 'RESET EXPT'
 
         self.GUI.exptEnded = True
-
-        #DONT RESET RIGHT AWAY
-        #self.GUI.RESTART_EXPT = True

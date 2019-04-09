@@ -2,6 +2,7 @@ import video_function
 import whiskerTouch
 import time
 import threading
+import GUIFunctions
 ####################################################################################
 #   GET BOX INPUTS FROM GUI
 ####################################################################################
@@ -92,7 +93,7 @@ def checkQs(self):
         ### CHECK OE Q ###
         if not self.openEphysBack_q.empty():
             OEMsg = self.openEphysBack_q.get()
-            self.log_event(OEMsg)
+            self.log_event(str(OEMsg))
 
 
 ###########################################################################################################
@@ -127,3 +128,22 @@ def log_event(self,event, event_other=''):
         print(event_string + event_other)                   # print to display
     except:
         print ('Log file not created yet. Check EXPT PATH, then Press "LOAD EXPT FILE BUTTON"')
+
+
+####################################################################################
+#   Make sure everything in box is back to false (Called with self.GUI)
+####################################################################################
+def resetBox(self):
+    self.fan.sendDBit(False)
+    self.cabin_light.sendDBit(False)
+    if 'EPHYS-2' in self.computer:
+        self.food_light.sendDBit(False)
+        if self.expt.TOUCHSCREEN_USED:
+            self.TSq.put('')
+    if 'EPHYS-1' in self.computer:
+        self.low_tone.sendDByte(0)
+
+    self.L_condition_Lt.sendDBit(False)
+    self.R_condition_Lt.sendDBit(False)
+
+    GUIFunctions.EXTEND_LEVERS(self,"Levers_Retracted",False,False)

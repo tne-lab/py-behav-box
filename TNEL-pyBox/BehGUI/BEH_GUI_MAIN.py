@@ -67,8 +67,6 @@ class BEH_GUI():
 
             if self.START_EXPT:
                 self.expt.run()
-            if self.RESTART_EXPT:
-                self.setupExpt() # Setups experiment and GUI!
 
             ######################################
             #   UPDATE SCREEN
@@ -178,7 +176,7 @@ class BEH_GUI():
             elif info.label == "DATE":
                   info.text = [str(self.date)]
             elif info.label == "TIME":
-                if self.START_EXPT: info.text = [str(round(self.cur_time/60.0,3))]
+                if self.START_EXPT: info.text = [str(round(self.expt.cur_time/60.0,3))]
                 #else: info.text = ['0.000']
             elif "VI" in info.label: # VI Countdown
                 if self.expt.BAR_PRESS_INDEPENDENT_PROTOCOL:
@@ -347,7 +345,7 @@ class BEH_GUI():
 
                 elif event.button == 4:  #Wheel roll UP
                      self.MOUSE_WHEEL_SCROLL_UP = True
-                     self.new_slider_y -= int(self.sliders[0].slotL/len(self.events)*3) # SCrool up
+                     if len(self.events) > 0: self.new_slider_y -= int(self.sliders[0].slotL/len(self.events)*3) # SCrool up
                      if self.new_slider_y <= self.sliders[0].bh: self.new_slider_y = self.sliders[0].bh
                      #self.new_slider_y = self.sliders[0].sliderY - (1 + int( self.sliders[0].slotL/self.sliders[0].bh))
                      # Limit possible slider position
@@ -358,7 +356,7 @@ class BEH_GUI():
 
                 elif event.button == 5: #Wheel roll Down
                      self.MOUSE_WHEEL_SCROLL_DN = True
-                     self.new_slider_y += int(self.sliders[0].slotL/len(self.events)*3) # SCROLL DOWN
+                     if len(self.events) > 0: self.new_slider_y += int(self.sliders[0].slotL/len(self.events)*3) # SCROLL DOWN
                      if self.new_slider_y >= self.sliders[0].slotL:
                          self.new_slider_y = self.sliders[0].slotL
 
@@ -495,15 +493,16 @@ class BEH_GUI():
                                elif button.text == "STOP EXPT":
                                     self.expt.endExpt()
 
+                               elif button.text == "RESET EXPT":
+                                    self.exptEnded = False
+                                    self.setupExpt()
+
                                #######################################
                                #
                                #   START EXPERIMENT
                                #
                                #######################################
                                elif button.text == "START EXPT":
-                                    if self.exptEnded == True:
-                                        self.exptEnded = False
-                                        self.setupExpt()
                                     if self.EXPT_LOADED:
                                         button.UP_DN = "DN"
                                         self.Expt_Count +=1
@@ -763,7 +762,6 @@ class BEH_GUI():
                         if self.EXPT_LOADED: self.expt.log_event("Lever_Pressed_L")
                         self.LEVER_PRESSED_L = True
                         #print("LEFT LEVER PRESSED")
-                        if self.START_EXPT: self.expt.num_L_lever_preses += 1
                         self.levers[0].STATE = "DN"
 
             # nose pokes

@@ -122,6 +122,12 @@ def setExptGlobals(self):
     self.MAX_EXPT_TIME = 60 # in min
 
     ################################################################
+    # PAUSE
+    ################################################################
+    self.EAT_TO_START = False
+    self.BARPRESS_TO_START = False
+
+    ################################################################
     # What are we using for this EXPT? (Gets set in load_expt_file())
     ################################################################
     self.EPHYS_ENABLED = False
@@ -136,9 +142,6 @@ def setExptGlobals(self):
     self.SIMPLEVIDq = Queue()
     simpleVidThread = threading.Thread(target=video_function.runSimpleVid, args=(self.SIMPLEVIDq,))
     simpleVidThread.start()
-
-    self.ROI = ""
-    self.ROI_RECEIVED = False
 
     ################################################################
     # PAUSE
@@ -164,6 +167,8 @@ def setVidGlobals(self):
     self.UNFROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
     self.FREEZE_DETECTION_ENABLED = False
     self.PREVIOUSLY_FROZEN = False #Used to prevent 'unfrozen' from being logged prior to first 'frozen' event
+    self.ROI = ""
+    self.ROI_RECEIVED = False
     if "EPHYS-2" in self.GUI.computer:
         self.FLIP = True
 
