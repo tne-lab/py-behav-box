@@ -586,7 +586,7 @@ class Experiment:
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 if self.cur_time > (self.VI_start + self.VI):
 
-                   GUIFunctions.FOOD_REWARD("Food_Pellet")
+                   GUIFunctions.FOOD_REWARD(self.GUI, "Food_Pellet")
                    # Calculate self.VI for next time
                    if self.var_interval_reward <= 1:
                        self.VI = 0
