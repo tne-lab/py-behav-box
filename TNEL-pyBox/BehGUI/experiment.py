@@ -579,21 +579,25 @@ class Experiment:
                                 self.var_interval_reward += 15 # Increases VI by 15
                                 if self.var_interval_reward >=  self.VI_final:
                                     self.var_interval_reward =  self.VI_final # Limit VI to final value (b above)
-                                self.log_event( "NEW VI between: 0 and "+ str(2*self.var_interval_reward) + " (sec)" )
-                                print ("NEW VI: ",str(self.var_interval_reward))
+                                self.log_event("NEW VI between: 0 and "+ str(2*self.var_interval_reward) + " (sec)")
+                                print ("NEW VI between: 0 and "+ str(2*self.var_interval_reward) + " (sec)" )
 
-                # Check if amount of VI has passed
-                print('cur:', self.cur_time, ' start: ', self.VI_start,' vi:', self.VI)
+            # Check if amount of VI has passed. If so, reward. Recalc VI
+            if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 if self.cur_time > (self.VI_start + self.VI):
-                   GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
+
+                   GUIFunctions.FOOD_REWARD("Food_Pellet")
+                   # Calculate self.VI for next time
                    if self.var_interval_reward <= 1:
                        self.VI = 0
                    else:
                        self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
-                   self.log_event( "Cur VI:" + str(self.VI) + " (sec)" )
-                   self.VI_start= self.cur_time
 
+                   self.log_event("Current VI now: "+ str(self.VI) + " (sec)")
+                   self.VI_start = self.cur_time
 
+                self.LEVER_PRESSED_R = False
+                self.LEVER_PRESSED_L = False
 
 #Variable Ratio rewards.
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
