@@ -1,8 +1,11 @@
 # BehavioralChamber
 
-WIP python program to manage a rat behavioral box with customizable GUI and protocol format.
+In development python based GUI used to manage rat behavioral box's with customizable GUI and protocol format.
+
+![TNEL Logo](/images/TNE Logo.jpg)
 
 ## Installation
+WIP.
 
 ### Dependencies
 python3+ (untested but probably 3.5+)
@@ -13,8 +16,14 @@ zmq
 ## Usage
 
 ```
-python BEH_GUI.py 
+python BEH_GUI_MAIN.py
 ```
+
+![GUI Image](/images/pyBox.png)
+
+
+### Edit Box details
+daqAPI.py correlates port numbers to input/output responses.
 
 ## Info
 
