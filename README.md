@@ -2,7 +2,7 @@
 
 In development python based GUI used to manage rat behavioral box's with customizable GUI and protocol format.
 
-![TNEL Logo](/images/TNE Logo.jpg)
+![TNEL Logo](/images/TNELogo.jpg)
 
 ## Installation
 WIP.
