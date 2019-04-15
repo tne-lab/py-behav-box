@@ -1,6 +1,6 @@
 [EXPERIMENT]
 EXPT_NAME = Bandit_Touch
-EXPT_PATH 	= E:\py-behav-box\TNEL-pyBox\BehGUI\DATA
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe # on Flav's PC Ephys-2
 
 [TONE1]
@@ -15,7 +15,7 @@ Duration(s) 	= 3
 ROI=GENERATE
 
 [TOUCHSCREEN]
-IMAGES_PATH = E:\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
+IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
 COORDS=(141,100):(582,100)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 # Image name: probability of reward on each trial
 IMG1= SPIDER.bmp:(80x500)

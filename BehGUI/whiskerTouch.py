@@ -68,7 +68,7 @@ from whisker.twistedclient import WhiskerTwistedTask
 
 DEFAULT_DISPLAY_NUM = 0
 #DEFAULT_MEDIA_DIR = r"C:\Program Files (x86)\WhiskerControl\Client Media"
-DEFAULT_MEDIA_DIR = r"C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES"
+DEFAULT_MEDIA_DIR = r"C:\Users\ephys-2\Documents\GitHub\py-behav-box\BehGUI\RESOURCES"
 DEFAULT_WAV = "telephone.wav"
 
 DISPLAY = "display"

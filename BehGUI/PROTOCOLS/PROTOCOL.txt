@@ -1,6 +1,6 @@
 [EXPERIMENT]
 EXPT_NAME = TESTING     # This is the name of your experiment
-EXPT_PATH 	= C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA       #D:\Desktop\py-behav-box\TNEL-pyBox\BehGUI\DATA
+EXPT_PATH 	= C:\Users\ephys-2\Documents\GitHub\py-behav-box\BehGUI\DATA       #D:\Desktop\py-behav-box\BehGUI\DATA
 
 
 [TONE1] # NEED TONE1, TONE2

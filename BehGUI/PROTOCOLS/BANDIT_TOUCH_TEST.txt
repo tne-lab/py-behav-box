@@ -1,6 +1,6 @@
 [EXPERIMENT]
 EXPT_NAME = Bandit_Touch_TEST # Don't use "-" in name, use underscores "_" instead
-EXPT_PATH 	= E:\py-behav-box\TNEL-pyBox\BehGUI\DATA
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 #OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release\bin\open-ephys.exe # on Flav's PC Ephys-2
 ###               E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe # on Jean's PC Ephys-1
 
@@ -26,7 +26,7 @@ Volume(0-1)	= 1.0
 #ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also starts FREEZE detection  FREEZE=TRUE
 
 [TOUCHSCREEN]
-IMAGES_PATH = E:\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
+IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
 COORDS=(141,100):(582,100)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 # Image name: probability of reward on each trial
 IMG1= SPIDER.bmp:(20x500)

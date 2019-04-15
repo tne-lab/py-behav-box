@@ -1,6 +1,6 @@
 [EXPERIMENT]
 EXPT_NAME = BAR_PRESS_TRAIN
-EXPT_PATH 	=  E:\py-behav-box\TNEL-pyBox\BehGUI\DATA
+EXPT_PATH 	=  E:\py-behav-box\BehGUI\DATA
 
 [SETUP]
 FAN_ON=True

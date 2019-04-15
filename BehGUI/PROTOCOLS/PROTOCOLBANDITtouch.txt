@@ -1,6 +1,6 @@
 [EXPERIMENT]
 EXPT_NAME = BANDIT-TOUCH1
-EXPT_PATH 	= E:\py-behav-box\TNEL-pyBox\BehGUI\DATA
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
 [TONE1] # Need TONE1, TONE2
 Duration(s) = 3
@@ -23,7 +23,7 @@ Min Moving Pix	= 5000
 Min Theshold = 26
 
 [TOUCHSCREEN]
-IMAGES_PATH = E:\py-behav-box\TNEL-pyBox\BehGUI\RESOURCES
+IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
 # Note: Touchscreen is 1024 x 768. If we discount the deadzone, the
 #       screen is 1024 x 518.  For picture area to equal to active
 #       background area, picture must be 364 x 364

@@ -1,7 +1,7 @@
 [EXPERIMENT]
 # This experiment will place an image in a random location on the screen
 EXPT_NAME = BANDIT
-EXPT_PATH 	= C:\Users\ephys-2\Documents\GitHub\py-behav-box\TNEL-pyBox\BehGUI\DATA
+EXPT_PATH 	= C:\Users\ephys-2\Documents\GitHub\py-behav-box\BehGUI\DATA
 
 
 
