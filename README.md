@@ -9,8 +9,11 @@ WIP.
 
 ### Dependencies
 python3+ (untested but probably 3.5+)
+
 opencv
+
 whisker
+
 zmq
 
 ## Usage
