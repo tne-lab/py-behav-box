@@ -17,9 +17,9 @@ whisker
 zmq
 
 ## Usage
-We use a batch file to open the GUI.
+We use the following code in a batch file to open the GUI.
 ```
-cd PATH_TO_GUI
+cd "PATH_TO_GUI"
 python BEH_GUI_MAIN.py
 ```
 
@@ -51,6 +51,8 @@ Two classes: GUI and Experiment
 Gui holds GUI information and handles communication with behavioral box. Only to be updated if new GUI element needed to either show a new box input/output or if want to show new information.
 
 Experiment handles running the testing. Should be changed to add new options in protocol.
+
+Uses ZMQ to communicate with Open Ephys plugin-GUI. Need updated event broadcaster plugin from development branch (as of April 2019).
 
 ## Info
 
