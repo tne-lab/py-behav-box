@@ -1,0 +1,48 @@
+[EXPERIMENT] # This is a REQUIRED Header
+# This experiment will place an image in a random location on the screen
+EXPT_NAME = Screen_Touch_train_RANDOM_LOC
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+
+[TONE1] # Need TONE1 to be associated with correct action
+Duration(s) = 2
+Freq(Hz)	= 1800
+Volume(0-1)	= 1.0
+
+[TOUCHSCREEN]
+IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
+# Note: Touchscreen is 1024 x 768. If we discount the deadzone, the
+#       screen is 1024 x 518.  picture size is 240 x 240.
+#       Image size is controlled in whiskerTouchZMQ.py
+COORDS=(181,14):(181,264):(602,14):(602,264) #RANDOM   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+IMG1= FLOWER_REAL.bmp  # Image name
+TRAIN_TOUCH =1,100  # note: TRAIN_TOUCH =a,b.  a = initial VI for img touch, b = initial VI for background touch
+
+[SETUP] # This is a REQUIRED Header
+MAX_EXPT_TIME = 60     # NOTE: In minutes.   Generally 60 min max for rats
+FAN_ON=TRUE
+CAB_LIGHT=TRUE
+CAMERA=TRUE
+REC=TRUE
+FOOD_LIGHT=TRUE
+
+[PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
+# This is a REQUIRED Header
+START_LOOP1 = 600  # Max trials should be no more than 100 # This is a REQUIRED Header
+  DRAW_IMAGES=True
+  CONDITIONS=0    # NOTE: starts at 0
+  PAUSE = 2   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet...
+END_LOOP      # This is a REQUIRED entry
+
+FOOD_LIGHT=False
+REC=False
+CAMERA= False
+CAB_LIGHT=False
+FAN_ON=False
+[END PROTOCOL]
+
+[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE or AFTER_EATING.  Also, HERE WE NEED COMMAS. # This is a REQUIRED Header
+MAX_TIME, RESET,        CORRECT,          WRONG,             NO_ACTION
+60,       ON_RESPONSE,  PELLET_TOUCHVI1,  PELLET_TOUCHVI2,   NONE
+
+# Max Time for stimulus presentation should be 30 s
+# For training:
