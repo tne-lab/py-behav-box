@@ -64,7 +64,7 @@ class Stim:
         self.task.timing(sr) # rate , can also change active_edge,
                                 #continuous or finite number of samples
 
-        self.waitForEvent()
+        #self.waitForEvent()
 
 
     def sendStim():
@@ -84,3 +84,10 @@ class Stim:
                     self.sendStim()
             if not self.q.empty():
                 return
+
+
+if __name__ == "__main__":
+    q = 1
+    stim = Stim('Dev2/ao1', q)
+    for i in range(5):
+        stim.sendStim
