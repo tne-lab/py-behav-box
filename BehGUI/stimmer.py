@@ -5,6 +5,8 @@ import os
 import zmq
 import math
 
+import zmqClasses
+
 # Dev3 for flavs computer
 
 class Stim:
@@ -50,14 +52,9 @@ class Stim:
         self.q = q
 
         # Create socket to listen to
-        '''
-        context = zmq.Context()
-        self.socket = context.socket(zmq.SUB, ZMQ_RCVTIMEO = 30)
-        self.socket.connect("tcp://localhost:" + str(port))
-        SUBSCRIBE = b'event'
-        for sub in SUBSCRIBE:
-            self.socket.setsockopt(zmq.SUBSCRIBE, sub)
-            '''
+        self.rcv = zmqClasses.RCVEvent(5557, [b'ttl'])
+
+
 
         # Create Task
         self.task = nidaqmx.Task()
@@ -66,7 +63,7 @@ class Stim:
         self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = period) # rate , can also change active_edge,
                                 #continuous or finite number of samples
 
-        #self.waitForEvent()
+        self.waitForEvent()
 
 
     def sendStim(self):
@@ -77,16 +74,10 @@ class Stim:
 
     def waitForEvent(self):
         while True:
-            msg = self.socket.recv()
-            if len(msg) == 2:
-                envelope, jsonStr = msg
-                if 'CHANGE ME' in envelope:
-                    self.sendStim()
-            else:
-                if 'CHANGE ME' in msg:
-                    self.sendStim()
-            if not self.q.empty():
-                return
+            json = self.rcv.rcv()
+            if json:
+                self.sendStim()
+                json = False
 
     def close(self):
         self.task.close()
@@ -96,7 +87,3 @@ if __name__ == "__main__":
     q = 1
     #print(nidaqmx.system._collection
     stim = Stim('Dev3/ao1', q)
-    for i in range(5):
-        stim.sendStim()
-        time.sleep(1)
-    stim.close()
