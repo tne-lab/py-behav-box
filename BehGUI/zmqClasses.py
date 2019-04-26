@@ -33,6 +33,8 @@ class RCVEvent:
                 #print(jsonStr, 'just json')
                 #print('\n')
                 return jsonStr
+            else:
+                return false
 
     # First version of Json parser that breaks up the json object
     # Doesn't really do anything useful yet. Probably change this depending on how we want to do stuff
