@@ -15,11 +15,11 @@ class Stim:
         ######## Create Waveform ######################################
         # --------------------- INPUTS --------------------------------
         sr = 10000 # Sampling Rate (Hz)
-        amplitude = 10 # Amplitude (Volts)
-        width = 10 # duration of pulse (ms)
-        ipi = 30 # inter-pulse interval (ms). output zero during this period,
+        amplitude = 1 # Amplitude (Volts)
+        width = 500 # duration of pulse (ms)
+        ipi = 500 # inter-pulse interval (ms). output zero during this period,
         # if muliple waveforms, period = width + ipi
-        numPulse = 1
+        numPulse = 3
         biphasic = True # if true, pulse is ceil(width/2) of amp followed by floow(width/2) of -amp
         phaseShift = 270
         # --------------------------------------------------------------
@@ -63,7 +63,7 @@ class Stim:
         self.task = nidaqmx.Task()
         self.task.ao_channels.add_ao_voltage_chan(address) # Change max_val to max voltage used
         # Set timing
-        self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = period) # rate , can also change active_edge,
+        self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
                                 #continuous or finite number of samples
 
         #self.waitForEvent()
@@ -75,7 +75,7 @@ class Stim:
         self.task.stop()
         print('stim done')
 
-    def waitForEvent(self):
+    def waitForEvent(self): # waiting for OPEN EPHYS. then tells GUI and open ephys that it sent the stim
         while True:
             msg = self.socket.recv()
             if len(msg) == 2:
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     q = 1
     #print(nidaqmx.system._collection
     stim = Stim('Dev3/ao1', q)
-    for i in range(5):
-        stim.sendStim()
-        time.sleep(1)
+    #for i in range(5):
+    stim.sendStim()
+    #time.sleep(1)
     stim.close()
