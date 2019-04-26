@@ -23,7 +23,7 @@ class Stim:
         # if muliple waveforms, period = width + ipi
         numPulse = 1
         biphasic = True # if true, pulse is ceil(width/2) of amp followed by floow(width/2) of -amp
-        phaseShift = 270
+        phaseShift = 0
         # --------------------------------------------------------------
 
         # Now lets build it
@@ -52,8 +52,15 @@ class Stim:
         self.q = q
 
         # Create socket to listen to
-        self.rcv = zmqClasses.RCVEvent(5557, [b'ttl'])
-
+        #self.rcv = zmqClasses.RCVEvent(5557, [b'ttl'])
+        context = zmq.Context()
+        self.socket = context.socket(zmq.SUB)
+        self.socket.connect("tcp://localhost:" + str(5557))
+        #self.poller = zmq.Poller()
+        #self.poller.register(self.socket, zmq.POLLIN)
+        SUBSCRIBE = [b'ttl']
+        for sub in SUBSCRIBE:
+            self.socket.setsockopt(zmq.SUBSCRIBE, sub)
 
 
         # Create Task
@@ -74,10 +81,9 @@ class Stim:
 
     def waitForEvent(self):
         while True:
-            json = self.rcv.rcv()
-            if json:
-                self.sendStim()
-                json = False
+            envelope, jsonStr = self.socket.recv_multipart()
+            self.sendStim()
+
 
     def close(self):
         self.task.close()
