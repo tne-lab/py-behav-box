@@ -9,25 +9,25 @@ import zmqClasses
 
 # Dev3 for flavs computer
 
-class Stim:
+cdef class Stim:
     '''
     Class to create and send stim waveforms
     '''
+    cdef int waveform[10000] #numPulse * Period (hard code for speed!) Hopefully update
     def __init__(self, address, q):
         ######## Create Waveform ######################################
         # --------------------- INPUTS --------------------------------
-        sr = 10000 # Sampling Rate (Hz)
+        sr = 1000000 # Sampling Rate (Hz)
         amplitude = 1 # Amplitude (Volts)
-        width = 500 # duration of pulse (ms)
-        ipi = 500 # inter-pulse interval (ms). output zero during this period,
+        width = 5 # duration of pulse (ms)
+        ipi = 5 # inter-pulse interval (ms). output zero during this period,
         # if muliple waveforms, period = width + ipi
-        numPulse = 3
+        numPulse = 1
         biphasic = True # if true, pulse is ceil(width/2) of amp followed by floow(width/2) of -amp
         phaseShift = 0
         # --------------------------------------------------------------
 
         # Now lets build it
-        self.waveform = []
         negAmplitude = amplitude * -1
         widthSamp = int(width/1000.0*sr)
         ipiSamp = int(ipi/1000.0*sr)
@@ -35,17 +35,17 @@ class Stim:
 
         for num in range(numPulse):
             for i in range(int(phaseShift/360.0 * period)):
-                self.waveform.append(0)
+                self.waveform[i*num] = 0
             for i in range(widthSamp):
                 if biphasic:
                     if i <= math.ceil(widthSamp/2) + 1:
-                        self.waveform.append(amplitude)
+                        self.waveform[i*num] = amplitude
                     else:
-                        self.waveform.append(negAmplitude)
+                        self.waveform[i * num] = negAmplitude
                 else:
-                    self.waveform.append(amplitude)
+                    self.waveform[i * num] = amplitude
             for i in range(int((360-phaseShift)/360.0 * period)):
-                self.waveform.append(0)
+                self.waveform[i * num] = 0
         ##################################################################
 
         # From parent to get quit
@@ -73,12 +73,12 @@ class Stim:
         self.waitForEvent()
 
 
-    def sendStim(self):
+    cdef sendStim(self):
         self.task.write(self.waveform, auto_start = True)
         self.task.wait_until_done() # Waits until done or timeouts after 10 seconds
         self.task.stop()
 
-    def waitForEvent(self): # waiting for OPEN EPHYS. then tells GUI and open ephys that it sent the stim
+    cdef waitForEvent(self): # waiting for OPEN EPHYS. then tells GUI and open ephys that it sent the stim
         while True:
             self.socket.recv_multipart()
             self.sendStim()
