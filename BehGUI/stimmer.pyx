@@ -77,19 +77,19 @@ class Stim:
         self.task.write(self.waveform, auto_start = True)
         self.task.wait_until_done() # Waits until done or timeouts after 10 seconds
         self.task.stop()
-        print('stim done')
 
     def waitForEvent(self): # waiting for OPEN EPHYS. then tells GUI and open ephys that it sent the stim
         while True:
-            envelope, jsonStr = self.socket.recv_multipart()
+            self.socket.recv_multipart()
             self.sendStim()
 
 
     def close(self):
         self.task.close()
 
-
+def main():
+  q = 1
+  #print(nidaqmx.system._collection
+  stim = Stim('Dev3/ao1', q)
 if __name__ == "__main__":
-    q = 1
-    #print(nidaqmx.system._collection
-    stim = Stim('Dev3/ao1', q)
+  main()

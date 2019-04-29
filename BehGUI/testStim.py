@@ -1,0 +1,3 @@
+import stimmer
+
+stimmer.main()
