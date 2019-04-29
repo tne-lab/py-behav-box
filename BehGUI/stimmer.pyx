@@ -6,6 +6,7 @@ import zmq
 import math
 
 import zmqClasses
+from libc.stdlib cimport malloc, free
 
 # Dev3 for flavs computer
 
@@ -13,6 +14,7 @@ cdef class Stim:
     '''
     Class to create and send stim waveforms
     '''
+    #cdef int* waveform
     cdef int waveform[10000] #numPulse * Period (hard code for speed!) Hopefully update
     def __init__(self, address, q):
         ######## Create Waveform ######################################
@@ -32,6 +34,7 @@ cdef class Stim:
         widthSamp = int(width/1000.0*sr)
         ipiSamp = int(ipi/1000.0*sr)
         period = widthSamp + ipiSamp
+        #self.waveform = <int *> malloc(period*numPulse * sizeof(int)) Possible option
 
         for num in range(numPulse):
             for i in range(int(phaseShift/360.0 * period)):
