@@ -18,7 +18,7 @@ cdef class Stim:
         ######## Create Waveform ######################################
         # --------------------- INPUTS --------------------------------
         sr = 1000000 # Sampling Rate (Hz)
-        amplitude = 1 # Amplitude (Volts)
+        amplitude = 1 # Amplitude (Volts) (change this to amps) , biphasic?
         width = 5 # duration of pulse (ms)
         ipi = 5 # inter-pulse interval (ms). output zero during this period,
         # if muliple waveforms, period = width + ipi
@@ -65,7 +65,8 @@ cdef class Stim:
 
         # Create Task
         self.task = nidaqmx.Task()
-        self.task.ao_channels.add_ao_voltage_chan(address) # Change max_val to max voltage used
+        self.task.ao_channels.add_ao_voltage_chan(address) # Change this eventually
+        #self.task.ao_channels.add_ao_current_chan(address) # check max amps
         # Set timing
         self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
                                 #continuous or finite number of samples
