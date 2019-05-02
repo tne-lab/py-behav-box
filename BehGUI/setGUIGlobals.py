@@ -3,6 +3,10 @@ import os
 import pygame
 import time
 import GUIFunctions
+from queue import Queue
+import multiprocessing
+import pyximport; pyximport.install()
+import stimmer
 try:
     import daqAPI
 except:
@@ -48,9 +52,10 @@ def setGUIGlobals(self):
         self.checkPressLeft, self.checkPressRight = daqAPI.leverInputSetup()
         self.eaten = daqAPI.foodEatInputSetup()
         # Create stim thread
-        #self.STIM_ENABLED = True
-        #self.stimQ = Queue()
-        #self.stim = multiprocessing.Process(target=stimmer.Stim, args=(ADDRESS***, self.stimQ)) # NEED TO UPDATE ADDRESS
+        self.STIM_ENABLED = True
+        self.stimQ = multiprocessing.Queue()
+        self.stim = multiprocessing.Process(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ)) # NEED TO UPDATE ADDRESS
+        self.stim.start()
 
     ##################
     # DATA

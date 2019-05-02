@@ -246,7 +246,7 @@ def exit_game(self):
       self.R_nose_poke.end()
       self.checkPressLeft.end()
       self.checkPressRight.end()
-      #if self.STIM_ENABLED: self.stim.terminate()
+      if self.STIM_ENABLED: self.stim.terminate()
 
     pygame.quit()
     sys.exit()
