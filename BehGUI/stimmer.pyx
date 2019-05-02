@@ -10,12 +10,13 @@ from libc.stdlib cimport malloc, free
 
 # Dev3 for flavs computer
 
-cdef class Stim:
+class Stim:
     '''
     Class to create and send stim waveforms
     '''
     #cdef int* waveform
-    cdef int waveform[10000] #numPulse * Period (hard code for speed!) Hopefully update
+
+    #cdef int waveform[10000] #numPulse * Period (hard code for speed!) Hopefully update
     def __init__(self, address, q):
         ######## Create Waveform ######################################
         # --------------------- INPUTS --------------------------------
@@ -30,6 +31,7 @@ cdef class Stim:
         # --------------------------------------------------------------
 
         # Now lets build it
+        self.waveform = []
         negAmplitude = amplitude * -1
         widthSamp = int(width/1000.0*sr)
         ipiSamp = int(ipi/1000.0*sr)
@@ -38,21 +40,26 @@ cdef class Stim:
 
         for num in range(numPulse):
             for i in range(int(phaseShift/360.0 * period)):
-                self.waveform[i*num] = 0
+                #self.waveform[i*num] = 0
+                self.waveform.append(0)
             for i in range(widthSamp):
                 if biphasic:
                     if i <= math.ceil(widthSamp/2) + 1:
-                        self.waveform[i*num] = amplitude
+                        #self.waveform[i*num] = amplitude
+                        self.waveform.append(amplitude)
                     else:
-                        self.waveform[i * num] = negAmplitude
+                        #self.waveform[i * num] = negAmplitude
+                        self.waveform.append(negAmplitude)
                 else:
-                    self.waveform[i * num] = amplitude
+                    #self.waveform[i * num] = amplitude
+                    self.waveform.append(amplitude)
             for i in range(int((360-phaseShift)/360.0 * period)):
-                self.waveform[i * num] = 0
+                #self.waveform[i * num] = 0
+                self.waveform.append(0)
         ##################################################################
 
         # From parent to get quit
-        self.q = q
+        #self.q = q
 
         # Create socket to listen to
         #self.rcv = zmqClasses.RCVEvent(5557, [b'ttl'])
@@ -77,12 +84,12 @@ cdef class Stim:
         self.waitForEvent()
 
 
-    cdef sendStim(self):
+    def sendStim(self):
         self.task.write(self.waveform, auto_start = True)
         self.task.wait_until_done() # Waits until done or timeouts after 10 seconds
         self.task.stop()
 
-    cdef waitForEvent(self): # waiting for OPEN EPHYS. then tells GUI and open ephys that it sent the stim
+    def waitForEvent(self): # waiting for OPEN EPHYS. then tells GUI and open ephys that it sent the stim
         while True:
             self.socket.recv_multipart()
             self.sendStim()
