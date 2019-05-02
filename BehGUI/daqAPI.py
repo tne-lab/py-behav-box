@@ -71,22 +71,6 @@ def enableSetup():
     enableTask.startTask()
     return enableTask
 
-
-'''
-!!! DEPRECIATED !!!!
-Enable pulse for when sending bits/bytes.
-(Doesn't need a global task because its just a pulse).
-!! Plus it seems like making a class on port0 isn't a good idea.
-'''
-'''
-def enablePulse():
-    try:
-            enable.enable()
-        enable.end()
-    except:
-        print('woops')
-    return
-'''
 def enablePulse():
     enable = dev + '/port0/line4'
     #print('Enable Pulse')

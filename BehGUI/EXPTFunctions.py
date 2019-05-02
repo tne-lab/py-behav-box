@@ -93,7 +93,13 @@ def checkQs(self):
         ### CHECK OE Q ###
         if not self.openEphysBack_q.empty():
             OEMsg = self.openEphysBack_q.get()
-            self.log_event(str(OEMsg))
+            self.log_event(str(OEMsg))'
+
+    if self.GUI.STIM_ENABLED:
+        ### CHECK STIM Q ###
+        if not self.GUI.stimQ.empty():
+            stim = self.GUI.stimQ.get() # What do we want here?
+            self.log_event(stim)
 
 
 ###########################################################################################################

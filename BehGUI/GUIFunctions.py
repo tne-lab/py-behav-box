@@ -218,6 +218,9 @@ def StartTouchScreen(self):
         self.TOUCH_TRHEAD_STARTED = True
         self.TSq.put('') # Send an emtpy string so it draws a blank screen to start!
 
+###########################################################################################################
+# EXIT GAME
+###########################################################################################################
 def exit_game(self):
     #Exit things
     if self.EXPT_LOADED: self.expt.endExpt()
@@ -243,8 +246,8 @@ def exit_game(self):
       self.R_nose_poke.end()
       self.checkPressLeft.end()
       self.checkPressRight.end()
+      #if self.STIM_ENABLED: self.stim.terminate()
 
-      #self.stimQ.put('STOP')
     pygame.quit()
     sys.exit()
 

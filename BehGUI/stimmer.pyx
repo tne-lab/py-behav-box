@@ -91,9 +91,8 @@ cdef class Stim:
     def close(self):
         self.task.close()
 
-def main():
-  q = 1
-  #print(nidaqmx.system._collection
-  stim = Stim('Dev3/ao1', q)
+def main(address, q):
+  stim = Stim(address, q) #'Dev3/ao1'
+
 if __name__ == "__main__":
   main()

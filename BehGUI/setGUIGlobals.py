@@ -20,7 +20,7 @@ def setGUIGlobals(self):
     WINDOW_HEIGHT = SCREEN_HEIGHT -100
     WINDOW_HCENTER = WINDOW_HEIGHT/2
     self.GAME_AREA = pygame.Rect(20, 10, WINDOW_WIDTH, WINDOW_HEIGHT)
-
+    self.STIM_ENABLED = False
     ################################################################
     # NIDAQ GLOBALS
     ################################################################
@@ -50,8 +50,7 @@ def setGUIGlobals(self):
         # Create stim thread
         #self.STIM_ENABLED = True
         #self.stimQ = Queue()
-        #stimThread = threading.Thread(target=stimmer.Stim, args=(ADDRESS***, self.stimQ)) # NEED TO UPDATE ADDRESS
-
+        #self.stim = multiprocessing.Process(target=stimmer.Stim, args=(ADDRESS***, self.stimQ)) # NEED TO UPDATE ADDRESS
 
     ##################
     # DATA
