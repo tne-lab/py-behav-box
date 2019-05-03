@@ -4,6 +4,8 @@ import time
 import os
 import zmq
 import math
+import json
+import random
 
 import zmqClasses
 from libc.stdlib cimport malloc, free
@@ -17,7 +19,7 @@ class Stim:
     #cdef int* waveform
 
     #cdef int waveform[10000] #numPulse * Period (hard code for speed!) Hopefully update
-    def __init__(self, address, q):
+    def __init__(self, address, q, MODE, lenERP = 30):
         ######## Create Waveform ######################################
         # --------------------- INPUTS --------------------------------
         sr = 1000000 # Sampling Rate (Hz)
@@ -58,30 +60,37 @@ class Stim:
                 self.waveform.append(0)
         ##################################################################
 
-        # From parent to get quit
-        #self.q = q
+        # Send back stim events
+        self.q = q
 
-        # Create socket to listen to
-        #self.rcv = zmqClasses.RCVEvent(5557, [b'ttl'])
-        context = zmq.Context()
-        self.socket = context.socket(zmq.SUB)
-        self.socket.connect("tcp://localhost:" + str(5557))
-        #self.poller = zmq.Poller()
-        #self.poller.register(self.socket, zmq.POLLIN)
-        SUBSCRIBE = [b'ttl']
-        for sub in SUBSCRIBE:
-            self.socket.setsockopt(zmq.SUBSCRIBE, sub)
+        # ERP
+        if MODE == 'ERP':
+            self.lenERP = lenERP
+            self.ERP()
+            return
+
+        elif MODE == 'TRIGGER'
+            # Create socket to listen to
+            #self.rcv = zmqClasses.RCVEvent(5557, [b'ttl'])
+            context = zmq.Context()
+            self.socket = context.socket(zmq.SUB)
+            self.socket.connect("tcp://localhost:" + str(5557))
+            #self.poller = zmq.Poller()
+            #self.poller.register(self.socket, zmq.POLLIN)
+            SUBSCRIBE = [b'ttl']
+            for sub in SUBSCRIBE:
+                self.socket.setsockopt(zmq.SUBSCRIBE, sub)
 
 
-        # Create Task
-        self.task = nidaqmx.Task()
-        self.task.ao_channels.add_ao_voltage_chan(address) # Change this eventually
-        #self.task.ao_channels.add_ao_current_chan(address) # check max amps
-        # Set timing
-        self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
-                                #continuous or finite number of samples
+            # Create Task
+            self.task = nidaqmx.Task()
+            self.task.ao_channels.add_ao_voltage_chan(address) # Change this eventually
+            #self.task.ao_channels.add_ao_current_chan(address) # check max amps
+            # Set timing
+            self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
+                                    #continuous or finite number of samples
 
-        self.waitForEvent()
+            self.waitForEvent()
 
 
     def sendStim(self):
@@ -89,17 +98,32 @@ class Stim:
         self.task.wait_until_done() # Waits until done or timeouts after 10 seconds
         self.task.stop()
 
-    def waitForEvent(self): # waiting for OPEN EPHYS. then tells GUI and open ephys that it sent the stim
+    def waitForEvent(self):
+        '''
+        waiting for OPEN EPHYS trigger. then tells GUI that it sent the stim
+        '''
         while True:
-            self.socket.recv_multipart()
+            header, jsonMsg = self.socket.recv_multipart()
+            jsonStr = json.loads(jsonMsg)
+            if jsonStr['type'] == 'ttl' and jsonStr['data']: # ttl and data==true!
+                self.sendStim()
+                self.q.put('Stim pulse sent')
+
+    def ERP(self):
+        '''
+        ERP stimulation paradigm
+        '''
+        for i in range(self.lenERP):
             self.sendStim()
+            slpLen = random.uniform(3,5)
+            time.sleep(slpLen * 1000) # 4 +- 1 second
 
 
     def close(self):
         self.task.close()
 
-def main(address, q):
-  stim = Stim(address, q) #'Dev3/ao1'
+def main(address, q, MODE):
+  stim = Stim(address, q, MODE) #'Dev3/ao1'
 
 if __name__ == "__main__":
   main()

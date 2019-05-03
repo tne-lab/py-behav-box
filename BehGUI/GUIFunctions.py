@@ -56,8 +56,7 @@ def choose_file():
     #Tk.withdraw() # we don't want a full GUI, so keep the root window from appearing
     chosenFileName = askopenfilename() # show an "Open" dialog box and return the path to the selected file
     filename = os.path.basename(chosenFileName)
-    win32gui.EnumWindows(closeWindow, 'tk')
-
+    #win32gui.EnumWindows(closeWindow, 'tk') # was stalling here?
     return filename
 
 def FAN_ON_OFF(self, FAN_ON):

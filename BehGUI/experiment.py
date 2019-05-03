@@ -7,6 +7,9 @@ import random
 from RESOURCES.GUI_elements_by_flav import *
 import GUIFunctions
 import EXPTFunctions
+import multiprocessing
+import pyximport; pyximport.install()
+import stimmer
 
 class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
@@ -30,13 +33,19 @@ class Experiment:
             print("COULD NOT LOAD EXPT FILE")
             self.log_event("COULD NOT LOAD EXPT FILE")
         # Open ephys stuff
+        self.EPHYS_ENABLED = True
         if self.EPHYS_ENABLED:
             self.snd = zmqClasses.SNDEvent(5556) # subject number or something
             self.openEphysBack_q = Queue()
             self.openEphysQ = Queue()
             # Start thread
-            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike',b'ttl']})
+            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'event',b'ttl']})
             open_ephys_rcv.start()
+            if self.GUI.NIDAQ_AVAILABLE:
+                self.STIM_ENABLED = True
+                self.stimQ = multiprocessing.Queue()
+                self.stim = multiprocessing.Process(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ)) # NEED TO UPDATE ADDRESS
+                self.stim.start()
 
         self.GUI.EXPT_LOADED = True
 ####################################################################################
