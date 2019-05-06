@@ -85,7 +85,7 @@ class Stim:
 
         elif MODE == 'TRIGGER'
             # Create socket to listen to
-            #self.rcv = zmqClasses.RCVEvent(5557, [b'ttl'])
+            #self.rcv = zmqClasses.RCVEvent(5557, [b'ttl']) #see if same speed. may come back to this (poller/thread/q)
             context = zmq.Context()
             self.socket = context.socket(zmq.SUB)
             self.socket.connect("tcp://localhost:" + str(5557))
@@ -137,7 +137,6 @@ class Stim:
           time.sleep(slpLen * 1000) # 4 +- 1 second
 
         self.close()
-
 
     def close(self):
         self.task.close()
