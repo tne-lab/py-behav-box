@@ -95,10 +95,10 @@ def checkQs(self):
             OEMsg = self.openEphysBack_q.get()
             self.log_event(str(OEMsg))
 
-    if self.GUI.STIM_ENABLED:
+    if self.STIM_ENABLED:
         ### CHECK STIM Q ###
-        if not self.GUI.stimQ.empty():
-            stim = self.GUI.stimQ.get() # What do we want here?
+        if not self.stimQ.empty():
+            stim = self.stimQ.get() # What do we want here?
             self.log_event(stim)
 
 
@@ -151,5 +151,7 @@ def resetBox(self):
 
     self.L_condition_Lt.sendDBit(False)
     self.R_condition_Lt.sendDBit(False)
+
+    if self.STIM_ENABLED: self.stim.terminate()
 
     GUIFunctions.EXTEND_LEVERS(self,"Levers_Retracted",False,False)

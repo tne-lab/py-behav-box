@@ -41,11 +41,6 @@ class Experiment:
             # Start thread
             open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'event',b'ttl']})
             open_ephys_rcv.start()
-            if self.GUI.NIDAQ_AVAILABLE:
-                self.STIM_ENABLED = True
-                self.stimQ = multiprocessing.Queue()
-                self.stim = multiprocessing.Process(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ)) # NEED TO UPDATE ADDRESS
-                self.stim.start()
 
         self.GUI.EXPT_LOADED = True
 ####################################################################################
@@ -540,6 +535,37 @@ class Experiment:
                             self.GUI.TSq.put('')
                         else:
                             self.log_event(self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
+
+        elif "CLOSED_LOOP" == key:
+            if protocolDict["CLOSED_LOOP"]:
+                if self.GUI.NIDAQ_AVAILABLE:
+                    self.STIM_ENABLED = True
+                    self.stimQ = multiprocessing.Queue()
+                    self.stim = multiprocessing.Process(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ, "TRIGGER")) # NEED TO UPDATE ADDRESS
+                    self.stim.start()
+                    self.Protocol_ln_num += 1
+                else:
+                    self.log_event("Closed Loop Starting Failed, fix DAQ")
+                    self.endExpt()
+            else:
+                self.stim.terminate()
+                self.STIM_ENABLED = False
+                self.Protocol_ln_num += 1
+
+        elif "ERP" == key:
+            if not self.STIM_ENABLED:
+                if self.GUI.NIDAQ_AVAILABLE:
+                    self.STIM_ENABLED = True
+                    self.stimQ = multiprocessing.Queue()
+                    self.stim = multiprocessing.Process(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ, "ERP"), kwargs = {'lenERP': protocolDict["ERP"], 'addressY' : 'Dev3/ao0'})
+                    self.stim.start()
+                else:
+                    self.log_event("ERP Starting Failed, fix DAQ")
+                    self.endExpt()
+            else:
+                if not self.stim.is_alive():
+                    self.STIM_ENABLED = False
+                    self.Protocol_ln_num += 1
 
         elif key == "CONDITIONS":
             self.runConditions(protocolDict)

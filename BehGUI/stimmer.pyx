@@ -19,7 +19,7 @@ class Stim:
     #cdef int* waveform
 
     #cdef int waveform[10000] #numPulse * Period (hard code for speed!) Hopefully update
-    def __init__(self, address, q, MODE, lenERP = 30):
+    def __init__(self, address, q, MODE, lenERP = 30, addressY = 'Dev3/ao1'):
         ######## Create Waveform ######################################
         # --------------------- INPUTS --------------------------------
         sr = 1000000 # Sampling Rate (Hz)
@@ -63,9 +63,23 @@ class Stim:
         # Send back stim events
         self.q = q
 
+        # Create Task
+        self.task = nidaqmx.Task()
+        self.task.ao_channels.add_ao_voltage_chan(address) # Change this eventually
+        #self.task.ao_channels.add_ao_current_chan(address) # check max amps
+        # Set timing
+        self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
+                                #continuous or finite number of samples
+
         # ERP
         if MODE == 'ERP':
             self.lenERP = lenERP
+            self.taskY = = nidaqmx.Task()
+            self.taskY.ao_channels.add_ao_voltage_chan(addressY) # Change this eventually
+            #self.task.ao_channels.add_ao_current_chan(address) # check max amps
+            # Set timing
+            self.taskY.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
+                                    #continuous or finite number of samples
             self.ERP()
             return
 
@@ -81,15 +95,6 @@ class Stim:
             for sub in SUBSCRIBE:
                 self.socket.setsockopt(zmq.SUBSCRIBE, sub)
 
-
-            # Create Task
-            self.task = nidaqmx.Task()
-            self.task.ao_channels.add_ao_voltage_chan(address) # Change this eventually
-            #self.task.ao_channels.add_ao_current_chan(address) # check max amps
-            # Set timing
-            self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
-                                    #continuous or finite number of samples
-
             self.waitForEvent()
 
 
@@ -97,6 +102,11 @@ class Stim:
         self.task.write(self.waveform, auto_start = True)
         self.task.wait_until_done() # Waits until done or timeouts after 10 seconds
         self.task.stop()
+
+    def sendStimY(self):
+        self.taskY.write(self.waveform, auto_start = True)
+        self.taskY.wait_until_done() # Waits until done or timeouts after 10 seconds
+        self.taskY.stop()
 
     def waitForEvent(self):
         '''
@@ -114,16 +124,27 @@ class Stim:
         ERP stimulation paradigm
         '''
         for i in range(self.lenERP):
+          # Stim at location X or Y
+          int XorY = random.randint(0,1)
+          if XorY:
             self.sendStim()
-            slpLen = random.uniform(3,5)
-            time.sleep(slpLen * 1000) # 4 +- 1 second
+            self.q.put('ERP pulse sent , ' + address)
+          else:
+            self.sendStimY()
+            self.q.put('ERP pulse sent , ' + addressY)
+          # Wait for brain to return to normal before stimming again
+          slpLen = random.uniform(3,5)
+          time.sleep(slpLen * 1000) # 4 +- 1 second
+
+        self.close()
 
 
     def close(self):
         self.task.close()
 
-def main(address, q, MODE):
-  stim = Stim(address, q, MODE) #'Dev3/ao1'
+def main():
+  stimQ = 1
+  stim = Stim('Dev3/ao1', stimQ, "TRIGGER") #'Dev3/ao1'
 
 if __name__ == "__main__":
   main()
