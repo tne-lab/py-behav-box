@@ -93,7 +93,7 @@ def checkQs(self):
         ### CHECK OE Q ###
         if not self.openEphysBack_q.empty():
             OEMsg = self.openEphysBack_q.get()
-            self.log_event(str(OEMsg))
+            #self.log_event(str(OEMsg))
 
     if self.STIM_ENABLED:
         ### CHECK STIM Q ###
@@ -131,7 +131,7 @@ def log_event(self,event, event_other=''):
     if len(self.GUI.events) > 14:  self.start_line = len(self.GUI.events) - 14
     try:
         self.log_file.write(event_string + event_other + '\n')   # To WRITE TO FILE
-        print(event_string + event_other)                   # print to display
+        #print(event_string + event_other)                   # print to display
     except:
         print ('Log file not created yet. Check EXPT PATH, then Press "LOAD EXPT FILE BUTTON"')
 

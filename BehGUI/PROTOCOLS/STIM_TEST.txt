@@ -1,7 +1,7 @@
 [EXPERIMENT]
-EXPT_NAME = Bandit_Touch_TEST # Don't use "-" in name, use underscores "_" instead
+EXPT_NAME = STIM_TEST # Don't use "-" in name, use underscores "_" instead
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
-#OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release\bin\open-ephys.exe # on Flav's PC Ephys-2
+OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\VisualStudio2013\x64\Release\bin\open-ephys.exe # on Flav's PC Ephys-2
 # CHANGE TO PRIVATE ^^^
 
 [SETUP]
@@ -11,20 +11,20 @@ FOOD_LIGHT=TRUE
 REC=TRUE
 
 [PROTOCOL]
-ERP = 10 # 10 pulses to random areas
-PAUSE = 180
+ERP = 5 # 10 pulses to random areas
+PAUSE = 5
 
-CLOSED_LOOP = TRUE
-START_LOOP1 = 15
+CLOSED_LOOP =TRUE
+START_LOOP1 = 5
   PAUSE = 1
   EXTEND_LEVERS=R_LVR
   PAUSE = 2    # sec
   EXTEND_LEVERS=FALSE
 END_LOOP
-CLOSED_LOOP = FALSE
+CLOSED_LOOP =FALSE
 
-PAUSE = 180
-ERP = 10
+PAUSE = 5
+ERP = 5
 
 FAN_ON=FALSE
 CAB_LIGHT=FALSE

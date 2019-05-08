@@ -19,7 +19,7 @@ class Stim:
     #cdef int* waveform
 
     #cdef int waveform[10000] #numPulse * Period (hard code for speed!) Hopefully update
-    def __init__(self, address, q, MODE, lenERP = 30, addressY = 'Dev3/ao1'):
+    def __init__(self, address, q, backQ, MODE, lenERP = 30, addressY = 'Dev3/ao1'):
         ######## Create Waveform ######################################
         # --------------------- INPUTS --------------------------------
         sr = 1000000 # Sampling Rate (Hz)
@@ -62,6 +62,7 @@ class Stim:
 
         # Send back stim events
         self.q = q
+        self.backQ = backQ
 
         # Create Task
         self.task = nidaqmx.Task()
@@ -70,11 +71,12 @@ class Stim:
         # Set timing
         self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
                                 #continuous or finite number of samples
-
+        self.address = address
+        self.addressY = addressY
         # ERP
         if MODE == 'ERP':
             self.lenERP = lenERP
-            self.taskY = = nidaqmx.Task()
+            self.taskY = nidaqmx.Task()
             self.taskY.ao_channels.add_ao_voltage_chan(addressY) # Change this eventually
             #self.task.ao_channels.add_ao_current_chan(address) # check max amps
             # Set timing
@@ -83,7 +85,7 @@ class Stim:
             self.ERP()
             return
 
-        elif MODE == 'TRIGGER'
+        elif MODE == 'TRIGGER':
             # Create socket to listen to
             #self.rcv = zmqClasses.RCVEvent(5557, [b'ttl']) #see if same speed. may come back to this (poller/thread/q)
             context = zmq.Context()
@@ -115,29 +117,39 @@ class Stim:
         while True:
             header, jsonMsg = self.socket.recv_multipart()
             jsonStr = json.loads(jsonMsg)
+            if not self.backQ.empty():
+                self.backQ.get()
+                self.close()
             if jsonStr['type'] == 'ttl' and jsonStr['data']: # ttl and data==true!
                 self.sendStim()
                 self.q.put('Stim pulse sent')
+
 
     def ERP(self):
         '''
         ERP stimulation paradigm
         '''
         for i in range(self.lenERP):
-          # Stim at location X or Y
-          int XorY = random.randint(0,1)
-          if XorY:
-            self.sendStim()
-            self.q.put('ERP pulse sent , ' + address)
-          else:
-            self.sendStimY()
-            self.q.put('ERP pulse sent , ' + addressY)
-          # Wait for brain to return to normal before stimming again
-          slpLen = random.uniform(3,5)
-          time.sleep(slpLen * 1000) # 4 +- 1 second
+            if not self.backQ.empty():
+                self.backQ.get()
+                self.closeXY()
+            # Stim at location X or Y
+            XorY = random.randint(0,1)
+            if XorY:
+                self.sendStim()
+                self.q.put('ERP pulse sent , ' + self.address)
+            else:
+                self.sendStim()
+                self.q.put('ERP pulse sent , ' + self.addressY)
+            # Wait for brain to return to normal before stimming again
+            slpLen = random.uniform(3,5)
+            time.sleep(slpLen) # 4 +- 1 second
 
-        self.close()
+        self.closeXY()
 
+    def closeXY(self):
+        self.task.close()
+        self.taskY.close()
     def close(self):
         self.task.close()
 

@@ -7,7 +7,6 @@ import random
 from RESOURCES.GUI_elements_by_flav import *
 import GUIFunctions
 import EXPTFunctions
-import multiprocessing
 import pyximport; pyximport.install()
 import stimmer
 
@@ -33,7 +32,7 @@ class Experiment:
             print("COULD NOT LOAD EXPT FILE")
             self.log_event("COULD NOT LOAD EXPT FILE")
         # Open ephys stuff
-        self.EPHYS_ENABLED = True
+        #self.EPHYS_ENABLED = True
         if self.EPHYS_ENABLED:
             self.snd = zmqClasses.SNDEvent(5556) # subject number or something
             self.openEphysBack_q = Queue()
@@ -537,28 +536,34 @@ class Experiment:
                             self.log_event(self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
 
         elif "CLOSED_LOOP" == key:
-            if protocolDict["CLOSED_LOOP"]:
+            val = str2bool(protocolDict[key])
+            if val:
                 if self.GUI.NIDAQ_AVAILABLE:
-                    self.STIM_ENABLED = True
-                    self.stimQ = multiprocessing.Queue()
-                    self.stim = multiprocessing.Process(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ, "TRIGGER")) # NEED TO UPDATE ADDRESS
-                    self.stim.start()
-                    self.Protocol_ln_num += 1
+                    if not self.STIM_ENABLED:
+                        self.STIM_ENABLED = True
+                        self.stimQ = Queue()
+                        self.stimBackQ = Queue()
+                        self.stim = threading.Thread(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ, self.stimBackQ, "TRIGGER")) # NEED TO UPDATE ADDRESS
+                        self.stim.start()
+                        self.Protocol_ln_num += 1
                 else:
                     self.log_event("Closed Loop Starting Failed, fix DAQ")
                     self.endExpt()
             else:
-                self.stim.terminate()
+                #self.stim.terminate()
+                self.stimBackQ.put('STOP')
                 self.STIM_ENABLED = False
                 self.Protocol_ln_num += 1
 
         elif "ERP" == key:
             if not self.STIM_ENABLED:
                 if self.GUI.NIDAQ_AVAILABLE:
-                    self.STIM_ENABLED = True
-                    self.stimQ = multiprocessing.Queue()
-                    self.stim = multiprocessing.Process(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ, "ERP"), kwargs = {'lenERP': protocolDict["ERP"], 'addressY' : 'Dev3/ao0'})
-                    self.stim.start()
+                    if not self.STIM_ENABLED:
+                        self.STIM_ENABLED = True
+                        self.stimQ = Queue()
+                        self.stimBackQ = Queue()
+                        self.stim = threading.Thread(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ, self.stimBackQ, "ERP"), kwargs = {'lenERP': int(protocolDict["ERP"]), 'addressY' : 'Dev3/ao0'})
+                        self.stim.start()
                 else:
                     self.log_event("ERP Starting Failed, fix DAQ")
                     self.endExpt()

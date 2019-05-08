@@ -28,6 +28,7 @@ def setExptGlobals(self):
     self.trial_num = 0
     self.EXPT_FILE_LOADED = False
     self.RECORDING = False
+    self.STIM_ENABLED = False
 
     ################################################################
     # EXPERIMENT PARAMETERS
@@ -150,6 +151,7 @@ def setExptGlobals(self):
     self.TOUCHED_TO_START_TRIAL = False
     self.START_IMG_PLACED = False
 
+    self.setVidGlobals()
     ################################################################
     # VIDEO GLOBALS
     ################################################################
