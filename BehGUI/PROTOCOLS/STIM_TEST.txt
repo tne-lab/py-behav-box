@@ -7,10 +7,12 @@ OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\V
 
 
 [ERP]
-PULSE_WIDTH = 4
+INTER_PULSE_WIDTH = 4
 PUSLE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
 NUM_PULSE_X = 10 # number of pulses to region X
 NUM_PULSE_Y = 10
+STIM_ADDRESS_X = Dev3/ao0
+STIM_ADDRESS_Y = Dev3/ao1
 
 [SETUP]
 FAN_ON=TRUE

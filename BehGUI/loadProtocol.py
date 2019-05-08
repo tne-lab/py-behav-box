@@ -72,6 +72,8 @@ def load_expt_file(self):
                     self.setTouchGlobals()
                 elif '[BAR_PRESS]' in str_before_equal:
                     currentlySetting = 'BARPRESS'
+                elif '[ERP]' in str_before_equal:
+                    currentlySetting = 'ERP'
                 elif '[PROTOCOL' in str_before_equal:
                     currentlySetting = 'PROTOCOL'
                 elif '[SETUP' in str_before_equal:
@@ -273,6 +275,20 @@ def load_expt_file(self):
 ##                            print("var_RATIO_reward: ",self.var_ratio_reward)
 ##                        except:
 ##                            print ("!!!!!!!!!!!VR must have the form '(10, 1,30,5)' in EXP PROOCOL file!!!!!!!!!!!!!!")
+
+                elif currentlySetting = 'ERP':
+                    if 'INTER_PULSE_WIDTH' == str_before_equal:
+                        self.INTER_PULSE_WIDTH = float(str_after_equal)
+                    if 'PULSE_VAR' == str_before_equal:
+                        self.PUSLE_VAR = float(str_after_equal)
+                    if 'NUM_PULSE_X' == str_before_equal:
+                        self.NUM_PULSE_X = float(str_after_equal)
+                    if 'NUM_PULSE_Y' == str_after_equal:
+                        self.NUM_PULSE_Y = float(str_after_equal)
+                    if 'STIM_ADDRESS_X' == str_before_equal or 'STIM_ADDRESS' == str_before_equal:
+                        self.stimAddress = str_after_equal
+                    if 'STIM_ADDRESS_Y' == str_before_equal:
+                        self.stimAddressY = str_after_equal
 
                 elif currentlySetting == 'SHOCK':
                     if 'DURATION' in str_before_equal:

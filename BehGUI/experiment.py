@@ -548,7 +548,7 @@ class Experiment:
                         self.STIM_ENABLED = True
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
-                        self.stim = threading.Thread(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ, self.stimBackQ, "TRIGGER")) # NEED TO UPDATE ADDRESS
+                        self.stim = threading.Thread(target=stimmer.Stim, args=(self.stimAddress, self.stimQ, self.stimBackQ, "TRIGGER")) # NEED TO UPDATE ADDRESS
                         self.stim.start()
                         self.Protocol_ln_num += 1
                 else:
@@ -559,7 +559,6 @@ class Experiment:
                 self.log_event("Closed Loop Starting Failed, fix DAQ")
                 self.endExpt()
 
-
         elif "ERP" == key:
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
                 if not self.STIM_ENABLED:
@@ -569,7 +568,7 @@ class Experiment:
                     self.STIM_ENABLED = True
                     self.stimQ = Queue()
                     self.stimBackQ = Queue()
-                    self.stim = threading.Thread(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ, self.stimBackQ, "ERP"), kwargs = {'lenERP': int(protocolDict["ERP"]), 'addressY' : 'Dev3/ao0'})
+                    self.stim = threading.Thread(target=stimmer.Stim, args=(self.stimAddress, self.stimQ, self.stimBackQ, "ERP"), kwargs = {'nERPX': self.NUM_PULSE_X, 'nERPY' : self.NUM_PULSE_Y, 'addressY' : self.stimAddressX, 'INTER_PULSE_WIDTH' : self.INTER_PULSE_WIDTH, 'PULSE_VAR' : self.PULSE_VAR})
                     self.stim.start()
                 else:
                     if not self.stim.is_alive():

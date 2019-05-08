@@ -16,10 +16,7 @@ class Stim:
     '''
     Class to create and send stim waveforms
     '''
-    #cdef int* waveform
-
-    #cdef int waveform[10000] #numPulse * Period (hard code for speed!) Hopefully update
-    def __init__(self, address, q, backQ, MODE, lenERP = 30, addressY = 'Dev3/ao1'):
+    def __init__(self, address, q, backQ, MODE, nERPX = 0, nERPY = 0, addressY = 'Dev3/ao1', INTER_PULSE_WIDTH = 4, PULSE_VAR = 1):
         ######## Create Waveform ######################################
         # --------------------- INPUTS --------------------------------
         sr = 1000000 # Sampling Rate (Hz)
@@ -38,7 +35,6 @@ class Stim:
         widthSamp = int(width/1000.0*sr)
         ipiSamp = int(ipi/1000.0*sr)
         period = widthSamp + ipiSamp
-        #self.waveform = <int *> malloc(period*numPulse * sizeof(int)) Possible option
 
         for num in range(numPulse):
             for i in range(int(phaseShift/360.0 * period)):
@@ -64,6 +60,7 @@ class Stim:
         self.q = q
         self.backQ = backQ
 
+
         # Create Task
         self.task = nidaqmx.Task()
         self.task.ao_channels.add_ao_voltage_chan(address) # Change this eventually
@@ -73,9 +70,19 @@ class Stim:
                                 #continuous or finite number of samples
         self.address = address
         self.addressY = addressY
+        self.taskY = None
+
         # ERP
         if MODE == 'ERP':
-            self.lenERP = lenERP
+            # Custom ERP Settings
+            self.nERPX = nERPX
+            self.nERPY = nERPY
+            self.nXStim = 0
+            self.nYStim = 0
+            self.PULSE_INTER_LOW = INTER_PULSE_WIDTH - PULSE_VAR
+            self.PULSE_INTER_HIGH = INTER_PULSE_WIDTH + PULSE_VAR
+
+            # Setup task
             self.taskY = nidaqmx.Task()
             self.taskY.ao_channels.add_ao_voltage_chan(addressY) # Change this eventually
             #self.task.ao_channels.add_ao_current_chan(address) # check max amps
@@ -124,34 +131,45 @@ class Stim:
                 self.sendStim()
                 self.q.put('Stim pulse sent')
 
-
     def ERP(self):
         '''
         ERP stimulation paradigm
         '''
-        for i in range(self.lenERP):
+        for i in range(self.nERPX + self.nERPY):
             if not self.backQ.empty():
                 self.backQ.get()
                 self.closeXY()
             # Stim at location X or Y
+            # Randomize but make sure each get specified num of pulses ( probably make this cleaner)
             XorY = random.randint(0,1)
             if XorY:
+              if self.nXStim <= self.nERPX: # Make sure not all x pulses occured
                 self.sendStim()
                 self.q.put('ERP pulse sent , ' + self.address)
-            else:
-                self.sendStim()
+                self.nXStim += 1
+              else:
+                self.sendStimY()
                 self.q.put('ERP pulse sent , ' + self.addressY)
+                self.nYStim += 1
+            else:
+              if self.nYStim <= self.nERPY:
+                self.sendStimY()
+                self.q.put('ERP pulse sent , ' + self.addressY)
+                self.nYStim += 1
+              else:
+                self.sendStim()
+                self.q.put('ERP pulse sent , ' + self.address)
+                self.nXStim += 1
             # Wait for brain to return to normal before stimming again
-            slpLen = random.uniform(3,5)
-            time.sleep(slpLen) # 4 +- 1 second
+            sleepLen = random.uniform(self.PULSE_INTER_LOW, self.PULSE_INTER_HIGH)
+            time.sleep(sleepLen) # 4 +- 1 second
 
-        self.closeXY()
+        self.close()
 
-    def closeXY(self):
-        self.task.close()
-        self.taskY.close()
     def close(self):
         self.task.close()
+        if self.taskY != None:
+          self.taskY.close()
 
 def main():
   stimQ = 1

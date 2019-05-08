@@ -11,6 +11,7 @@ from queue import Queue
 import whiskerTouch
 try:
     import win32gui
+    import win32con
     LINUX = False
 except:
     LINUX = True
@@ -32,7 +33,6 @@ def lookForProgram(hwnd, programName):
         if 'Whisker' in programName:
             IsWhiskerRunning = True
         elif 'Ephys' in programName:
-            print('found ephys!')
             IsOpenEphysRunning = True
 
 def killProgram(hwnd, programName):
