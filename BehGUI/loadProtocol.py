@@ -5,6 +5,7 @@ import GUIFunctions
 import time
 import webbrowser
 import win32gui
+import shutil
 
 def get_val_between_equal_sign_and_hash(line):
     try:
@@ -45,6 +46,7 @@ def load_expt_file(self):
         f = open(self.GUI.expt_file_path_name,'r')
         # Read Line by line
         EXPERIMENT = False
+        self.config_file_path = ''
         for ln in f:
             str_before_equal, str_after_equal = get_LR_before_hash(ln)
             line = get_before_hash(ln)
@@ -129,20 +131,20 @@ def load_expt_file(self):
                             return False
                         print(video_file_path)
 
-                    elif 'OPEN_EPHYS' in str_before_equal:
+                    elif "OPEN_EPHYS_CONFIG_FILE" in str_before_equal:
+                        self.config_file_path = str_after_equal
+
+                    elif 'OPEN_EPHYS_PATH' in str_before_equal:
                         self.EPHYS_ENABLED = True
                         if self.GUI.NIDAQ_AVAILABLE:
+                            if self.config_file_path != '':
+                                shutil.move('RESOURCES/CONFIGS/' + self.config_file_path, str_after_equal + 'lastConfig.xml')
                             ephys = 'Open Ephys GUI'
+                            win32gui.killProgram(GUIFunctions.lookForProgram, ephys)
+                            oe = str_after_equal
+                            window = subprocess.Popen(oe)# # doesn't capture output
+                            time.sleep(2)
                             win32gui.EnumWindows(GUIFunctions.lookForProgram, ephys)
-                            if not GUIFunctions.IsOpenEphysRunning:
-                                oe = str_after_equal
-                                window = subprocess.Popen(oe)# # doesn't capture output
-                                time.sleep(2)
-                                win32gui.EnumWindows(GUIFunctions.lookForProgram, ephys)
-                                #except:
-                                #    print("Could not start Open Ephys")
-                            else: print("Open Ephysis already RUNNING")
-                            print(".............................................")
 
                     elif 'VI_TIMES_LIST_PATH' in str_before_equal:
                         self.VIs_file_path = str_after_equal

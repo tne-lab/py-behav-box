@@ -1,8 +1,16 @@
 [EXPERIMENT]
 EXPT_NAME = STIM_TEST # Don't use "-" in name, use underscores "_" instead
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+
+OPEN_EPHYS_CONFIG_FILE = IL.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
 OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\VisualStudio2013\x64\Release\bin\open-ephys.exe # on Flav's PC Ephys-2
-# CHANGE TO PRIVATE ^^^
+
+
+[ERP]
+PULSE_WIDTH = 4
+PUSLE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
+NUM_PULSE_X = 10 # number of pulses to region X
+NUM_PULSE_Y = 10
 
 [SETUP]
 FAN_ON=TRUE
@@ -11,20 +19,25 @@ FOOD_LIGHT=TRUE
 REC=TRUE
 
 [PROTOCOL]
-ERP = 5 # 10 pulses to random areas
+PAUSE = 180 # Record for 3 minutes
+ERP = PRE # 10 pulses to randomized area (X or Y)
 PAUSE = 5
 
-CLOSED_LOOP =TRUE
-START_LOOP1 = 5
-  PAUSE = 1
-  EXTEND_LEVERS=R_LVR
-  PAUSE = 2    # sec
-  EXTEND_LEVERS=FALSE
-END_LOOP
-CLOSED_LOOP =FALSE
+CLOSED_LOOP = TRUE # Begin closed loop stim thread
+PAUSE = 30 * 60 # closed loop for 30 minutes
+CLOSED_LOOP = FALSE # Kill thread
 
-PAUSE = 5
+PAUSE = 5 * 60 # 5 min post
 ERP = 5
+
+PAUSE = 10 * 60 # 15 min post
+ERP = 15
+
+PAUSE = 15 * 60 # 30 min post
+ERP = 30
+
+PAUSE = 30 * 60 # 30 min post
+ERP = 60
 
 FAN_ON=FALSE
 CAB_LIGHT=FALSE

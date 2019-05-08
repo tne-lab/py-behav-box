@@ -129,6 +129,8 @@ class Experiment:
                 else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
                     self.vidSTATE = 'REC_STOP'
                     print("\nREC = False, Self.ROI: ",self.ROI,"\n")
+                    if self.EPHYS_ENABLED:
+                        self.snd.send(self.snd.STOP_REC) # OPEN_EPHYS
 
             elif "EXTEND_LEVERS" in key:
                 self.setup_ln_num +=1
@@ -537,9 +539,12 @@ class Experiment:
 
         elif "CLOSED_LOOP" == key:
             val = str2bool(protocolDict[key])
-            if val:
-                if self.GUI.NIDAQ_AVAILABLE:
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if val:
                     if not self.STIM_ENABLED:
+                        self.snd.send(self.snd.STOP_REC)
+                        self.snd.changeVars(prependText = 'CLOSED_LOOP')
+                        self.snd.send(self.snd.START_REC)
                         self.STIM_ENABLED = True
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
@@ -547,30 +552,33 @@ class Experiment:
                         self.stim.start()
                         self.Protocol_ln_num += 1
                 else:
-                    self.log_event("Closed Loop Starting Failed, fix DAQ")
-                    self.endExpt()
-            else:
-                #self.stim.terminate()
-                self.stimBackQ.put('STOP')
-                self.STIM_ENABLED = False
-                self.Protocol_ln_num += 1
-
-        elif "ERP" == key:
-            if not self.STIM_ENABLED:
-                if self.GUI.NIDAQ_AVAILABLE:
-                    if not self.STIM_ENABLED:
-                        self.STIM_ENABLED = True
-                        self.stimQ = Queue()
-                        self.stimBackQ = Queue()
-                        self.stim = threading.Thread(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ, self.stimBackQ, "ERP"), kwargs = {'lenERP': int(protocolDict["ERP"]), 'addressY' : 'Dev3/ao0'})
-                        self.stim.start()
-                else:
-                    self.log_event("ERP Starting Failed, fix DAQ")
-                    self.endExpt()
-            else:
-                if not self.stim.is_alive():
+                    self.stimBackQ.put('STOP')
                     self.STIM_ENABLED = False
                     self.Protocol_ln_num += 1
+            else:
+                self.log_event("Closed Loop Starting Failed, fix DAQ")
+                self.endExpt()
+
+
+        elif "ERP" == key:
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if not self.STIM_ENABLED:
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = 'ERP_' + protocolDict[key])
+                    self.snd.send(self.snd.START_REC)
+                    self.STIM_ENABLED = True
+                    self.stimQ = Queue()
+                    self.stimBackQ = Queue()
+                    self.stim = threading.Thread(target=stimmer.Stim, args=('Dev3/ao1', self.stimQ, self.stimBackQ, "ERP"), kwargs = {'lenERP': int(protocolDict["ERP"]), 'addressY' : 'Dev3/ao0'})
+                    self.stim.start()
+                else:
+                    if not self.stim.is_alive():
+                        self.STIM_ENABLED = False
+                        self.Protocol_ln_num += 1
+            else:
+                self.log_event("ERP Starting Failed, fix DAQ")
+                self.endExpt()
+
 
         elif key == "CONDITIONS":
             self.runConditions(protocolDict)
@@ -1061,6 +1069,9 @@ class Experiment:
         if self.VID_ENABLED:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
+
+        if self.STIM_ENABLED:
+            self.stimBackQ.put('STOP')
 
         if self.GUI.num_cameras >= 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
         EXPTFunctions.resetBox(self.GUI)
