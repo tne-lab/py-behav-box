@@ -1063,6 +1063,7 @@ class Experiment:
         # Tell open ephys to stop acquistion and recording?
         if self.EPHYS_ENABLED:
             self.snd.send(self.snd.STOP_ACQ)
+            win32gui.killProgram(GUIFunctions.lookForProgram, 'Open Ephys GUI')
             self.openEphysQ.put('STOP')
 
         if self.VID_ENABLED:

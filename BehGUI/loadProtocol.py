@@ -137,16 +137,19 @@ def load_expt_file(self):
                         self.config_file_path = str_after_equal
 
                     elif 'OPEN_EPHYS_PATH' in str_before_equal:
-                        self.EPHYS_ENABLED = True
                         if self.GUI.NIDAQ_AVAILABLE:
+                            win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
+                            if GUIFunctions.IsOpenEphysRunning:
+                                win32gui.EnumWindows(GUIFunctions.killProgram, 'Open Ephys GUI')
+                                time.sleep(2)
                             if self.config_file_path != '':
-                                shutil.move('RESOURCES/CONFIGS/' + self.config_file_path, str_after_equal + 'lastConfig.xml')
-                            ephys = 'Open Ephys GUI'
-                            win32gui.killProgram(GUIFunctions.lookForProgram, ephys)
+                                shutil.move('RESOURCES/CONFIGS/' + self.config_file_path, str_after_equal[:-14] + 'lastConfig.xml')
                             oe = str_after_equal
                             window = subprocess.Popen(oe)# # doesn't capture output
                             time.sleep(2)
-                            win32gui.EnumWindows(GUIFunctions.lookForProgram, ephys)
+                            win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
+                            if GUIFunctions.IsOpenEphysRunning:
+                                self.EPHYS_ENABLED = True
 
                     elif 'VI_TIMES_LIST_PATH' in str_before_equal:
                         self.VIs_file_path = str_after_equal

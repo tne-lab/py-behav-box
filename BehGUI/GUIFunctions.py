@@ -36,8 +36,11 @@ def lookForProgram(hwnd, programName):
             IsOpenEphysRunning = True
 
 def killProgram(hwnd, programName):
+    global IsOpenEphysRunning
     if programName in win32gui.GetWindowText(hwnd):
         win32gui.PostMessage(hwnd,win32con.WM_CLOSE,0,0)
+        if 'Ephys' in programName:
+            IsOpenEphysRunning = False
 
 def openWhiskerEphys(NIDAQ_AVAILABLE):
     global IsWhiskerRunning, IsOpenEphysRunning #, self.NIDAQ_AVAILABLE
