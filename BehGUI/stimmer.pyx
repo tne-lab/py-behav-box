@@ -56,6 +56,7 @@ class Stim:
                 self.waveform.append(0)
         ##################################################################
 
+        self.npWave = np.array(self.waveform)
         # Send back stim events
         self.q = q
         self.backQ = backQ
@@ -70,6 +71,7 @@ class Stim:
                                 #continuous or finite number of samples
         self.address = address
         self.addressY = addressY
+        self.stream = nidaqmx.stream_writers.AnalogSingleChannelWriter(self.task, auto_start = True)
         self.taskY = None
 
         # ERP
@@ -89,6 +91,7 @@ class Stim:
             # Set timing
             self.taskY.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
                                     #continuous or finite number of samples
+            self.streamY = nidaqmx.stream_writers.AnalogSingleChannelWriter(self.taskY, auto_start = True)
             self.ERP()
             return
 
@@ -108,14 +111,16 @@ class Stim:
 
 
     def sendStim(self):
-        self.task.write(self.waveform, auto_start = True)
-        self.task.wait_until_done() # Waits until done or timeouts after 10 seconds
-        self.task.stop()
+        #self.task.write(self.waveform, auto_start = True)
+        #self.task.wait_until_done() # Waits until done or timeouts after 10 seconds
+        self.stream.write_many_samples(self.npWave) # Faster writer and returns when done.
+        #self.task.stop()
 
     def sendStimY(self):
-        self.taskY.write(self.waveform, auto_start = True)
-        self.taskY.wait_until_done() # Waits until done or timeouts after 10 seconds
-        self.taskY.stop()
+        #self.taskY.write(self.waveform, auto_start = True)
+        #self.taskY.wait_until_done() # Waits until done or timeouts after 10 seconds
+        self.streamY.write_many_samples(self.npWave)
+        #self.taskY.stop()
 
     def waitForEvent(self):
         '''
