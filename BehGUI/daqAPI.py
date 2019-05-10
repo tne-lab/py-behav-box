@@ -18,6 +18,7 @@ NOTE: 1. Please Start Whisker server first
 """
 import nidaqmx
 from nidaqmx.constants import (LineGrouping)
+from nidaqmx import stream_writers
 import time
 import os
 dev = 'Dev2'
@@ -195,6 +196,28 @@ Returns a new high tone Task
 #    highTone = InterfaceOut(highToneAddress)
 #    highTone.startTask()
 #    return highTone
+
+####################################################
+##   Analog Out
+####################################################
+class AnalogOut:
+    def __init__(self, address):
+        self.task = nidaqmx.Task()
+        self.task.ao_channels.add_ao_voltage_chan(address)
+        self.address = address
+        self.stream = stream_writers.AnalogSingleChannelWriter(self.task.out_stream, auto_start = True)
+
+    def setClock(self, sr, samples):
+        self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = samples)
+
+    def startTask(self):
+        self.task.start()
+
+    def sendWaveform(self,data):
+        self.stream.write_many_sample(data)
+
+    def end(self):
+        self.task.close()
 
 ####################################################
 ##   Inputs

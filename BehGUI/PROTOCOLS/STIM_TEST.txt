@@ -9,8 +9,8 @@ OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\V
 [ERP]
 INTER_PULSE_WIDTH = 4
 PUSLE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
-NUM_PULSE_X = 10 # number of pulses to region X
-NUM_PULSE_Y = 10
+NUM_PULSE_X = 2 # number of pulses to region X
+NUM_PULSE_Y = 2
 STIM_ADDRESS_X = Dev3/ao0
 STIM_ADDRESS_Y = Dev3/ao1
 
@@ -21,24 +21,24 @@ FOOD_LIGHT=TRUE
 REC=TRUE
 
 [PROTOCOL]
-PAUSE = 180 # Record for 3 minutes
+PAUSE = 5 # Record for 3 minutes
 ERP = PRE # 10 pulses to randomized area (X or Y)
 PAUSE = 5
 
 CLOSED_LOOP = TRUE # Begin closed loop stim thread
-PAUSE = 30 * 60 # closed loop for 30 minutes
+PAUSE = 10 #* 60 # closed loop for 30 minutes
 CLOSED_LOOP = FALSE # Kill thread
 
-PAUSE = 5 * 60 # 5 min post
+PAUSE = 5 #* 60 # 5 min post
 ERP = 5
 
-PAUSE = 10 * 60 # 15 min post
+PAUSE = 10 #* 60 # 15 min post
 ERP = 15
 
-PAUSE = 15 * 60 # 30 min post
+PAUSE = 15 #* 60 # 30 min post
 ERP = 30
 
-PAUSE = 30 * 60 # 30 min post
+PAUSE = 30 #* 60 # 30 min post
 ERP = 60
 
 FAN_ON=FALSE

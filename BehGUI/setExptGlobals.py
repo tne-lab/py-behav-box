@@ -35,8 +35,8 @@ def setExptGlobals(self):
     self.STIM_ENABLED = False
     self.NUM_PULSE_X = 0
     self.NUM_PULSE_Y = 0
-    self.stimAddressY = 'Dev3/ao0'
-    self.stimAddress = 'dev3/ao1'
+    self.stimAddressY = 'Dev3/ao1'
+    self.stimAddress = 'dev3/ao0'
     self.INTER_PULSE_WIDTH = 0
     self.PULSE_VAR = 0
 

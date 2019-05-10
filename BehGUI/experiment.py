@@ -9,6 +9,11 @@ import GUIFunctions
 import EXPTFunctions
 import pyximport; pyximport.install()
 import stimmer
+import win32gui
+try:
+    import daqAPI
+except:
+    pass
 
 class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
@@ -546,9 +551,10 @@ class Experiment:
                         self.snd.changeVars(prependText = 'CLOSED_LOOP')
                         self.snd.send(self.snd.START_REC)
                         self.STIM_ENABLED = True
+                        self.stim = daqAPI.AnalogOut(self.stimAddress)
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
-                        self.stim = threading.Thread(target=stimmer.Stim, args=(self.stimAddress, self.stimQ, self.stimBackQ, "TRIGGER")) # NEED TO UPDATE ADDRESS
+                        self.stim = threading.Thread(target=stimmer.Stim, args=(self.stim, self.stimQ, self.stimBackQ, "TRIGGER")) # NEED TO UPDATE ADDRESS
                         self.stim.start()
                         self.Protocol_ln_num += 1
                 else:
@@ -568,7 +574,9 @@ class Experiment:
                     self.STIM_ENABLED = True
                     self.stimQ = Queue()
                     self.stimBackQ = Queue()
-                    self.stim = threading.Thread(target=stimmer.Stim, args=(self.stimAddress, self.stimQ, self.stimBackQ, "ERP"), kwargs = {'nERPX': self.NUM_PULSE_X, 'nERPY' : self.NUM_PULSE_Y, 'addressY' : self.stimAddressX, 'INTER_PULSE_WIDTH' : self.INTER_PULSE_WIDTH, 'PULSE_VAR' : self.PULSE_VAR})
+                    self.stimX = daqAPI.AnalogOut(self.stimAddress)
+                    self.stimY = daqAPI.AnalogOut(self.stimAddressY)
+                    self.stim = threading.Thread(target=stimmer.Stim, args=(self.stimX, self.stimQ, self.stimBackQ, "ERP"), kwargs = {'nERPX': self.NUM_PULSE_X, 'nERPY' : self.NUM_PULSE_Y, 'stimY' : self.stimY, 'INTER_PULSE_WIDTH' : self.INTER_PULSE_WIDTH, 'PULSE_VAR' : self.PULSE_VAR})
                     self.stim.start()
                 else:
                     if not self.stim.is_alive():
@@ -1063,7 +1071,7 @@ class Experiment:
         # Tell open ephys to stop acquistion and recording?
         if self.EPHYS_ENABLED:
             self.snd.send(self.snd.STOP_ACQ)
-            win32gui.killProgram(GUIFunctions.lookForProgram, 'Open Ephys GUI')
+            win32gui.EnumWindows(GUIFunctions.killProgram, 'Open Ephys GUI')
             self.openEphysQ.put('STOP')
 
         if self.VID_ENABLED:

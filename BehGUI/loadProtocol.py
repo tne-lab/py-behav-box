@@ -141,12 +141,13 @@ def load_expt_file(self):
                             win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
                             if GUIFunctions.IsOpenEphysRunning:
                                 win32gui.EnumWindows(GUIFunctions.killProgram, 'Open Ephys GUI')
-                                time.sleep(2)
+                                time.sleep(0.5)
                             if self.config_file_path != '':
-                                shutil.move('RESOURCES/CONFIGS/' + self.config_file_path, str_after_equal[:-14] + 'lastConfig.xml')
+                                dest = shutil.copy(os.getcwd() + '\\RESOURCES\\CONFIGS\\' + self.config_file_path, str_after_equal[:-14] + 'lastConfig.xml')
+                                print('moved config file to oe dir : ', dest)
                             oe = str_after_equal
                             window = subprocess.Popen(oe)# # doesn't capture output
-                            time.sleep(2)
+                            time.sleep(0.5)
                             win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
                             if GUIFunctions.IsOpenEphysRunning:
                                 self.EPHYS_ENABLED = True
@@ -279,15 +280,15 @@ def load_expt_file(self):
 ##                        except:
 ##                            print ("!!!!!!!!!!!VR must have the form '(10, 1,30,5)' in EXP PROOCOL file!!!!!!!!!!!!!!")
 
-                elif currentlySetting = 'ERP':
+                elif currentlySetting == 'ERP':
                     if 'INTER_PULSE_WIDTH' == str_before_equal:
                         self.INTER_PULSE_WIDTH = float(str_after_equal)
                     if 'PULSE_VAR' == str_before_equal:
                         self.PUSLE_VAR = float(str_after_equal)
                     if 'NUM_PULSE_X' == str_before_equal:
-                        self.NUM_PULSE_X = float(str_after_equal)
+                        self.NUM_PULSE_X = int(str_after_equal)
                     if 'NUM_PULSE_Y' == str_after_equal:
-                        self.NUM_PULSE_Y = float(str_after_equal)
+                        self.NUM_PULSE_Y = int(str_after_equal)
                     if 'STIM_ADDRESS_X' == str_before_equal or 'STIM_ADDRESS' == str_before_equal:
                         self.stimAddress = str_after_equal
                     if 'STIM_ADDRESS_Y' == str_before_equal:

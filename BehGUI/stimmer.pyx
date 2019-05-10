@@ -1,11 +1,13 @@
 import nidaqmx
 from nidaqmx.constants import (LineGrouping)
+from nidaqmx import stream_writers
 import time
 import os
 import zmq
 import math
 import json
 import random
+import numpy as np
 
 import zmqClasses
 from libc.stdlib cimport malloc, free
@@ -16,7 +18,7 @@ class Stim:
     '''
     Class to create and send stim waveforms
     '''
-    def __init__(self, address, q, backQ, MODE, nERPX = 0, nERPY = 0, addressY = 'Dev3/ao1', INTER_PULSE_WIDTH = 4, PULSE_VAR = 1):
+    def __init__(self, stimX, q, backQ, MODE, nERPX = 0, nERPY = 0, stimY = None, INTER_PULSE_WIDTH = 4, PULSE_VAR = 1):
         ######## Create Waveform ######################################
         # --------------------- INPUTS --------------------------------
         sr = 1000000 # Sampling Rate (Hz)
@@ -56,42 +58,42 @@ class Stim:
                 self.waveform.append(0)
         ##################################################################
 
-        self.npWave = np.array(self.waveform)
+        self.npWave = np.array(self.waveform, dtype=np.float64)
         # Send back stim events
         self.q = q
         self.backQ = backQ
 
-
-        # Create Task
-        self.task = nidaqmx.Task()
-        self.task.ao_channels.add_ao_voltage_chan(address) # Change this eventually
-        #self.task.ao_channels.add_ao_current_chan(address) # check max amps
-        # Set timing
-        self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
-                                #continuous or finite number of samples
-        self.address = address
-        self.addressY = addressY
-        self.stream = nidaqmx.stream_writers.AnalogSingleChannelWriter(self.task, auto_start = True)
-        self.taskY = None
+        self.stimX = stimX
+        self.stimY = stimY
+        # # Create Task
+        # self.task = nidaqmx.Task()
+        # self.task.ao_channels.add_ao_voltage_chan(address) # Change this eventually
+        # #self.task.ao_channels.add_ao_current_chan(address) # check max amps
+        # # Set timing
+        # self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
+        #                         #continuous or finite number of samples
+        # self.address = address
+        # self.addressY = addressY
+        # self.stream = stream_writers.AnalogSingleChannelWriter(self.task.out_stream)
 
         # ERP
         if MODE == 'ERP':
             # Custom ERP Settings
-            self.nERPX = nERPX
-            self.nERPY = nERPY
+            self.nERPX = int(nERPX)
+            self.nERPY = int(nERPY)
             self.nXStim = 0
             self.nYStim = 0
             self.PULSE_INTER_LOW = INTER_PULSE_WIDTH - PULSE_VAR
             self.PULSE_INTER_HIGH = INTER_PULSE_WIDTH + PULSE_VAR
 
-            # Setup task
-            self.taskY = nidaqmx.Task()
-            self.taskY.ao_channels.add_ao_voltage_chan(addressY) # Change this eventually
-            #self.task.ao_channels.add_ao_current_chan(address) # check max amps
-            # Set timing
-            self.taskY.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
-                                    #continuous or finite number of samples
-            self.streamY = nidaqmx.stream_writers.AnalogSingleChannelWriter(self.taskY, auto_start = True)
+            # # Setup task
+            # self.taskY = nidaqmx.Task()
+            # self.taskY.ao_channels.add_ao_voltage_chan(addressY) # Change this eventually
+            # #self.task.ao_channels.add_ao_current_chan(address) # check max amps
+            # # Set timing
+            # self.taskY.timing.cfg_samp_clk_timing(sr, samps_per_chan = period * numPulse) # rate , can also change active_edge,
+            #                         #continuous or finite number of samples
+            # self.streamY = stream_writers.AnalogSingleChannelWriter(self.taskY.out_stream)
             self.ERP()
             return
 
@@ -113,14 +115,20 @@ class Stim:
     def sendStim(self):
         #self.task.write(self.waveform, auto_start = True)
         #self.task.wait_until_done() # Waits until done or timeouts after 10 seconds
-        self.stream.write_many_samples(self.npWave) # Faster writer and returns when done.
-        #self.task.stop()
+        # self.stream.write_many_sample(self.npWave) # Faster writer and returns when done.
+        # self.task.start()
+        # self.task.wait_until_done()
+        # self.task.stop()
+        self.stimX.sendWaveform(self.npWave)
 
     def sendStimY(self):
         #self.taskY.write(self.waveform, auto_start = True)
         #self.taskY.wait_until_done() # Waits until done or timeouts after 10 seconds
-        self.streamY.write_many_samples(self.npWave)
-        #self.taskY.stop()
+        # self.streamY.write_many_sample(self.npWave) # Faster writer and returns when done.
+        # self.taskY.start()
+        # self.taskY.wait_until_done()
+        # self.taskY.stop()
+        self.stimY.sendWaveform(self.npWave)
 
     def waitForEvent(self):
         '''
@@ -150,20 +158,20 @@ class Stim:
             if XorY:
               if self.nXStim <= self.nERPX: # Make sure not all x pulses occured
                 self.sendStim()
-                self.q.put('ERP pulse sent , ' + self.address)
+                self.q.put('ERP pulse sent , ' + self.stimX.address)
                 self.nXStim += 1
               else:
                 self.sendStimY()
-                self.q.put('ERP pulse sent , ' + self.addressY)
+                self.q.put('ERP pulse sent , ' + self.stimY.address)
                 self.nYStim += 1
             else:
               if self.nYStim <= self.nERPY:
                 self.sendStimY()
-                self.q.put('ERP pulse sent , ' + self.addressY)
+                self.q.put('ERP pulse sent , ' + self.stimY.address)
                 self.nYStim += 1
               else:
                 self.sendStim()
-                self.q.put('ERP pulse sent , ' + self.address)
+                self.q.put('ERP pulse sent , ' + self.stimX.address)
                 self.nXStim += 1
             # Wait for brain to return to normal before stimming again
             sleepLen = random.uniform(self.PULSE_INTER_LOW, self.PULSE_INTER_HIGH)
@@ -172,9 +180,12 @@ class Stim:
         self.close()
 
     def close(self):
-        self.task.close()
-        if self.taskY != None:
-          self.taskY.close()
+        # self.task.close()
+        # if self.taskY != None:
+        #   self.taskY.close()
+        self.stimX.end()
+        if self.stimY != None:
+            self.stimY.end()
 
 def main():
   stimQ = 1
