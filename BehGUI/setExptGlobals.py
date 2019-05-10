@@ -39,6 +39,8 @@ def setExptGlobals(self):
     self.stimAddress = 'dev3/ao0'
     self.INTER_PULSE_WIDTH = 0
     self.PULSE_VAR = 0
+    self.stimX = None
+    self.stimY = None
 
     ################################################################
     # EXPERIMENT PARAMETERS

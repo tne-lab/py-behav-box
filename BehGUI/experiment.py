@@ -551,16 +551,16 @@ class Experiment:
                         self.snd.changeVars(prependText = 'CLOSED_LOOP')
                         self.snd.send(self.snd.START_REC)
                         self.STIM_ENABLED = True
-                        self.stim = daqAPI.AnalogOut(self.stimAddress)
+                        self.stimX = daqAPI.AnalogOut(self.stimAddress)
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
-                        self.stim = threading.Thread(target=stimmer.Stim, args=(self.stim, self.stimQ, self.stimBackQ, "TRIGGER")) # NEED TO UPDATE ADDRESS
+                        self.stim = threading.Thread(target=stimmer.Stim, args=(self.stimX, self.stimQ, self.stimBackQ, "TRIGGER")) # NEED TO UPDATE ADDRESS
                         self.stim.start()
                         self.Protocol_ln_num += 1
                 else:
                     self.stimBackQ.put('STOP')
                     if not self.stim.is_alive():
-                        self.stim.end()
+                        self.stimX.end()
                         self.STIM_ENABLED = False
                         self.Protocol_ln_num += 1
             else:
@@ -584,6 +584,7 @@ class Experiment:
                     if not self.stim.is_alive():
                         self.stimX.end()
                         self.stimY.end()
+                        self.stimY = None
                         self.STIM_ENABLED = False
                         self.Protocol_ln_num += 1
             else:
@@ -1084,6 +1085,9 @@ class Experiment:
 
         if self.STIM_ENABLED:
             self.stimBackQ.put('STOP')
+            self.stimX.end()
+            if self.stimY != None:
+                self.stimY.end()
 
         if self.GUI.num_cameras >= 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
         EXPTFunctions.resetBox(self.GUI)

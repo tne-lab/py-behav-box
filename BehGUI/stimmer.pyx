@@ -109,7 +109,7 @@ class Stim:
             if not self.backQ.empty():
                 self.backQ.get()
                 break
-              
+
             # Stim at location X or Y
             # Randomize but make sure each get specified num of pulses ( probably make this cleaner)
             XorY = random.randint(0,1)
