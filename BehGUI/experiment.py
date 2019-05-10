@@ -559,8 +559,10 @@ class Experiment:
                         self.Protocol_ln_num += 1
                 else:
                     self.stimBackQ.put('STOP')
-                    self.STIM_ENABLED = False
-                    self.Protocol_ln_num += 1
+                    if not self.stim.is_alive():
+                        self.stim.end()
+                        self.STIM_ENABLED = False
+                        self.Protocol_ln_num += 1
             else:
                 self.log_event("Closed Loop Starting Failed, fix DAQ")
                 self.endExpt()
@@ -580,6 +582,8 @@ class Experiment:
                     self.stim.start()
                 else:
                     if not self.stim.is_alive():
+                        self.stimX.end()
+                        self.stimY.end()
                         self.STIM_ENABLED = False
                         self.Protocol_ln_num += 1
             else:
