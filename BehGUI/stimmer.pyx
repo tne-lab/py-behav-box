@@ -20,6 +20,7 @@ class Stim:
     '''
     def __init__(self, stimX, q, backQ, MODE, nERPX = 0, nERPY = 0, stimY = None, INTER_PULSE_WIDTH = 4, PULSE_VAR = 1):
         ######## Create Waveform ######################################
+        ## Change to 100micro amps for 90microsecs and biphasic!! Jeans stim
         # --------------------- INPUTS --------------------------------
         sr = 1000000 # Sampling Rate (Hz)
         amplitude = 1 # Amplitude (Volts) (change this to amps) , biphasic?

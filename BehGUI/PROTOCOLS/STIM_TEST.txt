@@ -5,6 +5,8 @@ EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 OPEN_EPHYS_CONFIG_FILE = IL.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
 OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\VisualStudio2013\x64\Release\bin\open-ephys.exe # on Flav's PC Ephys-2
 
+[CLOSED_LOOP]
+STIM_ADDRESS = Dev3/ao0
 
 [ERP]
 INTER_PULSE_WIDTH = 4

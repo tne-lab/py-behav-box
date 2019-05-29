@@ -576,7 +576,7 @@ class Experiment:
                     self.STIM_ENABLED = True
                     self.stimQ = Queue()
                     self.stimBackQ = Queue()
-                    self.stimX = daqAPI.AnalogOut(self.stimAddress)
+                    self.stimX = daqAPI.AnalogOut(self.stimAddressX)
                     self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                     self.stim = threading.Thread(target=stimmer.Stim, args=(self.stimX, self.stimQ, self.stimBackQ, "ERP"), kwargs = {'nERPX': self.NUM_PULSE_X, 'nERPY' : self.NUM_PULSE_Y, 'stimY' : self.stimY, 'INTER_PULSE_WIDTH' : self.INTER_PULSE_WIDTH, 'PULSE_VAR' : self.PULSE_VAR})
                     self.stim.start()
