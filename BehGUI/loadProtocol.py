@@ -59,6 +59,8 @@ def load_expt_file(self):
             if str_before_equal != "" and str_before_equal[0] != "#" : #Skip Blank Lines and Skip lines that are just comments (but still copy them to new file)
                 if '[EXPERIMENT' in str_before_equal:
                     currentlySetting = 'EXPERIMENT'
+                elif '[OPEN_EPHYS' in str_before_equal:
+                    currentlySetting = 'OPEN_EPHYS'
                 elif '[TONE1' in str_before_equal:
                     currentlySetting = 'TONE1'
                 elif '[TONE2' in str_before_equal:
@@ -135,7 +137,12 @@ def load_expt_file(self):
                             return False
                         print(video_file_path)
 
-                    elif "OPEN_EPHYS_CONFIG_FILE" in str_before_equal:
+                    elif 'VI_TIMES_LIST_PATH' in str_before_equal:
+                        self.VIs_file_path = str_after_equal
+                        print(self.VIs_file_path)
+
+                elif currentlySetting == 'OPEN_EPHYS':
+                    if "OPEN_EPHYS_CONFIG_FILE" in str_before_equal:
                         self.config_file_path = str_after_equal
 
                     elif 'OPEN_EPHYS_PATH' in str_before_equal:
@@ -154,9 +161,20 @@ def load_expt_file(self):
                             if GUIFunctions.IsOpenEphysRunning:
                                 self.EPHYS_ENABLED = True
 
-                    elif 'VI_TIMES_LIST_PATH' in str_before_equal:
-                        self.VIs_file_path = str_after_equal
-                        print(self.VIs_file_path)
+                    elif 'TTL_LEVER_R' == str_before_equal:
+                        self.TTL_LEVER_L = str_after_equal
+
+                    elif 'TTL_LEVER_L' == str_before_equal:
+                        self.TTL_LEVER_R = str_after_equal
+
+                    elif 'TTL_NOSE_L' == str_before_equal:
+                        self.TTL_NOSE_L = str_after_equal
+
+                    elif 'TTL_NOSE_R' == str_before_equal:
+                        self.TTL_NOSE_R = str_after_equal
+
+                    elif 'TTL_FOOD' == str_before_equal:
+                        self.TTL_NOSE_L = str_after_equal
 
                 elif currentlySetting == 'TONE1':#TONE1
                     if 'DURATION' in str_before_equal:

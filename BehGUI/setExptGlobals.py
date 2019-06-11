@@ -58,6 +58,17 @@ def setExptGlobals(self):
     self.START_EXPT = False
 
     ################################################################
+    # EXPERIMENT PARAMETERS
+    ################################################################
+    self.TTL_LEVER_L = 0
+    self.TTL_LEVER_R = 0
+    self.TLL_NOSE_L = 0
+    self.TLL_NOSE_R = 0
+    self.TLL_FOOD = 0
+
+    self.TTL_ON = []
+
+    ################################################################
     # OUTCOME STATS
     ################################################################
     self.num_correct = 0

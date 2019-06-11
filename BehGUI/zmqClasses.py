@@ -103,6 +103,12 @@ class SNDEvent:
         message = self.socket.recv()
         print("Received reply %s " %  message)
 
+    def sendTTL(ON_OFF, TTL_CHAN):
+        if ON_OFF:
+            self.socket.send(b"".join([b'TTL Channel=', TTL_CHAN, b' on=1']))
+        else:
+            self.socket.send(b"".join([b'TTL Channel=', TTL_CHAN, b' on=0']))
+
     # Function that acts as a C switch. Gets your desired string
     def switch(self, x):
         return {

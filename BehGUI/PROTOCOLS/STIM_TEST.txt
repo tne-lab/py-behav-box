@@ -2,8 +2,12 @@
 EXPT_NAME = STIM_TEST # Don't use "-" in name, use underscores "_" instead
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
+[OPEN_EPHYS]
 OPEN_EPHYS_CONFIG_FILE = IL.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
 OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\VisualStudio2013\x64\Release\bin\open-ephys.exe # on Flav's PC Ephys-2
+TTL_STIM = 1 # Not used, only for your knowledge. Hardware used.
+TTL_LEVER_R = 2 # Can be TTL_*, * = NOSE_L/R, FOOD
+TTL_LEVER_L = 3
 
 [CLOSED_LOOP]
 STIM_ADDRESS = Dev3/ao0
