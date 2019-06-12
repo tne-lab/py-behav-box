@@ -554,7 +554,7 @@ class Experiment:
                         self.stimX = daqAPI.AnalogOut(self.stimAddress)
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
-                        self.stim = threading.Thread(target=stimmer.Stim, args=(self.stimX, self.stimQ, self.stimBackQ, "TRIGGER")) # NEED TO UPDATE ADDRESS
+                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimQ, self.stimBackQ)) # NEED TO UPDATE ADDRESS
                         self.stim.start()
                         self.Protocol_ln_num += 1
                 else:
@@ -580,7 +580,7 @@ class Experiment:
                         self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
-                        self.stim = threading.Thread(target=stimmer.Stim, args=(self.stimX, self.stimQ, self.stimBackQ, "OPEN_LOOP"), kwargs = {'stimY' : self.stimY}) # NEED TO UPDATE ADDRESS
+                        self.stim = threading.Thread(target=stimmer.openLoop, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.openLoopPhaseDelay)) # NEED TO UPDATE ADDRESS
                         self.stim.start()
                         self.Protocol_ln_num += 1
                 else:

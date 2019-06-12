@@ -329,8 +329,8 @@ def load_expt_file(self):
                         self.stimAddressY = str_after_equal
 
                 elif currentlySetting = 'OPEN_LOOP':
-                    if "DELAY" == str_before_equal:
-                        self.openLoopDelay = str_after_equal
+                    if "PHASE_DELAY" == str_before_equal:
+                        self.openLoopPhaseDelay = str_after_equal
 
                 elif currentlySetting = 'PARAMETER_SWEEPING':
                     if "INTENSITY" == str_before_equal:

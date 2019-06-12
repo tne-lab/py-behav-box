@@ -196,6 +196,10 @@ class Stim:
           sleepLen = random.uniform(delayLow, delayHigh)
           time.sleep(sleepLen)
 
+
+'''
+Not class stimmer. Makes things a little smallers
+'''
 def createWaveform(amplitude, numPulse):
   # Now lets build it
   waveform = []
@@ -277,7 +281,7 @@ def ERP(stimX, stimY, q, backQ, nERPX, nERPY, ERP_INTER_LOW, ERP_INTER_HIGH):
         sleepLen = random.uniform(ERP_INTER_LOW, ERP_INTER_HIGH)
         time.sleep(sleepLen) # 4 +- 1 second
 
-def openLoop(stimX, stimY, q, backQ, delayLow, delayHigh):
+def openLoop(stimX, stimY, q, backQ, phaseDelay):
   '''
   Open Loop (Jean) stimulation paradigm
   '''
@@ -294,8 +298,7 @@ def openLoop(stimX, stimY, q, backQ, delayLow, delayHigh):
     time.sleep(.0833)
     stimY.sendWaveform(npWave)
     q.put('Open Loop stim 2 , ' + stimY.address)
-    sleepLen = random.uniform(delayLow, delayHigh) # Need to set delays here
-    time.sleep(sleepLen)
+    time.sleep(phaseDelay)
 
   def paramSweeping(stimX, stimY, q, backQ, intensity, pulseLength, setSize, delayLow, delayHigh):
     '''

@@ -21,7 +21,7 @@ DELAY_VAR = 2
 SET_SIZE = 40  # How many pulse trains per set of intensity/duration
 
 [OPEN_LOOP]
-DELAY = 83.3 # milliseconds
+PHASE_DELAY = 83.3 # in milliseconds
 
 [ERP]
 INTER_PULSE_WIDTH = 4
