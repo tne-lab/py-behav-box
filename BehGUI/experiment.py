@@ -567,6 +567,32 @@ class Experiment:
                 self.log_event("Closed Loop Starting Failed, fix DAQ")
                 self.endExpt()
 
+        elif "OPEN_LOOP" == key:
+            val = str2bool(protocolDict[key])
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if val:
+                    if not self.STIM_ENABLED:
+                        self.snd.send(self.snd.STOP_REC)
+                        self.snd.changeVars(prependText = 'OPEN_LOOP')
+                        self.snd.send(self.snd.START_REC)
+                        self.STIM_ENABLED = True
+                        self.stimX = daqAPI.AnalogOut(self.stimAddressX)
+                        self.stimY = daqAPI.AnalogOut(self.stimAddressY)
+                        self.stimQ = Queue()
+                        self.stimBackQ = Queue()
+                        self.stim = threading.Thread(target=stimmer.Stim, args=(self.stimX, self.stimQ, self.stimBackQ, "OPEN_LOOP"), kwargs = {'stimY' : self.stimY}) # NEED TO UPDATE ADDRESS
+                        self.stim.start()
+                        self.Protocol_ln_num += 1
+                else:
+                    self.stimBackQ.put('STOP')
+                    if not self.stim.is_alive():
+                        self.stimX.end()
+                        self.STIM_ENABLED = False
+                        self.Protocol_ln_num += 1
+            else:
+                self.log_event("Closed Loop Starting Failed, fix DAQ")
+                self.endExpt()
+
         elif "ERP" == key:
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
                 if not self.STIM_ENABLED:
@@ -578,7 +604,7 @@ class Experiment:
                     self.stimBackQ = Queue()
                     self.stimX = daqAPI.AnalogOut(self.stimAddressX)
                     self.stimY = daqAPI.AnalogOut(self.stimAddressY)
-                    self.stim = threading.Thread(target=stimmer.Stim, args=(self.stimX, self.stimQ, self.stimBackQ, "ERP"), kwargs = {'nERPX': self.NUM_PULSE_X, 'nERPY' : self.NUM_PULSE_Y, 'stimY' : self.stimY, 'INTER_PULSE_WIDTH' : self.INTER_PULSE_WIDTH, 'PULSE_VAR' : self.PULSE_VAR})
+                    self.stim = threading.Thread(target=stimmer.ERP, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.NUM_PULSE_X, self.NUM_PULSE_Y, self.INTER_PULSE_WIDTH - self.PULSE_VAR, self.INTER_PULSE_WIDTH + self.PULSE_VAR))
                     self.stim.start()
                 else:
                     if not self.stim.is_alive():

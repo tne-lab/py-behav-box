@@ -161,6 +161,9 @@ def resetBox(self):
 
     GUIFunctions.EXTEND_LEVERS(self,"Levers_Retracted",False,False)
 
+####################################################################################
+#   Sending ttls to open ephys on behavioral events
+####################################################################################
 def sendTTL(self, ttlChan):
     # Make sure the TTL channel is set so we only send ttls when sent.
     if tllChan != 0:

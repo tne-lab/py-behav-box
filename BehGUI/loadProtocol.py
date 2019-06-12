@@ -80,6 +80,10 @@ def load_expt_file(self):
                     currentlySetting = 'ERP'
                 elif '[PROTOCOL' in str_before_equal:
                     currentlySetting = 'PROTOCOL'
+                elif '[PARAMETER_SWEEPING' in str_before_equal:
+                    currentlySetting = 'PARAMETER_SWEEPING'
+                elif '[OPEN_LOOP' in str_before_equal:
+                    currentlySetting = 'OPEN_LOOP'
                 elif '[SETUP' in str_before_equal:
                     currentlySetting = 'SETUP'
                 elif "[CONDITIONS" in str_before_equal:
@@ -300,9 +304,16 @@ def load_expt_file(self):
 ##                        except:
 ##                            print ("!!!!!!!!!!!VR must have the form '(10, 1,30,5)' in EXP PROOCOL file!!!!!!!!!!!!!!")
 
-                elif currentlySetting == 'CLOSED_LOOP':
+                elif currentlySetting == "STIM":
+                    if 'STIM_ADDRESS_X' == str_before_equal or 'STIM_ADDRESS' == str_before_equal:
+                        self.stimAddressX = str_after_equal
+                    if 'STIM_ADDRESS_Y' == str_before_equal:
+                        self.stimAddressY = str_after_equal
+
+                elif currentlySetting == 'CLOSED_LOOP': # Probably won't use.
                     if 'STIM_ADDRESS' == str_before_equal:
                         self.stimAddress = str_before_equal
+
                 elif currentlySetting == 'ERP':
                     if 'INTER_PULSE_WIDTH' == str_before_equal:
                         self.INTER_PULSE_WIDTH = float(str_after_equal)
@@ -316,6 +327,28 @@ def load_expt_file(self):
                         self.stimAddressX = str_after_equal
                     if 'STIM_ADDRESS_Y' == str_before_equal:
                         self.stimAddressY = str_after_equal
+
+                elif currentlySetting = 'OPEN_LOOP':
+                    if "DELAY" == str_before_equal:
+                        self.openLoopDelay = str_after_equal
+
+                elif currentlySetting = 'PARAMETER_SWEEPING':
+                    if "INTENSITY" == str_before_equal:
+                        for c in '()':#Remove parenthesis from (x,y)
+                            str_before_equal = str_before_equal.replace(c, "")
+
+                        self.intensityArray = str_before_equal.split(",")
+                    if "DURATION" == str_before_equal:
+                        for c in '()':#Remove parenthesis from (x,y)
+                            str_before_equal = str_before_equal.replace(c, "")
+
+                        self.durationArray = str_before_equal.split(",")
+                    if "DELAY" == str_before_equal:
+                        self.paramDelay = float(str_after_equal)
+                    if "DELAY_VAR" == str_before_equal:
+                        self.paramDelayVar = float(str_after_equal)
+                    if "SET_SIZE" == str_before_equal:
+                        self.paramSetSize = str_after_equal
 
                 elif currentlySetting == 'SHOCK':
                     if 'DURATION' in str_before_equal:

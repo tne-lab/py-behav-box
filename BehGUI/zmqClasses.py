@@ -5,18 +5,19 @@ import json
 
 class RCVEvent:
     # SUBSCRIBE can be a list of vars, need to be in byte string format => b'spike'
-    def __init__(self, port, SUBSCRIBE):
+    def __init__(self, port, SUBSCRIBE, delay = 200):
         context = zmq.Context()
         self.socket = context.socket(zmq.SUB)
         self.socket.connect("tcp://localhost:" + str(port))
         self.poller = zmq.Poller()
         self.poller.register(self.socket, zmq.POLLIN)
+        self.delay = delay
         for sub in SUBSCRIBE:
             self.socket.setsockopt(zmq.SUBSCRIBE, sub)
 
     def rcv(self):
         #Get raw input from socket
-        sockets = self.poller.poll(200)
+        sockets = self.poller.poll(self.delay)
         for socket in sockets:
         #msg = self.socket.recv_multipart()
             msg = socket[0].recv_multipart()
