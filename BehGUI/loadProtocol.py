@@ -6,6 +6,7 @@ import time
 import webbrowser
 import win32gui
 import shutil
+import numpy as np
 
 def get_val_between_equal_sign_and_hash(line):
     try:
@@ -337,20 +338,20 @@ def load_expt_file(self):
                 elif currentlySetting == 'PARAMETER_SWEEPING':
                     if "INTENSITY" == str_before_equal:
                         for c in '()':#Remove parenthesis from (x,y)
-                            str_before_equal = str_before_equal.replace(c, "")
+                            str_after_equal = str_after_equal.replace(c, "")
 
-                        self.intensityArray = str_before_equal.split(",")
+                        self.intensityArray = np.asarray(str_after_equal.split(","), dtype=np.float64)
                     if "DURATION" == str_before_equal:
                         for c in '()':#Remove parenthesis from (x,y)
-                            str_before_equal = str_before_equal.replace(c, "")
+                            str_after_equal = str_after_equal.replace(c, "")
 
-                        self.durationArray = str_before_equal.split(",")
+                        self.durationArray = np.asarray(str_after_equal.split(","), dtype=np.float64)
                     if "DELAY" == str_before_equal:
                         self.paramDelay = float(str_after_equal)
                     if "DELAY_VAR" == str_before_equal:
                         self.paramDelayVar = float(str_after_equal)
                     if "SET_SIZE" == str_before_equal:
-                        self.paramSetSize = str_after_equal
+                        self.paramSetSize = int(str_after_equal)
 
                 elif currentlySetting == 'SHOCK':
                     if 'DURATION' in str_before_equal:

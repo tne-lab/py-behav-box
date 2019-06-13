@@ -33,7 +33,7 @@ def createWaveform(amplitude, numPulse):
   ipiSamp = int(ipi/1000.0*sr)
   period = widthSamp + ipiSamp
 
-  for num in range(numPulse):
+  for num in range(int(numPulse)):
       for i in range(int(phaseShift/360.0 * period)):
           waveform.append(0)
       for i in range(widthSamp):
@@ -64,7 +64,7 @@ def waitForEvent(stimX, q, backQ):
           break
       if jsonStr['type'] == 'ttl' and jsonStr['data']: # ttl and data==true!
           stimX.sendWaveform(npWave)
-          q.put('Stim pulse sent')
+          q.put('Closed loop pulse sent,' + stimX.address)
 
 def ERP(stimX, stimY, q, backQ, nERPX, nERPY, ERP_INTER_LOW, ERP_INTER_HIGH):
     '''
@@ -87,20 +87,20 @@ def ERP(stimX, stimY, q, backQ, nERPX, nERPY, ERP_INTER_LOW, ERP_INTER_HIGH):
         if XorY:
           if nXStim <= nERPX: # Make sure not all x pulses occured
             stimX.sendWaveform(npWave)
-            q.put('ERP pulse sent , ' + stimX.address)
+            q.put('ERP pulse sent X, ' + stimX.address)
             nXStim += 1
           else:
             stimY.sendWaveform(npWave)
-            q.put('ERP pulse sent , ' + stimY.address)
+            q.put('ERP pulse sent Y, ' + stimY.address)
             nYStim += 1
         else:
           if nYStim <= nERPY:
             stimY.sendWaveform(npWave)
-            q.put('ERP pulse sent , ' + stimY.address)
+            q.put('ERP pulse sent Y, ' + stimY.address)
             nYStim += 1
           else:
             stimX.sendWaveform(npWave)
-            q.put('ERP pulse sent , ' + stimX.address)
+            q.put('ERP pulse sent X, ' + stimX.address)
             nXStim += 1
         # Wait for brain to return to normal before stimming again
         sleepLen = random.uniform(ERP_INTER_LOW, ERP_INTER_HIGH)
@@ -120,37 +120,36 @@ def openLoop(stimX, stimY, q, backQ, phaseDelay, delayLow, delayHigh):
         break
 
     stimX.sendWaveform(npWave)
-    q.put('Open Loop stim 1 , ' + stimX.address)
+    q.put('Open Loop stim X , ' + stimX.address)
     time.sleep(phaseDelay)
     stimY.sendWaveform(npWave)
-    q.put('Open Loop stim 2 , ' + stimY.address)
+    q.put('Open Loop stim Y , ' + stimY.address)
     sleepLen = random.uniform(delayLow, delayHigh)
     time.sleep(sleepLen)
 
-  def paramSweeping(stimX, stimY, q, backQ, intensity, pulseLength, setSize, phaseDelay, delayLow, delayHigh):
+def paramSweeping(stimX, stimY, q, backQ, intensity, pulseLength, setSize, phaseDelay, delayLow, delayHigh):
     '''
     Jeans parameter sweeping paradigm
     '''
     randIntense = np.random.permutation(len(intensity))
     randLen = np.random.permutation(len(pulseLength))
 
-    for i in range(randIntense):
-      curIntense = randIntense[i]
-      for j in range(randLen):
-        curLen = pulseLength[i]
-        createWaveform(intensity[curIntense],pulseLength[curLen] / (width+ipi))
+    for i in randIntense:
+      curIntense = intensity[i]
+      for j in randLen:
+        curLen = pulseLength[j]
+        npWave = createWaveform(curIntense,curLen / (width+ipi))
         for x in range(setSize):
           if not backQ.empty():
               backQ.get()
               break
           stimX.sendWaveform(npWave)
-          q.put('paramSweep Pulse Sent 1, ' + intensity[curIntense] + "," + pulseLength[curLen])
+          q.put('paramSweep Pulse Sent X, ' +  stimX.address + ',' + str(curIntense) + "," + str(curLen))
           time.sleep(phaseDelay)
           stimY.sendWaveform(npWave)
-          q.put('paramSweep Pulse Sent 2, ' + intensity[curIntense] + ',' + pulseLength[curLen])
+          q.put('paramSweep Pulse Sent Y, ' +  stimY.address + ',' + str(curIntense) + ',' + str(curLen))
           sleepLen = random.uniform(delayLow, delayHigh)
           time.sleep(sleepLen)
-
 
 def main():
   stimQ = 1

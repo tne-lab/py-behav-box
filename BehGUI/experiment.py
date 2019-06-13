@@ -550,8 +550,9 @@ class Experiment:
                         self.snd.send(self.snd.STOP_REC)
                         self.snd.changeVars(prependText = 'CLOSED_LOOP')
                         self.snd.send(self.snd.START_REC)
+                        self.log_event("Starting Closed Loop")
                         self.STIM_ENABLED = True
-                        self.stimX = daqAPI.AnalogOut(self.stimAddress)
+                        self.stimX = daqAPI.AnalogOut(self.stimAddressX)
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
                         self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimQ, self.stimBackQ)) # NEED TO UPDATE ADDRESS
@@ -571,6 +572,7 @@ class Experiment:
             val = str2bool(protocolDict[key])
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
                 if not self.STIM_ENABLED:
+                    self.log_event("Starting parameter sweeping")
                     self.snd.send(self.snd.STOP_REC)
                     self.snd.changeVars(prependText = 'PARAMETER_SWEEPING')
                     self.snd.send(self.snd.START_REC)
@@ -579,9 +581,8 @@ class Experiment:
                     self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                     self.stimQ = Queue()
                     self.stimBackQ = Queue()
-                    self.stim = threading.Thread(target=stimmer.openLoop, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.openLoopPhaseDelay, self.paramDelay - self.paramDelayVar, self.paramDelay + self.paramDelayVar))
+                    self.stim = threading.Thread(target=stimmer.paramSweeping, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.intensityArray,self.durationArray, self.paramSetSize, self.openLoopPhaseDelay, self.paramDelay - self.paramDelayVar, self.paramDelay + self.paramDelayVar))
                     self.stim.start()
-                    self.Protocol_ln_num += 1
                 else:
                     if not self.stim.is_alive():
                         self.stimX.end()
@@ -601,6 +602,7 @@ class Experiment:
                         self.snd.send(self.snd.STOP_REC)
                         self.snd.changeVars(prependText = 'OPEN_LOOP')
                         self.snd.send(self.snd.START_REC)
+                        self.log_event("Starting open loop")
                         self.STIM_ENABLED = True
                         self.stimX = daqAPI.AnalogOut(self.stimAddressX)
                         self.stimY = daqAPI.AnalogOut(self.stimAddressY)
@@ -625,6 +627,7 @@ class Experiment:
                     self.snd.send(self.snd.STOP_REC)
                     self.snd.changeVars(prependText = 'ERP_' + protocolDict[key])
                     self.snd.send(self.snd.START_REC)
+                    self.log_event("Starting ERP")
                     self.STIM_ENABLED = True
                     self.stimQ = Queue()
                     self.stimBackQ = Queue()
@@ -643,12 +646,34 @@ class Experiment:
                 self.log_event("ERP Starting Failed, fix DAQ")
                 self.endExpt()
 
+        elif "RAW" == key:
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if not self.PAUSE_STARTED:
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = 'RAW_PRE')
+                    self.snd.send(self.snd.START_REC)
+                    self.PAUSE_TIME = float(protocolDict[key])
+                    self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec")
+                    self.PAUSE_STARTED = True
+                    self.pause_start_time = time.perf_counter()
+
+                    self.PAUSE_STARTED = True
+                else:
+                    time_elapsed = time.perf_counter() - self.pause_start_time
+                    if time_elapsed >= self.PAUSE_TIME:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+            else:
+                self.log_event("Raw recording failed, fix DAQ")
+                self.endExpt()
+
 
         elif key == "CONDITIONS":
             self.runConditions(protocolDict)
 
         else:
             print("PROTOCOL ITEM NOT RECOGNIZED",key)
+            self.Protocol_ln_num += 1
 
         #########################################################################################
         # RUN BAR PRESS INDEPENDENT OF PROTOCOLS OR CONDTIONS
