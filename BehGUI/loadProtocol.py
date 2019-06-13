@@ -74,6 +74,8 @@ def load_expt_file(self):
                     self.setTouchGlobals()
                 elif '[BAR_PRESS]' in str_before_equal:
                     currentlySetting = 'BARPRESS'
+                elif '[STIM]' in str_before_equal:
+                    currentlySetting = 'STIM'
                 elif '[CLOSED_LOOP]' in str_before_equal:
                     currentlySetting = 'CLOSED_LOOP'
                 elif '[ERP]' in str_before_equal:
@@ -328,11 +330,11 @@ def load_expt_file(self):
                     if 'STIM_ADDRESS_Y' == str_before_equal:
                         self.stimAddressY = str_after_equal
 
-                elif currentlySetting = 'OPEN_LOOP':
+                elif currentlySetting == 'OPEN_LOOP':
                     if "PHASE_DELAY" == str_before_equal:
-                        self.openLoopPhaseDelay = str_after_equal
+                        self.openLoopPhaseDelay = float(str_after_equal)
 
-                elif currentlySetting = 'PARAMETER_SWEEPING':
+                elif currentlySetting == 'PARAMETER_SWEEPING':
                     if "INTENSITY" == str_before_equal:
                         for c in '()':#Remove parenthesis from (x,y)
                             str_before_equal = str_before_equal.replace(c, "")

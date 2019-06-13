@@ -15,7 +15,7 @@ from libc.stdlib cimport malloc, free
 # Dev3 for flavs computer
 sr = 1000000 # Sampling Rate (Hz)
 #amplitude = 1 # Amplitude (Volts) (change this to amps) , biphasic?
-width = 0.9 # duration of pulse (ms)
+width = 20 # duration of pulse (ms)
 ipi = 5 # inter-pulse interval (ms). output zero during this period,
 # if muliple waveforms, period = width + ipi
 #numPulse = 1
@@ -55,11 +55,10 @@ def waitForEvent(stimX, q, backQ):
   '''
   # Create socket to listen to
   rcv = zmqClasses.RCVEvent(5557, [b'ttl'])
-  npWave = createWaveform(100, 1)
+  npWave = createWaveform(1, 1)
   while True:
-    jsonMsg = rcv.rcv()
-    if jsonMsg:
-      jsonStr = json.loads(jsonMsg)
+    jsonStr = rcv.rcv()
+    if jsonStr:
       if not backQ.empty():
           backQ.get()
           break
@@ -72,7 +71,7 @@ def ERP(stimX, stimY, q, backQ, nERPX, nERPY, ERP_INTER_LOW, ERP_INTER_HIGH):
     ERP stimulation paradigm
     '''
     # Custom ERP Settings
-    npWave = createWaveform(100,1)
+    npWave = createWaveform(1,1)
 
     nXStim = 0
     nYStim = 0
@@ -107,11 +106,11 @@ def ERP(stimX, stimY, q, backQ, nERPX, nERPY, ERP_INTER_LOW, ERP_INTER_HIGH):
         sleepLen = random.uniform(ERP_INTER_LOW, ERP_INTER_HIGH)
         time.sleep(sleepLen) # 4 +- 1 second
 
-def openLoop(stimX, stimY, q, backQ, phaseDelay):
+def openLoop(stimX, stimY, q, backQ, phaseDelay, delayLow, delayHigh):
   '''
   Open Loop (Jean) stimulation paradigm
   '''
-  npWave = createWaveform(100,1)
+  npWave = createWaveform(1,1)
 
   while True:
     # Check to stop
@@ -121,10 +120,11 @@ def openLoop(stimX, stimY, q, backQ, phaseDelay):
 
     stimX.sendWaveform(npWave)
     q.put('Open Loop stim 1 , ' + stimX.address)
-    time.sleep(.0833)
+    time.sleep(phaseDelay)
     stimY.sendWaveform(npWave)
     q.put('Open Loop stim 2 , ' + stimY.address)
-    time.sleep(phaseDelay)
+    sleepLen = random.uniform(delayLow, delayHigh)
+    time.sleep(sleepLen)
 
   def paramSweeping(stimX, stimY, q, backQ, intensity, pulseLength, setSize, delayLow, delayHigh):
     '''

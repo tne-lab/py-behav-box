@@ -169,7 +169,7 @@ def sendTTL(self, ttlChan):
     if tllChan != 0:
         if ttlChan in self.TTL_ON:
             # If no tread at this line started
-            if !self.TTL_ON[ttlChan]:
+            if not self.TTL_ON[ttlChan]:
                 # Start thread (thread handles)
                 self.snd.sendTTL(True, ttlChan)
                 self.TTL_ON[ttlChan] = time.perf_counter()

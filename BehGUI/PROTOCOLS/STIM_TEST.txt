@@ -14,14 +14,14 @@ STIM_ADDRESS_X = Dev3/ao0 # Leading stim location
 STIM_ADDRESS_Y = Dev3/ao1 # Following stim location
 
 [PARAMETER_SWEEPING]
-INTENSITY = (25, 50, 100) #microamps
+INTENSITY = (.25, .50, 10.0) #microamps
 DURATION = (250, 500, 1000) #milliseconds
 DELAY = 8
 DELAY_VAR = 2
 SET_SIZE = 40  # How many pulse trains per set of intensity/duration
 
 [OPEN_LOOP]
-PHASE_DELAY = 83.3 # in milliseconds
+PHASE_DELAY = 0.0833 # in seconds
 
 [ERP]
 INTER_PULSE_WIDTH = 4
@@ -36,9 +36,9 @@ FOOD_LIGHT=TRUE
 REC=TRUE
 
 [PROTOCOL]
-PAUSE = 5 # Record for 3 minutes
-ERP = PRE # 10 pulses to randomized area (X or Y)
-PAUSE = 5
+OPEN_LOOP = TRUE
+PAUSE = 10
+OPEN_LOOP = FALSE
 
 CLOSED_LOOP = TRUE # Begin closed loop stim thread
 PAUSE = 10 #* 60 # closed loop for 30 minutes
