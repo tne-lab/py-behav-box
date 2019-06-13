@@ -140,8 +140,8 @@ def resetBox(self):
         self.food_light.sendDBit(False)
         if self.expt.TOUCHSCREEN_USED:
             self.TSq.put('')
-    if 'EPHYS-1' in self.computer:
-        self.low_tone.sendDByte(0)
+    #if 'EPHYS-1' in self.computer:
+        #self.low_tone.sendDByte(0)
 
     self.L_condition_Lt.sendDBit(False)
     self.R_condition_Lt.sendDBit(False)
