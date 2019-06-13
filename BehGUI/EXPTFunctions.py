@@ -58,7 +58,7 @@ def checkQs(self):
     # Handle Video
     if self.VID_ENABLED:
         #Check Vid Q
-        if not self.VIDBack_q.empty():
+        while not self.VIDBack_q.empty():
             backDict = self.VIDBack_q.get()
             if backDict['FROZEN']: # FROZEN
                   # NOTE: this must be "debounced"
