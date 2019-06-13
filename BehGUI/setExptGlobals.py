@@ -41,6 +41,9 @@ def setExptGlobals(self):
     self.PULSE_VAR = 0
     self.stimX = None
     self.stimY = None
+    self.phaseDelay = 0
+    self.paramDelay = 0
+    self.paramDelayVar = 0
 
     ################################################################
     # EXPERIMENT PARAMETERS

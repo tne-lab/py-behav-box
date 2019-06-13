@@ -567,6 +567,32 @@ class Experiment:
                 self.log_event("Closed Loop Starting Failed, fix DAQ")
                 self.endExpt()
 
+        elif "PARAMETER_SWEEPING" == key:
+            val = str2bool(protocolDict[key])
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if not self.STIM_ENABLED:
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = 'PARAMETER_SWEEPING')
+                    self.snd.send(self.snd.START_REC)
+                    self.STIM_ENABLED = True
+                    self.stimX = daqAPI.AnalogOut(self.stimAddressX)
+                    self.stimY = daqAPI.AnalogOut(self.stimAddressY)
+                    self.stimQ = Queue()
+                    self.stimBackQ = Queue()
+                    self.stim = threading.Thread(target=stimmer.openLoop, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.openLoopPhaseDelay, self.paramDelay - self.paramDelayVar, self.paramDelay + self.paramDelayVar))
+                    self.stim.start()
+                    self.Protocol_ln_num += 1
+                else:
+                    if not self.stim.is_alive():
+                        self.stimX.end()
+                        self.stimY.end()
+                        self.stimY = None
+                        self.STIM_ENABLED = False
+                        self.Protocol_ln_num += 1
+            else:
+                self.log_event("Parameter sweeping Starting Failed, fix DAQ")
+                self.endExpt()
+
         elif "OPEN_LOOP" == key:
             val = str2bool(protocolDict[key])
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
@@ -580,7 +606,7 @@ class Experiment:
                         self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
-                        self.stim = threading.Thread(target=stimmer.openLoop, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.openLoopPhaseDelay, self.INTER_PULSE_WIDTH - self.PULSE_VAR, self.INTER_PULSE_WIDTH + self.PULSE_VAR))
+                        self.stim = threading.Thread(target=stimmer.openLoop, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.openLoopPhaseDelay, self.paramDelay - self.paramDelayVar, self.paramDelay + self.paramDelayVar))
                         self.stim.start()
                         self.Protocol_ln_num += 1
                 else:
@@ -590,7 +616,7 @@ class Experiment:
                         self.STIM_ENABLED = False
                         self.Protocol_ln_num += 1
             else:
-                self.log_event("Closed Loop Starting Failed, fix DAQ")
+                self.log_event("Open Loop Starting Failed, fix DAQ")
                 self.endExpt()
 
         elif "ERP" == key:

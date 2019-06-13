@@ -16,6 +16,7 @@ STIM_ADDRESS_Y = Dev3/ao1 # Following stim location
 [PARAMETER_SWEEPING]
 INTENSITY = (.25, .50, 10.0) #microamps
 DURATION = (250, 500, 1000) #milliseconds
+PHASE_DELAY = 0.0833 # in seconds
 DELAY = 8
 DELAY_VAR = 2
 SET_SIZE = 40  # How many pulse trains per set of intensity/duration
@@ -36,6 +37,8 @@ FOOD_LIGHT=TRUE
 REC=TRUE
 
 [PROTOCOL]
+PARAMETER_SWEEPING = TRUE
+
 OPEN_LOOP = TRUE
 PAUSE = 10
 OPEN_LOOP = FALSE

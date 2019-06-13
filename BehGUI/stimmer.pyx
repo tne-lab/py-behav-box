@@ -106,6 +106,7 @@ def ERP(stimX, stimY, q, backQ, nERPX, nERPY, ERP_INTER_LOW, ERP_INTER_HIGH):
         sleepLen = random.uniform(ERP_INTER_LOW, ERP_INTER_HIGH)
         time.sleep(sleepLen) # 4 +- 1 second
 
+
 def openLoop(stimX, stimY, q, backQ, phaseDelay, delayLow, delayHigh):
   '''
   Open Loop (Jean) stimulation paradigm
@@ -126,24 +127,12 @@ def openLoop(stimX, stimY, q, backQ, phaseDelay, delayLow, delayHigh):
     sleepLen = random.uniform(delayLow, delayHigh)
     time.sleep(sleepLen)
 
-  def paramSweeping(stimX, stimY, q, backQ, intensity, pulseLength, setSize, delayLow, delayHigh):
+  def paramSweeping(stimX, stimY, q, backQ, intensity, pulseLength, setSize, phaseDelay, delayLow, delayHigh):
     '''
     Jeans parameter sweeping paradigm
     '''
-    #25,50,100ma
-    # .25,.5,1 s
-    #40 trials of one set, 8 seconds between pulse trains
-    # Is there a pause between 40 trial sets?
-    #### Inputs
-    #intensity = [25, 50, 100]
-    #pulseLength = [250, 500, 1000] # in ms
     randIntense = np.random.permutation(len(intensity))
     randLen = np.random.permutation(len(pulseLength))
-    #setSize = 40
-    #delay = 8 #sec
-    #delayVar = 2 # sec
-    #delayHigh = delay + delayVar
-    #delayLow = delay - delayVar
 
     for i in range(randIntense):
       curIntense = randIntense[i]
@@ -155,9 +144,13 @@ def openLoop(stimX, stimY, q, backQ, phaseDelay, delayLow, delayHigh):
               backQ.get()
               break
           stimX.sendWaveform(npWave)
-          q.put('paramSweep Pulse Sent , ' + intensity[curIntense] + "," + pulseLength[curLen])
+          q.put('paramSweep Pulse Sent 1, ' + intensity[curIntense] + "," + pulseLength[curLen])
+          time.sleep(phaseDelay)
+          stimY.sendWaveform(npWave)
+          q.put('paramSweep Pulse Sent 2, ' + intensity[curIntense] + ',' + pulseLength[curLen])
           sleepLen = random.uniform(delayLow, delayHigh)
           time.sleep(sleepLen)
+
 
 def main():
   stimQ = 1
