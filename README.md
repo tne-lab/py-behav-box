@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/160200586.svg)](https://zenodo.org/badge/latestdoi/160200586)
 # BehavioralChamber
 
 In development python based GUI used to manage rat behavioral box's with customizable GUI and protocol format.
