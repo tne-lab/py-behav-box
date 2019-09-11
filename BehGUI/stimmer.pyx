@@ -21,7 +21,6 @@ ipi = 5 # inter-pulse interval (ms). output zero during this period,
 #numPulse = 1
 biphasic = True # if true, pulse is ceil(width/2) of amp followed by floow(width/2) of -amp
 phaseShift = 0
-
 '''
 Not class stimmer. Makes things a little smaller
 '''
@@ -125,7 +124,7 @@ def openLoop(stimX, stimY, q, backQ, phaseDelay, delayLow, delayHigh):
     stimY.sendWaveform(npWave)
     q.put('Open Loop stim Y , ' + stimY.address)
     sleepLen = random.uniform(delayLow, delayHigh)
-    time.sleep(sleepLen)
+    time.sleep(1)
 
 def paramSweeping(stimX, stimY, q, backQ, intensity, pulseLength, setSize, phaseDelay, delayLow, delayHigh):
     '''
