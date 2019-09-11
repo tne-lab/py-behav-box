@@ -153,6 +153,7 @@ def setExptGlobals(self):
     ################################################################
     self.EAT_TO_START = False
     self.BARPRESS_TO_START = False
+    self.NOSEPOKE_TO_START = False
 
     ################################################################
     # What are we using for this EXPT? (Gets set in load_expt_file())

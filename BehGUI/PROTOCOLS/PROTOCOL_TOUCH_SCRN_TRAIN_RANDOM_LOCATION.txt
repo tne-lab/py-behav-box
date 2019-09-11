@@ -13,8 +13,8 @@ IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
 # Note: Touchscreen is 1024 x 768. If we discount the deadzone, the
 #       screen is 1024 x 518.  picture size is 240 x 240.
 #       Image size is controlled in whiskerTouchZMQ.py
-COORDS=(181,14):(181,264):(602,14):(602,264) #RANDOM   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
-IMG1= FLOWER_REAL.bmp  # Image name
+COORDS=(181,264):(602,264)###(181,14):(181,264):(602,14):(602,264) #RANDOM   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+IMG1= BLANK.bmp  # Image name
 TRAIN_TOUCH =1,100  # note: TRAIN_TOUCH =a,b.  a = initial VI for img touch, b = initial VI for background touch
 
 [SETUP] # This is a REQUIRED Header
