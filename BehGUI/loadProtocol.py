@@ -42,8 +42,10 @@ def get_before_hash(line):
         print("Could not parse line3:", line)
         return clean_line
 
+
 def load_expt_file(self):
     try:
+        currentlySetting = None
         f = open(self.GUI.expt_file_path_name,'r')
         # Read Line by line
         EXPERIMENT = False
@@ -52,7 +54,7 @@ def load_expt_file(self):
             str_before_equal, str_after_equal = get_LR_before_hash(ln)
             line = get_before_hash(ln)
 
-            if not EXPERIMENT: # Makes sure that path is correct
+            if (not EXPERIMENT) and (currentlySetting!='STIM'): # Makes sure that path is correct
                 str_after_equal = str_after_equal.upper()
 
             self.exptFileLines.append(line)

@@ -48,22 +48,34 @@ def createWaveform(amplitude, numPulse):
 
   return np.array(waveform, dtype=np.float64)
 
-def waitForEvent(stimX, q, backQ):
+def waitForEvent(stimX, stimY, q, backQ):
   '''
   waiting for OPEN EPHYS trigger. then tells GUI that it sent the stim
   '''
   # Create socket to listen to
-  rcv = zmqClasses.RCVEvent(5557, [b'ttl'])
+  print('in closed loop')
+  rcv = zmqClasses.RCVEvent(5557, [b'ttl', b'event'])
   npWave = createWaveform(1, 1)
+  stimSent = 0
+  stimTime = time.perf_counter()
   while True:
+    if not backQ.empty():
+        backQ.get()
+        break
     jsonStr = rcv.rcv()
     if jsonStr:
-      if not backQ.empty():
-          backQ.get()
-          break
-      if jsonStr['type'] == 'ttl' and jsonStr['data']: # ttl and data==true!
-          stimX.sendWaveform(npWave)
-          q.put('Closed loop pulse sent,' + stimX.address)
+      if time.perf_counter() - stimTime > 1: # wait one second
+        if jsonStr['type'] == 'ttl' and jsonStr['channel'] == 0 and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
+          if stimSent == 0: # last was sham, send stim now
+            stimX.sendWaveform(npWave)
+            q.put('Closed loop pulse sent,' + stimX.address)
+            stimTime = time.perf_counter()
+            stimSent = 1
+          else:
+            stimY.sendWaveform(npWave)
+            q.put('Closed loop sham pulse sent,' + stimY.address)
+            stimTime = time.perf_counter()
+            stimSent = 0
 
 def ERP(stimX, stimY, q, backQ, nERPX, nERPY, ERP_INTER_LOW, ERP_INTER_HIGH):
     '''

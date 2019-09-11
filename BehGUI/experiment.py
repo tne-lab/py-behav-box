@@ -555,15 +555,17 @@ class Experiment:
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
                 if val:
                     if not self.STIM_ENABLED:
+                        print('IF HANGS ADD NETWORK EVENTS TO OPEN EPHYS!!!')
                         self.snd.send(self.snd.STOP_REC)
                         self.snd.changeVars(prependText = 'CLOSED_LOOP')
                         self.snd.send(self.snd.START_REC)
                         self.log_event("Starting Closed Loop")
                         self.STIM_ENABLED = True
                         self.stimX = daqAPI.AnalogOut(self.stimAddressX)
+                        self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
-                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimQ, self.stimBackQ)) # NEED TO UPDATE ADDRESS
+                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ)) # NEED TO UPDATE ADDRESS
                         self.stim.start()
                         self.Protocol_ln_num += 1
                 else:
@@ -654,11 +656,32 @@ class Experiment:
                 self.log_event("ERP Starting Failed, fix DAQ")
                 self.endExpt()
 
-        elif "RAW" == key:
+        elif "RAW_PRE" == key:
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
                 if not self.PAUSE_STARTED:
                     self.snd.send(self.snd.STOP_REC)
                     self.snd.changeVars(prependText = 'RAW_PRE')
+                    self.snd.send(self.snd.START_REC)
+                    self.PAUSE_TIME = float(protocolDict[key])
+                    self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec")
+                    self.PAUSE_STARTED = True
+                    self.pause_start_time = time.perf_counter()
+
+                    self.PAUSE_STARTED = True
+                else:
+                    time_elapsed = time.perf_counter() - self.pause_start_time
+                    if time_elapsed >= self.PAUSE_TIME:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+            else:
+                self.log_event("Raw recording failed, fix DAQ")
+                self.endExpt()
+
+        elif "RAW_POST" == key:
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if not self.PAUSE_STARTED:
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = 'RAW_POST')
                     self.snd.send(self.snd.START_REC)
                     self.PAUSE_TIME = float(protocolDict[key])
                     self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec")
@@ -1161,7 +1184,7 @@ class Experiment:
         # Tell open ephys to stop acquistion and recording?
         if self.EPHYS_ENABLED:
             self.snd.send(self.snd.STOP_ACQ)
-            win32gui.EnumWindows(GUIFunctions.killProgram, 'Open Ephys GUI')
+            #win32gui.EnumWindows(GUIFunctions.killProgram, 'Open Ephys GUI')
             self.openEphysQ.put('STOP')
 
         if self.VID_ENABLED:
