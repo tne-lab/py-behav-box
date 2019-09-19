@@ -52,7 +52,8 @@ R_CONDITIONING_LIGHT = False
 #  PAUSE = 1  # to wait for tone to finish
  DRAW_IMAGES=True
  CONDITIONS=0
-  PAUSE = 5    # sec
+ #IF WRONG PAUSE 5 with house light
+  PAUSE = 3    # sec
 END_LOOP
 
 FOOD_LIGHT=False

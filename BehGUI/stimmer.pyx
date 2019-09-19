@@ -8,6 +8,8 @@ import math
 import json
 import random
 import numpy as np
+from mttkinter.mtTkinter import *
+from tkinter import *
 
 import zmqClasses
 from libc.stdlib cimport malloc, free
@@ -15,7 +17,7 @@ from libc.stdlib cimport malloc, free
 # Dev3 for flavs computer
 sr = 1000000 # Sampling Rate (Hz)
 #amplitude = 1 # Amplitude (Volts) (change this to amps) , biphasic?
-width = 20 # duration of pulse (ms)
+width = .09 # duration of pulse (ms) # duration of pulse (ms)
 ipi = 5 # inter-pulse interval (ms). output zero during this period,
 # if muliple waveforms, period = width + ipi
 #numPulse = 1
@@ -53,9 +55,8 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps):
   waiting for OPEN EPHYS trigger. then tells GUI that it sent the stim
   '''
   # Create socket to listen to
-  print('in closed loop')
   rcv = zmqClasses.RCVEvent(5557, [b'ttl', b'event'])
-  voltage = microamps * 100
+  voltage = microamps / 100
   npWave = createWaveform(voltage)
   stimSent = 0
   stimTime = time.perf_counter()
@@ -64,9 +65,10 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps):
         backQ.get()
         break
     jsonStr = rcv.rcv()
+
     if jsonStr:
       if time.perf_counter() - stimTime > 1: # wait one second
-        if jsonStr['type'] == 'ttl' and jsonStr['channel'] == channel and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
+        if jsonStr['type'] == 'ttl' and jsonStr['channel'] == 0 and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
           if stimSent == 0: # last was sham, send stim now
             stimX.sendWaveform(npWave)
             q.put('Closed loop pulse sent,' + stimX.address)
@@ -84,31 +86,31 @@ def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIO
     '''
     # Custom ERP Settings
     npWave = createWaveform(1)
-
-    nXStim = 0
-    nYStim = 0
-
-    for i in range(nERPX + nERPY):
+    randint = np.random.permutation(NUM_LOCATIONS)
+    for i in randint:
+      print('hello! randint = ' + str(i))
+      optText = ''
+      if i == 0:
+        optText = '(IL)'
+      elif i == 1:
+        optText = '(BLA)'
+      print('before messagebox')
+      #messagebox.showinfo('LOCATION SWAP', 'Location #' + str(i) + ' (' + optText + ')')
+      window = Tk()
+      winText = "Change to location #" + str(i) + ' ' + optText
+      lbl = Label(window, text=winText, font=("Arial Bold", 100))
+      lbl.grid(column=0, row=0)
+      window.mainloop()
+      print('after messagebox')
+      for j in range(nERP):
         if not backQ.empty():
-            backQ.get()
-            break
-
-        # Stim at location X or Y
-        # Randomize but make sure each get specified num of pulses ( probably make this cleaner)
-        randint = random.perumation(NUM_LOCATIONS)
-        for i in randint:
-          optText = ''
-          if randint == 0:
-            optText = 'IL'
-          elif randint == 1:
-            optText = 'BLA'
-          messagebox.showinfo('LOCATION SWAP', 'Location #' + str(randint) + ' (' + optText + ')')
-          for i in range(nERP):
-            stimX.sendWaveform(npWave)
-            q.put('ERP stim, ' + str(randint))
-            # Wait for brain to return to normal before stimming again
-            sleepLen = random.uniform(ERP_INTER_LOW, ERP_INTER_HIGH)
-            time.sleep(sleepLen) # 4 +- 1 second
+          backQ.get()
+          break
+        stimX.sendWaveform(npWave)
+        q.put('ERP stim, ' + str(i))
+        # Wait for brain to return to normal before stimming again
+        sleepLen = random.uniform(ERP_INTER_LOW, ERP_INTER_HIGH)
+        time.sleep(sleepLen) # 4 +- 1 second
 
 
 def openLoop(stimX, stimY, q, backQ, phaseDelay, delayLow, delayHigh):

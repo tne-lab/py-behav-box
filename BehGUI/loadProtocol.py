@@ -314,16 +314,21 @@ def load_expt_file(self):
                 elif currentlySetting == "STIM":
                     if 'STIM_ADDRESS_X' == str_before_equal or 'STIM_ADDRESS' == str_before_equal:
                         self.stimAddressX = str_after_equal
-                    if 'STIM_ADDRESS_Y' == str_before_equal or 'STIM_ADDRESS_SHAM' == str_after_equal':
+                    if 'STIM_ADDRESS_Y' == str_before_equal or 'STIM_ADDRESS_SHAM' == str_after_equal:
                         self.stimAddressY = str_after_equal
 
                 elif currentlySetting == 'CLOSED_LOOP':
                     if 'EVENTCHANNEL' in str_before_equal:
                         self.CLCHANNEL = str_after_equal
                     if 'MICROAMPS' in str_before_equal:
-                        self.CLMicroAmps = str_after_equal
+                        self.CLMicroAmps = int(str_after_equal)
 
                 elif currentlySetting == 'ERP':
+                    if '[ERP]' == str_before_equal: # Defaults, should do this for all!
+                        self.INTER_PULSE_WIDTH = 4
+                        self.PUSLE_VAR = 1
+                        self.NUM_ERP_PULSE = 2
+                        self.NUM_ERP_LOCATIONS = 2
                     if 'INTER_PULSE_WIDTH' == str_before_equal:
                         self.INTER_PULSE_WIDTH = float(str_after_equal)
                     if 'PULSE_VAR' == str_before_equal:
