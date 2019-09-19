@@ -21,7 +21,7 @@ MICROAMPS = 100
 [ERP]
 INTER_PULSE_WIDTH = 4
 PUSLE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
-NUM_PULSE = 2 # number of pulses to region X
+NUM_PULSE = 50 # number of pulses to region X
 NUM_LOCATIONS = 2
 
 [SETUP]

@@ -68,7 +68,7 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps):
 
     if jsonStr:
       if time.perf_counter() - stimTime > 1: # wait one second
-        if jsonStr['type'] == 'ttl' and jsonStr['channel'] == 0 and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
+        if jsonStr['type'] == 'ttl' and jsonStr['channel'] == channel-1 and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
           if stimSent == 0: # last was sham, send stim now
             stimX.sendWaveform(npWave)
             q.put('Closed loop pulse sent,' + stimX.address)
