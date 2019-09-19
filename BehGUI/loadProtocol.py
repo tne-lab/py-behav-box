@@ -89,6 +89,8 @@ def load_expt_file(self):
                     currentlySetting = 'PARAMETER_SWEEPING'
                 elif '[OPEN_LOOP' in str_before_equal:
                     currentlySetting = 'OPEN_LOOP'
+                elif '[CLOSED_LOOP' in str_before_equal:
+                    currentlySetting = 'CLOSED_LOOP'
                 elif '[SETUP' in str_before_equal:
                     currentlySetting = 'SETUP'
                 elif "[CONDITIONS" in str_before_equal:
@@ -312,26 +314,24 @@ def load_expt_file(self):
                 elif currentlySetting == "STIM":
                     if 'STIM_ADDRESS_X' == str_before_equal or 'STIM_ADDRESS' == str_before_equal:
                         self.stimAddressX = str_after_equal
-                    if 'STIM_ADDRESS_Y' == str_before_equal:
+                    if 'STIM_ADDRESS_Y' == str_before_equal or 'STIM_ADDRESS_SHAM' == str_after_equal':
                         self.stimAddressY = str_after_equal
 
-                elif currentlySetting == 'CLOSED_LOOP': # Probably won't use.
-                    if 'STIM_ADDRESS' == str_before_equal:
-                        self.stimAddress = str_before_equal
+                elif currentlySetting == 'CLOSED_LOOP':
+                    if 'EVENTCHANNEL' in str_before_equal:
+                        self.CLCHANNEL = str_after_equal
+                    if 'MICROAMPS' in str_before_equal:
+                        self.CLMicroAmps = str_after_equal
 
                 elif currentlySetting == 'ERP':
                     if 'INTER_PULSE_WIDTH' == str_before_equal:
                         self.INTER_PULSE_WIDTH = float(str_after_equal)
                     if 'PULSE_VAR' == str_before_equal:
                         self.PUSLE_VAR = float(str_after_equal)
-                    if 'NUM_PULSE_X' == str_before_equal:
-                        self.NUM_PULSE_X = int(str_after_equal)
-                    if 'NUM_PULSE_Y' == str_after_equal:
-                        self.NUM_PULSE_Y = int(str_after_equal)
-                    if 'STIM_ADDRESS_X' == str_before_equal or 'STIM_ADDRESS' == str_before_equal:
-                        self.stimAddressX = str_after_equal
-                    if 'STIM_ADDRESS_Y' == str_before_equal:
-                        self.stimAddressY = str_after_equal
+                    if 'NUM_PULSE' == str_before_equal:
+                        self.NUM_ERP_PULSE = int(str_after_equal)
+                    if 'NUM_LOCATIONS' == str_before_equal:
+                        self.NUM_ERP_LOCATIONS = int(str_after_equal)
 
                 elif currentlySetting == 'OPEN_LOOP':
                     if "PHASE_DELAY" == str_before_equal:
