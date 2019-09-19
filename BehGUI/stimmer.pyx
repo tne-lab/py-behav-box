@@ -24,7 +24,7 @@ phaseShift = 0
 '''
 Not class stimmer. Makes things a little smaller
 '''
-def createWaveform(amplitude, numPulse):
+def createWaveform(amplitude, numPulse = 1):
   # Now lets build it
   waveform = []
   negAmplitude = amplitude * -1
@@ -48,14 +48,15 @@ def createWaveform(amplitude, numPulse):
 
   return np.array(waveform, dtype=np.float64)
 
-def waitForEvent(stimX, stimY, q, backQ):
+def waitForEvent(stimX, stimY, q, backQ, channel, microamps):
   '''
   waiting for OPEN EPHYS trigger. then tells GUI that it sent the stim
   '''
   # Create socket to listen to
   print('in closed loop')
   rcv = zmqClasses.RCVEvent(5557, [b'ttl', b'event'])
-  npWave = createWaveform(1, 1)
+  voltage = microamps * 100
+  npWave = createWaveform(voltage)
   stimSent = 0
   stimTime = time.perf_counter()
   while True:
@@ -65,7 +66,7 @@ def waitForEvent(stimX, stimY, q, backQ):
     jsonStr = rcv.rcv()
     if jsonStr:
       if time.perf_counter() - stimTime > 1: # wait one second
-        if jsonStr['type'] == 'ttl' and jsonStr['channel'] == 0 and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
+        if jsonStr['type'] == 'ttl' and jsonStr['channel'] == channel and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
           if stimSent == 0: # last was sham, send stim now
             stimX.sendWaveform(npWave)
             q.put('Closed loop pulse sent,' + stimX.address)
@@ -77,12 +78,12 @@ def waitForEvent(stimX, stimY, q, backQ):
             stimTime = time.perf_counter()
             stimSent = 0
 
-def ERP(stimX, stimY, q, backQ, nERPX, nERPY, ERP_INTER_LOW, ERP_INTER_HIGH):
+def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIONS):
     '''
     ERP stimulation paradigm
     '''
     # Custom ERP Settings
-    npWave = createWaveform(1,1)
+    npWave = createWaveform(1)
 
     nXStim = 0
     nYStim = 0
@@ -94,28 +95,20 @@ def ERP(stimX, stimY, q, backQ, nERPX, nERPY, ERP_INTER_LOW, ERP_INTER_HIGH):
 
         # Stim at location X or Y
         # Randomize but make sure each get specified num of pulses ( probably make this cleaner)
-        XorY = random.randint(0,1)
-        if XorY:
-          if nXStim <= nERPX: # Make sure not all x pulses occured
+        randint = random.perumation(NUM_LOCATIONS)
+        for i in randint:
+          optText = ''
+          if randint == 0:
+            optText = 'IL'
+          elif randint == 1:
+            optText = 'BLA'
+          messagebox.showinfo('LOCATION SWAP', 'Location #' + str(randint) + ' (' + optText + ')')
+          for i in range(nERP):
             stimX.sendWaveform(npWave)
-            q.put('ERP pulse sent X, ' + stimX.address)
-            nXStim += 1
-          else:
-            stimY.sendWaveform(npWave)
-            q.put('ERP pulse sent Y, ' + stimY.address)
-            nYStim += 1
-        else:
-          if nYStim <= nERPY:
-            stimY.sendWaveform(npWave)
-            q.put('ERP pulse sent Y, ' + stimY.address)
-            nYStim += 1
-          else:
-            stimX.sendWaveform(npWave)
-            q.put('ERP pulse sent X, ' + stimX.address)
-            nXStim += 1
-        # Wait for brain to return to normal before stimming again
-        sleepLen = random.uniform(ERP_INTER_LOW, ERP_INTER_HIGH)
-        time.sleep(sleepLen) # 4 +- 1 second
+            q.put('ERP stim, ' + str(randint))
+            # Wait for brain to return to normal before stimming again
+            sleepLen = random.uniform(ERP_INTER_LOW, ERP_INTER_HIGH)
+            time.sleep(sleepLen) # 4 +- 1 second
 
 
 def openLoop(stimX, stimY, q, backQ, phaseDelay, delayLow, delayHigh):

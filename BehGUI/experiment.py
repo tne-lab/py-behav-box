@@ -565,7 +565,7 @@ class Experiment:
                         self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
-                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ)) # NEED TO UPDATE ADDRESS
+                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps)) # NEED TO UPDATE ADDRESS
                         self.stim.start()
                         self.Protocol_ln_num += 1
                 else:
@@ -643,7 +643,7 @@ class Experiment:
                     self.stimBackQ = Queue()
                     self.stimX = daqAPI.AnalogOut(self.stimAddressX)
                     self.stimY = daqAPI.AnalogOut(self.stimAddressY)
-                    self.stim = threading.Thread(target=stimmer.ERP, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.NUM_PULSE_X, self.NUM_PULSE_Y, self.INTER_PULSE_WIDTH - self.PULSE_VAR, self.INTER_PULSE_WIDTH + self.PULSE_VAR))
+                    self.stim = threading.Thread(target=stimmer.ERP, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.NUM_ERP_PULSE, self.INTER_PULSE_WIDTH - self.PULSE_VAR, self.INTER_PULSE_WIDTH + self.PULSE_VAR, self.NUM_ERP_LOCATIONS))
                     self.stim.start()
                 else:
                     if not self.stim.is_alive():
