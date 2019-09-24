@@ -955,7 +955,6 @@ class Experiment:
                    #  BACKGROUND TOUCHED (image missed)
                    ##########################################
                    if self.touchMsg['picture'] == 'missed': # Touched background
-
                        self.log_event(" missed ," + "(" + str(x) + ";" + str(y)  + ")")
                        self.background_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                        self.background_touches += 1
@@ -996,19 +995,6 @@ class Experiment:
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
                                    self.correct_image_touches += 1
-                               if self.touchMsg['picture'] == 'missed':
-                                   if self.cond['WRONG'].upper() == 'DN_PUNISH':
-                                       if not self.PAUSE_STARTED:
-                                           self.cabin_light.sendDBit(True)
-                                           self.PAUSE_TIME = 5
-                                           self.PAUSE_STARTED = True
-                                           self.pause_start_time = time.perf_counter()
-                                       else:
-                                           time_elapsed = time.perf_counter() - self.pause_start_time
-                                           if time_elapsed >= self.PAUSE_TIME:
-                                               self.cabin_light.sendDBit(False)
-                                               self.Protocol_ln_num += 1
-                                               self.PAUSE_STARTED = False
 
 
 
@@ -1071,7 +1057,7 @@ class Experiment:
            ################
            if self.cond["RESET"] == "FIXED":
                if cond_time_elapsed >= float(self.cond["MAX_TIME"]): # Time is up
-                  self.CONDITION_STARTED = False
+                  #self.CONDITION_STARTED = False
                   if not self.WRONG and not self.CORRECT:
                       self.NO_ACTION_TAKEN = True
                       self.log_event("NO_ACTION_TAKEN")
@@ -1080,11 +1066,11 @@ class Experiment:
            if self.cond["RESET"] == "ON_RESPONSE":
                #print (cond["Reset"])
                if self.WRONG or self.CORRECT: # A response was given
-                   self.CONDITION_STARTED = False  # Time is up
+                   #self.CONDITION_STARTED = False  # Time is up
                    # NOTE: "END_OF_TRIAL" LOGGED AFTER OUTCOMES
                    self.TIME_IS_UP = True
                if cond_time_elapsed >= float(self.cond["MAX_TIME"]): # Time is up
-                  self.CONDITION_STARTED = False
+                  #self.CONDITION_STARTED = False
                   if not self.WRONG and not self.CORRECT:
                       self.NO_ACTION_TAKEN = True
                       self.log_event("NO_ACTION_TAKEN")
@@ -1116,7 +1102,7 @@ class Experiment:
                   self.num_no_action += 1
                   self.no_actionPercentage = self.num_no_action/self.trial_num * 100
                   print("No Action Taken")
-               print(outcome)
+               self.NEXT_TRIAL = True
                ##############################################################
                # OUTCOMES (Specified in protocol files under [CONDITIONS])
                ##############################################################
@@ -1181,6 +1167,21 @@ class Experiment:
                elif outcome == 'SHOCK':
                     self.log_event("Shock_ON",("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
                     self.SHOCK_ON = True
+
+               elif outcome == 'DN_PUNISH':
+                   if not self.PAUSE_STARTED:
+                       self.GUI.cabin_light.sendDBit(True)
+                       self.PAUSE_TIME = 5
+                       self.PAUSE_STARTED = True
+                       self.pause_start_time = time.perf_counter()
+                       self.NEXT_TRIAL = False
+                   else:
+                       time_elapsed = time.perf_counter() - self.pause_start_time
+                       self.NEXT_TRIAL = False
+                       if time_elapsed >= self.PAUSE_TIME:
+                           self.GUI.cabin_light.sendDBit(False)
+                           self.NEXT_TRIAL = True
+                           self.PAUSE_STARTED = False
                else: #outcome == 'NONE'
                    self.log_event("NONE")
                    #print("Outcome = NONE")
@@ -1190,10 +1191,12 @@ class Experiment:
 ##                       self.GUI.TSq.put('')
                    self.GUI.TSq.put('')
 
-               self.TIME_IS_UP = False
-               self.CONDITION_STARTED = False
-               self.log_event("END_OF_TRIAL")
-               self.Protocol_ln_num +=1
+               if self.NEXT_TRIAL == True:
+                   print('next trial')
+                   self.TIME_IS_UP = False
+                   self.CONDITION_STARTED = False
+                   self.log_event("END_OF_TRIAL")
+                   self.Protocol_ln_num +=1
     ### END EXPT ###
     def endExpt(self):
         # Tell open ephys to stop acquistion and recording?
