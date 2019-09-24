@@ -996,6 +996,21 @@ class Experiment:
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
                                    self.correct_image_touches += 1
+                               if self.touchMsg['picture'] == 'missed':
+                                   if self.cond['WRONG'].upper() == 'DN_PUNISH':
+                                       if not self.PAUSE_STARTED:
+                                           self.cabin_light.sendDBit(True)
+                                           self.PAUSE_TIME = 5
+                                           self.PAUSE_STARTED = True
+                                           self.pause_start_time = time.perf_counter()
+                                       else:
+                                           time_elapsed = time.perf_counter() - self.pause_start_time
+                                           if time_elapsed >= self.PAUSE_TIME:
+                                               self.cabin_light.sendDBit(False)
+                                               self.Protocol_ln_num += 1
+                                               self.PAUSE_STARTED = False
+
+
 
                        #################################
                        # TOUCH TRAINING
