@@ -627,6 +627,7 @@ class BEH_GUI():
                     if self.speeker.collidepoint(cur_x,cur_y):
                           # NOTE: Tone_OFF logged while drawing speeker above in main loop
                           if "EPHYS-2" in self.computer:
+                             print(self.Tone1_Freq)
                              GUIFunctions.PLAY_TONE(self,"TONE1") #using computer speeker
                           elif "EPHYS-1" in self.computer:
                              GUIFunctions.PLAY_TONE_LAF(self,"TONE1") #using computer speeker

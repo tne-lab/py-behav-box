@@ -1091,17 +1091,17 @@ class Experiment:
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
                   self.correctPercentage = self.num_correct/self.trial_num * 100
-                  print("Correct")
+                  #print("Correct")
                elif self.WRONG:
                   outcome = self.cond['WRONG'].upper()    # Outcome for wrong response(in Expt File)
                   self.num_wrong += 1
                   self.wrongPercentage = self.num_wrong/self.trial_num * 100
-                  print("Wrong")
+                  #print("Wrong")
                else:
                   outcome = self.cond['NO_ACTION'].upper()# Outcome for No_Action taken(in Expt File)
                   self.num_no_action += 1
                   self.no_actionPercentage = self.num_no_action/self.trial_num * 100
-                  print("No Action Taken")
+                  #print("No Action Taken")
                self.NEXT_TRIAL = True
                ##############################################################
                # OUTCOMES (Specified in protocol files under [CONDITIONS])
@@ -1139,6 +1139,11 @@ class Experiment:
                                GUIFunctions.PLAY_TONE(self.GUI,"TONE1")
                            else:  # Low prob image pressed, so different tone.
                                GUIFunctions.PLAY_TONE(self.GUI,"TONE2")
+                               if self.cond['WRONG'].upper() == 'DN_PUNISH':
+                                   self.NEXT_TRIAL = False
+                                   self.WRONG = True
+                                   self.CORRECT = False
+
                            rand = random.random() * 100
                            #print("our random number", rand)
                            if rand <= self.cur_probability:
@@ -1185,14 +1190,13 @@ class Experiment:
                else: #outcome == 'NONE'
                    self.log_event("NONE")
                    #print("Outcome = NONE")
-               if self.TOUCHSCREEN_USED:
+               if self.TOUCHSCREEN_USED and not self.PAUSE_STARTED:
                    # Want to wait a second before blanking screen
 ##                   if self.cur_time - self.touch_time > 1.0:
 ##                       self.GUI.TSq.put('')
                    self.GUI.TSq.put('')
 
                if self.NEXT_TRIAL == True:
-                   print('next trial')
                    self.TIME_IS_UP = False
                    self.CONDITION_STARTED = False
                    self.log_event("END_OF_TRIAL")

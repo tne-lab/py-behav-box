@@ -95,7 +95,7 @@ def PLAY_TONE(self, TONE_ID):  # Plays tone using computer speaker
     if TONE_ID == 'TONE1':
         if not self.TONE_ON:
             if self.EXPT_LOADED: self.expt.log_event("Tone_ON",("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
-            newThread = threading.Thread(target=play_sound, args=(self.Tone1_Freq, self.Tone1_Vol,self.Tone1_Duration))
+            newThread = threading.Thread(target=play_sound, args=(self.Tone1_Freq, self.Tone1_Vol,self.Tone1_Duration)) #
             print("freq: ",self.Tone1_Freq,"Vol: ", self.Tone1_Vol, "Duration: ",self.Tone1_Duration)
             # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
             newThread.start()
@@ -107,7 +107,7 @@ def PLAY_TONE(self, TONE_ID):  # Plays tone using computer speaker
     elif TONE_ID == 'TONE2':
         if not self.TONE_ON:
             if self.EXPT_LOADED: self.expt.log_event("Tone_ON",("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
-            newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration))
+            newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration)) # self.Tone2_Freq
             # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
             newThread.start()
             self.TONE_TIME = time.perf_counter()

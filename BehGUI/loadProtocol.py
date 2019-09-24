@@ -56,6 +56,7 @@ def load_expt_file(self):
 
             if (not EXPERIMENT) and (currentlySetting!='STIM'): # Makes sure that path is correct
                 str_after_equal = str_after_equal.upper()
+                str_before_equal = str_before_equal.upper()
 
             self.exptFileLines.append(line)
 
@@ -189,28 +190,28 @@ def load_expt_file(self):
 
                 elif currentlySetting == 'TONE1':#TONE1
                     if 'DURATION' in str_before_equal:
-                        self.Tone1_Duration = float(str_after_equal)
-                        print("self.Tone1_Duration",self.Tone1_Duration)
+                        self.GUI.Tone1_Duration = float(str_after_equal)
+                        print("self.Tone1_Duration",self.GUI.Tone1_Duration)
 
                     if 'FREQ' in str_before_equal:
                         self.GUI.Tone1_Freq = float(str_after_equal)
                         print("self.Tone1_Freq: ",self.GUI.Tone1_Freq)
 
                     if 'VOL' in str_before_equal:
-                        self.Tone1_Vol = float(str_after_equal)
+                        self.GUI.Tone1_Vol = float(str_after_equal)
                         print("self.Tone1_Vol: ",self.GUI.Tone1_Vol)
 
                 elif currentlySetting == 'TONE2':#TONE2
                     if 'DURATION' in str_before_equal:
-                        self.Tone2_Duration = float(str_after_equal)
+                        self.GUI.Tone2_Duration = float(str_after_equal)
                         print("self.Tone2_Duration",self.GUI.Tone2_Duration)
 
                     if 'FREQ' in str_before_equal:
-                        self.Tone2_Freq = float(str_after_equal)
+                        self.GUI.Tone2_Freq = float(str_after_equal)
                         print("self.Tone2_Freq: ",self.GUI.Tone2_Freq)
 
                     if 'VOL' in str_before_equal:
-                        self.Tone2_Vol = float(str_after_equal)
+                        self.GUI.Tone2_Vol = float(str_after_equal)
                         print("self.Tone2_Vol: ",self.GUI.Tone2_Vol)
 
                 elif currentlySetting == 'TOUCHSCREEN':
