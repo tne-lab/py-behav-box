@@ -3,7 +3,7 @@ EXPT_NAME = STIM_PLASTICITY # Don't use "-" in name, use underscores "_" instead
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
 [OPEN_EPHYS]
-OPEN_EPHYS_CONFIG_FILE = STIM_TEST.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
+OPEN_EPHYS_CONFIG_FILE = PLASTICITY.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
 OPEN_EPHYS_PATH =  E:\GitHub\OE\plugin-GUI-private\Build\Release\open-ephys.exe # on Flav's PC Ephys-2
 TTL_STIM = 1 # Not used, only for your knowledge. Hardware used.
 TTL_LEVER_R = 2 # Can be TTL_*, * = NOSE_L/R, FOOD
@@ -20,7 +20,8 @@ MICROAMPS = 100
 [ERP]
 INTER_PULSE_WIDTH = 4
 PUSLE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
-NUM_PULSE_X = 50 # number of pulses to region X
+NUM_PULSE = 50 # number of pulses to region X
+NUM_LOCATIONS = 2
 
 [SETUP]
 FAN_ON=TRUE
