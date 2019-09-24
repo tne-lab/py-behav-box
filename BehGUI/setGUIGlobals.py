@@ -3,6 +3,9 @@ import os
 import pygame
 import time
 import GUIFunctions
+from queue import Queue
+import multiprocessing
+
 try:
     import daqAPI
 except:
@@ -20,7 +23,7 @@ def setGUIGlobals(self):
     WINDOW_HEIGHT = SCREEN_HEIGHT -100
     WINDOW_HCENTER = WINDOW_HEIGHT/2
     self.GAME_AREA = pygame.Rect(20, 10, WINDOW_WIDTH, WINDOW_HEIGHT)
-
+    self.STIM_ENABLED = False
     ################################################################
     # NIDAQ GLOBALS
     ################################################################
@@ -48,9 +51,6 @@ def setGUIGlobals(self):
         self.checkPressLeft, self.checkPressRight = daqAPI.leverInputSetup()
         self.eaten = daqAPI.foodEatInputSetup()
         # Create stim thread
-        #self.STIM_ENABLED = True
-        #self.stimQ = Queue()
-        #stimThread = threading.Thread(target=stimmer.Stim, args=(ADDRESS***, self.stimQ)) # NEED TO UPDATE ADDRESS
 
 
     ##################

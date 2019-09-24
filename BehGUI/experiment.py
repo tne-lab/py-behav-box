@@ -7,11 +7,18 @@ import random
 from RESOURCES.GUI_elements_by_flav import *
 import GUIFunctions
 import EXPTFunctions
+import pyximport; pyximport.install()
+import stimmer
+import win32gui
+try:
+    import daqAPI
+except:
+    pass
 
 class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
     import GUIFunctions
-    from EXPTFunctions import checkStatus, checkQs,  log_event, MyVideo
+    from EXPTFunctions import checkStatus, checkQs,  log_event, MyVideo, sendTTL, checkToEndTTL
     from setExptGlobals import setExptGlobals, setVidGlobals, setTouchGlobals
 ####################################################################################
 #   INITIALIZE EXPERIMENT
@@ -30,12 +37,13 @@ class Experiment:
             print("COULD NOT LOAD EXPT FILE")
             self.log_event("COULD NOT LOAD EXPT FILE")
         # Open ephys stuff
+        #self.EPHYS_ENABLED = True
         if self.EPHYS_ENABLED:
             self.snd = zmqClasses.SNDEvent(5556) # subject number or something
             self.openEphysBack_q = Queue()
             self.openEphysQ = Queue()
             # Start thread
-            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike',b'ttl']})
+            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'event',b'ttl']})
             open_ephys_rcv.start()
 
         self.GUI.EXPT_LOADED = True
@@ -126,6 +134,8 @@ class Experiment:
                 else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
                     self.vidSTATE = 'REC_STOP'
                     print("\nREC = False, Self.ROI: ",self.ROI,"\n")
+                    if self.EPHYS_ENABLED:
+                        self.snd.send(self.snd.STOP_REC) # OPEN_EPHYS
 
             elif "EXTEND_LEVERS" in key:
                 self.setup_ln_num +=1
@@ -497,6 +507,9 @@ class Experiment:
                     elif "BARPRESS_TO_START" in protocolDict["PAUSE"]:
                         self.PAUSE_TIME = 1000.0
                         self.BARPRESS_TO_START = True
+                    elif "NOSEPOKE_TO_START" in protocolDict["PAUSE"]:
+                        self.PAUSE_TIME = 1000.0
+                        self.NOSEPOKE_TO_START = True
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
                 self.pause_start_time = time.perf_counter()
@@ -518,6 +531,11 @@ class Experiment:
                         self.Protocol_ln_num += 1
                         self.PAUSE_STARTED = False
                         self.BARPRESS_TO_START = False
+                elif self.NOSEPOKE_TO_START:
+                    if self.NOSE_POKED_L or self.NOSE_POKED_R:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+                        self.NOSEPOKE_TO_START = False
 
                 if self.TOUCHSCREEN_USED:
                     if not self.GUI.TSBack_q.empty():
@@ -532,11 +550,161 @@ class Experiment:
                         else:
                             self.log_event(self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
 
+        elif "CLOSED_LOOP" == key:
+            val = str2bool(protocolDict[key])
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if val:
+                    if not self.STIM_ENABLED:
+                        print('IF HANGS ADD NETWORK EVENTS TO OPEN EPHYS!!!')
+                        self.snd.send(self.snd.STOP_REC)
+                        self.snd.changeVars(prependText = 'CLOSED_LOOP')
+                        self.snd.send(self.snd.START_REC)
+                        self.log_event("Starting Closed Loop")
+                        self.STIM_ENABLED = True
+                        self.stimX = daqAPI.AnalogOut(self.stimAddressX)
+                        self.stimY = daqAPI.AnalogOut(self.stimAddressY)
+                        self.stimQ = Queue()
+                        self.stimBackQ = Queue()
+                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps)) # NEED TO UPDATE ADDRESS
+                        self.stim.start()
+                        self.Protocol_ln_num += 1
+                else:
+                    self.stimBackQ.put('STOP')
+                    if not self.stim.is_alive():
+                        self.stimX.end()
+                        self.STIM_ENABLED = False
+                        self.Protocol_ln_num += 1
+            else:
+                self.log_event("Closed Loop Starting Failed, fix DAQ")
+                self.endExpt()
+
+        elif "PARAMETER_SWEEPING" == key:
+            val = str2bool(protocolDict[key])
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if not self.STIM_ENABLED:
+                    self.log_event("Starting parameter sweeping")
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = 'PARAMETER_SWEEPING')
+                    self.snd.send(self.snd.START_REC)
+                    self.STIM_ENABLED = True
+                    self.stimX = daqAPI.AnalogOut(self.stimAddressX)
+                    self.stimY = daqAPI.AnalogOut(self.stimAddressY)
+                    self.stimQ = Queue()
+                    self.stimBackQ = Queue()
+                    self.stim = threading.Thread(target=stimmer.paramSweeping, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.intensityArray,self.durationArray, self.paramSetSize, self.openLoopPhaseDelay, self.paramDelay - self.paramDelayVar, self.paramDelay + self.paramDelayVar))
+                    self.stim.start()
+                else:
+                    if not self.stim.is_alive():
+                        self.stimX.end()
+                        self.stimY.end()
+                        self.stimY = None
+                        self.STIM_ENABLED = False
+                        self.Protocol_ln_num += 1
+            else:
+                self.log_event("Parameter sweeping Starting Failed, fix DAQ")
+                self.endExpt()
+
+        elif "OPEN_LOOP" == key:
+            val = str2bool(protocolDict[key])
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if val:
+                    if not self.STIM_ENABLED:
+                        self.snd.send(self.snd.STOP_REC)
+                        self.snd.changeVars(prependText = 'OPEN_LOOP')
+                        self.snd.send(self.snd.START_REC)
+                        self.log_event("Starting open loop")
+                        self.STIM_ENABLED = True
+                        self.stimX = daqAPI.AnalogOut(self.stimAddressX)
+                        self.stimY = daqAPI.AnalogOut(self.stimAddressY)
+                        self.stimQ = Queue()
+                        self.stimBackQ = Queue()
+                        self.stim = threading.Thread(target=stimmer.openLoop, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.openLoopPhaseDelay, self.paramDelay - self.paramDelayVar, self.paramDelay + self.paramDelayVar))
+                        self.stim.start()
+                        self.Protocol_ln_num += 1
+                else:
+                    self.stimBackQ.put('STOP')
+                    if not self.stim.is_alive():
+                        self.stimX.end()
+                        self.STIM_ENABLED = False
+                        self.Protocol_ln_num += 1
+            else:
+                self.log_event("Open Loop Starting Failed, fix DAQ")
+                self.endExpt()
+
+        elif "ERP" == key:
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if not self.STIM_ENABLED:
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = 'ERP_' + protocolDict[key])
+                    self.snd.send(self.snd.START_REC)
+                    self.log_event("Starting ERP")
+                    self.STIM_ENABLED = True
+                    self.stimQ = Queue()
+                    self.stimBackQ = Queue()
+                    self.stimX = daqAPI.AnalogOut(self.stimAddressX)
+                    self.stimY = daqAPI.AnalogOut(self.stimAddressY)
+                    self.stim = threading.Thread(target=stimmer.ERP, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.NUM_ERP_PULSE, self.INTER_PULSE_WIDTH - self.PULSE_VAR, self.INTER_PULSE_WIDTH + self.PULSE_VAR, self.NUM_ERP_LOCATIONS))
+                    self.stim.start()
+                else:
+                    if not self.stim.is_alive():
+                        self.stimX.end()
+                        self.stimY.end()
+                        self.stimY = None
+                        self.STIM_ENABLED = False
+                        self.Protocol_ln_num += 1
+            else:
+                self.log_event("ERP Starting Failed, fix DAQ")
+                self.endExpt()
+
+        elif "RAW_PRE" == key:
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if not self.PAUSE_STARTED:
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = 'RAW_PRE')
+                    self.snd.send(self.snd.START_REC)
+                    self.PAUSE_TIME = float(protocolDict[key])
+                    self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec")
+                    self.PAUSE_STARTED = True
+                    self.pause_start_time = time.perf_counter()
+
+                    self.PAUSE_STARTED = True
+                else:
+                    time_elapsed = time.perf_counter() - self.pause_start_time
+                    if time_elapsed >= self.PAUSE_TIME:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+            else:
+                self.log_event("Raw recording failed, fix DAQ")
+                self.endExpt()
+
+        elif "RAW_POST" == key:
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if not self.PAUSE_STARTED:
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = 'RAW_POST')
+                    self.snd.send(self.snd.START_REC)
+                    self.PAUSE_TIME = float(protocolDict[key])
+                    self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec")
+                    self.PAUSE_STARTED = True
+                    self.pause_start_time = time.perf_counter()
+
+                    self.PAUSE_STARTED = True
+                else:
+                    time_elapsed = time.perf_counter() - self.pause_start_time
+                    if time_elapsed >= self.PAUSE_TIME:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+            else:
+                self.log_event("Raw recording failed, fix DAQ")
+                self.endExpt()
+
+
         elif key == "CONDITIONS":
             self.runConditions(protocolDict)
 
         else:
             print("PROTOCOL ITEM NOT RECOGNIZED",key)
+            self.Protocol_ln_num += 1
 
         #########################################################################################
         # RUN BAR PRESS INDEPENDENT OF PROTOCOLS OR CONDTIONS
@@ -1016,11 +1184,18 @@ class Experiment:
         # Tell open ephys to stop acquistion and recording?
         if self.EPHYS_ENABLED:
             self.snd.send(self.snd.STOP_ACQ)
+            #win32gui.EnumWindows(GUIFunctions.killProgram, 'Open Ephys GUI')
             self.openEphysQ.put('STOP')
 
         if self.VID_ENABLED:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
+
+        if self.STIM_ENABLED:
+            self.stimBackQ.put('STOP')
+            self.stimX.end()
+            if self.stimY != None:
+                self.stimY.end()
 
         if self.GUI.num_cameras >= 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
         EXPTFunctions.resetBox(self.GUI)

@@ -1,0 +1,49 @@
+[EXPERIMENT]
+EXPT_NAME = STIM_TEST # Don't use "-" in name, use underscores "_" instead
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+
+[OPEN_EPHYS]
+#OPEN_EPHYS_CONFIG_FILE = IL.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
+#OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI-private\Builds\VisualStudio2013\x64\Release\bin\open-ephys.exe # on Flav's PC Ephys-2
+TTL_STIM = 1 # Not used, only for your knowledge. Hardware used.
+TTL_LEVER_R = 2 # Can be TTL_*, * = NOSE_L/R, FOOD
+TTL_LEVER_L = 3
+
+[STIM]
+#STIM_ADDRESS_X = Dev3/ao0 # Leading stim location
+#STIM_ADDRESS_Y = Dev3/ao1 # Following stim location
+STIM_ADDRESS_X = pciDAQ/ao0
+STIM_ADDRESS_SHAM = pciDAQ/ao2
+
+#[PARAMETER_SWEEPING]
+#INTENSITY = (.25, .50, 10.0) #microamps
+#DURATION = (250, 500, 1000) #milliseconds
+#PHASE_DELAY = 0.0833 # in seconds
+#DELAY = 1
+##DELAY_VAR = 0.5
+#SET_SIZE = 1  # How many pulse trains per set of intensity/duration
+
+#[OPEN_LOOP]
+#PHASE_DELAY = 0.0833 # in seconds
+
+#[ERP]
+#INTER_PULSE_WIDTH = 4
+#PUSLE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
+#NUM_PULSE_X = 2 # number of pulses to region X
+#NUM_PULSE_Y = 2
+
+[SETUP]
+FAN_ON=TRUE
+CAB_LIGHT=TRUE
+FOOD_LIGHT=TRUE
+REC=TRUE
+
+[PROTOCOL]
+CLOSED_LOOP = TRUE # Begin closed loop stim thread
+PAUSE = 10 * 30 # closed loop for 30 minutes
+CLOSED_LOOP = FALSE # Kill thread
+
+FAN_ON=FALSE
+CAB_LIGHT=FALSE
+FOOD_LIGHT=FALSE
+REC=FALSE

@@ -1,0 +1,67 @@
+[EXPERIMENT]
+EXPT_NAME = STIM_TEST_SIEGLE # Don't use "-" in name, use underscores "_" instead
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+
+[OPEN_EPHYS]
+OPEN_EPHYS_CONFIG_FILE = closed_loop.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
+OPEN_EPHYS_PATH =  E:\plugin-GUI-private\Builds\VisualStudio2013\x64\Release\bin\open-ephys.exe # Jeans pc
+TTL_STIM = 1 # Not used, only for your knowledge. Hardware used.
+TTL_LEVER_R = 2 # Can be TTL_*, * = NOSE_L/R, FOOD
+TTL_LEVER_L = 3
+
+[STIM]
+STIM_ADDRESS_X = pciDAQ/ao0 # Leading stim location
+STIM_ADDRESS_Y = pciDAQ/ao2 # Following stim location/Sham stim for open loop (will change eventually)
+
+[PARAMETER_SWEEPING]
+INTENSITY = (.25, .50, 10.0) #microamps
+DURATION = (250, 500, 1000) #milliseconds
+PHASE_DELAY = 0.0833 # in seconds
+DELAY = 1
+DELAY_VAR = 0.5
+SET_SIZE = 1  # How many pulse trains per set of intensity/duration
+
+[OPEN_LOOP]
+PHASE_DELAY = 0.0833 # in seconds
+
+[ERP]
+INTER_PULSE_WIDTH = 4
+PUSLE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
+NUM_PULSE_X = 2 # number of pulses to region X
+NUM_PULSE_Y = 2
+
+[SETUP]
+FAN_ON=TRUE
+CAB_LIGHT=TRUE
+EXTEND_LEVERS = TRUE
+
+
+[BAR_PRESS]
+#NOTE: VI=15 is variable interval with mean time of 15.  PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
+# (10, 1,30,5) creates 10 variable ratio reward stating at every press (1, to random between (1,30) incremented by 5 every loop)
+BAR_PRESS_TRAIN=VI(60,60)  # note: VI(a,b).  a = initial VI for bar PRESS, b = final VI for session
+
+
+[PROTOCOL]
+
+RAW_PRE = 300
+#PARAMETER_SWEEPING = TRUE
+
+#OPEN_LOOP = TRUE
+#PAUSE = 10
+#OPEN_LOOP = FALSE
+
+CLOSED_LOOP = TRUE # Begin closed loop stim thread
+PAUSE = 1800 # closed loop for 30 minutes
+CLOSED_LOOP = FALSE # Kill thread
+
+#PAUSE = 5 #* 60 # 5 min post
+#ERP = 5
+
+RAW_POST = 300
+
+
+EXTEND_LEVERS=FALSE
+FAN_ON=FALSE
+CAB_LIGHT=FALSE
+REC=FALSE

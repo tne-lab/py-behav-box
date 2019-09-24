@@ -18,6 +18,7 @@ NOTE: 1. Please Start Whisker server first
 """
 import nidaqmx
 from nidaqmx.constants import (LineGrouping)
+from nidaqmx import stream_writers
 import time
 import os
 dev = 'Dev2'
@@ -71,22 +72,6 @@ def enableSetup():
     enableTask.startTask()
     return enableTask
 
-
-'''
-!!! DEPRECIATED !!!!
-Enable pulse for when sending bits/bytes.
-(Doesn't need a global task because its just a pulse).
-!! Plus it seems like making a class on port0 isn't a good idea.
-'''
-'''
-def enablePulse():
-    try:
-            enable.enable()
-        enable.end()
-    except:
-        print('woops')
-    return
-'''
 def enablePulse():
     enable = dev + '/port0/line4'
     #print('Enable Pulse')
@@ -211,6 +196,28 @@ Returns a new high tone Task
 #    highTone = InterfaceOut(highToneAddress)
 #    highTone.startTask()
 #    return highTone
+
+####################################################
+##   Analog Out
+####################################################
+class AnalogOut:
+    def __init__(self, address):
+        self.task = nidaqmx.Task()
+        self.task.ao_channels.add_ao_voltage_chan(address)
+        self.address = address
+        self.stream = stream_writers.AnalogSingleChannelWriter(self.task.out_stream, auto_start = True)
+
+    def setClock(self, sr, samples):
+        self.task.timing.cfg_samp_clk_timing(sr, samps_per_chan = samples)
+
+    def startTask(self):
+        self.task.start()
+
+    def sendWaveform(self,data):
+        self.stream.write_many_sample(data)
+
+    def end(self):
+        self.task.close()
 
 ####################################################
 ##   Inputs

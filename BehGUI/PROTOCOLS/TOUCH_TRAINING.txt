@@ -27,10 +27,10 @@ Volume(0-1)	= 1.0
 
 [TOUCHSCREEN]
 IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
-COORDS=(141,150):(582,150)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+COORDS=(141,275):(640,275)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 # Image name: probability of reward on each trial
-IMG1= SPIDER.bmp:(80x500)
-IMG2= FLOWER.bmp:(20x500)
+IMG1= SPIDER.bmp:(100x100)
+IMG2= FLOWER.bmp:(100x100)
 TOUCH_BANDIT
 
 [SETUP]

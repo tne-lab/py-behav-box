@@ -134,6 +134,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
 
 
 def setupExpt(self):
+    print('starting expt')
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (20,40)
     self.myscreen = pygame.display.set_mode((500,990),pygame.RESIZABLE,32)
     #self.myscreen = pygame.display.set_mode((500,990),32)
@@ -214,8 +215,9 @@ def setupExpt(self):
     self.events = []
 
     time.sleep(0.5)
-    self.expt = experiment.Experiment(self)
 
+    self.expt = experiment.Experiment(self)
+    print('done starting')
     self.buttons,self.levers,self.boxes,self.circles,self.LEDs,self.toggles,self.info_boxes,self.user_inputs,self.labels,self.sliders = NIDAQ_GUI_ELEMENT(self, self.myscreen )
     self.feederBox = self.boxes[0]
     self.new_slider_y = self.sliders[0].slotL # SETUPGUI

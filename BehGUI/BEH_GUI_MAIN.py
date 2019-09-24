@@ -683,7 +683,9 @@ class BEH_GUI():
                             elif user_input.label == "EXPT PATH":
                                  self.datapath = user_input.text
                             elif user_input.label == "EXPT FILE NAME":
+                                 print('choosing file')
                                  self.expt_file_name = GUIFunctions.choose_file()
+                                 print(self.expt_file_name)
                                  self.expt_file_path_name = os.path.join(self.protocolpath,self.expt_file_name )
                                  print ("File selected: in BehGUI main",self.expt_file_name,self.expt_file_path_name)
                                  if self.expt_file_name == '':

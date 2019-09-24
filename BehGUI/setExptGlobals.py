@@ -30,6 +30,22 @@ def setExptGlobals(self):
     self.RECORDING = False
 
     ################################################################
+    # STIM PARAMETERS
+    ################################################################
+    self.STIM_ENABLED = False
+    self.NUM_PULSE_X = 0
+    self.NUM_PULSE_Y = 0
+    self.stimAddressY = 'Dev3/ao1'
+    self.stimAddressX = 'Dev3/ao0'
+    self.INTER_PULSE_WIDTH = 0
+    self.PULSE_VAR = 0
+    self.stimX = None
+    self.stimY = None
+    self.phaseDelay = 0
+    self.paramDelay = 0
+    self.paramDelayVar = 0
+
+    ################################################################
     # EXPERIMENT PARAMETERS
     ################################################################
     self.setup = []
@@ -43,6 +59,17 @@ def setExptGlobals(self):
     self.CONDITION_STARTED = False
     self.RUN_SETUP = False
     self.START_EXPT = False
+
+    ################################################################
+    # EXPERIMENT PARAMETERS
+    ################################################################
+    self.TTL_LEVER_L = 0
+    self.TTL_LEVER_R = 0
+    self.TLL_NOSE_L = 0
+    self.TLL_NOSE_R = 0
+    self.TLL_FOOD = 0
+
+    self.TTL_ON = []
 
     ################################################################
     # OUTCOME STATS
@@ -126,6 +153,7 @@ def setExptGlobals(self):
     ################################################################
     self.EAT_TO_START = False
     self.BARPRESS_TO_START = False
+    self.NOSEPOKE_TO_START = False
 
     ################################################################
     # What are we using for this EXPT? (Gets set in load_expt_file())
@@ -150,6 +178,7 @@ def setExptGlobals(self):
     self.TOUCHED_TO_START_TRIAL = False
     self.START_IMG_PLACED = False
 
+    self.setVidGlobals()
     ################################################################
     # VIDEO GLOBALS
     ################################################################

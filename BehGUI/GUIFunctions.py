@@ -11,6 +11,7 @@ from queue import Queue
 import whiskerTouch
 try:
     import win32gui
+    import win32con
     LINUX = False
 except:
     LINUX = True
@@ -32,8 +33,14 @@ def lookForProgram(hwnd, programName):
         if 'Whisker' in programName:
             IsWhiskerRunning = True
         elif 'Ephys' in programName:
-            print('found ephys!')
             IsOpenEphysRunning = True
+
+def killProgram(hwnd, programName):
+    global IsOpenEphysRunning
+    if programName in win32gui.GetWindowText(hwnd):
+        win32gui.PostMessage(hwnd,win32con.WM_CLOSE,0,0)
+        if 'Ephys' in programName:
+            IsOpenEphysRunning = False
 
 def openWhiskerEphys(NIDAQ_AVAILABLE):
     global IsWhiskerRunning, IsOpenEphysRunning #, self.NIDAQ_AVAILABLE
@@ -56,8 +63,7 @@ def choose_file():
     #Tk.withdraw() # we don't want a full GUI, so keep the root window from appearing
     chosenFileName = askopenfilename() # show an "Open" dialog box and return the path to the selected file
     filename = os.path.basename(chosenFileName)
-    win32gui.EnumWindows(closeWindow, 'tk')
-
+    #win32gui.EnumWindows(closeWindow, 'tk') # was stalling here?
     return filename
 
 def FAN_ON_OFF(self, FAN_ON):
@@ -218,6 +224,9 @@ def StartTouchScreen(self):
         self.TOUCH_TRHEAD_STARTED = True
         self.TSq.put('') # Send an emtpy string so it draws a blank screen to start!
 
+###########################################################################################################
+# EXIT GAME
+###########################################################################################################
 def exit_game(self):
     #Exit things
     if self.EXPT_LOADED: self.expt.endExpt()
@@ -244,7 +253,6 @@ def exit_game(self):
       self.checkPressLeft.end()
       self.checkPressRight.end()
 
-      #self.stimQ.put('STOP')
     pygame.quit()
     sys.exit()
 

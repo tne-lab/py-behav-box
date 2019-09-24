@@ -5,6 +5,8 @@ import GUIFunctions
 import time
 import webbrowser
 import win32gui
+import shutil
+import numpy as np
 
 def get_val_between_equal_sign_and_hash(line):
     try:
@@ -40,16 +42,19 @@ def get_before_hash(line):
         print("Could not parse line3:", line)
         return clean_line
 
+
 def load_expt_file(self):
     try:
+        currentlySetting = None
         f = open(self.GUI.expt_file_path_name,'r')
         # Read Line by line
         EXPERIMENT = False
+        self.config_file_path = ''
         for ln in f:
             str_before_equal, str_after_equal = get_LR_before_hash(ln)
             line = get_before_hash(ln)
 
-            if not EXPERIMENT: # Makes sure that path is correct
+            if (not EXPERIMENT) and (currentlySetting!='STIM'): # Makes sure that path is correct
                 str_after_equal = str_after_equal.upper()
 
             self.exptFileLines.append(line)
@@ -57,6 +62,8 @@ def load_expt_file(self):
             if str_before_equal != "" and str_before_equal[0] != "#" : #Skip Blank Lines and Skip lines that are just comments (but still copy them to new file)
                 if '[EXPERIMENT' in str_before_equal:
                     currentlySetting = 'EXPERIMENT'
+                elif '[OPEN_EPHYS' in str_before_equal:
+                    currentlySetting = 'OPEN_EPHYS'
                 elif '[TONE1' in str_before_equal:
                     currentlySetting = 'TONE1'
                 elif '[TONE2' in str_before_equal:
@@ -70,8 +77,20 @@ def load_expt_file(self):
                     self.setTouchGlobals()
                 elif '[BAR_PRESS]' in str_before_equal:
                     currentlySetting = 'BARPRESS'
+                elif '[STIM]' in str_before_equal:
+                    currentlySetting = 'STIM'
+                elif '[CLOSED_LOOP]' in str_before_equal:
+                    currentlySetting = 'CLOSED_LOOP'
+                elif '[ERP]' in str_before_equal:
+                    currentlySetting = 'ERP'
                 elif '[PROTOCOL' in str_before_equal:
                     currentlySetting = 'PROTOCOL'
+                elif '[PARAMETER_SWEEPING' in str_before_equal:
+                    currentlySetting = 'PARAMETER_SWEEPING'
+                elif '[OPEN_LOOP' in str_before_equal:
+                    currentlySetting = 'OPEN_LOOP'
+                elif '[CLOSED_LOOP' in str_before_equal:
+                    currentlySetting = 'CLOSED_LOOP'
                 elif '[SETUP' in str_before_equal:
                     currentlySetting = 'SETUP'
                 elif "[CONDITIONS" in str_before_equal:
@@ -129,24 +148,44 @@ def load_expt_file(self):
                             return False
                         print(video_file_path)
 
-                    elif 'OPEN_EPHYS' in str_before_equal:
-                        self.EPHYS_ENABLED = True
-                        if self.GUI.NIDAQ_AVAILABLE:
-                            ephys = 'Open Ephys GUI'
-                            win32gui.EnumWindows(GUIFunctions.lookForProgram, ephys)
-                            if not GUIFunctions.IsOpenEphysRunning:
-                                oe = str_after_equal
-                                window = subprocess.Popen(oe)# # doesn't capture output
-                                time.sleep(2)
-                                win32gui.EnumWindows(GUIFunctions.lookForProgram, ephys)
-                                #except:
-                                #    print("Could not start Open Ephys")
-                            else: print("Open Ephysis already RUNNING")
-                            print(".............................................")
-
                     elif 'VI_TIMES_LIST_PATH' in str_before_equal:
                         self.VIs_file_path = str_after_equal
                         print(self.VIs_file_path)
+
+                elif currentlySetting == 'OPEN_EPHYS':
+                    if "OPEN_EPHYS_CONFIG_FILE" in str_before_equal:
+                        self.config_file_path = str_after_equal
+
+                    elif 'OPEN_EPHYS_PATH' in str_before_equal:
+                        if self.GUI.NIDAQ_AVAILABLE:
+                            win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
+                            if GUIFunctions.IsOpenEphysRunning:
+                                win32gui.EnumWindows(GUIFunctions.killProgram, 'Open Ephys GUI')
+                                time.sleep(0.5)
+                            if self.config_file_path != '':
+                                dest = shutil.copy(os.getcwd() + '\\RESOURCES\\CONFIGS\\' + self.config_file_path, str_after_equal[:-14] + 'lastConfig.xml')
+                                print('moved config file to oe dir : ', dest)
+                            oe = str_after_equal
+                            window = subprocess.Popen(oe)# # doesn't capture output
+                            time.sleep(0.5)
+                            win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
+                            if GUIFunctions.IsOpenEphysRunning:
+                                self.EPHYS_ENABLED = True
+
+                    elif 'TTL_LEVER_R' == str_before_equal:
+                        self.TTL_LEVER_L = str_after_equal
+
+                    elif 'TTL_LEVER_L' == str_before_equal:
+                        self.TTL_LEVER_R = str_after_equal
+
+                    elif 'TTL_NOSE_L' == str_before_equal:
+                        self.TTL_NOSE_L = str_after_equal
+
+                    elif 'TTL_NOSE_R' == str_before_equal:
+                        self.TTL_NOSE_R = str_after_equal
+
+                    elif 'TTL_FOOD' == str_before_equal:
+                        self.TTL_NOSE_L = str_after_equal
 
                 elif currentlySetting == 'TONE1':#TONE1
                     if 'DURATION' in str_before_equal:
@@ -271,6 +310,55 @@ def load_expt_file(self):
 ##                            print("var_RATIO_reward: ",self.var_ratio_reward)
 ##                        except:
 ##                            print ("!!!!!!!!!!!VR must have the form '(10, 1,30,5)' in EXP PROOCOL file!!!!!!!!!!!!!!")
+
+                elif currentlySetting == "STIM":
+                    if 'STIM_ADDRESS_X' == str_before_equal or 'STIM_ADDRESS' == str_before_equal:
+                        self.stimAddressX = str_after_equal
+                    if 'STIM_ADDRESS_Y' == str_before_equal or 'STIM_ADDRESS_SHAM' == str_after_equal:
+                        self.stimAddressY = str_after_equal
+
+                elif currentlySetting == 'CLOSED_LOOP':
+                    if 'EVENTCHANNEL' in str_before_equal:
+                        self.CLCHANNEL = str_after_equal
+                    if 'MICROAMPS' in str_before_equal:
+                        self.CLMicroAmps = int(str_after_equal)
+
+                elif currentlySetting == 'ERP':
+                    if '[ERP]' == str_before_equal: # Defaults, should do this for all!
+                        self.INTER_PULSE_WIDTH = 4
+                        self.PUSLE_VAR = 1
+                        self.NUM_ERP_PULSE = 2
+                        self.NUM_ERP_LOCATIONS = 2
+                    if 'INTER_PULSE_WIDTH' == str_before_equal:
+                        self.INTER_PULSE_WIDTH = float(str_after_equal)
+                    if 'PULSE_VAR' == str_before_equal:
+                        self.PUSLE_VAR = float(str_after_equal)
+                    if 'NUM_PULSE' == str_before_equal:
+                        self.NUM_ERP_PULSE = int(str_after_equal)
+                    if 'NUM_LOCATIONS' == str_before_equal:
+                        self.NUM_ERP_LOCATIONS = int(str_after_equal)
+
+                elif currentlySetting == 'OPEN_LOOP':
+                    if "PHASE_DELAY" == str_before_equal:
+                        self.openLoopPhaseDelay = float(str_after_equal)
+
+                elif currentlySetting == 'PARAMETER_SWEEPING':
+                    if "INTENSITY" == str_before_equal:
+                        for c in '()':#Remove parenthesis from (x,y)
+                            str_after_equal = str_after_equal.replace(c, "")
+
+                        self.intensityArray = np.asarray(str_after_equal.split(","), dtype=np.float64)
+                    if "DURATION" == str_before_equal:
+                        for c in '()':#Remove parenthesis from (x,y)
+                            str_after_equal = str_after_equal.replace(c, "")
+
+                        self.durationArray = np.asarray(str_after_equal.split(","), dtype=np.float64)
+                    if "DELAY" == str_before_equal:
+                        self.paramDelay = float(str_after_equal)
+                    if "DELAY_VAR" == str_before_equal:
+                        self.paramDelayVar = float(str_after_equal)
+                    if "SET_SIZE" == str_before_equal:
+                        self.paramSetSize = int(str_after_equal)
 
                 elif currentlySetting == 'SHOCK':
                     if 'DURATION' in str_before_equal:
