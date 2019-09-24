@@ -10,8 +10,12 @@ TTL_LEVER_R = 2 # Can be TTL_*, * = NOSE_L/R, FOOD
 TTL_LEVER_L = 3
 
 [STIM]
-STIM_ADDRESS_X = Dev3/ao0 # Leading stim location
-STIM_ADDRESS_Y = Dev3/ao1 # Following stim location
+STIM_ADDRESS = Dev3/ao0 # Leading stim location
+STIM_ADDRESS_SHAM = Dev3/ao1 # Following stim location
+
+[CLOSED_LOOP]
+EVENTCHANNEL = 1
+MICROAMPS = 100
 
 [ERP]
 INTER_PULSE_WIDTH = 4
@@ -25,21 +29,19 @@ FOOD_LIGHT=TRUE
 REC=TRUE
 
 [PROTOCOL]
-RAW_PRE = 5 *60  # 5 min pre record to set thresholds
-
-ERP = PRE # ERP = Folder name
+RAW_PRE = 300  # 5 min pre record to set thresholds
 
 CLOSED_LOOP = TRUE # Begin closed loop stim thread
-PAUSE = 30 * 60 # closed loop for 30 minutes.  Stim at threshold crossing
+PAUSE = 1800 # closed loop for 30 minutes.  Stim at threshold crossing
 CLOSED_LOOP = FALSE # Kill thread
 
-PAUSE = 5 *60 # 5 min post
+PAUSE = 300 # 5 min post
 ERP = 5 # 5 = Folder name
 
-PAUSE = 10 * 60 # 15 min post
+PAUSE = 600 # 15 min post
 ERP = 15 # 15 = Folder name
 
-RAW_POST = 5*60
+RAW_POST = 300
 
 FAN_ON=FALSE
 CAB_LIGHT=FALSE
