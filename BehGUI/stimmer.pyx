@@ -17,7 +17,7 @@ from libc.stdlib cimport malloc, free
 # Dev3 for flavs computer
 sr = 1000000 # Sampling Rate (Hz)
 #amplitude = 1 # Amplitude (Volts) (change this to amps) , biphasic?
-width = .09 # duration of pulse (ms) # duration of pulse (ms)
+width = 0.09 # duration of pulse (ms) # duration of pulse (ms) .09
 ipi = 5 # inter-pulse interval (ms). output zero during this period,
 # if muliple waveforms, period = width + ipi
 #numPulse = 1
@@ -58,6 +58,11 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps):
   rcv = zmqClasses.RCVEvent(5557, [b'ttl', b'event'])
   voltage = microamps / 100
   npWave = createWaveform(voltage)
+  window = Tk()
+  winText = "Change location for closed loop!"
+  lbl = Label(window, text=winText, font=("Arial Bold", 100))
+  lbl.grid(column=0, row=0)
+  window.mainloop()
   stimSent = 0
   stimTime = time.perf_counter()
   while True:
@@ -65,10 +70,9 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps):
         backQ.get()
         break
     jsonStr = rcv.rcv()
-
     if jsonStr:
       if time.perf_counter() - stimTime > 1: # wait one second
-        if jsonStr['type'] == 'ttl' and jsonStr['channel'] == channel-1 and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
+        if jsonStr['type'] == 'ttl' and int(jsonStr['channel']) == int(channel)-1 and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
           if stimSent == 0: # last was sham, send stim now
             stimX.sendWaveform(npWave)
             q.put('Closed loop pulse sent,' + stimX.address)
@@ -88,20 +92,17 @@ def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIO
     npWave = createWaveform(1)
     randint = np.random.permutation(NUM_LOCATIONS)
     for i in randint:
-      print('hello! randint = ' + str(i))
       optText = ''
       if i == 0:
         optText = '(IL)'
       elif i == 1:
         optText = '(BLA)'
-      print('before messagebox')
       #messagebox.showinfo('LOCATION SWAP', 'Location #' + str(i) + ' (' + optText + ')')
       window = Tk()
       winText = "Change to location #" + str(i) + ' ' + optText
       lbl = Label(window, text=winText, font=("Arial Bold", 100))
       lbl.grid(column=0, row=0)
       window.mainloop()
-      print('after messagebox')
       for j in range(nERP):
         if not backQ.empty():
           backQ.get()

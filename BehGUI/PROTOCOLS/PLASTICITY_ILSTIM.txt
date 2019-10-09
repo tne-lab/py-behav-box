@@ -1,5 +1,5 @@
 [EXPERIMENT]
-EXPT_NAME = STIM_TEST # Don't use "-" in name, use underscores "_" instead
+EXPT_NAME = STIM_PLASTICITY # Don't use "-" in name, use underscores "_" instead
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
 [OPEN_EPHYS]
@@ -20,7 +20,7 @@ MICROAMPS = 100
 [ERP]
 INTER_PULSE_WIDTH = 4
 PUSLE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
-NUM_PULSE = 10 # number of pulses to region X
+NUM_PULSE = 30 # number of pulses to region X
 NUM_LOCATIONS = 2
 
 [SETUP]
@@ -30,17 +30,24 @@ FOOD_LIGHT=TRUE
 CAMERA=TRUE
 REC=TRUE
 
+# HALFED EVERYTHING SO WE CAN TRY TO GET THROUGH THE WHOLE THING!
+
 [PROTOCOL]
+RAW_PRE = 150  # 5 min pre record to set thresholds UNCOMMENT ME
+
 ERP = PRE # PRE = Folder name UNCOMMENT ME
 
 CLOSED_LOOP = TRUE # Begin closed loop stim thread
 PAUSE = 900 # closed loop for 30 minutes.  Stim at threshold crossing
 CLOSED_LOOP = FALSE # Kill thread
 
+RAW_POST = 150 # 5 min post (5 minute pause)
 ERP = 5 # 5 = Folder name (takes 10 minutes)
 
+RAW_POST = 450 # 15 min post (15 minutes pause)
 ERP = 30 # 30 = Folder name (takes 10 minutes)
 
+RAW_POST = 150 # 40 min post (5 minute pause)
 
 FAN_ON=FALSE
 CAB_LIGHT=FALSE
