@@ -4,7 +4,7 @@
   <INFO>
     <VERSION>0.4.5</VERSION>
     <PLUGIN_API_VERSION>5</PLUGIN_API_VERSION>
-    <DATE>25 Sep 2019 13:24:28</DATE>
+    <DATE>9 Oct 2019 11:14:50</DATE>
     <OS>Windows 7</OS>
     <MACHINE>EPHYS-2-PC</MACHINE>
   </INFO>
@@ -198,10 +198,11 @@
       </CHANNEL>
       <EVENTCHANNEL name="0" number="0"/>
       <EDITOR isCollapsed="0" displayName="Rhythm FPGA" SampleRate="17" SampleRateString="30.0 kS/s"
-              LowCut="1" HighCut="7500" ADCsOn="1" AudioOutputL="-1" AudioOutputR="-1"
-              NoiseSlicer="0" TTLFastSettle="1" DAC_TTL="0" DAC_HPF="1" DSPOffset="1"
-              DSPCutoffFreq="9.3882172206595999e-316" save_impedance_measurements="0"
-              auto_measure_impedances="0" LEDs="1" ClockDivideRatio="1">
+              LowCut="1.09766971131144" HighCut="7603.7651218333704" ADCsOn="1"
+              AudioOutputL="-1" AudioOutputR="-1" NoiseSlicer="0" TTLFastSettle="1"
+              DAC_TTL="0" DAC_HPF="1" DSPOffset="1" DSPCutoffFreq="0.14571292570770725"
+              save_impedance_measurements="0" auto_measure_impedances="0" LEDs="1"
+              ClockDivideRatio="1">
         <ADCRANGE Channel="0" Range="0"/>
         <ADCRANGE Channel="1" Range="0"/>
         <ADCRANGE Channel="2" Range="0"/>
@@ -350,14 +351,14 @@
         <TAB Active="0"/>
         <WINDOW Active="0"/>
         <VALUES inputChanId="36" outputChanId="2" bRising="1" bFalling="0" thresholdType="0"
-                threshold="0" indicatorChanName="" indicatorTarget="180" useIndicatorRange="1"
+                threshold="0.5" indicatorChanName="" indicatorTarget="180" useIndicatorRange="1"
                 indicatorRangeMin="-180" indicatorRangeMax="180" learningRate="0.02"
                 minLearningRate="0.005" decayRate="3e-005" useAdaptThreshRange="1"
                 adaptThreshRangeMin="-180" adaptThreshRangeMax="180" minThresh="-180"
                 maxThresh="180" thresholdChanId="2" pastPctExclusive="100" pastSpanExclusive="0"
                 futurePctExclusive="100" futureSpanExclusive="0" bJumpLimit="0"
                 jumpLimit="5" bBufferEndMask="0" bufferEndMask="3" durationMS="5"
-                timeoutMS="1000"/>
+                timeoutMS="0"/>
       </EDITOR>
     </PROCESSOR>
     <PROCESSOR name="Filters/Crossing Detector" insertionPoint="1" pluginName="Crossing Detector"
@@ -499,14 +500,14 @@
         <TAB Active="0"/>
         <WINDOW Active="0"/>
         <VALUES inputChanId="38" outputChanId="3" bRising="1" bFalling="0" thresholdType="0"
-                threshold="0" indicatorChanName="" indicatorTarget="180" useIndicatorRange="1"
+                threshold="0.5" indicatorChanName="" indicatorTarget="180" useIndicatorRange="1"
                 indicatorRangeMin="-180" indicatorRangeMax="180" learningRate="0.02"
                 minLearningRate="0.005" decayRate="3e-005" useAdaptThreshRange="1"
                 adaptThreshRangeMin="-180" adaptThreshRangeMax="180" minThresh="-180"
                 maxThresh="180" thresholdChanId="2" pastPctExclusive="100" pastSpanExclusive="0"
                 futurePctExclusive="100" futureSpanExclusive="0" bJumpLimit="0"
                 jumpLimit="5" bBufferEndMask="0" bufferEndMask="3" durationMS="5"
-                timeoutMS="1000"/>
+                timeoutMS="0"/>
       </EDITOR>
     </PROCESSOR>
     <PROCESSOR name="Filters/Common Avg Ref" insertionPoint="1" pluginName="Common Avg Ref"

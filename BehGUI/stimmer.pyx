@@ -17,7 +17,7 @@ from libc.stdlib cimport malloc, free
 # Dev3 for flavs computer
 sr = 1000000 # Sampling Rate (Hz)
 #amplitude = 1 # Amplitude (Volts) (change this to amps) , biphasic?
-width = 0.09 # duration of pulse (ms) # duration of pulse (ms) .09
+width = 0.9 # duration of pulse (ms) # duration of pulse (ms) .09
 ipi = 5 # inter-pulse interval (ms). output zero during this period,
 # if muliple waveforms, period = width + ipi
 #numPulse = 1
