@@ -3,7 +3,7 @@ EXPT_NAME = STIM_PLASTICITY # Don't use "-" in name, use underscores "_" instead
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
 [OPEN_EPHYS]
-OPEN_EPHYS_CONFIG_FILE = PLASTICITY.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
+OPEN_EPHYS_CONFIG_FILE = PLASTICITY_BLASTIM.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
 OPEN_EPHYS_PATH =  E:\GitHub\OE\plugin-GUI-private\Build\Release\open-ephys.exe # on Flav's PC Ephys-2
 TTL_STIM = 1 # Not used, only for your knowledge. Hardware used.
 TTL_LEVER_R = 2 # Can be TTL_*, * = NOSE_L/R, FOOD
@@ -32,17 +32,19 @@ REC=TRUE
 [PROTOCOL]
 RAW_PRE = 300  # 5 min pre record to set thresholds
 
+ERP = PRE # PRE = Folder name
+
 CLOSED_LOOP = TRUE # Begin closed loop stim thread
 PAUSE = 1800 # closed loop for 30 minutes.  Stim at threshold crossing
 CLOSED_LOOP = FALSE # Kill thread
 
-PAUSE = 300 # 5 min post
-ERP = 5 # 5 = Folder name
+RAW_POST = 300 # 5 min post (5 minute pause)
+ERP = 5 # 5 = Folder name (takes 10 minutes)
 
-PAUSE = 600 # 15 min post
-ERP = 15 # 15 = Folder name
+RAW_POST = 900 # 15 min post (15 minutes pause)
+ERP = 30 # 30 = Folder name (takes 10 minutes)
 
-RAW_POST = 300
+RAW_POST = 300 # 40 min post (5 minute pause)
 
 FAN_ON=FALSE
 CAB_LIGHT=FALSE

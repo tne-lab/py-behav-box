@@ -10,6 +10,7 @@ import EXPTFunctions
 import pyximport; pyximport.install()
 import stimmer
 import win32gui
+from tkinter import messagebox
 try:
     import daqAPI
 except:
@@ -487,6 +488,10 @@ class Experiment:
         ###############################
         # PAUSE
         ###############################
+        elif key == 'CONFIRM_STIM':
+                messagebox.showinfo('WARNING', 'Check for stim locations before starting closed loop!')
+                self.Protocol_ln_num +=1 #Go to next protocol item
+
         elif key == "PAUSE":
             if not self.PAUSE_STARTED:
                 try: # WAS A NUMBER
@@ -510,6 +515,7 @@ class Experiment:
                     elif "NOSEPOKE_TO_START" in protocolDict["PAUSE"]:
                         self.PAUSE_TIME = 1000.0
                         self.NOSEPOKE_TO_START = True
+
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
                 self.pause_start_time = time.perf_counter()
@@ -1103,6 +1109,9 @@ class Experiment:
                   self.no_actionPercentage = self.num_no_action/self.trial_num * 100
                   #print("No Action Taken")
                self.NEXT_TRIAL = True
+
+               if self.TOUCHSCREEN_USED and not self.PAUSE_STARTED:
+                  self.GUI.TSq.put('')
                ##############################################################
                # OUTCOMES (Specified in protocol files under [CONDITIONS])
                ##############################################################
@@ -1190,11 +1199,6 @@ class Experiment:
                else: #outcome == 'NONE'
                    self.log_event("NONE")
                    #print("Outcome = NONE")
-               if self.TOUCHSCREEN_USED and not self.PAUSE_STARTED:
-                   # Want to wait a second before blanking screen
-##                   if self.cur_time - self.touch_time > 1.0:
-##                       self.GUI.TSq.put('')
-                   self.GUI.TSq.put('')
 
                if self.NEXT_TRIAL == True:
                    self.TIME_IS_UP = False
