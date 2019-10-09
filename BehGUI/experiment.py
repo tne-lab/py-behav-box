@@ -637,7 +637,7 @@ class Experiment:
                     self.snd.send(self.snd.STOP_REC)
                     self.snd.changeVars(prependText = 'ERP_' + protocolDict[key])
                     self.snd.send(self.snd.START_REC)
-                    self.log_event("Starting ERP")
+                    self.log_event("Starting ERP, " + protocolDict[key])
                     self.STIM_ENABLED = True
                     self.stimQ = Queue()
                     self.stimBackQ = Queue()
@@ -663,7 +663,7 @@ class Experiment:
                     self.snd.changeVars(prependText = 'RAW_PRE')
                     self.snd.send(self.snd.START_REC)
                     self.PAUSE_TIME = float(protocolDict[key])
-                    self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec")
+                    self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec, RAW_PRE")
                     self.PAUSE_STARTED = True
                     self.pause_start_time = time.perf_counter()
 
@@ -684,7 +684,7 @@ class Experiment:
                     self.snd.changeVars(prependText = 'RAW_POST')
                     self.snd.send(self.snd.START_REC)
                     self.PAUSE_TIME = float(protocolDict[key])
-                    self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec")
+                    self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec, RAW_POST")
                     self.PAUSE_STARTED = True
                     self.pause_start_time = time.perf_counter()
 

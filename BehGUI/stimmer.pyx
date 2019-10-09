@@ -94,14 +94,11 @@ def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIO
         optText = '(IL)'
       elif i == 1:
         optText = '(BLA)'
-      print('before messagebox')
-      #messagebox.showinfo('LOCATION SWAP', 'Location #' + str(i) + ' (' + optText + ')')
       window = Tk()
       winText = "Change to location #" + str(i) + ' ' + optText
       lbl = Label(window, text=winText, font=("Arial Bold", 100))
       lbl.grid(column=0, row=0)
       window.mainloop()
-      print('after messagebox')
       for j in range(nERP):
         if not backQ.empty():
           backQ.get()
