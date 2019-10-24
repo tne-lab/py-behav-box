@@ -311,24 +311,24 @@ class Experiment:
         elif "EXTEND_LEVERS" in key:
             self.Protocol_ln_num +=1
             if protocolDict[key] == "L_LVR":
-                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,False)
+                GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,False)
             elif protocolDict[key] == "R_LVR":
-               GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",False,True)
+                GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",False,True)
             else:
                 val = str2bool(protocolDict[key])
                 if val: # EXTEND_LEVERS == True
-                   #print ("EXTEND LEVERS")
-                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,True)
-                   for lever in self.GUI.levers:
-                         lever.STATE = "OUT"
-                   for button in self.GUI.buttons:
+                    #print ("EXTEND LEVERS")
+                    GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,True)
+                    for lever in self.GUI.levers:
+                            lever.STATE = "OUT"
+                    for button in self.GUI.buttons:
                         if button.text == "EXTEND": button.text = "RETRACT"
                 else: # RETRACT LEVERS (EXTEND_LEVERS == False)
-                   #print ("RETRACT LEVERS")
-                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
-                   for lever in self.GUI.levers:
+                    #print ("RETRACT LEVERS")
+                    GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
+                    for lever in self.GUI.levers:
                         lever.STATE = "IN"
-                   for button in self.GUI.buttons:
+                    for button in self.GUI.buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
         ##############################
         #  TOUCHSCREEN  in RUNEXPT (DRAWS IMAGES)
@@ -571,7 +571,8 @@ class Experiment:
                         self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
-                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps)) # NEED TO UPDATE ADDRESS
+                        messagebox.showinfo('WARNING', 'Check for stim locations before starting closed loop!')
+                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps, self.STIM_LAG)) # NEED TO UPDATE ADDRESS
                         self.stim.start()
                         self.Protocol_ln_num += 1
                 else:

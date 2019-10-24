@@ -319,10 +319,21 @@ def load_expt_file(self):
                         self.stimAddressY = str_after_equal
 
                 elif currentlySetting == 'CLOSED_LOOP':
+                    if '[CLOSED_LOOP]' == str_before_equal: # Defaults, should do this for all!
+                        self.CLCHANNEL = 1
+                        self.CLMicroAmps = 100
+                        self.STIM_LAG = 0 # Default as fast as possible (milliseconds)
                     if 'EVENTCHANNEL' in str_before_equal:
                         self.CLCHANNEL = str_after_equal
                     if 'MICROAMPS' in str_before_equal:
                         self.CLMicroAmps = int(str_after_equal)
+                    if 'STIM_LAG' in str_before_equal: # note 7.5ms delay here
+                        stimLag = float(str_after_equal)
+                        if stimLag < 7.5:
+                            self.STIM_LAG = 0
+                        else:
+                            self.STIM_LAG = float(str_after_equal) - 7.5
+
 
                 elif currentlySetting == 'ERP':
                     if '[ERP]' == str_before_equal: # Defaults, should do this for all!
