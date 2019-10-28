@@ -50,7 +50,7 @@ def createWaveform(amplitude, numPulse = 1):
 
   return np.array(waveform, dtype=np.float64)
 
-def waitForEvent(stimX, stimY, q, backQ, channel, microamps):
+def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag):
   '''
   waiting for OPEN EPHYS trigger. then tells GUI that it sent the stim
   '''
@@ -58,11 +58,6 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps):
   rcv = zmqClasses.RCVEvent(5557, [b'ttl', b'event'])
   voltage = microamps / 100
   npWave = createWaveform(voltage)
-  window = Tk()
-  winText = "Change location for closed loop!"
-  lbl = Label(window, text=winText, font=("Arial Bold", 100))
-  lbl.grid(column=0, row=0)
-  window.mainloop()
   stimSent = 0
   stimTime = time.perf_counter()
   while True:
@@ -71,14 +66,18 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps):
         break
     jsonStr = rcv.rcv()
     if jsonStr:
-      if time.perf_counter() - stimTime > 1: # wait one second
+      if time.perf_counter() - stimTime > 0.99: # wait one second
         if jsonStr['type'] == 'ttl' and int(jsonStr['channel']) == int(channel)-1 and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
           if stimSent == 0: # last was sham, send stim now
+            if stimLag > 0:
+                time.sleep(stimLag)
             stimX.sendWaveform(npWave)
             q.put('Closed loop pulse sent,' + stimX.address)
             stimTime = time.perf_counter()
             stimSent = 1
           else:
+            if stimLag > 0:
+                time.sleep(stimLag)
             stimY.sendWaveform(npWave)
             q.put('Closed loop sham pulse sent,' + stimY.address)
             stimTime = time.perf_counter()
