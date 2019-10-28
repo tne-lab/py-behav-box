@@ -66,16 +66,18 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag):
         break
     jsonStr = rcv.rcv()
     if jsonStr:
-      if time.perf_counter() - stimTime > 1: # wait one second
+      if time.perf_counter() - stimTime > 0.99: # wait one second
         if jsonStr['type'] == 'ttl' and int(jsonStr['channel']) == int(channel)-1 and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
           if stimSent == 0: # last was sham, send stim now
-            time.sleep(stimLag)
+            if stimLag > 0:
+                time.sleep(stimLag)
             stimX.sendWaveform(npWave)
             q.put('Closed loop pulse sent,' + stimX.address)
             stimTime = time.perf_counter()
             stimSent = 1
           else:
-            time.sleep(stimLag)
+            if stimLag > 0:
+                time.sleep(stimLag)
             stimY.sendWaveform(npWave)
             q.put('Closed loop sham pulse sent,' + stimY.address)
             stimTime = time.perf_counter()

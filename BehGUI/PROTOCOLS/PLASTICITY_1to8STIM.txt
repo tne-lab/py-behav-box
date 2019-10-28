@@ -1,9 +1,9 @@
 [EXPERIMENT]
-EXPT_NAME = STIM_PLASTICITY # Don't use "-" in name, use underscores "_" instead
+EXPT_NAME = PLASTICITY_1to8_STIM # Don't use "-" in name, use underscores "_" instead
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
 [OPEN_EPHYS]
-OPEN_EPHYS_CONFIG_FILE = PLASTICITY_BLASTIM.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
+#OPEN_EPHYS_CONFIG_FILE = PLASTICITY_1to8STIM.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
 OPEN_EPHYS_PATH =  E:\GitHub\OE\plugin-GUI-private\Build\Release\open-ephys.exe # on Flav's PC Ephys-2
 TTL_STIM = 1 # Not used, only for your knowledge. Hardware used.
 TTL_LEVER_R = 2 # Can be TTL_*, * = NOSE_L/R, FOOD
@@ -16,36 +16,39 @@ STIM_ADDRESS_SHAM = Dev3/ao1 # Following stim location
 [CLOSED_LOOP]
 EVENTCHANNEL = 1
 MICROAMPS = 100
+STIM_LAG = 0
 
 [ERP]
 INTER_PULSE_WIDTH = 4
 PUSLE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
-NUM_PULSE = 50 # number of pulses to region X
+NUM_PULSE = 30 # number of pulses to region X
 NUM_LOCATIONS = 2
 
 [SETUP]
 FAN_ON=TRUE
 CAB_LIGHT=TRUE
 FOOD_LIGHT=TRUE
-CAMERA=TRUE
+#CAMERA=TRUE # Cam isnt working again..
 REC=TRUE
 
-[PROTOCOL]
-RAW_PRE = 300  # 5 min pre record to set thresholds
+# HALFED EVERYTHING SO WE CAN TRY TO GET THROUGH THE WHOLE THING!
 
-ERP = PRE # PRE = Folder name
+[PROTOCOL]
+#RAW_PRE = 30  # 5 min pre record to set thresholds UNCOMMENT ME
+
+#ERP = PRE # PRE = Folder name UNCOMMENT ME
 
 CLOSED_LOOP = TRUE # Begin closed loop stim thread
-PAUSE = 1800 # closed loop for 30 minutes.  Stim at threshold crossing
+PAUSE = 900 # closed loop for 30 minutes.  Stim at threshold crossing
 CLOSED_LOOP = FALSE # Kill thread
 
-RAW_POST = 300 # 5 min post (5 minute pause)
+RAW_POST = 150 # 5 min post (5 minute pause)
 ERP = 5 # 5 = Folder name (takes 10 minutes)
 
-RAW_POST = 900 # 15 min post (15 minutes pause)
+RAW_POST = 450 # 15 min post (15 minutes pause)
 ERP = 30 # 30 = Folder name (takes 10 minutes)
 
-RAW_POST = 300 # 40 min post (5 minute pause)
+RAW_POST = 150 # 40 min post (5 minute pause)
 
 FAN_ON=FALSE
 CAB_LIGHT=FALSE

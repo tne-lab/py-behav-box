@@ -80,8 +80,6 @@ def load_expt_file(self):
                     currentlySetting = 'BARPRESS'
                 elif '[STIM]' in str_before_equal:
                     currentlySetting = 'STIM'
-                elif '[CLOSED_LOOP]' in str_before_equal:
-                    currentlySetting = 'CLOSED_LOOP'
                 elif '[ERP]' in str_before_equal:
                     currentlySetting = 'ERP'
                 elif '[PROTOCOL' in str_before_equal:
@@ -332,7 +330,7 @@ def load_expt_file(self):
                         if stimLag < 7.5:
                             self.STIM_LAG = 0
                         else:
-                            self.STIM_LAG = float(str_after_equal) - 7.5
+                            self.STIM_LAG = (float(str_after_equal) - 7.5)/1000.0
 
 
                 elif currentlySetting == 'ERP':
