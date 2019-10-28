@@ -336,13 +336,13 @@ def load_expt_file(self):
                 elif currentlySetting == 'ERP':
                     if '[ERP]' == str_before_equal: # Defaults, should do this for all!
                         self.INTER_PULSE_WIDTH = 4
-                        self.PUSLE_VAR = 1
+                        self.PULSE_VAR = 1
                         self.NUM_ERP_PULSE = 2
                         self.NUM_ERP_LOCATIONS = 2
                     if 'INTER_PULSE_WIDTH' == str_before_equal:
                         self.INTER_PULSE_WIDTH = float(str_after_equal)
                     if 'PULSE_VAR' == str_before_equal:
-                        self.PUSLE_VAR = float(str_after_equal)
+                        self.PULSE_VAR = float(str_after_equal)
                     if 'NUM_PULSE' == str_before_equal:
                         self.NUM_ERP_PULSE = int(str_after_equal)
                     if 'NUM_LOCATIONS' == str_before_equal:

@@ -20,7 +20,7 @@ STIM_LAG = 0
 
 [ERP]
 INTER_PULSE_WIDTH = 4
-PUSLE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
+PULSE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
 NUM_PULSE = 30 # number of pulses to region X
 NUM_LOCATIONS = 2
 
