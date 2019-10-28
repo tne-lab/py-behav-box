@@ -94,9 +94,9 @@ def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIO
     for i in randint:
       optText = ''
       if i == 0:
-        optText = '(IL)'
+        optText = ',(CH 1-8)'
       elif i == 1:
-        optText = '(BLA)'
+        optText = ',(CH 9-16)'
       window = Tk()
       winText = "Change to location #" + str(i) + ' ' + optText
       lbl = Label(window, text=winText, font=("Arial Bold", 100))
@@ -107,7 +107,7 @@ def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIO
           backQ.get()
           break
         stimX.sendWaveform(npWave)
-        q.put('ERP stim, ' + str(i))
+        q.put('ERP stim, ' + str(i) + optText)
         # Wait for brain to return to normal before stimming again
         sleepLen = random.uniform(ERP_INTER_LOW, ERP_INTER_HIGH)
         time.sleep(sleepLen) # 4 +- 1 second

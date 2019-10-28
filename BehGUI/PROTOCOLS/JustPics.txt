@@ -27,10 +27,10 @@ Volume(0-1)	= 1.0
 
 [TOUCHSCREEN]
 IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
-COORDS=(141,275):(565,275)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+COORDS=(141,275):(640,275)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 # Image name: probability of reward on each trial
-IMG1= FLOWER.bmp:(0x100)
-IMG2= spider.bmp:(100x100)
+IMG1= spider.bmp:(0x100)
+IMG2= FLOWER.bmp:(100x100)
 TOUCH_BANDIT
 
 [SETUP]
@@ -49,6 +49,7 @@ R_CONDITIONING_LIGHT = False
 #  TONE1 # When Spider is high prob img
 #  PAUSE = 1  # to wait for tone to finish
  DRAW_IMAGES=True
+ PAUSE = 120
  CONDITIONS=0
  #IF WRONG PAUSE 5 with house light
   PAUSE = 3    # sec
@@ -61,4 +62,4 @@ FAN_ON=False
 
 [CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS.
 MAX_TIME, RESET,        CORRECT,        WRONG,   NO_ACTION
-60,       ON_RESPONSE,  PELLET_VAR,     DN_PUNISH,    NONE
+60,       FIXED,       PELLET_VAR,     DN_PUNISH,    NONE
