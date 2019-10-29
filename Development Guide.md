@@ -1,4 +1,4 @@
-# Py-Behav-Box Developement Guide
+# Py-Behav-Box Developement Guide v1.0
 
 ## Overview
 I view this code as split into two main classes with helper functions and one big helper function to load in files. BEH_GUI_MAIN creates a GUI class instance. Only one is created everytime you open the program and handles all interaction with the user. experiment creates a new expt class instance for every new experiment started. The user doesn't really directly interact with the expt class. The loadProtocol function is how we go from a txt file with the protocol and variables needed to something that the expt class can read. I've split this guide into three parts for each of those. 
