@@ -557,11 +557,11 @@ class Experiment:
                             self.log_event(self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
 
         elif "CLOSED_LOOP" == key:
-            val = str2bool(protocolDict[key]) or isNumber(protocolDict[key]) > 0
+            val = str2bool(protocolDict[key]) or self.isNumber(protocolDict[key]) > 0
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
                 if val:
                     if not self.STIM_ENABLED:
-                        if isNumber(protocolDict[key]):
+                        if self.isNumber(protocolDict[key]):
                             CLTimer = float(protocolDict[key])
                         else:
                             CLTimer = 9999999
@@ -569,15 +569,13 @@ class Experiment:
                         self.snd.send(self.snd.STOP_REC)
                         self.snd.changeVars(prependText = 'CLOSED_LOOP')
                         self.snd.send(self.snd.START_REC)
-                        self.log_event("Starting Closed Loop")
-                        if 
+                        self.log_event("Starting Closed Loop," + str(CLTimer))
                         self.STIM_ENABLED = True
                         self.stimX = daqAPI.AnalogOut(self.stimAddressX)
                         self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
-                        messagebox.showinfo('WARNING', 'Check for stim locations before starting closed loop!')
-                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps, self.CLLag, CLTimer, self.CLTimout, self.CLTimeoutVar)) # NEED TO UPDATE ADDRESS
+                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps, self.CLLag, CLTimer, self.CLTimeout, self.CLTimeoutVar)) # NEED TO UPDATE ADDRESS
                         self.stim.start()
                         self.Protocol_ln_num += 1
                 else:

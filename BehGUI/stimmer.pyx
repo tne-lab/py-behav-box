@@ -17,7 +17,7 @@ from libc.stdlib cimport malloc, free
 # Dev3 for flavs computer
 sr = 1000000 # Sampling Rate (Hz)
 #amplitude = 1 # Amplitude (Volts) (change this to amps) , biphasic?
-width = 0.9 # duration of pulse (ms) # duration of pulse (ms) .09
+width = 0.9 # duration of pulse (ms) # duration of pulse (ms) .9
 ipi = 5 # inter-pulse interval (ms). output zero during this period,
 # if muliple waveforms, period = width + ipi
 #numPulse = 1
@@ -59,16 +59,17 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, tim
   voltage = microamps / 100
   npWave = createWaveform(voltage)
   window = Tk()
-  winText = "Change to location for Closed Loop" 
+  winText = "Change to location for Closed Loop"
   lbl = Label(window, text=winText, font=("Arial Bold", 100))
   lbl.grid(column=0, row=0)
   window.mainloop()
-  timer = timer * 60
+  timer = timer
   stimSent = 0
   stimTime = time.perf_counter()
   startTime = stimTime
   timeoutHigh = timeout + timeoutVar # Set high and low timeout variables (so we don't stim at 1hz)
   timeoutLow = timeout - timeoutVar
+  curTimeout = random.uniform(timeoutHigh, timeoutLow)
   while True:
     if not backQ.empty():
         backQ.get()
@@ -76,6 +77,7 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, tim
     jsonStr = rcv.rcv()
     curTime = time.perf_counter()
     if curTime - startTime > timer: # Closed loop is over!
+      print('returned from closed loop')
       return
     if jsonStr:
       if curTime - stimTime > curTimeout: # wait one second
