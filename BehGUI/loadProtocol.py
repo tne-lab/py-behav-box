@@ -321,6 +321,9 @@ def load_expt_file(self):
                         self.CLCHANNEL = 1
                         self.CLMicroAmps = 100
                         self.STIM_LAG = 0 # Default as fast as possible (milliseconds)
+                        self.CLTimer = 30 # probably won't use this? Use experiment protocol Closed_loop = 30 to run for 30 minutes
+                        self.CLTimeout = 1
+                        self.CLTimeoutVar = 0.3
                     if 'EVENTCHANNEL' in str_before_equal:
                         self.CLCHANNEL = str_after_equal
                     if 'MICROAMPS' in str_before_equal:
@@ -328,9 +331,15 @@ def load_expt_file(self):
                     if 'STIM_LAG' in str_before_equal: # note 7.5ms delay here
                         stimLag = float(str_after_equal)
                         if stimLag < 7.5:
-                            self.STIM_LAG = 0
+                            self.CLLag = 0
                         else:
-                            self.STIM_LAG = (float(str_after_equal) - 7.5)/1000.0
+                            self.CLlag = (stimLag - 7.5)/1000.0
+                    if 'TIMER' in str_before_equal: # 
+                        self.CLTimer = float(str_after_equal)
+                    if 'TIMEOUT' in str_before_equal:
+                        self.CLTimout = float(str_after_equal)
+                    if 'TIMEOUTVAR' in str_before_equal:
+                        self.CLTimeoutVar = float(str_after_equal)
 
 
                 elif currentlySetting == 'ERP':

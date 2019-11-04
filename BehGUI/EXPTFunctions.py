@@ -161,21 +161,9 @@ def resetBox(self):
 
     GUIFunctions.EXTEND_LEVERS(self,"Levers_Retracted",False,False)
 
-####################################################################################
-#   Sending ttls to open ephys on behavioral events
-####################################################################################
-def sendTTL(self, ttlChan):
-    # Make sure the TTL channel is set so we only send ttls when sent.
-    if ttlChan != 0:
-        if ttlChan in self.TTL_ON:
-            # If no tread at this line started
-            if not self.TTL_ON[ttlChan]:
-                # Start thread (thread handles)
-                self.snd.sendTTL(True, ttlChan)
-                self.TTL_ON[ttlChan] = time.perf_counter()
-
-def checkToEndTTL(self):
-    # Loop through all current TTLs currently on. If over 10ms, turn off event.
-    for ttlChan, ttlStart in self.TTL_ON:
-        if time.perf_counter() - ttlStart > 10/1000:
-            self.snd.sendTTL(False, int(ttlChan))
+def isNumber(self, s):
+    try: 
+        float(s)
+        return True
+    except ValueError:
+        return False
