@@ -25,16 +25,13 @@ NUM_PULSE = 30 # number of pulses to region X
 NUM_LOCATIONS = 2
 
 [SETUP]
-FAN_ON=TRUE
-CAB_LIGHT=TRUE
-FOOD_LIGHT=TRUE
 #CAMERA=TRUE # Cam isnt working again..
 REC=TRUE
 
 # HALFED EVERYTHING SO WE CAN TRY TO GET THROUGH THE WHOLE THING!
 
 [PROTOCOL]
-RAW_PRE = 30  # 5 min pre record to set thresholds UNCOMMENT ME
+#RAW_PRE = 30  # 5 min pre record to set thresholds UNCOMMENT ME
 
 ERP = PRE # PRE = Folder name UNCOMMENT ME
 

@@ -4,7 +4,7 @@
   <INFO>
     <VERSION>0.4.5</VERSION>
     <PLUGIN_API_VERSION>5</PLUGIN_API_VERSION>
-    <DATE>10 Oct 2019 9:40:36</DATE>
+    <DATE>1 Nov 2019 10:31:46</DATE>
     <OS>Windows 7</OS>
     <MACHINE>EPHYS-2-PC</MACHINE>
   </INFO>
@@ -198,7 +198,7 @@
       </CHANNEL>
       <EVENTCHANNEL name="0" number="0"/>
       <EDITOR isCollapsed="0" displayName="Rhythm FPGA" SampleRate="17" SampleRateString="30.0 kS/s"
-              LowCut="1.8392965460350641" HighCut="7603.7651218333704" ADCsOn="1"
+              LowCut="1.9615616675223595" HighCut="7603.7651218333704" ADCsOn="1"
               AudioOutputL="-1" AudioOutputR="-1" NoiseSlicer="0" TTLFastSettle="1"
               DAC_TTL="0" DAC_HPF="1" DSPOffset="1" DSPCutoffFreq="0.14571292570770725"
               save_impedance_measurements="0" auto_measure_impedances="0" LEDs="1"
@@ -1165,7 +1165,7 @@
                 decayRate="3e-005" useAdaptThreshRange="1" adaptThreshRangeMin="-180"
                 adaptThreshRangeMax="180" minThresh="-180" maxThresh="180" thresholdChanId="1"
                 pastPctExclusive="100" pastSpanExclusive="0" futurePctExclusive="100"
-                futureSpanExclusive="0" bJumpLimit="1" jumpLimit="500" jumpSleepLimit="2"
+                futureSpanExclusive="0" bJumpLimit="1" jumpLimit="15" jumpSleepLimit="0.1"
                 bBufferEndMask="0" bufferEndMask="3" durationMS="5" timeoutMS="1000"/>
       </EDITOR>
     </PROCESSOR>
@@ -1314,8 +1314,8 @@
       <EDITOR isCollapsed="0" displayName="LFP Viewer" Type="LfpDisplayEditor">
         <TAB Active="1"/>
         <WINDOW Active="0"/>
-        <LFPDISPLAY Range="1000,2000,10.0" Timebase="2.0" Spread="40" colorGrouping="1"
-                    isInverted="0" drawMethod="0" EventButtonState="255" ChannelDisplayState="1111111111111111111111111111111111111111111"
+        <LFPDISPLAY Range="5000,2000,10.0" Timebase="4.0" Spread="40" colorGrouping="1"
+                    isInverted="0" drawMethod="0" EventButtonState="255" ChannelDisplayState="1011111111111111111111111111111111111111111"
                     ScrollX="0" ScrollY="0"/>
         <VALUES SubprocessorId="0"/>
       </EDITOR>
@@ -1462,15 +1462,14 @@
       <EDITOR isCollapsed="0" displayName="Event Broadcaster"/>
     </PROCESSOR>
   </SIGNALCHAIN>
-  <AUDIO sampleRate="48000" bufferSize="1024" deviceType="Windows Audio">
-    <DEVICESETUP deviceType="Windows Audio" audioOutputDeviceName="Speakers (Realtek High Definition Audio)"
-                 audioInputDeviceName="Microphone (Webcam 250)" audioDeviceRate="48000"
-                 audioDeviceBufferSize="1024" audioDeviceInChans="0"/>
+  <AUDIO sampleRate="192000" bufferSize="192" deviceType="ASIO">
+    <DEVICESETUP deviceType="ASIO" audioOutputDeviceName="ASIO4ALL v2" audioInputDeviceName="ASIO4ALL v2"
+                 audioDeviceRate="192000" audioDeviceBufferSize="192"/>
   </AUDIO>
   <RECORDING isRecordThreadEnabled="1"/>
   <GLOBAL_TIMESTAMP selected_index="0" selected_sub_index="0"/>
-  <CONTROLPANEL isOpen="0" recordPath="E:\GitHub\OE\plugin-GUI-private\Build\Release"
-                prependText="" appendText="" recordEngine="OPENEPHYS"/>
+  <CONTROLPANEL isOpen="0" recordPath="E:\PY-BEHAV-BOX\BEHGUI\DATA\PLASTICITY_9TO18_STIM\Nov_01_19\09-38"
+                prependText="RAW_POST" appendText="" recordEngine="OPENEPHYS"/>
   <AUDIOEDITOR isMuted="0" volume="0" noiseGate="0"/>
   <RECORDENGINES>
     <ENGINE id="OPENEPHYS" name="Open Ephys">

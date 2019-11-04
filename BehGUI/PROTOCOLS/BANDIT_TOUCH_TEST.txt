@@ -29,8 +29,8 @@ Volume(0-1)	= 1.0
 IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
 COORDS=(141,275):(565,275)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 # Image name: probability of reward on each trial
-IMG1= FLOWER.bmp:(0x100)
-IMG2= spider.bmp:(100x100)
+IMG1= LEAF.bmp:(100x120)
+IMG2= scissors.bmp:(0x120)
 TOUCH_BANDIT
 
 [SETUP]
@@ -50,7 +50,7 @@ R_CONDITIONING_LIGHT = False
 #  PAUSE = 1  # to wait for tone to finish
  DRAW_IMAGES=True
  CONDITIONS=0
- #IF WRONG PAUSE 5 with house light
+ #IF WRONG PAUSE 8 with house light
   PAUSE = 3    # sec
 END_LOOP
 
