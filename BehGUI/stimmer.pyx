@@ -63,6 +63,7 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, tim
   lbl = Label(window, text=winText, font=("Arial Bold", 100))
   lbl.grid(column=0, row=0)
   window.mainloop()
+  q.put('CONTINUE')
   timer = timer
   stimSent = 0
   stimTime = time.perf_counter()

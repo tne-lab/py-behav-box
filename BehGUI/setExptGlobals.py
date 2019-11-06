@@ -32,13 +32,13 @@ def setExptGlobals(self):
     ################################################################
     # STIM PARAMETERS
     ################################################################
-    self.STIM_ENABLED = False
     self.NUM_PULSE_X = 0
     self.NUM_PULSE_Y = 0
     self.stimAddressY = 'Dev3/ao1'
     self.stimAddressX = 'Dev3/ao0'
     self.stimX = None
     self.stimY = None
+    self.stim = None # Stim thread to none
     self.phaseDelay = 0
     self.paramDelay = 0
     self.paramDelayVar = 0
