@@ -39,6 +39,7 @@ def setExptGlobals(self):
     self.stimX = None
     self.stimY = None
     self.stim = None # Stim thread to none
+    self.CL_Enabled = False
     self.phaseDelay = 0
     self.paramDelay = 0
     self.paramDelayVar = 0

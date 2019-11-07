@@ -214,6 +214,9 @@ class Experiment:
         '''
         protocolDict = self.protocol[self.Protocol_ln_num]
         key = list(protocolDict.keys())[0] # First key in protocolDict
+        if self.CL_Enabled and self.stim is not None and not self.stim.is_alive():
+            self.CL_Enabled = False
+            self.stim = None
         #cur_time = time.perf_counter()
         if key == "":
             self.Protocol_ln_num +=1
@@ -573,6 +576,7 @@ class Experiment:
                         self.stimBackQ = Queue()
                         self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps, self.CLLag, CLTimer, self.CLTimeout, self.CLTimeoutVar)) # NEED TO UPDATE ADDRESS
                         self.stim.start()
+                        self.CL_Enabled = True
                         #self.Protocol_ln_num += 1 # Doing this from check q function. Gross but works
                 else: # Can still use CLOSED_LOOP=False to kill the stim
                     self.stimBackQ.put('STOP')
@@ -659,7 +663,7 @@ class Experiment:
             else:
                 self.log_event("ERP Starting Failed, fix DAQ")
                 self.endExpt()
-        elif "RAW" == key[:3]
+        elif "RAW" == key[:3]:
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
                 if not self.PAUSE_STARTED:
                     self.snd.send(self.snd.STOP_REC)
@@ -679,6 +683,13 @@ class Experiment:
             else:
                 self.log_event("Raw recording failed, fix DAQ")
                 self.endExpt()
+
+        elif key == "CONDITIONS":
+            self.runConditions(protocolDict)
+
+        else:
+            print("PROTOCOL ITEM NOT RECOGNIZED",key)
+            self.Protocol_ln_num += 1
 
         ''' # Improved raw recording above Delete below after testing
         elif "RAW_PRE" == key:
@@ -724,12 +735,7 @@ class Experiment:
                 self.endExpt()
         '''
 
-        elif key == "CONDITIONS":
-            self.runConditions(protocolDict)
 
-        else:
-            print("PROTOCOL ITEM NOT RECOGNIZED",key)
-            self.Protocol_ln_num += 1
 
         #########################################################################################
         # RUN BAR PRESS INDEPENDENT OF PROTOCOLS OR CONDTIONS

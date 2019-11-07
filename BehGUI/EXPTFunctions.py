@@ -94,6 +94,7 @@ def checkQs(self):
         while not self.stimQ.empty():
             stim = self.stimQ.get() # What do we want here?
             if stim == "CONTINUE":
+                print('moving on from CL wait')
                 self.Protocol_ln_num+=1
             else:
                 self.log_event(stim)

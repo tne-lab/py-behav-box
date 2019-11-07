@@ -19,29 +19,26 @@ MICROAMPS = 100
 
 
 [ERP]
-INTER_PULSE_WIDTH = 4
-PULSE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
-NUM_PULSE = 30 # number of pulses to region X
+INTER_PULSE_WIDTH = 1
+PULSE_VAR = 0.2 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
+NUM_PULSE = 2 # number of pulses to region X
 NUM_LOCATIONS = 2
 
 [SETUP]
-FAN_ON=TRUE
-CAB_LIGHT=TRUE
-FOOD_LIGHT=TRUE
 #CAMERA=TRUE # Cam isnt working again..
 REC=TRUE
 
 # HALFED EVERYTHING SO WE CAN TRY TO GET THROUGH THE WHOLE THING!
 
 [PROTOCOL]
-#RAW_PRE = 30  # 5 min pre record to set thresholds UNCOMMENT ME
+#RAW_PRE = 5  # 5 min pre record to set thresholds UNCOMMENT ME
 
-#ERP = PRE # PRE = Folder name UNCOMMENT ME
+ERP = PRE # PRE = Folder name UNCOMMENT ME
 
-CLOSED_LOOP = 60 # Begin closed loop stim thread for x minutes!
-PAUSE = 60
+CLOSED_LOOP = 5 # Begin closed loop stim thread for x minutes!
+PAUSE = 5
 
-RAW_POST = 150 # 5 min post (5 minute pause)
+RAW_POST = 1 # 5 min post (5 minute pause)
 ERP = 5 # 5 = Folder name (takes 10 minutes)
 
 RAW_POST = 450 # 15 min post (15 minutes pause)

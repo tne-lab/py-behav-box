@@ -4,7 +4,7 @@
   <INFO>
     <VERSION>0.4.5</VERSION>
     <PLUGIN_API_VERSION>5</PLUGIN_API_VERSION>
-    <DATE>10 Oct 2019 9:41:37</DATE>
+    <DATE>5 Nov 2019 7:17:04</DATE>
     <OS>Windows 7</OS>
     <MACHINE>EPHYS-2-PC</MACHINE>
   </INFO>
@@ -198,7 +198,7 @@
       </CHANNEL>
       <EVENTCHANNEL name="0" number="0"/>
       <EDITOR isCollapsed="0" displayName="Rhythm FPGA" SampleRate="17" SampleRateString="30.0 kS/s"
-              LowCut="1.3217748361428077" HighCut="7603.7651218333704" ADCsOn="1"
+              LowCut="1.5778451369336692" HighCut="7603.7651218333704" ADCsOn="1"
               AudioOutputL="-1" AudioOutputR="-1" NoiseSlicer="0" TTLFastSettle="1"
               DAC_TTL="0" DAC_HPF="1" DSPOffset="1" DSPCutoffFreq="0.14571292570770725"
               save_impedance_measurements="0" auto_measure_impedances="0" LEDs="1"
@@ -518,11 +518,11 @@
         <GROUPSTATE reference="1" affected="1"/>
       </CHANNEL>
       <CHANNEL name="1" number="1">
-        <SELECTIONSTATE param="1" record="1" audio="0"/>
+        <SELECTIONSTATE param="0" record="1" audio="0"/>
         <GROUPSTATE reference="0" affected="1"/>
       </CHANNEL>
       <CHANNEL name="2" number="2">
-        <SELECTIONSTATE param="1" record="1" audio="0"/>
+        <SELECTIONSTATE param="0" record="1" audio="0"/>
         <GROUPSTATE reference="0" affected="1"/>
       </CHANNEL>
       <CHANNEL name="3" number="3">
@@ -530,19 +530,19 @@
         <GROUPSTATE reference="1" affected="1"/>
       </CHANNEL>
       <CHANNEL name="4" number="4">
-        <SELECTIONSTATE param="1" record="1" audio="0"/>
+        <SELECTIONSTATE param="0" record="1" audio="0"/>
         <GROUPSTATE reference="0" affected="1"/>
       </CHANNEL>
       <CHANNEL name="5" number="5">
-        <SELECTIONSTATE param="1" record="1" audio="0"/>
+        <SELECTIONSTATE param="0" record="1" audio="0"/>
         <GROUPSTATE reference="0" affected="1"/>
       </CHANNEL>
       <CHANNEL name="6" number="6">
-        <SELECTIONSTATE param="1" record="1" audio="0"/>
+        <SELECTIONSTATE param="0" record="1" audio="0"/>
         <GROUPSTATE reference="0" affected="1"/>
       </CHANNEL>
       <CHANNEL name="7" number="7">
-        <SELECTIONSTATE param="1" record="1" audio="0"/>
+        <SELECTIONSTATE param="0" record="1" audio="0"/>
         <GROUPSTATE reference="0" affected="1"/>
       </CHANNEL>
       <CHANNEL name="8" number="8">
@@ -1165,8 +1165,8 @@
                 decayRate="3e-005" useAdaptThreshRange="1" adaptThreshRangeMin="-180"
                 adaptThreshRangeMax="180" minThresh="-180" maxThresh="180" thresholdChanId="1"
                 pastPctExclusive="100" pastSpanExclusive="0" futurePctExclusive="100"
-                futureSpanExclusive="0" bJumpLimit="1" jumpLimit="5" jumpSleepLimit="0"
-                bBufferEndMask="0" bufferEndMask="3" durationMS="5" timeoutMS="1000"/>
+                futureSpanExclusive="0" bJumpLimit="1" jumpLimit="15" jumpSleepLimit="0.1"
+                bBufferEndMask="0" bufferEndMask="3" durationMS="5" timeoutMS="0"/>
       </EDITOR>
     </PROCESSOR>
     <PROCESSOR name="Utilities/Splitter" insertionPoint="1" pluginName="Splitter"
@@ -1468,8 +1468,8 @@
   </AUDIO>
   <RECORDING isRecordThreadEnabled="1"/>
   <GLOBAL_TIMESTAMP selected_index="0" selected_sub_index="0"/>
-  <CONTROLPANEL isOpen="0" recordPath="E:\GitHub\OE\plugin-GUI-private\Build\Release"
-                prependText="" appendText="" recordEngine="OPENEPHYS"/>
+  <CONTROLPANEL isOpen="0" recordPath="E:\PY-BEHAV-BOX\BEHGUI\DATA\PLASTICITY_TEST\Nov_04_19\15-01"
+                prependText="RAW_POST" appendText="" recordEngine="OPENEPHYS"/>
   <AUDIOEDITOR isMuted="0" volume="0" noiseGate="0"/>
   <RECORDENGINES>
     <ENGINE id="OPENEPHYS" name="Open Ephys">

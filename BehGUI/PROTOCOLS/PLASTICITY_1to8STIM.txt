@@ -25,22 +25,19 @@ NUM_PULSE = 30 # number of pulses to region X
 NUM_LOCATIONS = 2
 
 [SETUP]
-FAN_ON=TRUE
-CAB_LIGHT=TRUE
-FOOD_LIGHT=TRUE
 #CAMERA=TRUE # Cam isnt working again..
 REC=TRUE
 
 # HALFED EVERYTHING SO WE CAN TRY TO GET THROUGH THE WHOLE THING!
 
 [PROTOCOL]
-RAW_PRE = 30  # 5 min pre record to set thresholds UNCOMMENT ME
+#RAW_PRE = 30  # 5 min pre record to set thresholds
 
-ERP = PRE # PRE = Folder name UNCOMMENT ME
+ERP = PRE # PRE = Folder name
 
-CLOSED_LOOP = TRUE # Begin closed loop stim thread
+CLOSED_LOOP = 900 # Begin closed loop stim thread
 PAUSE = 900 # closed loop for 30 minutes.  Stim at threshold crossing
-CLOSED_LOOP = FALSE # Kill thread
+#CLOSED_LOOP = FALSE # Kill thread
 
 RAW_POST = 150 # 5 min post (5 minute pause)
 ERP = 5 # 5 = Folder name (takes 10 minutes)

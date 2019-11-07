@@ -15,9 +15,9 @@ import zmqClasses
 from libc.stdlib cimport malloc, free
 
 # Dev3 for flavs computer
-sr = 1000000 # Sampling Rate (Hz)
+sr = 3000000 # Sampling Rate (Hz)
 #amplitude = 1 # Amplitude (Volts) (change this to amps) , biphasic?
-width = 0.9 # duration of pulse (ms) # duration of pulse (ms) .9
+width = 0.09 # duration of pulse (ms) # duration of pulse (ms) .9
 ipi = 5 # inter-pulse interval (ms). output zero during this period,
 # if muliple waveforms, period = width + ipi
 #numPulse = 1
@@ -35,7 +35,7 @@ def createWaveform(amplitude, numPulse = 1):
   period = widthSamp + ipiSamp
 
   for num in range(int(numPulse)):
-      for i in range(int(phaseShift/360.0 * period)):
+      for i in range(int(phaseShift/360.0 * ipiSamp)):
           waveform.append(0)
       for i in range(widthSamp):
           if biphasic:
@@ -45,7 +45,7 @@ def createWaveform(amplitude, numPulse = 1):
                   waveform.append(negAmplitude)
           else:
               waveform.append(amplitude)
-      for i in range(int((360-phaseShift)/360.0 * period)):
+      for i in range(int((360-phaseShift)/360.0 * ipiSamp)):
           waveform.append(0)
 
   return np.array(waveform, dtype=np.float64)
@@ -64,6 +64,7 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, tim
   lbl.grid(column=0, row=0)
   window.mainloop()
   q.put('CONTINUE')
+  time.sleep(1) # wait a sec to deal with edge cases
   timer = timer
   stimSent = 0
   stimTime = time.perf_counter()
