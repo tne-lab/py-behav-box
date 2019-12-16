@@ -64,7 +64,7 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, tim
   lbl.grid(column=0, row=0)
   window.mainloop()
   q.put('CONTINUE')
-  time.sleep(1) # wait a sec to deal with edge cases
+  #time.sleep(1) # wait a sec to deal with edge cases
   timer = timer
   stimSent = 0
   stimTime = time.perf_counter()
