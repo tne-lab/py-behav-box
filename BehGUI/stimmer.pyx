@@ -17,7 +17,7 @@ from libc.stdlib cimport malloc, free
 # Dev3 for flavs computer
 sr = 1000000 # Sampling Rate (Hz)
 #amplitude = 1 # Amplitude (Volts) (change this to amps) , biphasic?
-width = 0.9 # duration of pulse (ms) # duration of pulse (ms) .09
+width = 0.9 # duration of pulse (ms) # duration of pulse (ms) .9
 ipi = 5 # inter-pulse interval (ms). output zero during this period,
 # if muliple waveforms, period = width + ipi
 #numPulse = 1
@@ -50,7 +50,7 @@ def createWaveform(amplitude, numPulse = 1):
 
   return np.array(waveform, dtype=np.float64)
 
-def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag):
+def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, timeout, timeoutVar):
   '''
   waiting for OPEN EPHYS trigger. then tells GUI that it sent the stim
   '''
@@ -58,15 +58,29 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag):
   rcv = zmqClasses.RCVEvent(5557, [b'ttl', b'event'])
   voltage = microamps / 100
   npWave = createWaveform(voltage)
+  window = Tk()
+  winText = "Change to location for Closed Loop"
+  lbl = Label(window, text=winText, font=("Arial Bold", 100))
+  lbl.grid(column=0, row=0)
+  window.mainloop()
+  timer = timer
   stimSent = 0
   stimTime = time.perf_counter()
+  startTime = stimTime
+  timeoutHigh = timeout + timeoutVar # Set high and low timeout variables (so we don't stim at 1hz)
+  timeoutLow = timeout - timeoutVar
+  curTimeout = random.uniform(timeoutHigh, timeoutLow)
   while True:
     if not backQ.empty():
         backQ.get()
         break
     jsonStr = rcv.rcv()
+    curTime = time.perf_counter()
+    if curTime - startTime > timer: # Closed loop is over!
+      print('returned from closed loop')
+      return
     if jsonStr:
-      if time.perf_counter() - stimTime > 0.99: # wait one second
+      if curTime - stimTime > curTimeout: # wait one second
         if jsonStr['type'] == 'ttl' and int(jsonStr['channel']) == int(channel)-1 and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
           if stimSent == 0: # last was sham, send stim now
             if stimLag > 0:
@@ -75,6 +89,7 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag):
             q.put('Closed loop pulse sent,' + stimX.address)
             stimTime = time.perf_counter()
             stimSent = 1
+            curTimeout = random.uniform(timeoutHigh, timeoutLow)
           else:
             if stimLag > 0:
                 time.sleep(stimLag)
@@ -82,6 +97,7 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag):
             q.put('Closed loop sham pulse sent,' + stimY.address)
             stimTime = time.perf_counter()
             stimSent = 0
+            curTimeout = random.uniform(timeoutHigh, timeoutLow)
 
 def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIONS):
     '''
