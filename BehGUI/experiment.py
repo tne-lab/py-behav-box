@@ -837,7 +837,7 @@ class Experiment:
         #  PROTOCOL ENDED (Reset everything for next run
         #########################################################
         #print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.max_time * 60.0, " sec")
-        if self.cur_time >= self.MAX_EXPT_TIME * 60.0: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
+        if self.cur_time >= self.MAX_EXPT_TIME * 10000.0: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
             self.log_event("Exceeded MAX_EXPT_TIME")
             print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX_EXPT_TIME: ",self.MAX_EXPT_TIME)
             self.log_event("PROTOCOL ENDED-max time exceeded")

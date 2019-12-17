@@ -13,15 +13,20 @@ TTL_LEVER_L = 3
 STIM_ADDRESS = Dev3/ao0 # Leading stim location
 STIM_ADDRESS_SHAM = Dev3/ao1 # Following stim location
 
+
 [CLOSED_LOOP]
 EVENTCHANNEL = 1
-MICROAMPS = 100
-STIM_LAG = 0
+############################################
+MICROAMPS = 200
+STIM_LAG = 20
+############################################
+TIMEOUT = 1 # How many seconds in between event  stims
+TIMEOUT_VAR = 0.2 # Variation in seconds for timeout
 
 [ERP]
 INTER_PULSE_WIDTH = 4
 PULSE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
-NUM_PULSE = 30 # number of pulses to region X
+NUM_PULSE = 50 # number of pulses to region X
 NUM_LOCATIONS = 2
 
 [SETUP]
@@ -31,21 +36,21 @@ REC=TRUE
 # HALFED EVERYTHING SO WE CAN TRY TO GET THROUGH THE WHOLE THING!
 
 [PROTOCOL]
-#RAW_PRE = 30  # 5 min pre record to set thresholds
+#RAW_PRE = 300  # 5 min pre record to set thresholds
 
 ERP = PRE # PRE = Folder name
 
-CLOSED_LOOP = 900 # Begin closed loop stim thread
-PAUSE = 900 # closed loop for 30 minutes.  Stim at threshold crossing
+CLOSED_LOOP = 1800 # Begin closed loop stim thread
+PAUSE = 1800 # closed loop for 30 minutes.  Stim at threshold crossing
 #CLOSED_LOOP = FALSE # Kill thread
 
-RAW_POST = 150 # 5 min post (5 minute pause)
+RAW_POST = 300 # 5 min post (5 minute pause)
 ERP = 5 # 5 = Folder name (takes 10 minutes)
 
-RAW_POST = 450 # 15 min post (15 minutes pause)
+RAW_POST = 900 # 15 min post (15 minutes pause)
 ERP = 30 # 30 = Folder name (takes 10 minutes)
 
-RAW_POST = 150 # 40 min post (5 minute pause)
+#RAW_POST = 300 # 40 min post (5 minute pause)
 
 FAN_ON=FALSE
 CAB_LIGHT=FALSE
