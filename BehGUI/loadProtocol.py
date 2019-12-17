@@ -320,7 +320,11 @@ def load_expt_file(self):
                     if '[CLOSED_LOOP]' == str_before_equal: # Defaults, should do this for all!
                         self.CLCHANNEL = 1
                         self.CLMicroAmps = 100
-                        self.STIM_LAG = 0 # Default as fast as possible (milliseconds)
+                        self.CLLag = 0 # Default as fast as possible (milliseconds)
+                        self.CLTimer = 30 # probably won't use this? Use experiment protocol Closed_loop = 30 to run for 30 minutes
+                        self.CLTimeout = 1
+                        self.CLTimeoutVar = 0.2
+                        self.CL_Enabled = False
                     if 'EVENTCHANNEL' in str_before_equal:
                         self.CLCHANNEL = str_after_equal
                     if 'MICROAMPS' in str_before_equal:
@@ -555,7 +559,9 @@ def create_files(self):
     ###### EXPT COPY FILE #####
     new_dir = os.path.join(self.GUI.datapath,self.GUI.Expt_Name)
     if not os.path.exists(new_dir ):  os.mkdir(new_dir)
-    new_sub_dir = os.path.join(new_dir,self.date)
+    new_sub_dir = os.path.join(new_dir,self.GUI.Subject)
+    if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
+    new_sub_dir = os.path.join(new_sub_dir,self.date)
     if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
     new_sub_dir = os.path.join(new_sub_dir,self.exptTime)
     if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)

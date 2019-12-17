@@ -100,11 +100,15 @@ def checkQs(self):
             OEMsg = self.openEphysBack_q.get()
             #self.log_event(str(OEMsg))
 
-    if self.STIM_ENABLED:
+    if self.stim is not None and self.stim.is_alive():
         ### CHECK STIM Q ###
         while not self.stimQ.empty():
             stim = self.stimQ.get() # What do we want here?
-            self.log_event(stim)
+            if stim == "CONTINUE":
+                print('moving on from CL wait')
+                self.Protocol_ln_num+=1
+            else:
+                self.log_event(stim)
 
 
 ###########################################################################################################
@@ -145,6 +149,7 @@ def log_event(self,event, event_other=''):
 #   Make sure everything in box is back to false (Called with self.GUI)
 ####################################################################################
 def resetBox(self):
+    # TODO: Create list of DaqAPI elements and loop through them and turn off here (bitwise, bytewise lists)
     self.fan.sendDBit(False)
     self.cabin_light.sendDBit(False)
     if 'EPHYS-2' in self.computer:
@@ -156,8 +161,6 @@ def resetBox(self):
 
     self.L_condition_Lt.sendDBit(False)
     self.R_condition_Lt.sendDBit(False)
-
-    if self.STIM_ENABLED: self.stim.terminate()
 
     GUIFunctions.EXTEND_LEVERS(self,"Levers_Retracted",False,False)
 

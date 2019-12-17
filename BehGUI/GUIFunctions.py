@@ -120,16 +120,16 @@ def CAB_LIGHT(self, ON_OFF):
     gray        = (100,100,100)
     darkgray    = (50,50,50)
     if ON_OFF: # ON
-       if self.EXPT_LOADED: self.expt.log_event("Cabin Light ON")
-       Background_color = gray
-       #self.cabin_light = daqAPI.cabinLightSetup()
-       if self.NIDAQ_AVAILABLE:  self.cabin_light.sendDBit(True)
+        if self.EXPT_LOADED: self.expt.log_event("Cabin Light ON")
+        Background_color = gray
+        #self.cabin_light = daqAPI.cabinLightSetup()
+        if self.NIDAQ_AVAILABLE:  self.cabin_light.sendDBit(True)
 
     else: # ON_OFF = False
-       if self.EXPT_LOADED: self.expt.log_event("Cabin Light OFF")
-       Background_color = darkgray
-       if self.NIDAQ_AVAILABLE: self.cabin_light.sendDBit(False)
-       #self.cabin_light.end()
+        if self.EXPT_LOADED: self.expt.log_event("Cabin Light OFF")
+        Background_color = darkgray
+        if self.NIDAQ_AVAILABLE: self.cabin_light.sendDBit(False)
+        #self.cabin_light.end()
     return Background_color
 
 
@@ -162,36 +162,36 @@ def EXTEND_LEVERS(self, text, L_LVR, R_LVR):
 
 def L_CONDITIONING_LIGHT(self, ON_OFF):
     if ON_OFF : # ON
-       if self.EXPT_LOADED: self.expt.log_event("Left_Light_ON")
-       if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(True)
+        if self.EXPT_LOADED: self.expt.log_event("Left_Light_ON")
+        if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(True)
 
     else: # ON_OFF = False
-       if self.EXPT_LOADED: self.expt.log_event("Left_Light_OFF")
-       if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(False)
+        if self.EXPT_LOADED: self.expt.log_event("Left_Light_OFF")
+        if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(False)
 
 def R_CONDITIONING_LIGHT(self, ON_OFF):
     if ON_OFF: # ON
-       if self.EXPT_LOADED: self.expt.log_event("Right_Light_ON")
-       if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(True)
+        if self.EXPT_LOADED: self.expt.log_event("Right_Light_ON")
+        if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(True)
 
     else: # ON_OFF = False
-       if self.EXPT_LOADED: self.expt.log_event("Right_Light_OFF")
-       if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(False)
+        if self.EXPT_LOADED: self.expt.log_event("Right_Light_OFF")
+        if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(False)
 
 def Food_Light_ONOFF(self, ON_OFF):
     gray = (100,100,100)
     black = (0,0,0)
     if ON_OFF: # ON
-          fill_color = gray
-          LEDsONOFF = "ON"
-          if self.EXPT_LOADED: self.expt.log_event("Feeder_Light_ON")
-          if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(True)
+        fill_color = gray
+        LEDsONOFF = "ON"
+        if self.EXPT_LOADED: self.expt.log_event("Feeder_Light_ON")
+        if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(True)
 
     else:
-          fill_color = black
-          LEDsONOFF = "OFF"
-          if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(False)
-          if self.EXPT_LOADED: self.expt.log_event("Feeder_Light_OFF")
+        fill_color = black
+        LEDsONOFF = "OFF"
+        if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(False)
+        if self.EXPT_LOADED: self.expt.log_event("Feeder_Light_OFF")
 
     return fill_color,LEDsONOFF
 
@@ -234,24 +234,24 @@ def exit_game(self):
 
     #Close all NIDAQ tasks
     if self.NIDAQ_AVAILABLE:
-      self.fan.end()
-      self.cabin_light.end()
-      if 'EPHYS-2' in self.computer:
-          self.food_light.end()
-      if 'EPHYS-1' in self.computer:
-          self.low_tone.end()
-      self.give_food.end()
-      self.eaten.end()
+        self.fan.end()
+        self.cabin_light.end()
+        if 'EPHYS-2' in self.computer:
+            self.food_light.end()
+        if 'EPHYS-1' in self.computer:
+            self.low_tone.end()
+        self.give_food.end()
+        self.eaten.end()
 
-      self.leverOut.end()
+        self.leverOut.end()
 
-      self.L_condition_Lt.end()
-      self.R_condition_Lt.end()
-      #self.high_tone.end()
-      self.L_nose_poke.end()
-      self.R_nose_poke.end()
-      self.checkPressLeft.end()
-      self.checkPressRight.end()
+        self.L_condition_Lt.end()
+        self.R_condition_Lt.end()
+        #self.high_tone.end()
+        self.L_nose_poke.end()
+        self.R_nose_poke.end()
+        self.checkPressLeft.end()
+        self.checkPressRight.end()
 
     pygame.quit()
     sys.exit()

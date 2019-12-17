@@ -214,6 +214,9 @@ class Experiment:
         '''
         protocolDict = self.protocol[self.Protocol_ln_num]
         key = list(protocolDict.keys())[0] # First key in protocolDict
+        if self.CL_Enabled and self.stim is not None and not self.stim.is_alive():
+            self.CL_Enabled = False
+            self.stim = None
         #cur_time = time.perf_counter()
         if key == "":
             self.Protocol_ln_num +=1
@@ -497,23 +500,20 @@ class Experiment:
                 try: # WAS A NUMBER
                     self.PAUSE_TIME = float(protocolDict["PAUSE"])
                 except: # NOT A NUMBER. MUST BE VI_TIMES
+                    self.PAUSE_TIME = 1000.0
                     if "HABITUATION" in protocolDict["PAUSE"]:
                         self.PAUSE_TIME = self.habituation_vi_times[self.VI_index]
                     elif "CONDITIONING" in protocolDict["PAUSE"]:
                         self.PAUSE_TIME = self.conditioning_vi_times[self.VI_index]
                     elif "TOUCH_TO_START" in protocolDict["PAUSE"] and not self.START_IMG_PLACED:
-                        self.PAUSE_TIME = 1000.0
                         start_img = {'BLANK.BMP':(392,100)}
                         self.GUI.TSq.put(start_img)
                         self.START_IMG_PLACED = True
                     elif "EAT_TO_START" in protocolDict["PAUSE"]:
-                        self.PAUSE_TIME = 1000.0
                         self.EAT_TO_START = True
                     elif "BARPRESS_TO_START" in protocolDict["PAUSE"]:
-                        self.PAUSE_TIME = 1000.0
                         self.BARPRESS_TO_START = True
                     elif "NOSEPOKE_TO_START" in protocolDict["PAUSE"]:
-                        self.PAUSE_TIME = 1000.0
                         self.NOSEPOKE_TO_START = True
 
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
@@ -557,16 +557,19 @@ class Experiment:
                             self.log_event(self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
 
         elif "CLOSED_LOOP" == key:
-            val = str2bool(protocolDict[key])
+            val = str2bool(protocolDict[key]) or self.isNumber(protocolDict[key])
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
                 if val:
-                    if not self.STIM_ENABLED:
+                    if self.stim is None:
+                        if self.isNumber(protocolDict[key]):
+                            CLTimer = float(protocolDict[key])
+                        else:
+                            CLTimer = 9999999
                         print('IF HANGS ADD NETWORK EVENTS TO OPEN EPHYS!!!')
                         self.snd.send(self.snd.STOP_REC)
                         self.snd.changeVars(prependText = 'CLOSED_LOOP')
                         self.snd.send(self.snd.START_REC)
-                        self.log_event("Starting Closed Loop")
-                        self.STIM_ENABLED = True
+                        self.log_event("Starting Closed Loop," + str(CLTimer))
                         self.stimX = daqAPI.AnalogOut(self.stimAddressX)
                         self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                         self.stimQ = Queue()
@@ -574,12 +577,14 @@ class Experiment:
                         messagebox.showinfo('WARNING', 'Check for stim locations before starting closed loop!')
                         self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps, self.STIM_LAG)) # NEED TO UPDATE ADDRESS
                         self.stim.start()
-                        self.Protocol_ln_num += 1
-                else:
+                        self.CL_Enabled = True
+                        #self.Protocol_ln_num += 1 # Doing this from check q function. Gross but works
+                else: # Can still use CLOSED_LOOP=False to kill the stim
                     self.stimBackQ.put('STOP')
                     if not self.stim.is_alive():
                         self.stimX.end()
-                        self.STIM_ENABLED = False
+                        self.stimY.end()
+                        self.stim = None
                         self.Protocol_ln_num += 1
             else:
                 self.log_event("Closed Loop Starting Failed, fix DAQ")
@@ -588,12 +593,11 @@ class Experiment:
         elif "PARAMETER_SWEEPING" == key:
             val = str2bool(protocolDict[key])
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
-                if not self.STIM_ENABLED:
+                if self.stim is None:
                     self.log_event("Starting parameter sweeping")
                     self.snd.send(self.snd.STOP_REC)
                     self.snd.changeVars(prependText = 'PARAMETER_SWEEPING')
                     self.snd.send(self.snd.START_REC)
-                    self.STIM_ENABLED = True
                     self.stimX = daqAPI.AnalogOut(self.stimAddressX)
                     self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                     self.stimQ = Queue()
@@ -605,7 +609,7 @@ class Experiment:
                         self.stimX.end()
                         self.stimY.end()
                         self.stimY = None
-                        self.STIM_ENABLED = False
+                        self.stim = None
                         self.Protocol_ln_num += 1
             else:
                 self.log_event("Parameter sweeping Starting Failed, fix DAQ")
@@ -615,12 +619,11 @@ class Experiment:
             val = str2bool(protocolDict[key])
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
                 if val:
-                    if not self.STIM_ENABLED:
+                    if self.stim is None:
                         self.snd.send(self.snd.STOP_REC)
                         self.snd.changeVars(prependText = 'OPEN_LOOP')
                         self.snd.send(self.snd.START_REC)
                         self.log_event("Starting open loop")
-                        self.STIM_ENABLED = True
                         self.stimX = daqAPI.AnalogOut(self.stimAddressX)
                         self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                         self.stimQ = Queue()
@@ -632,7 +635,7 @@ class Experiment:
                     self.stimBackQ.put('STOP')
                     if not self.stim.is_alive():
                         self.stimX.end()
-                        self.STIM_ENABLED = False
+                        self.stim = None
                         self.Protocol_ln_num += 1
             else:
                 self.log_event("Open Loop Starting Failed, fix DAQ")
@@ -640,12 +643,11 @@ class Experiment:
 
         elif "ERP" == key:
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
-                if not self.STIM_ENABLED:
+                if self.stim is None:
                     self.snd.send(self.snd.STOP_REC)
                     self.snd.changeVars(prependText = 'ERP_' + protocolDict[key])
                     self.snd.send(self.snd.START_REC)
                     self.log_event("Starting ERP, " + protocolDict[key])
-                    self.STIM_ENABLED = True
                     self.stimQ = Queue()
                     self.stimBackQ = Queue()
                     self.stimX = daqAPI.AnalogOut(self.stimAddressX)
@@ -657,12 +659,40 @@ class Experiment:
                         self.stimX.end()
                         self.stimY.end()
                         self.stimY = None
-                        self.STIM_ENABLED = False
+                        self.stim = None
                         self.Protocol_ln_num += 1
             else:
                 self.log_event("ERP Starting Failed, fix DAQ")
                 self.endExpt()
+        elif "RAW" == key[:3]:
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if not self.PAUSE_STARTED:
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = key)
+                    self.snd.send(self.snd.START_REC)
+                    self.PAUSE_TIME = float(protocolDict[key])
+                    self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec, "+ key)
+                    self.PAUSE_STARTED = True
+                    self.pause_start_time = time.perf_counter()
 
+                    self.PAUSE_STARTED = True
+                else:
+                    time_elapsed = time.perf_counter() - self.pause_start_time
+                    if time_elapsed >= self.PAUSE_TIME:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+            else:
+                self.log_event("Raw recording failed, fix DAQ")
+                self.endExpt()
+
+        elif key == "CONDITIONS":
+            self.runConditions(protocolDict)
+
+        else:
+            print("PROTOCOL ITEM NOT RECOGNIZED",key)
+            self.Protocol_ln_num += 1
+
+        ''' # Improved raw recording above Delete below after testing
         elif "RAW_PRE" == key:
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
                 if not self.PAUSE_STARTED:
@@ -704,21 +734,16 @@ class Experiment:
             else:
                 self.log_event("Raw recording failed, fix DAQ")
                 self.endExpt()
+        '''
 
 
-        elif key == "CONDITIONS":
-            self.runConditions(protocolDict)
-
-        else:
-            print("PROTOCOL ITEM NOT RECOGNIZED",key)
-            self.Protocol_ln_num += 1
 
         #########################################################################################
         # RUN BAR PRESS INDEPENDENT OF PROTOCOLS OR CONDTIONS
         #########################################################################################
         if self.BAR_PRESS_INDEPENDENT_PROTOCOL: #Running independently of CONDITIONS. Used for conditioning, habituation, extinction, and recall
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
-               self.num_bar_presses +=1
+                self.num_bar_presses +=1
 
             if self.VI_REWARDING:  # [BAR_PRESS] in protocol
                                    #  VI=15
@@ -761,15 +786,15 @@ class Experiment:
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 if self.cur_time > (self.VI_start + self.VI):
 
-                   GUIFunctions.FOOD_REWARD(self.GUI, "Food_Pellet")
-                   # Calculate self.VI for next time
-                   if self.var_interval_reward <= 1:
-                       self.VI = 0
-                   else:
-                       self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
+                    GUIFunctions.FOOD_REWARD(self.GUI, "Food_Pellet")
+                    # Calculate self.VI for next time
+                    if self.var_interval_reward <= 1:
+                        self.VI = 0
+                    else:
+                        self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
 
-                   self.log_event("Current VI now: "+ str(self.VI) + " (sec)")
-                   self.VI_start = self.cur_time
+                    self.log_event("Current VI now: "+ str(self.VI) + " (sec)")
+                    self.VI_start = self.cur_time
 
                 self.LEVER_PRESSED_R = False
                 self.LEVER_PRESSED_L = False
@@ -813,22 +838,22 @@ class Experiment:
         #  PROTOCOL ENDED (Reset everything for next run
         #########################################################
         #print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.max_time * 60.0, " sec")
-        if self.cur_time >= self.MAX_EXPT_TIME * 60.0: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
-           self.log_event("Exceeded MAX_EXPT_TIME")
-           print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX_EXPT_TIME: ",self.MAX_EXPT_TIME)
-           self.log_event("PROTOCOL ENDED-max time exceeded")
-           print("\nPROTOCOL ENDED-Max time exceeded")
-           self.RECORDING = False
-           self.log_event("Camera_OFF")
-           self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-           self.endExpt()
+        if self.cur_time >= self.MAX_EXPT_TIME * 10000.0: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
+            self.log_event("Exceeded MAX_EXPT_TIME")
+            print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX_EXPT_TIME: ",self.MAX_EXPT_TIME)
+            self.log_event("PROTOCOL ENDED-max time exceeded")
+            print("\nPROTOCOL ENDED-Max time exceeded")
+            self.RECORDING = False
+            self.log_event("Camera_OFF")
+            self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+            self.endExpt()
 
         if self.Protocol_ln_num >= len(self.protocol):
-           self.log_event("PROTOCOL ENDED")
-           print("\nPROTOCOL ENDED NORMALLY")
-           self.log_event("Camera_OFF")
-           self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-           self.endExpt()
+            self.log_event("PROTOCOL ENDED")
+            print("\nPROTOCOL ENDED NORMALLY")
+            self.log_event("Camera_OFF")
+            self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+            self.endExpt()
 ###########################################################################################################
 #   RUN CONDITIONS
 ###########################################################################################################
@@ -1218,7 +1243,7 @@ class Experiment:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
 
-        if self.STIM_ENABLED:
+        if self.stim is not None and self.stim.is_alive():
             self.stimBackQ.put('STOP')
             self.stimX.end()
             if self.stimY != None:
