@@ -29,8 +29,8 @@ def closeWindow(hwnd, windowName):
 def lookForProgram(hwnd, programName):
     global IsWhiskerRunning, IsOpenEphysRunning
     if programName in win32gui.GetWindowText(hwnd):
+        win32gui.CloseWindow(hwnd) # Minimize Window
         if 'Whisker' in programName:
-            win32gui.CloseWindow(hwnd) # Minimize Window
             IsWhiskerRunning = True
         elif 'Ephys' in programName:
             IsOpenEphysRunning = True
