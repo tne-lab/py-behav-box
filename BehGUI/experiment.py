@@ -19,7 +19,7 @@ except:
 class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
     import GUIFunctions
-    from EXPTFunctions import checkStatus, checkQs,  log_event, MyVideo, sendTTL, checkToEndTTL
+    from EXPTFunctions import checkStatus, checkQs,  log_event, MyVideo, isNumber
     from setExptGlobals import setExptGlobals, setVidGlobals, setTouchGlobals
 ####################################################################################
 #   INITIALIZE EXPERIMENT
@@ -212,11 +212,21 @@ class Experiment:
         '''
         RUN EXPERIMENTAL PROTOCOL IF START EXPT BUTTON PRESSED
         '''
+        if self.MASTER_PAUSE:
+            return
+
         protocolDict = self.protocol[self.Protocol_ln_num]
         key = list(protocolDict.keys())[0] # First key in protocolDict
-        if self.CL_Enabled and self.stim is not None and not self.stim.is_alive():
-            self.CL_Enabled = False
-            self.stim = None
+        if self.stim is not None and self.stim.is_alive():
+            ### CHECK STIM Q ###
+            while not self.stimQ.empty():
+                stim = self.stimQ.get() # What do we want here?
+                self.log_event(stim)
+                if stim == "CONTINUE":
+                    self.Protocol_ln_num+=1
+                    self.stim = None
+                else:
+                    self.log_event(stim)
         #cur_time = time.perf_counter()
         if key == "":
             self.Protocol_ln_num +=1
@@ -574,8 +584,7 @@ class Experiment:
                         self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
-                        messagebox.showinfo('WARNING', 'Check for stim locations before starting closed loop!')
-                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps, self.STIM_LAG)) # NEED TO UPDATE ADDRESS
+                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps, self.CLLag, CLTimer, self.CLTimeout, self.CLTimeoutVar))
                         self.stim.start()
                         self.CL_Enabled = True
                         #self.Protocol_ln_num += 1 # Doing this from check q function. Gross but works
@@ -1260,7 +1269,7 @@ class Experiment:
         self.GUI.START_EXPT = False
 
         for button in self.GUI.buttons:
-            if button.text == 'STOP EXPT':
+            if button.text == 'PAUSE EXPT':
                 button.text = 'RESET EXPT'
 
         self.GUI.exptEnded = True

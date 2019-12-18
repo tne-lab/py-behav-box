@@ -19,30 +19,19 @@ def checkStatus(self):
     self.LEVER_PRESSED_L = self.GUI.LEVER_PRESSED_L
     if self.LEVER_PRESSED_L:
         self.num_L_nose_pokes += 1
-        #self.sendTTL(self.TTL_LEVER_L)
-        #self.log_event("Lever_Pressed_L")
     self.LEVER_PRESSED_R = self.GUI. LEVER_PRESSED_R
     if self.LEVER_PRESSED_R:
         self.num_R_lever_preses += 1
-        #self.sendTTL(self.TTL_LEVER_R)
-        #self.log_event("Lever_Pressed_R")
     self.NOSE_POKED_L = self.GUI.NOSE_POKED_L
     if self.NOSE_POKED_L:
         self.num_L_nose_pokes += 1
-        #self.sendTTL(self.TLL_NOSE_L)
-        #self.log_event("Nose_Poke_L")
     self.NOSE_POKED_R = self.GUI.NOSE_POKED_R
     if self.NOSE_POKED_R:
         self.num_R_nose_pokes += 1
-        #self.sendTTL(self.TLL_NOSE_R)
-        #self.log_event("Nose_Poke_R")
     self.FOOD_EATEN = self.GUI.FOOD_EATEN
     if self.FOOD_EATEN:
         self.num_eaten +=1
-        #self.sendTTL(self.TLL_FOOD)
-        #self.log_event("Food_Eaten")
 
-    self.checkToEndTTL()
 
     # Might just use these eventually...
     self.GUI.FOOD_EATEN = False
@@ -164,21 +153,9 @@ def resetBox(self):
 
     GUIFunctions.EXTEND_LEVERS(self,"Levers_Retracted",False,False)
 
-####################################################################################
-#   Sending ttls to open ephys on behavioral events
-####################################################################################
-def sendTTL(self, ttlChan):
-    # Make sure the TTL channel is set so we only send ttls when sent.
-    if ttlChan != 0:
-        if ttlChan in self.TTL_ON:
-            # If no tread at this line started
-            if not self.TTL_ON[ttlChan]:
-                # Start thread (thread handles)
-                self.snd.sendTTL(True, ttlChan)
-                self.TTL_ON[ttlChan] = time.perf_counter()
-
-def checkToEndTTL(self):
-    # Loop through all current TTLs currently on. If over 10ms, turn off event.
-    for ttlChan, ttlStart in self.TTL_ON:
-        if time.perf_counter() - ttlStart > 10/1000:
-            self.snd.sendTTL(False, int(ttlChan))
+def isNumber(self, s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False

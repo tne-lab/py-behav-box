@@ -490,12 +490,29 @@ class BEH_GUI():
                                #   STOP EXPERIMENT
                                #
                                #######################################
-                               elif button.text == "STOP EXPT":
-                                    self.expt.endExpt()
+                               elif button.text == "PAUSE EXPT":
+                                    self.expt.MASTER_PAUSE = True
+                                    button.text = "RESET EXPT"
+                                    self.buttons.append(MyButton(myscreen,8, 315, 560, 75,50,"CONT EXPT",12) # IMPROT GUI ELEMENTS!!
+                                    self.MASTER_PAUSE_TIME = time.perf_counter()
+                                    if self.expt.stim is not None and self.expt.stim.is_alive():
+                                        self.expt.stimQ.put("PAUSE")
 
                                elif button.text == "RESET EXPT":
                                     self.exptEnded = False
+                                    self.expt.endExpt()
                                     self.setupExpt()
+
+                                elif button.text == "CONT EXPT":
+                                    for i in range(len(self.buttons)):
+                                        if self.buttons[i].text == "CONT EXPT":
+                                            del self.buttons[i]
+                                        elif self.buttons[i].text == "RESET EXPT":
+                                            self.butons[i].text = "PAUSE EXPT"
+                                    if self.expt.PAUSE_STARTED: # Do this at end
+                                        self.expt.pause_start_time += (time.perf_counter() - self.expt.MASTER_PAUSE_TIME)
+                                    if self.expt.stim is not None and self.expt.stim.is_alive():
+                                        self.expt.stimQ.put("CONTINUE")
 
                                #######################################
                                #
@@ -529,7 +546,7 @@ class BEH_GUI():
                                                        elif user_input.label == "SUBJECT":
                                                             user_input.border_color = (0,0,0)
 
-                                            button.text = "STOP EXPT"
+                                            button.text = "PAUSE EXPT"
                                             self.START_EXPT = True
 
                                     else:

@@ -50,7 +50,7 @@ def createWaveform(amplitude, numPulse = 1):
 
   return np.array(waveform, dtype=np.float64)
 
-def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag):
+def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, timeout, timeoutVar):
   '''
   waiting for OPEN EPHYS trigger. then tells GUI that it sent the stim
   '''
@@ -64,17 +64,32 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag):
   lbl.grid(column=0, row=0)
   window.mainloop()
   q.put('CONTINUE')
-  #time.sleep(1) # wait a sec to deal with edge cases
   timer = timer
   stimSent = 0
+  pause = False
   stimTime = time.perf_counter()
+  startTime = stimTime
+  timeoutHigh = timeout + timeoutVar # Set high and low timeout variables (so we don't stim at 1hz)
+  timeoutLow = timeout - timeoutVar
+  curTimeout = random.uniform(timeoutHigh, timeoutLow)
   while True:
     if not backQ.empty():
-        backQ.get()
-        break
+        msg = backQ.get()
+        if msg == 'STOP':
+          break
+        elif msg == 'PAUSE':
+          pause = True
+          pauseTime = time.perf_counter()
+        elif msg == 'CONTINUE':
+          pause = False
+          startTime += time.perf_counter() - pauseTime
     jsonStr = rcv.rcv()
-    if jsonStr:
-      if time.perf_counter() - stimTime > 0.99: # wait one second
+    curTime = time.perf_counter()
+    if curTime - startTime > timer and not pause: # Closed loop is over!
+      print('returned from closed loop')
+      return    
+    if jsonStr and not pause:
+      if curTime - stimTime > curTimeout: # wait timeout
         if jsonStr['type'] == 'ttl' and int(jsonStr['channel']) == int(channel)-1 and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
           if stimSent == 0: # last was sham, send stim now
             if stimLag > 0:
@@ -83,6 +98,7 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag):
             q.put('Closed loop pulse sent,' + stimX.address)
             stimTime = time.perf_counter()
             stimSent = 1
+            curTimeout = random.uniform(timeoutHigh, timeoutLow)
           else:
             if stimLag > 0:
                 time.sleep(stimLag)
@@ -90,6 +106,7 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag):
             q.put('Closed loop sham pulse sent,' + stimY.address)
             stimTime = time.perf_counter()
             stimSent = 0
+            curTimeout = random.uniform(timeoutHigh, timeoutLow)
 
 def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIONS):
     '''
@@ -109,15 +126,24 @@ def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIO
       lbl = Label(window, text=winText, font=("Arial Bold", 100))
       lbl.grid(column=0, row=0)
       window.mainloop()
-      for j in range(nERP):
+      j = 0
+      while j < nERP:
         if not backQ.empty():
-          backQ.get()
-          break
+            msg = backQ.get()
+            if msg == 'STOP':
+              break
+            elif msg == 'PAUSE':
+              pause = True
+            elif msg == 'CONTINUE':
+              pause = False
+        if pause:
+          continue
         stimX.sendWaveform(npWave)
         q.put('ERP stim, ' + str(i) + optText)
         # Wait for brain to return to normal before stimming again
         sleepLen = random.uniform(ERP_INTER_LOW, ERP_INTER_HIGH)
         time.sleep(sleepLen) # 4 +- 1 second
+        j+=1
 
 
 def openLoop(stimX, stimY, q, backQ, phaseDelay, delayLow, delayHigh):
@@ -129,8 +155,15 @@ def openLoop(stimX, stimY, q, backQ, phaseDelay, delayLow, delayHigh):
   while True:
     # Check to stop
     if not backQ.empty():
-        backQ.get()
-        break
+        msg = backQ.get()
+        if msg == 'STOP':
+          break
+        elif msg == 'PAUSE':
+          pause = True
+        elif msg == 'CONTINUE':
+          pause = False
+    if pause:
+      continue
 
     stimX.sendWaveform(npWave)
     q.put('Open Loop stim X , ' + stimX.address)
@@ -152,10 +185,18 @@ def paramSweeping(stimX, stimY, q, backQ, intensity, pulseLength, setSize, phase
       for j in randLen:
         curLen = pulseLength[j]
         npWave = createWaveform(curIntense,curLen / (width+ipi))
-        for x in range(setSize):
+        x = 0
+        while x < setSize:
           if not backQ.empty():
-              backQ.get()
-              break
+              msg = backQ.get()
+              if msg == 'STOP':
+                break
+              elif msg == 'PAUSE':
+                pause = True
+              elif msg == 'CONTINUE':
+                pause = False
+          if pause:
+            continue
           stimX.sendWaveform(npWave)
           q.put('paramSweep Pulse Sent X, ' +  stimX.address + ',' + str(curIntense) + "," + str(curLen))
           time.sleep(phaseDelay)
@@ -163,6 +204,7 @@ def paramSweeping(stimX, stimY, q, backQ, intensity, pulseLength, setSize, phase
           q.put('paramSweep Pulse Sent Y, ' +  stimY.address + ',' + str(curIntense) + ',' + str(curLen))
           sleepLen = random.uniform(delayLow, delayHigh)
           time.sleep(sleepLen)
+          x+=1
 
 def main():
   stimQ = 1

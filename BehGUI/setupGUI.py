@@ -29,6 +29,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     #                      (myscreen,ID, x, y, w, h,"text"    , font size)
     buttons.append(MyButton(myscreen,0,10,5,50,20,"CABIN LT",12))  # 0
     buttons.append(MyButton(myscreen,5,10,32,50,20,"FAN",12))         # 5
+    
 
     if checkForTouch(self):
         buttons.append(MyButton(myscreen,4,315,390,50,20,"FEED",12))     # 4

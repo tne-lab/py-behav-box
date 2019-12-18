@@ -28,6 +28,7 @@ def setExptGlobals(self):
     self.trial_num = 0
     self.EXPT_FILE_LOADED = False
     self.RECORDING = False
+    self.MASTER_PAUSE = False
 
     ################################################################
     # STIM PARAMETERS
