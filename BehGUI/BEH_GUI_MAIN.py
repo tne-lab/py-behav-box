@@ -493,26 +493,29 @@ class BEH_GUI():
                                elif button.text == "PAUSE EXPT":
                                     self.expt.MASTER_PAUSE = True
                                     button.text = "RESET EXPT"
-                                    self.buttons.append(MyButton(myscreen,8, 315, 560, 75,50,"CONT EXPT",12) # IMPROT GUI ELEMENTS!!
+                                    if self.EXPT_LOADED: self.expt.log_event("MASTER_PAUSE")
+                                    self.buttons.append(MyButton(self.myscreen,8, 315, 560, 75,50,"CONT EXPT",12)) # IMPROT GUI ELEMENTS!!
                                     self.MASTER_PAUSE_TIME = time.perf_counter()
                                     if self.expt.stim is not None and self.expt.stim.is_alive():
-                                        self.expt.stimQ.put("PAUSE")
+                                        self.expt.stimBackQ.put("PAUSE")
 
                                elif button.text == "RESET EXPT":
                                     self.exptEnded = False
                                     self.expt.endExpt()
                                     self.setupExpt()
 
-                                elif button.text == "CONT EXPT":
+                               elif button.text == "CONT EXPT":
+                                    self.expt.MASTER_PAUSE = False
+                                    if self.EXPT_LOADED: self.expt.log_event("MASTER_CONTINUE")
                                     for i in range(len(self.buttons)):
                                         if self.buttons[i].text == "CONT EXPT":
                                             del self.buttons[i]
                                         elif self.buttons[i].text == "RESET EXPT":
-                                            self.butons[i].text = "PAUSE EXPT"
+                                            self.buttons[i].text = "PAUSE EXPT"
                                     if self.expt.PAUSE_STARTED: # Do this at end
-                                        self.expt.pause_start_time += (time.perf_counter() - self.expt.MASTER_PAUSE_TIME)
+                                        self.expt.pause_start_time += (time.perf_counter() - self.MASTER_PAUSE_TIME)
                                     if self.expt.stim is not None and self.expt.stim.is_alive():
-                                        self.expt.stimQ.put("CONTINUE")
+                                        self.expt.stimBackQ.put("CONTINUE")
 
                                #######################################
                                #

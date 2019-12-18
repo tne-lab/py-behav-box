@@ -214,19 +214,10 @@ class Experiment:
         '''
         if self.MASTER_PAUSE:
             return
-
+        if self.stim is not None and not self.stim.is_alive():
+            self.stim = None
         protocolDict = self.protocol[self.Protocol_ln_num]
         key = list(protocolDict.keys())[0] # First key in protocolDict
-        if self.stim is not None and self.stim.is_alive():
-            ### CHECK STIM Q ###
-            while not self.stimQ.empty():
-                stim = self.stimQ.get() # What do we want here?
-                self.log_event(stim)
-                if stim == "CONTINUE":
-                    self.Protocol_ln_num+=1
-                    self.stim = None
-                else:
-                    self.log_event(stim)
         #cur_time = time.perf_counter()
         if key == "":
             self.Protocol_ln_num +=1

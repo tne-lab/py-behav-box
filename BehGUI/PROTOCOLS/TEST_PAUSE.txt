@@ -1,0 +1,58 @@
+[EXPERIMENT]
+EXPT_NAME = PLASTICITY_9to18_STIM  # Don't use "-" in name, use underscores "_" instead
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+
+[OPEN_EPHYS]
+OPEN_EPHYS_CONFIG_FILE = PLASTICITY_9to18STIM.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
+OPEN_EPHYS_PATH =  E:\GitHub\OE\plugin-GUI-private\Build\Release\open-ephys.exe # on Flav's PC Ephys-2
+TTL_STIM = 1 # Not used, only for your knowledge. Hardware used.
+TTL_LEVER_R = 2 # Can be TTL_*, * = NOSE_L/R, FOOD
+TTL_LEVER_L = 3
+
+[STIM]
+STIM_ADDRESS = Dev3/ao0 # Leading stim location
+STIM_ADDRESS_SHAM = Dev3/ao1 # Following stim location
+
+
+[CLOSED_LOOP]
+EVENTCHANNEL = 1
+########################################
+MICROAMPS = 50
+STIM_LAG = 20  # in ms
+########################################
+TIMEOUT = 1 # How many seconds inbetween event  stims
+TIMEOUT_VAR = 0.2 # Variation in seconds for timeout
+
+[ERP]
+INTER_PULSE_WIDTH = 4
+PULSE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
+NUM_PULSE = 5 # number of pulses to region X
+NUM_LOCATIONS = 2
+
+[SETUP]
+#CAMERA=TRUE # Cam isnt working again..
+REC=TRUE
+
+# undid "HALFED EVERYTHING SO WE CAN TRY TO GET THROUGH THE WHOLE THING!"
+
+[PROTOCOL] #Time in sec
+#RAW_PRE = 10  # 5 min pre record to set thresholds
+
+#ERP = PRE # PRE = Folder name
+
+CLOSED_LOOP = 15 # Begin closed loop stim thread
+PAUSE = 15 # closed loop for 30 minutes.  Stim at threshold crossing
+#CLOSED_LOOP = FALSE # Kill thread
+
+RAW_POST = 5 # 5 min post (5 minute pause)
+ERP = 5 # 5 = Folder name (takes 10 minutes)
+
+RAW_POST = 900 # 15 min post (15 minutes pause)
+ERP = 30 # 30 = Folder name (takes 10 minutes)
+
+#RAW_POST = 300 # 40 min post (5 minute pause)
+
+FAN_ON=FALSE
+CAB_LIGHT=FALSE
+FOOD_LIGHT=FALSE
+REC=FALSE

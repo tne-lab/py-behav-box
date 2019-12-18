@@ -54,6 +54,8 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, tim
   '''
   waiting for OPEN EPHYS trigger. then tells GUI that it sent the stim
   '''
+  while not backQ.empty():
+      msg = backQ.get()
   # Create socket to listen to
   rcv = zmqClasses.RCVEvent(5557, [b'ttl', b'event'])
   voltage = microamps / 100
@@ -72,9 +74,11 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, tim
   timeoutHigh = timeout + timeoutVar # Set high and low timeout variables (so we don't stim at 1hz)
   timeoutLow = timeout - timeoutVar
   curTimeout = random.uniform(timeoutHigh, timeoutLow)
+
   while True:
     if not backQ.empty():
         msg = backQ.get()
+        print(msg)
         if msg == 'STOP':
           break
         elif msg == 'PAUSE':
@@ -87,8 +91,12 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, tim
     curTime = time.perf_counter()
     if curTime - startTime > timer and not pause: # Closed loop is over!
       print('returned from closed loop')
-      return    
-    if jsonStr and not pause:
+      return
+    if pause:
+      print('pausing')
+      time.sleep(0.1)
+      continue
+    if jsonStr:
       if curTime - stimTime > curTimeout: # wait timeout
         if jsonStr['type'] == 'ttl' and int(jsonStr['channel']) == int(channel)-1 and jsonStr['data'] == True: # ttl and data==true! and only cd channel 0
           if stimSent == 0: # last was sham, send stim now
@@ -112,6 +120,9 @@ def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIO
     '''
     ERP stimulation paradigm
     '''
+    while not backQ.empty():
+        msg = backQ.get()
+        print(msg)
     # Custom ERP Settings
     npWave = createWaveform(1)
     randint = np.random.permutation(NUM_LOCATIONS)
@@ -126,18 +137,20 @@ def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIO
       lbl = Label(window, text=winText, font=("Arial Bold", 100))
       lbl.grid(column=0, row=0)
       window.mainloop()
+      pause = False
       j = 0
       while j < nERP:
         if not backQ.empty():
             msg = backQ.get()
             if msg == 'STOP':
-              break
+              return
             elif msg == 'PAUSE':
               pause = True
             elif msg == 'CONTINUE':
               pause = False
         if pause:
-          continue
+            time.sleep(0.1)
+            continue
         stimX.sendWaveform(npWave)
         q.put('ERP stim, ' + str(i) + optText)
         # Wait for brain to return to normal before stimming again
@@ -150,8 +163,10 @@ def openLoop(stimX, stimY, q, backQ, phaseDelay, delayLow, delayHigh):
   '''
   Open Loop (Jean) stimulation paradigm
   '''
+  while not backQ.empty():
+      msg = backQ.get()
   npWave = createWaveform(1,1)
-
+  pause = False
   while True:
     # Check to stop
     if not backQ.empty():
@@ -163,6 +178,7 @@ def openLoop(stimX, stimY, q, backQ, phaseDelay, delayLow, delayHigh):
         elif msg == 'CONTINUE':
           pause = False
     if pause:
+      time.sleep(0.1)
       continue
 
     stimX.sendWaveform(npWave)
@@ -177,9 +193,11 @@ def paramSweeping(stimX, stimY, q, backQ, intensity, pulseLength, setSize, phase
     '''
     Jeans parameter sweeping paradigm
     '''
+    while not backQ.empty():
+        msg = backQ.get()
     randIntense = np.random.permutation(len(intensity))
     randLen = np.random.permutation(len(pulseLength))
-
+    pause = False
     for i in randIntense:
       curIntense = intensity[i]
       for j in randLen:
@@ -190,12 +208,13 @@ def paramSweeping(stimX, stimY, q, backQ, intensity, pulseLength, setSize, phase
           if not backQ.empty():
               msg = backQ.get()
               if msg == 'STOP':
-                break
+                return
               elif msg == 'PAUSE':
                 pause = True
               elif msg == 'CONTINUE':
                 pause = False
           if pause:
+            time.sleep(0.1)
             continue
           stimX.sendWaveform(npWave)
           q.put('paramSweep Pulse Sent X, ' +  stimX.address + ',' + str(curIntense) + "," + str(curLen))
