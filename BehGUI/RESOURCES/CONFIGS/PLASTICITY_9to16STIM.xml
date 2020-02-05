@@ -4,7 +4,7 @@
   <INFO>
     <VERSION>0.4.5</VERSION>
     <PLUGIN_API_VERSION>5</PLUGIN_API_VERSION>
-    <DATE>8 Jan 2020 12:16:46</DATE>
+    <DATE>21 Jan 2020 12:10:41</DATE>
     <OS>Windows 7</OS>
     <MACHINE>EPHYS-2-PC</MACHINE>
   </INFO>
@@ -198,7 +198,7 @@
       </CHANNEL>
       <EVENTCHANNEL name="0" number="0"/>
       <EDITOR isCollapsed="0" displayName="Rhythm FPGA" SampleRate="17" SampleRateString="30.0 kS/s"
-              LowCut="2.3104271762941795" HighCut="7603.7651218333704" ADCsOn="1"
+              LowCut="2.4344671743710631" HighCut="7603.7651218333704" ADCsOn="1"
               AudioOutputL="-1" AudioOutputR="-1" NoiseSlicer="0" TTLFastSettle="1"
               DAC_TTL="0" DAC_HPF="1" DSPOffset="1" DSPCutoffFreq="0.14571292570770725"
               save_impedance_measurements="0" auto_measure_impedances="0" LEDs="1"
@@ -733,36 +733,36 @@
         <GROUPSTATE reference="0" affected="0"/>
       </CHANNEL>
       <CHANNEL name="8" number="8">
-        <SELECTIONSTATE param="1" record="0" audio="0"/>
+        <SELECTIONSTATE param="1" record="1" audio="0"/>
         <GROUPSTATE reference="1" affected="1"/>
       </CHANNEL>
       <CHANNEL name="9" number="9">
-        <SELECTIONSTATE param="1" record="0" audio="0"/>
+        <SELECTIONSTATE param="1" record="1" audio="0"/>
         <GROUPSTATE reference="1" affected="1"/>
       </CHANNEL>
       <CHANNEL name="10" number="10">
-        <SELECTIONSTATE param="0" record="0" audio="0"/>
-        <GROUPSTATE reference="0" affected="1"/>
+        <SELECTIONSTATE param="1" record="1" audio="0"/>
+        <GROUPSTATE reference="1" affected="1"/>
       </CHANNEL>
       <CHANNEL name="11" number="11">
-        <SELECTIONSTATE param="1" record="0" audio="0"/>
+        <SELECTIONSTATE param="1" record="1" audio="0"/>
         <GROUPSTATE reference="1" affected="1"/>
       </CHANNEL>
       <CHANNEL name="12" number="12">
-        <SELECTIONSTATE param="1" record="0" audio="0"/>
+        <SELECTIONSTATE param="1" record="1" audio="0"/>
         <GROUPSTATE reference="1" affected="1"/>
       </CHANNEL>
       <CHANNEL name="13" number="13">
-        <SELECTIONSTATE param="0" record="0" audio="0"/>
-        <GROUPSTATE reference="0" affected="1"/>
+        <SELECTIONSTATE param="1" record="1" audio="0"/>
+        <GROUPSTATE reference="1" affected="1"/>
       </CHANNEL>
       <CHANNEL name="14" number="14">
-        <SELECTIONSTATE param="0" record="0" audio="0"/>
-        <GROUPSTATE reference="0" affected="1"/>
+        <SELECTIONSTATE param="1" record="1" audio="0"/>
+        <GROUPSTATE reference="1" affected="1"/>
       </CHANNEL>
       <CHANNEL name="15" number="15">
-        <SELECTIONSTATE param="0" record="0" audio="0"/>
-        <GROUPSTATE reference="0" affected="1"/>
+        <SELECTIONSTATE param="1" record="1" audio="0"/>
+        <GROUPSTATE reference="1" affected="1"/>
       </CHANNEL>
       <CHANNEL name="16" number="16">
         <SELECTIONSTATE param="0" record="0" audio="0"/>
@@ -1181,7 +1181,7 @@
     </PROCESSOR>
     <PROCESSOR name="Sinks/LFP Viewer" insertionPoint="1" pluginName="LFP Viewer"
                pluginType="1" pluginIndex="10" libraryName="LFP viewer" libraryVersion="1"
-               isSource="0" isSink="1" NodeId="109">
+               isSource="0" isSink="1" NodeId="118">
       <CHANNEL name="0" number="0">
         <SELECTIONSTATE param="1" record="0" audio="0"/>
       </CHANNEL>
@@ -1319,16 +1319,16 @@
       <EDITOR isCollapsed="0" displayName="LFP Viewer" Type="LfpDisplayEditor">
         <TAB Active="1"/>
         <WINDOW Active="0"/>
-        <LFPDISPLAY Range="500,2000,10.0" Timebase="4.0" Spread="40" colorGrouping="1"
+        <LFPDISPLAY Range="250,2000,10.0" Timebase="2.0" Spread="40" colorGrouping="1"
                     isInverted="0" drawMethod="0" EventButtonState="255" ChannelDisplayState="1111111111111111111111111111111111111111111"
-                    ScrollX="0" ScrollY="1059"/>
+                    ScrollX="0" ScrollY="0"/>
         <VALUES SubprocessorId="0"/>
       </EDITOR>
     </PROCESSOR>
     <SWITCH number="2"/>
     <PROCESSOR name="Sinks/LFP Viewer" insertionPoint="1" pluginName="LFP Viewer"
                pluginType="1" pluginIndex="10" libraryName="LFP viewer" libraryVersion="1"
-               isSource="0" isSink="1" NodeId="114">
+               isSource="0" isSink="1" NodeId="117">
       <CHANNEL name="0" number="0">
         <SELECTIONSTATE param="1" record="0" audio="0"/>
       </CHANNEL>
@@ -1461,8 +1461,8 @@
       <EVENTCHANNEL name="0" number="0"/>
       <EDITOR isCollapsed="0" displayName="LFP Viewer" Type="LfpDisplayEditor">
         <TAB Active="0"/>
-        <WINDOW Active="1" x="842" y="171" width="952" height="687"/>
-        <LFPDISPLAY Range="1000,2000,10.0" Timebase="2.0" Spread="40" colorGrouping="1"
+        <WINDOW Active="1" x="560" y="270" width="800" height="500"/>
+        <LFPDISPLAY Range="250,2000,10.0" Timebase="2.0" Spread="40" colorGrouping="1"
                     isInverted="0" drawMethod="0" EventButtonState="255" ChannelDisplayState="1111111111111111111111111111111111111111111"
                     ScrollX="0" ScrollY="0"/>
         <VALUES SubprocessorId="0"/>
@@ -1616,7 +1616,7 @@
   </AUDIO>
   <RECORDING isRecordThreadEnabled="1"/>
   <GLOBAL_TIMESTAMP selected_index="0" selected_sub_index="0"/>
-  <CONTROLPANEL isOpen="0" recordPath="E:\PY-BEHAV-BOX\BEHGUI\DATA\PLASTICITY_9TO18_STIM\Nov_01_19\09-38"
+  <CONTROLPANEL isOpen="1" recordPath="E:\PY-BEHAV-BOX\BEHGUI\DATA\PLASTICITY_9TO18_STIM\Nov_01_19\09-38"
                 prependText="RAW_POST" appendText="" recordEngine="OPENEPHYS"/>
   <AUDIOEDITOR isMuted="0" volume="0" noiseGate="0"/>
   <RECORDENGINES>

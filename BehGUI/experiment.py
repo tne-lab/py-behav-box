@@ -214,10 +214,13 @@ class Experiment:
         '''
         if self.MASTER_PAUSE:
             return
-        if self.stim is not None and not self.stim.is_alive():
-            self.stim = None
+        #if self.stim is not None and not self.stim.is_alive():
+        #    self.stim = None
         protocolDict = self.protocol[self.Protocol_ln_num]
         key = list(protocolDict.keys())[0] # First key in protocolDict
+        if self.CL_Enabled and self.stim is not None and not self.stim.is_alive():
+            self.CL_Enabled = False
+            self.stim = None
         #cur_time = time.perf_counter()
         if key == "":
             self.Protocol_ln_num +=1

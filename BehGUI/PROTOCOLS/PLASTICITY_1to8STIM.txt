@@ -16,10 +16,25 @@ STIM_ADDRESS_SHAM = Dev3/ao1 # Following stim location
 
 [CLOSED_LOOP]
 EVENTCHANNEL = 1
-############################################
-MICROAMPS = 200
-STIM_LAG = 20
-############################################
+
+
+##############################################################################
+#
+#   CHANGE uAMPS and STIM lag below to
+#   match desired permutation
+#   NOTE:  don't use 0 uAMPS for SHAM below or it will not give us events.
+#          Instead, unplug the DAQ coax cable to the stimulator during OPEN Loop
+#          only.  (Keep it plugged in during ERPs)
+#_______________________
+
+MICROAMPS = 50  
+STIM_LAG = 100  # in ms
+
+##############################################################################
+
+
+
+
 TIMEOUT = 1 # How many seconds in between event  stims
 TIMEOUT_VAR = 0.2 # Variation in seconds for timeout
 
@@ -33,10 +48,8 @@ NUM_LOCATIONS = 2
 #CAMERA=TRUE # Cam isnt working again..
 REC=TRUE
 
-# HALFED EVERYTHING SO WE CAN TRY TO GET THROUGH THE WHOLE THING!
-
 [PROTOCOL]
-#RAW_PRE = 300  # 5 min pre record to set thresholds
+RAW_PRE = 120  # 5 min pre record to set thresholds
 
 ERP = PRE # PRE = Folder name
 
@@ -55,4 +68,5 @@ ERP = 30 # 30 = Folder name (takes 10 minutes)
 FAN_ON=FALSE
 CAB_LIGHT=FALSE
 FOOD_LIGHT=FALSE
+REC=FALSE
 REC=FALSE

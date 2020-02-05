@@ -1,9 +1,9 @@
 [EXPERIMENT]
-EXPT_NAME = PLASTICITY_9to18_STIM  # Don't use "-" in name, use underscores "_" instead
+EXPT_NAME = PLASTICITY_9to16_STIM  # Don't use "-" in name, use underscores "_" instead
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
 [OPEN_EPHYS]
-OPEN_EPHYS_CONFIG_FILE = PLASTICITY_9to18STIM.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
+OPEN_EPHYS_CONFIG_FILE = PLASTICITY_9to16STIM.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
 OPEN_EPHYS_PATH =  E:\GitHub\OE\plugin-GUI-private\Build\Release\open-ephys.exe # on Flav's PC Ephys-2
 TTL_STIM = 1 # Not used, only for your knowledge. Hardware used.
 TTL_LEVER_R = 2 # Can be TTL_*, * = NOSE_L/R, FOOD
@@ -16,10 +16,26 @@ STIM_ADDRESS_SHAM = Dev3/ao1 # Following stim location
 
 [CLOSED_LOOP]
 EVENTCHANNEL = 1
-########################################
+
+
+##################################################################################
+#
+#   CHANGE uAMPS and STIM lag below to
+#   match desired permutation
+#   NOTE:  don't use 0 uAMPS for SHAM below or it will not give us events.
+#          Instead, unplug the DAQ coax cable to the stimulator during OPEN Loop
+#          only.  (Keep it plugged in during ERPs)
+#_______________________
+
+
 MICROAMPS = 50
-STIM_LAG = 20  # in ms
-########################################
+STIM_LAG = 0 # in ms
+
+##############################################################################
+
+
+
+
 TIMEOUT = 1 # How many seconds inbetween event  stims
 TIMEOUT_VAR = 0.2 # Variation in seconds for timeout
 
@@ -36,7 +52,7 @@ REC=TRUE
 # undid "HALFED EVERYTHING SO WE CAN TRY TO GET THROUGH THE WHOLE THING!"
 
 [PROTOCOL] #Time in sec
-RAW_PRE = 300  # 5 min pre record to set thresholds
+RAW_PRE = 120  # 2 min pre record to set thresholds
 
 ERP = PRE # PRE = Folder name
 

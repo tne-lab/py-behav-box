@@ -96,7 +96,7 @@ def sendPulse(address,bits):
 Returns a new lever output task
 '''
 def leverOutputSetup():
-    leverAddress = dev + '/port1/line0:1'
+    leverAddress = dev + '/port3/line0:1'
     levers = InterfaceOut(leverAddress)
     levers.startTask()
     return levers
@@ -105,7 +105,7 @@ def leverOutputSetup():
 Returns a new left conditioning light task
 '''
 def conditioningLightsLeftSetup():
-    conditioningLightAddress = dev + '/port1/line2'
+    conditioningLightAddress = dev + '/port3/line2'
     conditioningLight = InterfaceOut(conditioningLightAddress)
     conditioningLight.startTask()
     return conditioningLight
@@ -114,7 +114,7 @@ def conditioningLightsLeftSetup():
 
 '''
 def conditioningLightsRightSetup():
-    conditioningLightAddress = dev + '/port1/line3'
+    conditioningLightAddress = dev + '/port3/line3'
     conditioningLight = InterfaceOut(conditioningLightAddress)
     conditioningLight.startTask()
     return conditioningLight
@@ -123,7 +123,7 @@ def conditioningLightsRightSetup():
 Returns a new food task
 '''
 def giveFoodSetup():
-    foodAddress = dev + '/port1/line4' #Output line 5
+    foodAddress = dev + '/port3/line4' #Output line 5
     food = InterfaceOut(foodAddress)
     food.startTask()
     return food
@@ -132,7 +132,7 @@ def giveFoodSetup():
 Returns a new food light task
 '''
 def foodLightSetup():
-    foodLightAddress = dev + '/port1/line6' #Output line 7
+    foodLightAddress = dev + '/port3/line6' #Output line 7
     foodLight = InterfaceOut(foodLightAddress)
     foodLight.startTask()
     return foodLight
@@ -143,10 +143,10 @@ def shockerSetup():
     computer = os.environ['COMPUTERNAME']
     print("USING ", computer, " Computer. ")
     if 'EPHYS-2' in computer:
-        shockerAddress = dev + '/port1/line5'  # Flav's PC #Output line 6
+        shockerAddress = dev + '/port3/line5'  # Flav's PC #Output line 6
         print ("Be sure shocker connected to port1/Line6")
     elif 'EPHYS-1' in computer:
-        shockerAddress = dev + '/port1/line5'  # Jean's PC
+        shockerAddress = dev + '/port3/line5'  # Jean's PC
         print ("Be sure shocker connected to port1/Line6") #Output line 6
     else:
         print("Unregistered computer!!!!!!!!!!  See daqAPI.py in current working directory.")
@@ -162,7 +162,7 @@ Returns a new fan task
 def fanSetup():
     computer = os.environ['COMPUTERNAME']
     if 'EPHYS-2' in computer:
-        fanAddress = dev + '/port2/line2'#
+        fanAddress = dev + '/port4/line2'#
     if 'EPHYS-1' in computer:
         fanAddress = dev + '/port2/line2'#
     fan = InterfaceOut(fanAddress)
@@ -173,7 +173,7 @@ def fanSetup():
 Returns a new cabin light task
 '''
 def cabinLightSetup():
-    cabinLightAddress = dev + '/port2/line1'
+    cabinLightAddress = dev + '/port4/line1'
     cabinLight = InterfaceOut(cabinLightAddress)
     cabinLight.startTask()
     return cabinLight
@@ -183,7 +183,7 @@ def cabinLightSetup():
 Returns a new low tone task
 '''
 def lowToneSetup():
-    lowToneAddress = dev + '/port1/line7'#For 2Khz.  Note: #8 on Beh Box
+    lowToneAddress = dev + '/port3/line7'#For 2Khz.  Note: #8 on Beh Box
     lowTone = InterfaceOut(lowToneAddress)
     lowTone.startTask()
     return lowTone
@@ -277,9 +277,9 @@ class debounce:
 Returns a new lever input task
 '''
 def leverInputSetup():
-    leftAddress = dev + '/port6/line0'
+    leftAddress = dev + '/port7/line0'
     checkPressLeft = InterfaceIn(leftAddress)
-    rightAddress = dev + '/port6/line1'
+    rightAddress = dev + '/port7/line1'
     checkPressRight = InterfaceIn(rightAddress)
     checkPressLeft.startTask()
     checkPressRight.startTask()
@@ -290,7 +290,7 @@ def leverInputSetup():
 Returns a new input task for when rat eats food
 '''
 def foodEatInputSetup():
-    foodEatAddress = dev + '/port6/line2'
+    foodEatAddress = dev + '/port7/line2'
     foodEat = InterfaceIn(foodEatAddress)
     foodEat.startTask()
     return foodEat
@@ -299,7 +299,7 @@ def foodEatInputSetup():
 Returns left nose poke input Task
 '''
 def leftNoseInputSetup(): # 3
-    leftNoseInputAddress = dev + '/port6/line3'
+    leftNoseInputAddress = dev + '/port7/line3'
     leftNose = InterfaceIn(leftNoseInputAddress)
     leftNose.startTask()
     return leftNose
@@ -308,7 +308,7 @@ def leftNoseInputSetup(): # 3
 Returns right nose poke input Task
 '''
 def rightNoseInputSetup():
-    rightNoseInputAddress = dev + '/port6/line4'
+    rightNoseInputAddress = dev + '/port7/line4'
     rightNose = InterfaceIn(rightNoseInputAddress)
     rightNose.startTask()
     return rightNose
