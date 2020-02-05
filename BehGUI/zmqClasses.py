@@ -2,6 +2,7 @@ import zmq
 import numpy as np
 from convertString import convertString
 import json
+import time
 
 class RCVEvent:
     # SUBSCRIBE can be a list of vars, need to be in byte string format => b'spike'
