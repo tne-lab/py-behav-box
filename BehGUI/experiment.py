@@ -368,6 +368,7 @@ class Experiment:
 
                 elif self.BANDIT_TRAINING:
                     # Get current trial coords
+                    print('IMG CCCC--------------', self.cur_img_coords_index)
                     curCoords = self.cur_img_coords[self.cur_img_coords_index]
                     # Link images to coords
                     imgList = {}
@@ -1065,6 +1066,7 @@ class Experiment:
                                    self.correct_image_touches += 1
                        
                        elif self.BANDIT_TRAINING:
+                           print('in ban im press')
                            for img, probabilityList in self.touchImgs.items():
                                probabilityListIDX = self.trial_num % len(probabilityList) # IDX = trial num. If Trial num exceeds len(probabilityList), it starts over
                                reward_prob_for_this_img = probabilityList[probabilityListIDX]
@@ -1077,10 +1079,14 @@ class Experiment:
                                    self.log_event( "Probability of pellet: " + str(probabilityList[self.trial_num]))
 
                                    if reward_prob_for_this_img > 50.0:
+                                       print('in good img')
+                                       print(self.cur_img_coords_index)
                                        self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                                        self.log_event("High PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" )
                                        self.cur_img_coords_index += 1 # Go to next picutre
-                                       self.cur_img_coords_index = self.cur_img_coords_index % len(self.cur_img_coords_index) # Overflow error
+                                       print(self.cur_img_coords_index)
+                                       self.cur_img_coords_index = self.cur_img_coords_index % len(self.cur_img_coords) # Overflow error
+                                       print(self.cur_img_coords_index)
                                    else: # Less desirable image touchewd
                                        self.wrong_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                                        self.log_event("Low PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" )
