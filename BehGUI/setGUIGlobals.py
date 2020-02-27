@@ -31,7 +31,7 @@ def setGUIGlobals(self):
         self.fan = daqAPI.fanSetup()
         self.cabin_light = daqAPI.cabinLightSetup()
         self.leverOut = daqAPI.leverOutputSetup()
-        if "EPHYS-2" in self.computer:
+        if "EPHYS-2" or "ABETUSER-PC" in self.computer:
             self.food_light = daqAPI.foodLightSetup()
         self.give_food = daqAPI.giveFoodSetup()
 

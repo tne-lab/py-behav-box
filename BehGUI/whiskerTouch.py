@@ -68,7 +68,8 @@ from whisker.twistedclient import WhiskerTwistedTask
 
 DEFAULT_DISPLAY_NUM = 0
 #DEFAULT_MEDIA_DIR = r"C:\Program Files (x86)\WhiskerControl\Client Media"
-DEFAULT_MEDIA_DIR = r"C:\Users\ephys-2\Documents\GitHub\py-behav-box\BehGUI\RESOURCES"
+#DEFAULT_MEDIA_DIR = r"C:\Users\ephys-2\Documents\GitHub\py-behav-box\BehGUI\RESOURCES"
+DEFAULT_MEDIA_DIR = r"C:\Users\ABET User\Documents\Github\py-behav-box\BehGUI\RESOURCES"
 DEFAULT_WAV = "telephone.wav"
 
 DISPLAY = "display"
@@ -107,7 +108,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
             opaque=True, style=BrushStyle.hatched,
             hatch_style=BrushHatchStyle.bdiagonal) #
         self.background_ht = 0
-        self.dead_zone_ht = 250
+        self.dead_zone_ht = 1
 
 
     def fully_connected(self) -> None: # RUNS ONCE WHEN FULLY CONNECTED
@@ -165,7 +166,7 @@ class MyWhiskerTask(WhiskerTwistedTask):
 
                 bit = self.whisker.display_add_obj_bitmap(
                     DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
-                    stretch = True , height =300, width = 300) # Returns T or F
+                    stretch = True , height = 289, width = 290) # Returns T or F
                 if not bit:
                     pass
             self.whisker.display_send_to_back(DOC, "background")
