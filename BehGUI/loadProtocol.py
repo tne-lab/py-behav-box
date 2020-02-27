@@ -220,6 +220,16 @@ def load_expt_file(self):
                         words = str_after_equal
                         if "RANDOM" in words:
                             self.RANDOM_IMG_COORDS = True # self.touchImgCoords will be made radom in BehGUI.py
+                        elif "BANDIT_TRAINING" in words:
+                            self.BANDIT_TRAINING = True
+                            self.cur_img_coords = 0
+                            imageCoords = words.split(':')[1:] # get rid of words before first ':'
+                            for i in range(len(imageCoords)): # Loop through coord list
+                                for c in '()':#Remove parenthesis from (x,y)
+                                    imageCoords[i] = imageCoords[i].replace(c, "")
+
+                                imageCoordsStr = imageCoords[i].split(",")
+                                self.touchImgCoords.append((int(imageCoordsStr[0]), int(imageCoordsStr[1])))
                         else:
                             imageCoords = words.split(':')
                             for i in range(len(imageCoords)): # Loop through coord list
