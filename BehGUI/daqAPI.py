@@ -99,7 +99,7 @@ def sendPulse(address,bits):
 Returns a new lever output task
 '''
 def leverOutputSetup():
-    leverAddress = dev + '/port1/line0:1'
+    leverAddress = dev + '/port3/line0:1'
     if 'ABETUSER-PC' == computer:
         leverAddress = dev + '/port3/line0:1'
     levers = InterfaceOut(leverAddress)
@@ -110,7 +110,7 @@ def leverOutputSetup():
 Returns a new left conditioning light task
 '''
 def conditioningLightsLeftSetup():
-    conditioningLightAddress = dev + '/port1/line2'
+    conditioningLightAddress = dev + '/port3/line2'
     if 'ABETUSER-PC' == computer:
         conditioningLightAddress = dev +'/port3/line2'
     conditioningLight = InterfaceOut(conditioningLightAddress)
@@ -121,7 +121,7 @@ def conditioningLightsLeftSetup():
 
 '''
 def conditioningLightsRightSetup():
-    conditioningLightAddress = dev + '/port1/line3'
+    conditioningLightAddress = dev + '/port3/line3'
     if 'ABETUSER-PC' == computer:
         conditioningLightAddress = dev + '/port3/line3'
     conditioningLight = InterfaceOut(conditioningLightAddress)
@@ -132,7 +132,7 @@ def conditioningLightsRightSetup():
 Returns a new food task
 '''
 def giveFoodSetup():
-    foodAddress = dev + '/port1/line4' #Output line 5
+    foodAddress = dev + '/port3/line4' #Output line 5
     if 'ABETUSER-PC' == computer:
         foodAddress = dev + '/port3/line4'
     food = InterfaceOut(foodAddress)
@@ -143,7 +143,7 @@ def giveFoodSetup():
 Returns a new food light task
 '''
 def foodLightSetup():
-    foodLightAddress = dev + '/port1/line6' #Output line 7
+    foodLightAddress = dev + '/port3/line6' #Output line 7
     if 'ABETUSER-PC' == computer:
         foodLightAddress = dev + '/port3/line5'
     foodLight = InterfaceOut(foodLightAddress)
@@ -156,10 +156,10 @@ def shockerSetup():
     computer = os.environ['COMPUTERNAME']
     print("USING ", computer, " Computer. ")
     if 'EPHYS-2' in computer:
-        shockerAddress = dev + '/port1/line5'  # Flav's PC #Output line 6
+        shockerAddress = dev + '/port3/line5'  # Flav's PC #Output line 6
         print ("Be sure shocker connected to port1/Line6")
     elif 'EPHYS-1' in computer:
-        shockerAddress = dev + '/port1/line5'  # Jean's PC
+        shockerAddress = dev + '/port3/line5'  # Jean's PC
         print ("Be sure shocker connected to port1/Line6") #Output line 6
     elif 'ABETUSER-PC' == computer:
         shockerAddress = dev + '/port1/line6'
@@ -177,7 +177,7 @@ Returns a new fan task
 def fanSetup():
     computer = os.environ['COMPUTERNAME']
     if 'EPHYS-2' in computer:
-        fanAddress = dev + '/port2/line2'#
+        fanAddress = dev + '/port4/line2'#
     if 'EPHYS-1' in computer:
         fanAddress = dev + '/port2/line2'#
     elif 'ABETUSER-PC' == computer:
@@ -190,7 +190,7 @@ def fanSetup():
 Returns a new cabin light task
 '''
 def cabinLightSetup():
-    cabinLightAddress = dev + '/port2/line1'
+    cabinLightAddress = dev + '/port4/line1'
     if 'ABETUSER-PC' == computer:
         cabinLightAddress = dev + '/port3/line7'
     cabinLight = InterfaceOut(cabinLightAddress)
@@ -202,7 +202,7 @@ def cabinLightSetup():
 Returns a new low tone task
 '''
 def lowToneSetup():
-    lowToneAddress = dev + '/port1/line7'#For 2Khz.  Note: #8 on Beh Box
+    lowToneAddress = dev + '/port3/line7'#For 2Khz.  Note: #8 on Beh Box
     if 'ABETUSER-PC' == computer:
         lowToneAddress = dev + '/port3/line7'
     lowTone = InterfaceOut(lowToneAddress)
