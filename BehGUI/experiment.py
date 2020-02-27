@@ -367,16 +367,18 @@ class Experiment:
                     self.log_event( log_string)
 
                 elif self.BANDIT_TRAINING:
-                    curCoords = self.touchImgCoords[self.cur_img_coords]
-
+                    # Get current trial coords
+                    curCoords = self.cur_img_coords[self.cur_img_coords_index]
+                    # Link images to coords
                     imgList = {}
                     i=0
                     for key in self.touchImgs.keys():
-                        imgList[key] = self.touchImgCoords[i] #places images
+                        imgList[key] = curCoords[i] #places images
                         print('ImgList', imgList)
                         i+=1
                         self.GUI.TSq.put(imgList)
 
+                    # Send images out to whisker
                     self.Protocol_ln_num +=1
 
                     log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
@@ -1077,8 +1079,8 @@ class Experiment:
                                    if reward_prob_for_this_img > 50.0:
                                        self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                                        self.log_event("High PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" )
-                                       self.cur_img_coords += 1 # Go to next picutre
-                                       self.cur_img_coords = self.cur_img_coords % len(self.cur_img_coords) # Overflow error
+                                       self.cur_img_coords_index += 1 # Go to next picutre
+                                       self.cur_img_coords_index = self.cur_img_coords_index % len(self.cur_img_coords_index) # Overflow error
                                    else: # Less desirable image touchewd
                                        self.wrong_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                                        self.log_event("Low PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" )
