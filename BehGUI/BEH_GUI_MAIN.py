@@ -493,8 +493,10 @@ class BEH_GUI():
                                elif button.text == "PAUSE EXPT":
                                     self.expt.MASTER_PAUSE = True
                                     button.text = "RESET EXPT"
+                                    button.face_color = (150,0,0)
                                     if self.EXPT_LOADED: self.expt.log_event("MASTER_PAUSE")
                                     self.buttons.append(MyButton(self.myscreen,8, 315, 560, 75,50,"CONT EXPT",12)) # IMPROT GUI ELEMENTS!!
+                                    self.buttons[-1].face_color = (0,150,0)
                                     self.MASTER_PAUSE_TIME = time.perf_counter()
                                     if self.expt.stim is not None and self.expt.stim.is_alive():
                                         self.expt.stimBackQ.put("PAUSE")
@@ -512,6 +514,7 @@ class BEH_GUI():
                                             del self.buttons[i]
                                         elif self.buttons[i].text == "RESET EXPT":
                                             self.buttons[i].text = "PAUSE EXPT"
+                                            self.buttons[i].face_color = (150,150,150)
                                     if self.expt.PAUSE_STARTED: # Do this at end
                                         self.expt.pause_start_time += (time.perf_counter() - self.MASTER_PAUSE_TIME)
                                     if self.expt.stim is not None and self.expt.stim.is_alive():
@@ -763,6 +766,9 @@ class BEH_GUI():
 
                     else: # ALL OTHER BUTTONS, NOT REC BUTTON
                         button.UP_DN = "UP"
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.FEED = True
+                GUIFunctions.FOOD_REWARD(self,"Food_Pellet_by_GUI")
 ###########################################################################################################
 #  HANDLE BEHAVIORAL CHAMBER EVENTS
 ###########################################################################################################
