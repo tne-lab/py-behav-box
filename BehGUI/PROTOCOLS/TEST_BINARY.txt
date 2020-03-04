@@ -1,10 +1,10 @@
 [EXPERIMENT]
-EXPT_NAME = PLASTICITY_9to18_STIM  # Don't use "-" in name, use underscores "_" instead
+EXPT_NAME = Test_Binary  # Don't use "-" in name, use underscores "_" instead
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
 [OPEN_EPHYS]
-OPEN_EPHYS_CONFIG_FILE = PLASTICITY_9to18STIM.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
-OPEN_EPHYS_PATH =  E:\GitHub\OE\plugin-GUI-private\Build\Release\open-ephys.exe # on Flav's PC Ephys-2
+OPEN_EPHYS_CONFIG_FILE = PLASTICITY_9to16STIM.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
+OPEN_EPHYS_PATH =  E:\GitHub\oep-installation\plugin-GUI\Build\Release\open-ephys.exe # on Flav's PC Ephys-2
 TTL_STIM = 1 # Not used, only for your knowledge. Hardware used.
 TTL_LEVER_R = 2 # Can be TTL_*, * = NOSE_L/R, FOOD
 TTL_LEVER_L = 3
@@ -33,10 +33,8 @@ NUM_LOCATIONS = 2
 #CAMERA=TRUE # Cam isnt working again..
 REC=TRUE
 
-# undid "HALFED EVERYTHING SO WE CAN TRY TO GET THROUGH THE WHOLE THING!"
-
 [PROTOCOL] #Time in sec
-#RAW_PRE = 10  # 5 min pre record to set thresholds
+RAW_PRE = 10  # 5 min pre record to set thresholds
 
 #ERP = PRE # PRE = Folder name
 

@@ -99,6 +99,8 @@ class SNDEvent:
         else:
             print('case not created')
             return
+
+        #time.sleep(1) #If we switch to binary we probably need this
         self.socket.send(self.switch(control))
 
         #  Get the reply.

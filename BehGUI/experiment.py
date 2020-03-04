@@ -677,8 +677,6 @@ class Experiment:
                     self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec, "+ key)
                     self.PAUSE_STARTED = True
                     self.pause_start_time = time.perf_counter()
-
-                    self.PAUSE_STARTED = True
                 else:
                     time_elapsed = time.perf_counter() - self.pause_start_time
                     if time_elapsed >= self.PAUSE_TIME:
