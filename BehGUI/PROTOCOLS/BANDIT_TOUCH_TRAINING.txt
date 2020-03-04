@@ -27,7 +27,7 @@ Volume(0-1)	= 1.0
 
 [TOUCHSCREEN]
 IMAGES_PATH = C:\Users\ABET User\Documents\Github\py-behav-box\BehGUI\RESOURCES
-COORDS=BANDIT_TRAINING%(220,425):(530,425)%(220,425):(530,425)%(220,425):(530,425)%(220,425):(530,425)%(530,425):(220,425)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+COORDS=BANDIT_TRAINING%(200,425):(530,425)%(530,425):(200,425)%(200,425):(530,425)%(200,425):(530,425)%(530,425):(200,425)%(530,425):(200,425)%(200,425):(530,425)%(530,425):(200,425)%(200,425):(530,425)%(200,425):(530,425)%(200,425):(530,425)%(530,425):(200,425)%(530,425):(200,425)%(530,425):(200,425)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 # Image name: probability of reward on each trial
 IMG1= 6a.bmp:(100x120)
 IMG2= 6b.bmp:(0x120)
@@ -38,7 +38,7 @@ CAMERA=FALSE
 REC=FALSE
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
-START_LOOP1 = 120 #NOTE: 1st 50 reward probabilities next to img name under [TOUCH]
+START_LOOP1 = 200#NOTE: 1st 50 reward probabilities next to img name under [TOUCH]
 FOOD_LIGHT = True
 # PAUSE = NOSEPOKE_TO_START
 # PAUSE = TOUCH_TO_START
@@ -49,8 +49,9 @@ FOOD_LIGHT = False
 #  PAUSE = 1  # to wait for tone to finish
  DRAW_IMAGES=True
  CONDITIONS=0
- #IF WRONG PAUSE 8 with house light
-  PAUSE = 3    # sec
+CHECK_NUM_CORRECT=50
+ #IF WRONG PAUSE 10 with house light
+  PAUSE = 5    # sec
 END_LOOP
 
 REC=False

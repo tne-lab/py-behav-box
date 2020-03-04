@@ -721,6 +721,10 @@ class Experiment:
             else:
                 self.log_event("Raw recording failed, fix DAQ")
                 self.endExpt()
+        elif "CHECK_NUM_CORRECT" == key:
+            self.Protocol_ln_num += 1
+            if self.correct_image_touches > int(protocolDict[key])-1:
+                self.endExpt()
 
         elif key == "CONDITIONS":
             self.runConditions(protocolDict)
@@ -1066,34 +1070,27 @@ class Experiment:
                                    self.correct_image_touches += 1
                        
                        elif self.BANDIT_TRAINING:
-                           print('in ban im press')
                            for img, probabilityList in self.touchImgs.items():
                                probabilityListIDX = self.trial_num % len(probabilityList) # IDX = trial num. If Trial num exceeds len(probabilityList), it starts over
                                reward_prob_for_this_img = probabilityList[probabilityListIDX]
 
 
-                               print(" reward_prob_for ", img, " = ", reward_prob_for_this_img  )
-                               print(self.touchMsg['picture'], img)
                                if self.touchMsg['picture'] == img:  # Touched an image
-                                   print(self.touchMsg['picture'], img)
                                    self.log_event( "Probability of pellet: " + str(probabilityList[self.trial_num]))
 
                                    if reward_prob_for_this_img > 50.0:
-                                       print('in good img')
-                                       print(self.cur_img_coords_index)
                                        self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
-                                       self.log_event("High PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" )
+                                       self.log_event("High PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" + ',' + str(self.cur_img_coords))
                                        self.cur_img_coords_index += 1 # Go to next picutre
-                                       print(self.cur_img_coords_index)
                                        self.cur_img_coords_index = self.cur_img_coords_index % len(self.cur_img_coords) # Overflow error
-                                       print(self.cur_img_coords_index)
+                                       self.correct_image_touches += 1
                                    else: # Less desirable image touchewd
                                        self.wrong_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
-                                       self.log_event("Low PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" )
+                                       self.log_event("Low PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" + ',' + str(self.cur_img_coords))
                                    # Holds the probability for each trial
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
-                                   self.correct_image_touches += 1
+                                   
 
 
 
@@ -1278,7 +1275,7 @@ class Experiment:
                elif outcome == 'DN_PUNISH':
                    if not self.PAUSE_STARTED:
                        self.GUI.cabin_light.sendDBit(True)
-                       self.PAUSE_TIME = 5
+                       self.PAUSE_TIME = 10
                        self.PAUSE_STARTED = True
                        self.pause_start_time = time.perf_counter()
                        self.NEXT_TRIAL = False
