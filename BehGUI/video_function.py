@@ -60,7 +60,7 @@ class Vid:
         # livestream!
         elif isinstance(videoPath, int): # Calculates Frames Per Sec (FPS)
             # Number of frames to capture
-            numFrames = 15;
+            numFrames = 15
             # Start time
             start = time.time()
             # Grab a few frames

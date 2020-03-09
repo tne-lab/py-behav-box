@@ -119,11 +119,11 @@ class Experiment:
 
 
             elif key == "REC":
-                print ("recording ....")
-                self.RECORDING = True
                 val = str2bool(setupDict[key])
                 self.setup_ln_num +=1
                 if val:  # REC == TRUE.  Remember Camera NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                    print ("recording ....")
+                    self.RECORDING = True
                     if self.EPHYS_ENABLED:
                         self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
                         self.snd.send(self.snd.START_REC) # OPEN_EPHYS
