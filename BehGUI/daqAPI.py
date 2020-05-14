@@ -27,7 +27,7 @@ print("USING COMPUTER: ",computer)
 if 'EPHYS-2' in computer:
         dev = 'Dev2'
 elif 'EPHYS-1' in computer:
-        dev = 'Dev1'
+        dev = 'Dev2'
 elif 'ABETUSER-PC' == computer:
         dev = 'Dev1'
 

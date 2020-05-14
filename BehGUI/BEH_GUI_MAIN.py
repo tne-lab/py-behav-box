@@ -684,7 +684,7 @@ class BEH_GUI():
                           else: #TURN CAMERA ON # NOTE: STATE = (ON,OFF,REC, START_EXPT,STOP_EXPT)
                                 self.CAMERA_ON = True
                                 if self.EXPT_LOADED:
-                                    self.expt.MyVideo(self)
+                                    self.expt.MyVideo()
                                     self.expt.log_event("Camera_ON")
                                 #print("CAMERA ON")
                                 self.vidSTATE = 'ON'

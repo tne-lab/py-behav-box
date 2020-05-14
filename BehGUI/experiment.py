@@ -1066,7 +1066,7 @@ class Experiment:
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
                                    self.correct_image_touches += 1
-                       
+
                        elif self.BANDIT_TRAINING:
                            for img, probabilityList in self.touchImgs.items():
                                probabilityListIDX = self.trial_num % len(probabilityList) # IDX = trial num. If Trial num exceeds len(probabilityList), it starts over
@@ -1088,7 +1088,7 @@ class Experiment:
                                    # Holds the probability for each trial
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
-                                   
+
 
 
 
@@ -1304,6 +1304,8 @@ class Experiment:
         if self.VID_ENABLED:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
+            while self.vid_thread.is_alive():
+                pass
 
         if self.stim is not None and self.stim.is_alive():
             self.stimBackQ.put('STOP')

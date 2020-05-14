@@ -104,11 +104,14 @@ def checkQs(self):
 #  START THREADS FOR VID/TOUCHSCREEN
 ###########################################################################################################
 def MyVideo(self):
-    vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q, self.freeze_file_path))
-    vid_thread.daemon = True
-    self.VIDq.pop()
+    self.vid_thread = threading.Thread(target=video_function.runVid, args=(self.VIDq,self.VIDBack_q, self.freeze_file_path))
+    self.vid_thread.daemon = True
+    try:
+        self.VIDq.pop()
+    except IndexError:
+        pass
     self.checkQs()
-    vid_thread.start()
+    self.vid_thread.start()
 
     while True:
       time.sleep(0.1)

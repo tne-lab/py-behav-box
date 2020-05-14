@@ -228,6 +228,7 @@ def StartTouchScreen(self):
 # EXIT GAME
 ###########################################################################################################
 def exit_game(self):
+    print('exiting\n')
     #Exit things
     if self.EXPT_LOADED: self.expt.endExpt()
     if self.TOUCH_TRHEAD_STARTED == True: self.TSq.put('STOP')
@@ -238,8 +239,8 @@ def exit_game(self):
         self.cabin_light.end()
         if 'EPHYS-2' in self.computer:
             self.food_light.end()
-        if 'EPHYS-1' in self.computer:
-            self.low_tone.end()
+        #if 'EPHYS-1' in self.computer:
+        #    self.low_tone.end()
         self.give_food.end()
         self.eaten.end()
 

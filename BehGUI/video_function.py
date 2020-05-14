@@ -114,6 +114,10 @@ class Vid:
             # Run video
             try:
                 msg = self.q.pop()
+            except IndexError:
+                #print("Error in video q")
+                pass
+            else:
                 time_from_GUI = msg['cur_time']
                 STATE = msg['STATE'] # NOTE: NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                 self.FLIP = msg['FLIP']
@@ -140,9 +144,7 @@ class Vid:
                 msg['vid_time'] = vid_cur_time
                 if msg['PATH_FILE'] != self.outPath:
                     self.openOutfile(msg['PATH_FILE'], self.cap.get(4) , self.cap.get(3))
-            except IndexError:
-                #print("Error in video q")
-                pass
+
 
             if not ret:
                 print('error in getting read')
