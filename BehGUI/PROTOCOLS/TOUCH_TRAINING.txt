@@ -1,0 +1,64 @@
+[EXPERIMENT]
+EXPT_NAME = Bandit_Touch # Don't use "-" in name, use underscores "_" instead
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+#OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe # on Flav's PC Ephys-2
+###               E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe # on Jean's PC Ephys-1
+
+
+[TONE1] # Need TONE1, TONE2 # Tone1 associated with GOOD response
+Duration(s) 	= 1
+Freq(Hz)	= 2000
+Volume(0-1)	= 1.0
+
+[TONE2] # Need TONE1, TONE2  # Tone2 associated with BAD response
+Duration(s) 	= 1
+Freq(Hz)	= 5000
+Volume(0-1)	= 1.0
+
+#[SHOCK]
+#Duration(s) 	= 3
+#Volts		= 5.5  # NOTE:  only duration is controlled here.
+#Amps(mA)	= 100  # V and amps are set manually on scrambled grid generator
+
+#[FREEZE]
+#Min Duration(s)	= 2
+#Min Moving Pix	= 5000
+#ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also starts FREEZE detection  FREEZE=TRUE
+
+[TOUCHSCREEN]
+IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
+COORDS=(141,275):(640,275)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+# Image name: probability of reward on each trial
+IMG1= SPIDER.bmp:(100x100)
+IMG2= FLOWER.bmp:(100x100)
+TOUCH_BANDIT
+
+[SETUP]
+FAN_ON=TRUE
+CAB_LIGHT=TRUE
+FOOD_LIGHT=TRUE
+CAMERA=TRUE
+REC=TRUE
+
+[PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
+START_LOOP1 = 500 #NOTE: 1st 50 reward probabilities next to img name under [TOUCH]
+  PAUSE = TOUCH_TO_START
+  PELLET
+#  TONE1 # When Spider is high prob img
+#  PAUSE = 1  # to wait for tone to finish
+  PAUSE = 3  # time between start and presentation
+  DRAW_IMAGES=True
+  CONDITIONS=0
+  PAUSE = 4    # sec
+END_LOOP
+
+FOOD_LIGHT=False
+REC=False
+CAMERA= False
+CAB_LIGHT=False
+FAN_ON=False
+[END PROTOCOL]
+
+[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS.
+MAX_TIME, RESET,        CORRECT,        WRONG,   NO_ACTION
+60,       ON_RESPONSE,  PELLET_VAR,     NONE,    NONE

@@ -7,11 +7,19 @@ import random
 from RESOURCES.GUI_elements_by_flav import *
 import GUIFunctions
 import EXPTFunctions
+import pyximport; pyximport.install()
+import stimmer
+import win32gui
+from tkinter import messagebox
+try:
+    import daqAPI
+except:
+    pass
 
 class Experiment:
     from loadProtocol import load_expt_file, create_files, create_expt_file_copy
     import GUIFunctions
-    from EXPTFunctions import checkStatus, checkQs,  log_event, MyVideo
+    from EXPTFunctions import checkStatus, checkQs,  log_event, MyVideo, isNumber
     from setExptGlobals import setExptGlobals, setVidGlobals, setTouchGlobals
 ####################################################################################
 #   INITIALIZE EXPERIMENT
@@ -30,12 +38,13 @@ class Experiment:
             print("COULD NOT LOAD EXPT FILE")
             self.log_event("COULD NOT LOAD EXPT FILE")
         # Open ephys stuff
+        #self.EPHYS_ENABLED = True
         if self.EPHYS_ENABLED:
             self.snd = zmqClasses.SNDEvent(5556) # subject number or something
             self.openEphysBack_q = Queue()
             self.openEphysQ = Queue()
             # Start thread
-            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'spike',b'ttl']})
+            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'event',b'ttl']})
             open_ephys_rcv.start()
 
         self.GUI.EXPT_LOADED = True
@@ -110,11 +119,11 @@ class Experiment:
 
 
             elif key == "REC":
-                print ("recording ....")
-                self.RECORDING = True
                 val = str2bool(setupDict[key])
                 self.setup_ln_num +=1
                 if val:  # REC == TRUE.  Remember Camera NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                    print ("recording ....")
+                    self.RECORDING = True
                     if self.EPHYS_ENABLED:
                         self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
                         self.snd.send(self.snd.START_REC) # OPEN_EPHYS
@@ -126,6 +135,8 @@ class Experiment:
                 else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
                     self.vidSTATE = 'REC_STOP'
                     print("\nREC = False, Self.ROI: ",self.ROI,"\n")
+                    if self.EPHYS_ENABLED:
+                        self.snd.send(self.snd.STOP_REC) # OPEN_EPHYS
 
             elif "EXTEND_LEVERS" in key:
                 self.setup_ln_num +=1
@@ -201,8 +212,15 @@ class Experiment:
         '''
         RUN EXPERIMENTAL PROTOCOL IF START EXPT BUTTON PRESSED
         '''
+        if self.MASTER_PAUSE:
+            return
+        #if self.stim is not None and not self.stim.is_alive():
+        #    self.stim = None
         protocolDict = self.protocol[self.Protocol_ln_num]
         key = list(protocolDict.keys())[0] # First key in protocolDict
+        if self.CL_Enabled and self.stim is not None and not self.stim.is_alive():
+            self.CL_Enabled = False
+            self.stim = None
         #cur_time = time.perf_counter()
         if key == "":
             self.Protocol_ln_num +=1
@@ -300,24 +318,24 @@ class Experiment:
         elif "EXTEND_LEVERS" in key:
             self.Protocol_ln_num +=1
             if protocolDict[key] == "L_LVR":
-                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,False)
+                GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,False)
             elif protocolDict[key] == "R_LVR":
-               GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",False,True)
+                GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",False,True)
             else:
                 val = str2bool(protocolDict[key])
                 if val: # EXTEND_LEVERS == True
-                   #print ("EXTEND LEVERS")
-                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,True)
-                   for lever in self.GUI.levers:
-                         lever.STATE = "OUT"
-                   for button in self.GUI.buttons:
+                    #print ("EXTEND LEVERS")
+                    GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers Extended",True,True)
+                    for lever in self.GUI.levers:
+                            lever.STATE = "OUT"
+                    for button in self.GUI.buttons:
                         if button.text == "EXTEND": button.text = "RETRACT"
                 else: # RETRACT LEVERS (EXTEND_LEVERS == False)
-                   #print ("RETRACT LEVERS")
-                   GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
-                   for lever in self.GUI.levers:
+                    #print ("RETRACT LEVERS")
+                    GUIFunctions.EXTEND_LEVERS(self.GUI,"Levers_Retracted",False,False)
+                    for lever in self.GUI.levers:
                         lever.STATE = "IN"
-                   for button in self.GUI.buttons:
+                    for button in self.GUI.buttons:
                         if button.text == "RETRACT": button.text = "EXTEND"
         ##############################
         #  TOUCHSCREEN  in RUNEXPT (DRAWS IMAGES)
@@ -348,7 +366,41 @@ class Experiment:
                     print('log_string', log_string)
                     self.log_event( log_string)
 
+                elif self.BANDIT_TRAINING:
+                    # Get current trial coords
+                    print('IMG CCCC--------------', self.cur_img_coords_index)
+                    curCoords = self.cur_img_coords[self.cur_img_coords_index]
+                    # Link images to coords
+                    imgList = {}
+                    i=0
+                    for key in self.touchImgs.keys():
+                        imgList[key] = curCoords[i] #places images
+                        print('ImgList', imgList)
+                        i+=1
+                        self.GUI.TSq.put(imgList)
 
+                    # Send images out to whisker
+                    self.Protocol_ln_num +=1
+
+                    log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
+                    log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
+                    log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
+                    log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
+                    log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                    idx = log_string.find(")")
+                    #print("IDX: ", idx, "logstring: ", log_string)
+                    while idx != -1: # returns -1 if string not found
+                        try:
+                            if log_string[idx+1] == ";": # Could be out of range if ")" is last char
+                                log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
+                            idx = log_string.find[:idx+2](")")
+                            print("IDX: ", idx, "logstring: ", log_string)
+                        except:
+                            print("\n\n FAILED creating log string\n\n")
+                            break
+
+                    print('log_string', log_string)
+                    self.log_event( log_string)
                 else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
 
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
@@ -477,26 +529,31 @@ class Experiment:
         ###############################
         # PAUSE
         ###############################
+        elif key == 'CONFIRM_STIM':
+                messagebox.showinfo('WARNING', 'Check for stim locations before starting closed loop!')
+                self.Protocol_ln_num +=1 #Go to next protocol item
+
         elif key == "PAUSE":
             if not self.PAUSE_STARTED:
                 try: # WAS A NUMBER
                     self.PAUSE_TIME = float(protocolDict["PAUSE"])
                 except: # NOT A NUMBER. MUST BE VI_TIMES
+                    self.PAUSE_TIME = 1000.0
                     if "HABITUATION" in protocolDict["PAUSE"]:
                         self.PAUSE_TIME = self.habituation_vi_times[self.VI_index]
                     elif "CONDITIONING" in protocolDict["PAUSE"]:
                         self.PAUSE_TIME = self.conditioning_vi_times[self.VI_index]
                     elif "TOUCH_TO_START" in protocolDict["PAUSE"] and not self.START_IMG_PLACED:
-                        self.PAUSE_TIME = 1000.0
                         start_img = {'BLANK.BMP':(392,100)}
                         self.GUI.TSq.put(start_img)
                         self.START_IMG_PLACED = True
                     elif "EAT_TO_START" in protocolDict["PAUSE"]:
-                        self.PAUSE_TIME = 1000.0
                         self.EAT_TO_START = True
                     elif "BARPRESS_TO_START" in protocolDict["PAUSE"]:
-                        self.PAUSE_TIME = 1000.0
                         self.BARPRESS_TO_START = True
+                    elif "NOSEPOKE_TO_START" in protocolDict["PAUSE"]:
+                        self.NOSEPOKE_TO_START = True
+
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
                 self.pause_start_time = time.perf_counter()
@@ -518,6 +575,11 @@ class Experiment:
                         self.Protocol_ln_num += 1
                         self.PAUSE_STARTED = False
                         self.BARPRESS_TO_START = False
+                elif self.NOSEPOKE_TO_START:
+                    if self.NOSE_POKED_L or self.NOSE_POKED_R:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+                        self.NOSEPOKE_TO_START = False
 
                 if self.TOUCHSCREEN_USED:
                     if not self.GUI.TSBack_q.empty():
@@ -532,18 +594,195 @@ class Experiment:
                         else:
                             self.log_event(self.touchMsg['picture'] + "Pressed BETWEEN trials, " + "(" + self.touchMsg['XY'][0] + ";" +self.touchMsg['XY'][1] + ")" )
 
+        elif "CLOSED_LOOP" == key:
+            val = str2bool(protocolDict[key]) or self.isNumber(protocolDict[key])
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if val:
+                    if self.stim is None:
+                        if self.isNumber(protocolDict[key]):
+                            CLTimer = float(protocolDict[key])
+                        else:
+                            CLTimer = 9999999
+                        print('IF HANGS ADD NETWORK EVENTS TO OPEN EPHYS!!!')
+                        self.snd.send(self.snd.STOP_REC)
+                        self.snd.changeVars(prependText = 'CLOSED_LOOP')
+                        self.snd.send(self.snd.START_REC)
+                        self.log_event("Starting Closed Loop," + str(CLTimer))
+                        self.stimX = daqAPI.AnalogOut(self.stimAddressX)
+                        self.stimY = daqAPI.AnalogOut(self.stimAddressY)
+                        self.stimQ = Queue()
+                        self.stimBackQ = Queue()
+                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps, self.CLLag, CLTimer, self.CLTimeout, self.CLTimeoutVar))
+                        self.stim.start()
+                        self.CL_Enabled = True
+                        #self.Protocol_ln_num += 1 # Doing this from check q function. Gross but works
+                else: # Can still use CLOSED_LOOP=False to kill the stim
+                    self.stimBackQ.put('STOP')
+                    if not self.stim.is_alive():
+                        self.stimX.end()
+                        self.stimY.end()
+                        self.stim = None
+                        self.Protocol_ln_num += 1
+            else:
+                self.log_event("Closed Loop Starting Failed, fix DAQ")
+                self.endExpt()
+
+        elif "PARAMETER_SWEEPING" == key:
+            val = str2bool(protocolDict[key])
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if self.stim is None:
+                    self.log_event("Starting parameter sweeping")
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = 'PARAMETER_SWEEPING')
+                    self.snd.send(self.snd.START_REC)
+                    self.stimX = daqAPI.AnalogOut(self.stimAddressX)
+                    self.stimY = daqAPI.AnalogOut(self.stimAddressY)
+                    self.stimQ = Queue()
+                    self.stimBackQ = Queue()
+                    self.stim = threading.Thread(target=stimmer.paramSweeping, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.intensityArray,self.durationArray, self.paramSetSize, self.openLoopPhaseDelay, self.paramDelay - self.paramDelayVar, self.paramDelay + self.paramDelayVar))
+                    self.stim.start()
+                else:
+                    if not self.stim.is_alive():
+                        self.stimX.end()
+                        self.stimY.end()
+                        self.stimY = None
+                        self.stim = None
+                        self.Protocol_ln_num += 1
+            else:
+                self.log_event("Parameter sweeping Starting Failed, fix DAQ")
+                self.endExpt()
+
+        elif "OPEN_LOOP" == key:
+            val = str2bool(protocolDict[key])
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if val:
+                    if self.stim is None:
+                        self.snd.send(self.snd.STOP_REC)
+                        self.snd.changeVars(prependText = 'OPEN_LOOP')
+                        self.snd.send(self.snd.START_REC)
+                        self.log_event("Starting open loop")
+                        self.stimX = daqAPI.AnalogOut(self.stimAddressX)
+                        self.stimY = daqAPI.AnalogOut(self.stimAddressY)
+                        self.stimQ = Queue()
+                        self.stimBackQ = Queue()
+                        self.stim = threading.Thread(target=stimmer.openLoop, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.openLoopPhaseDelay, self.paramDelay - self.paramDelayVar, self.paramDelay + self.paramDelayVar))
+                        self.stim.start()
+                        self.Protocol_ln_num += 1
+                else:
+                    self.stimBackQ.put('STOP')
+                    if not self.stim.is_alive():
+                        self.stimX.end()
+                        self.stim = None
+                        self.Protocol_ln_num += 1
+            else:
+                self.log_event("Open Loop Starting Failed, fix DAQ")
+                self.endExpt()
+
+        elif "ERP" == key:
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if self.stim is None:
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = 'ERP_' + protocolDict[key])
+                    self.snd.send(self.snd.START_REC)
+                    self.log_event("Starting ERP, " + protocolDict[key])
+                    self.stimQ = Queue()
+                    self.stimBackQ = Queue()
+                    self.stimX = daqAPI.AnalogOut(self.stimAddressX)
+                    self.stimY = daqAPI.AnalogOut(self.stimAddressY)
+                    self.stim = threading.Thread(target=stimmer.ERP, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.NUM_ERP_PULSE, self.INTER_PULSE_WIDTH - self.PULSE_VAR, self.INTER_PULSE_WIDTH + self.PULSE_VAR, self.NUM_ERP_LOCATIONS))
+                    self.stim.start()
+                else:
+                    if not self.stim.is_alive():
+                        self.stimX.end()
+                        self.stimY.end()
+                        self.stimY = None
+                        self.stim = None
+                        self.Protocol_ln_num += 1
+            else:
+                self.log_event("ERP Starting Failed, fix DAQ")
+                self.endExpt()
+        elif "RAW" == key[:3]:
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if not self.PAUSE_STARTED:
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = key)
+                    self.snd.send(self.snd.START_REC)
+                    self.PAUSE_TIME = float(protocolDict[key])
+                    self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec, "+ key)
+                    self.PAUSE_STARTED = True
+                    self.pause_start_time = time.perf_counter()
+                else:
+                    time_elapsed = time.perf_counter() - self.pause_start_time
+                    if time_elapsed >= self.PAUSE_TIME:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+            else:
+                self.log_event("Raw recording failed, fix DAQ")
+                self.endExpt()
+        elif "CHECK_NUM_CORRECT" == key:
+            self.Protocol_ln_num += 1
+            if self.correct_image_touches > int(protocolDict[key])-1:
+                self.endExpt()
+
         elif key == "CONDITIONS":
             self.runConditions(protocolDict)
 
         else:
             print("PROTOCOL ITEM NOT RECOGNIZED",key)
+            self.Protocol_ln_num += 1
+
+        ''' # Improved raw recording above Delete below after testing
+        elif "RAW_PRE" == key:
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if not self.PAUSE_STARTED:
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = 'RAW_PRE')
+                    self.snd.send(self.snd.START_REC)
+                    self.PAUSE_TIME = float(protocolDict[key])
+                    self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec, RAW_PRE")
+                    self.PAUSE_STARTED = True
+                    self.pause_start_time = time.perf_counter()
+
+                    self.PAUSE_STARTED = True
+                else:
+                    time_elapsed = time.perf_counter() - self.pause_start_time
+                    if time_elapsed >= self.PAUSE_TIME:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+            else:
+                self.log_event("Raw recording failed, fix DAQ")
+                self.endExpt()
+
+        elif "RAW_POST" == key:
+            if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
+                if not self.PAUSE_STARTED:
+                    self.snd.send(self.snd.STOP_REC)
+                    self.snd.changeVars(prependText = 'RAW_POST')
+                    self.snd.send(self.snd.START_REC)
+                    self.PAUSE_TIME = float(protocolDict[key])
+                    self.log_event("RECORDING RAW DATA FOR "+str(self.PAUSE_TIME)+" sec, RAW_POST")
+                    self.PAUSE_STARTED = True
+                    self.pause_start_time = time.perf_counter()
+
+                    self.PAUSE_STARTED = True
+                else:
+                    time_elapsed = time.perf_counter() - self.pause_start_time
+                    if time_elapsed >= self.PAUSE_TIME:
+                        self.Protocol_ln_num += 1
+                        self.PAUSE_STARTED = False
+            else:
+                self.log_event("Raw recording failed, fix DAQ")
+                self.endExpt()
+        '''
+
+
 
         #########################################################################################
         # RUN BAR PRESS INDEPENDENT OF PROTOCOLS OR CONDTIONS
         #########################################################################################
         if self.BAR_PRESS_INDEPENDENT_PROTOCOL: #Running independently of CONDITIONS. Used for conditioning, habituation, extinction, and recall
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
-               self.num_bar_presses +=1
+                self.num_bar_presses +=1
 
             if self.VI_REWARDING:  # [BAR_PRESS] in protocol
                                    #  VI=15
@@ -586,15 +825,15 @@ class Experiment:
             if self.LEVER_PRESSED_R or self.LEVER_PRESSED_L: # ANY LEVER
                 if self.cur_time > (self.VI_start + self.VI):
 
-                   GUIFunctions.FOOD_REWARD(self.GUI, "Food_Pellet")
-                   # Calculate self.VI for next time
-                   if self.var_interval_reward <= 1:
-                       self.VI = 0
-                   else:
-                       self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
+                    GUIFunctions.FOOD_REWARD(self.GUI, "Food_Pellet")
+                    # Calculate self.VI for next time
+                    if self.var_interval_reward <= 1:
+                        self.VI = 0
+                    else:
+                        self.VI = random.randint(0,int(self.var_interval_reward*2)) #NOTE: VI15 = reward given on variable interval with mean of 15 sec
 
-                   self.log_event("Current VI now: "+ str(self.VI) + " (sec)")
-                   self.VI_start = self.cur_time
+                    self.log_event("Current VI now: "+ str(self.VI) + " (sec)")
+                    self.VI_start = self.cur_time
 
                 self.LEVER_PRESSED_R = False
                 self.LEVER_PRESSED_L = False
@@ -638,22 +877,22 @@ class Experiment:
         #  PROTOCOL ENDED (Reset everything for next run
         #########################################################
         #print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.max_time * 60.0, " sec")
-        if self.cur_time >= self.MAX_EXPT_TIME * 60.0: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
-           self.log_event("Exceeded MAX_EXPT_TIME")
-           print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX_EXPT_TIME: ",self.MAX_EXPT_TIME)
-           self.log_event("PROTOCOL ENDED-max time exceeded")
-           print("\nPROTOCOL ENDED-Max time exceeded")
-           self.RECORDING = False
-           self.log_event("Camera_OFF")
-           self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-           self.endExpt()
+        if self.cur_time >= self.MAX_EXPT_TIME * 10000.0: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
+            self.log_event("Exceeded MAX_EXPT_TIME")
+            print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX_EXPT_TIME: ",self.MAX_EXPT_TIME)
+            self.log_event("PROTOCOL ENDED-max time exceeded")
+            print("\nPROTOCOL ENDED-Max time exceeded")
+            self.RECORDING = False
+            self.log_event("Camera_OFF")
+            self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+            self.endExpt()
 
         if self.Protocol_ln_num >= len(self.protocol):
-           self.log_event("PROTOCOL ENDED")
-           print("\nPROTOCOL ENDED NORMALLY")
-           self.log_event("Camera_OFF")
-           self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
-           self.endExpt()
+            self.log_event("PROTOCOL ENDED")
+            print("\nPROTOCOL ENDED NORMALLY")
+            self.log_event("Camera_OFF")
+            self.vidSTATE = 'REC_STOP'  # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+            self.endExpt()
 ###########################################################################################################
 #   RUN CONDITIONS
 ###########################################################################################################
@@ -787,7 +1026,6 @@ class Experiment:
                    #  BACKGROUND TOUCHED (image missed)
                    ##########################################
                    if self.touchMsg['picture'] == 'missed': # Touched background
-
                        self.log_event(" missed ," + "(" + str(x) + ";" + str(y)  + ")")
                        self.background_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
                        self.background_touches += 1
@@ -828,6 +1066,31 @@ class Experiment:
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
                                    self.correct_image_touches += 1
+                       
+                       elif self.BANDIT_TRAINING:
+                           for img, probabilityList in self.touchImgs.items():
+                               probabilityListIDX = self.trial_num % len(probabilityList) # IDX = trial num. If Trial num exceeds len(probabilityList), it starts over
+                               reward_prob_for_this_img = probabilityList[probabilityListIDX]
+
+
+                               if self.touchMsg['picture'] == img:  # Touched an image
+                                   self.log_event( "Probability of pellet: " + str(probabilityList[self.trial_num]))
+
+                                   if reward_prob_for_this_img > 50.0:
+                                       self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+                                       self.log_event("High PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" + ',' + str(self.cur_img_coords))
+                                       self.cur_img_coords_index += 1 # Go to next picutre
+                                       self.cur_img_coords_index = self.cur_img_coords_index % len(self.cur_img_coords) # Overflow error
+                                       self.correct_image_touches += 1
+                                   else: # Less desirable image touchewd
+                                       self.wrong_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+                                       self.log_event("Low PROB: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")" + ',' + str(self.cur_img_coords))
+                                   # Holds the probability for each trial
+                                   self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
+                                   self.CORRECT = True
+                                   
+
+
 
                        #################################
                        # TOUCH TRAINING
@@ -888,7 +1151,7 @@ class Experiment:
            ################
            if self.cond["RESET"] == "FIXED":
                if cond_time_elapsed >= float(self.cond["MAX_TIME"]): # Time is up
-                  self.CONDITION_STARTED = False
+                  #self.CONDITION_STARTED = False
                   if not self.WRONG and not self.CORRECT:
                       self.NO_ACTION_TAKEN = True
                       self.log_event("NO_ACTION_TAKEN")
@@ -897,11 +1160,11 @@ class Experiment:
            if self.cond["RESET"] == "ON_RESPONSE":
                #print (cond["Reset"])
                if self.WRONG or self.CORRECT: # A response was given
-                   self.CONDITION_STARTED = False  # Time is up
+                   #self.CONDITION_STARTED = False  # Time is up
                    # NOTE: "END_OF_TRIAL" LOGGED AFTER OUTCOMES
                    self.TIME_IS_UP = True
                if cond_time_elapsed >= float(self.cond["MAX_TIME"]): # Time is up
-                  self.CONDITION_STARTED = False
+                  #self.CONDITION_STARTED = False
                   if not self.WRONG and not self.CORRECT:
                       self.NO_ACTION_TAKEN = True
                       self.log_event("NO_ACTION_TAKEN")
@@ -922,18 +1185,21 @@ class Experiment:
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
                   self.correctPercentage = self.num_correct/self.trial_num * 100
-                  print("Correct")
+                  #print("Correct")
                elif self.WRONG:
                   outcome = self.cond['WRONG'].upper()    # Outcome for wrong response(in Expt File)
                   self.num_wrong += 1
                   self.wrongPercentage = self.num_wrong/self.trial_num * 100
-                  print("Wrong")
+                  #print("Wrong")
                else:
                   outcome = self.cond['NO_ACTION'].upper()# Outcome for No_Action taken(in Expt File)
                   self.num_no_action += 1
                   self.no_actionPercentage = self.num_no_action/self.trial_num * 100
-                  print("No Action Taken")
-               print(outcome)
+                  #print("No Action Taken")
+               self.NEXT_TRIAL = True
+
+               if self.TOUCHSCREEN_USED and not self.PAUSE_STARTED:
+                  self.GUI.TSq.put('')
                ##############################################################
                # OUTCOMES (Specified in protocol files under [CONDITIONS])
                ##############################################################
@@ -970,6 +1236,11 @@ class Experiment:
                                GUIFunctions.PLAY_TONE(self.GUI,"TONE1")
                            else:  # Low prob image pressed, so different tone.
                                GUIFunctions.PLAY_TONE(self.GUI,"TONE2")
+                               if self.cond['WRONG'].upper() == 'DN_PUNISH':
+                                   self.NEXT_TRIAL = False
+                                   self.WRONG = True
+                                   self.CORRECT = False
+
                            rand = random.random() * 100
                            #print("our random number", rand)
                            if rand <= self.cur_probability:
@@ -998,29 +1269,47 @@ class Experiment:
                elif outcome == 'SHOCK':
                     self.log_event("Shock_ON",("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
                     self.SHOCK_ON = True
+
+               elif outcome == 'DN_PUNISH':
+                   if not self.PAUSE_STARTED:
+                       self.GUI.cabin_light.sendDBit(True)
+                       self.PAUSE_TIME = 10
+                       self.PAUSE_STARTED = True
+                       self.pause_start_time = time.perf_counter()
+                       self.NEXT_TRIAL = False
+                   else:
+                       time_elapsed = time.perf_counter() - self.pause_start_time
+                       self.NEXT_TRIAL = False
+                       if time_elapsed >= self.PAUSE_TIME:
+                           self.GUI.cabin_light.sendDBit(False)
+                           self.NEXT_TRIAL = True
+                           self.PAUSE_STARTED = False
                else: #outcome == 'NONE'
                    self.log_event("NONE")
                    #print("Outcome = NONE")
-               if self.TOUCHSCREEN_USED:
-                   # Want to wait a second before blanking screen
-##                   if self.cur_time - self.touch_time > 1.0:
-##                       self.GUI.TSq.put('')
-                   self.GUI.TSq.put('')
 
-               self.TIME_IS_UP = False
-               self.CONDITION_STARTED = False
-               self.log_event("END_OF_TRIAL")
-               self.Protocol_ln_num +=1
+               if self.NEXT_TRIAL == True:
+                   self.TIME_IS_UP = False
+                   self.CONDITION_STARTED = False
+                   self.log_event("END_OF_TRIAL")
+                   self.Protocol_ln_num +=1
     ### END EXPT ###
     def endExpt(self):
         # Tell open ephys to stop acquistion and recording?
         if self.EPHYS_ENABLED:
             self.snd.send(self.snd.STOP_ACQ)
+            #win32gui.EnumWindows(GUIFunctions.killProgram, 'Open Ephys GUI')
             self.openEphysQ.put('STOP')
 
         if self.VID_ENABLED:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
+
+        if self.stim is not None and self.stim.is_alive():
+            self.stimBackQ.put('STOP')
+            self.stimX.end()
+            if self.stimY != None:
+                self.stimY.end()
 
         if self.GUI.num_cameras >= 2: self.SIMPLEVIDq.put({'STATE':'OFF'}) # Need two cameras
         EXPTFunctions.resetBox(self.GUI)
@@ -1033,7 +1322,7 @@ class Experiment:
         self.GUI.START_EXPT = False
 
         for button in self.GUI.buttons:
-            if button.text == 'STOP EXPT':
+            if button.text == 'PAUSE EXPT':
                 button.text = 'RESET EXPT'
 
         self.GUI.exptEnded = True

@@ -1,20 +1,19 @@
-# BehavioralChamber
+# BehavioralChamber [![DOI](https://zenodo.org/badge/160200586.svg)](https://zenodo.org/badge/latestdoi/160200586)
 
 In development python based GUI used to manage rat behavioral box's with customizable GUI and protocol format.
 
 ![TNEL Logo](/images/TNELogo.jpg)
 
 ## Installation
-WIP.
+I recommend using anaconda and creating a new environment to use this software.
 
-### Dependencies
-python3+ (untested but probably 3.5+)
+Use the provided environment.yaml.
 
-opencv
-
-whisker
-
-zmq
+Set up your environment using
+```
+conda env create -f environment.yaml
+```
+Otherwise see requirements.txt for a list of dependencies.
 
 ## Usage
 We use the following code in a batch file to open the GUI.
@@ -26,7 +25,7 @@ python BEH_GUI_MAIN.py
 ![GUI Image](/images/pyBox.png)
 
 
-### Edit Box details
+### Edit the Box for your project!
 daqAPI.py correlates port numbers to input/output responses.
 
 ### Protocols
@@ -34,16 +33,17 @@ See "all about protocols" file in PROTOCOLS folder.
 
 Basic Overview:
 
-[EXPERIMENT] set path and naming
+[EXPERIMENT]
+ - set path and names
 
-Then specific box items
+[SETUP]
+  - anything is setup is ran prior to the clock starting
 
-[SETUP] is used for various switches to be set
-
-[PROTOCOL] The experimental parameters, runs similar to a for loop
+[PROTOCOL]
+ - The experimental parameters, runs similar to a for loop
 
 [Conditions]
-correlates an input from chamber to an output along with timing
+ - correlates an input from chamber to an output along with timing
 
 ## Coding style overview
 Two classes: GUI and Experiment

@@ -2,21 +2,23 @@ import zmq
 import numpy as np
 from convertString import convertString
 import json
+import time
 
 class RCVEvent:
     # SUBSCRIBE can be a list of vars, need to be in byte string format => b'spike'
-    def __init__(self, port, SUBSCRIBE):
+    def __init__(self, port, SUBSCRIBE, delay = 200):
         context = zmq.Context()
         self.socket = context.socket(zmq.SUB)
         self.socket.connect("tcp://localhost:" + str(port))
         self.poller = zmq.Poller()
         self.poller.register(self.socket, zmq.POLLIN)
+        self.delay = delay
         for sub in SUBSCRIBE:
             self.socket.setsockopt(zmq.SUBSCRIBE, sub)
 
     def rcv(self):
         #Get raw input from socket
-        sockets = self.poller.poll(200)
+        sockets = self.poller.poll(self.delay)
         for socket in sockets:
         #msg = self.socket.recv_multipart()
             msg = socket[0].recv_multipart()
@@ -97,11 +99,22 @@ class SNDEvent:
         else:
             print('case not created')
             return
+
+        #time.sleep(1) #If we switch to binary we probably need this
         self.socket.send(self.switch(control))
 
         #  Get the reply.
         message = self.socket.recv()
         print("Received reply %s " %  message)
+
+    def sendTTL(self, TTL_CHAN):
+        # Send TTL ON
+        self.socket.send(b"".join([b'TTL Channel=', TTL_CHAN, b' on=1']))
+        self.socket.recv()
+        # Wait and send TTL OFF
+        time.sleep(0.005)
+        self.socket.send(b"".join([b'TTL Channel=', TTL_CHAN, b' on=0']))
+        self.socket.recv()
 
     # Function that acts as a C switch. Gets your desired string
     def switch(self, x):

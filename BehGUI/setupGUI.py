@@ -29,6 +29,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
     #                      (myscreen,ID, x, y, w, h,"text"    , font size)
     buttons.append(MyButton(myscreen,0,10,5,50,20,"CABIN LT",12))  # 0
     buttons.append(MyButton(myscreen,5,10,32,50,20,"FAN",12))         # 5
+    
 
     if checkForTouch(self):
         buttons.append(MyButton(myscreen,4,315,390,50,20,"FEED",12))     # 4
@@ -134,6 +135,7 @@ def NIDAQ_GUI_ELEMENT(self, myscreen):
 
 
 def setupExpt(self):
+    print('starting expt')
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (20,40)
     self.myscreen = pygame.display.set_mode((500,990),pygame.RESIZABLE,32)
     #self.myscreen = pygame.display.set_mode((500,990),32)
@@ -214,8 +216,9 @@ def setupExpt(self):
     self.events = []
 
     time.sleep(0.5)
-    self.expt = experiment.Experiment(self)
 
+    self.expt = experiment.Experiment(self)
+    print('done starting')
     self.buttons,self.levers,self.boxes,self.circles,self.LEDs,self.toggles,self.info_boxes,self.user_inputs,self.labels,self.sliders = NIDAQ_GUI_ELEMENT(self, self.myscreen )
     self.feederBox = self.boxes[0]
     self.new_slider_y = self.sliders[0].slotL # SETUPGUI

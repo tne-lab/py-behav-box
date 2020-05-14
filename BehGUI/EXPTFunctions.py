@@ -7,7 +7,6 @@ import GUIFunctions
 #   GET BOX INPUTS FROM GUI
 ####################################################################################
 def checkStatus(self):
-
     # Maybe reset inputs?
     self.FOOD_EATEN = False
     self.LEVER_PRESSED_L = False
@@ -20,26 +19,21 @@ def checkStatus(self):
     self.LEVER_PRESSED_L = self.GUI.LEVER_PRESSED_L
     if self.LEVER_PRESSED_L:
         self.num_L_nose_pokes += 1
-        self.log_event("Lever_Pressed_L")
     self.LEVER_PRESSED_R = self.GUI. LEVER_PRESSED_R
     if self.LEVER_PRESSED_R:
         self.num_R_lever_preses += 1
-        self.log_event("Lever_Pressed_R")
     self.NOSE_POKED_L = self.GUI.NOSE_POKED_L
     if self.NOSE_POKED_L:
         self.num_L_nose_pokes += 1
-        self.log_event("Nose_Poke_L")
     self.NOSE_POKED_R = self.GUI.NOSE_POKED_R
     if self.NOSE_POKED_R:
         self.num_R_nose_pokes += 1
-        self.log_event("Nose_Poke_R")
     self.FOOD_EATEN = self.GUI.FOOD_EATEN
     if self.FOOD_EATEN:
         self.num_eaten +=1
-        self.log_event("Food_Eaten")
 
 
-    # Not sure what to do here. Reset self.GUI inputs?
+    # Might just use these eventually...
     self.GUI.FOOD_EATEN = False
     self.GUI.LEVER_PRESSED_L = False
     self.GUI.LEVER_PRESSED_R = False
@@ -53,7 +47,7 @@ def checkQs(self):
     # Handle Video
     if self.VID_ENABLED:
         #Check Vid Q
-        if not self.VIDBack_q.empty():
+        while not self.VIDBack_q.empty():
             backDict = self.VIDBack_q.get()
             if backDict['FROZEN']: # FROZEN
                   # NOTE: this must be "debounced"
@@ -91,9 +85,19 @@ def checkQs(self):
 
     if self.EPHYS_ENABLED:
         ### CHECK OE Q ###
-        if not self.openEphysBack_q.empty():
+        while not self.openEphysBack_q.empty():
             OEMsg = self.openEphysBack_q.get()
-            self.log_event(str(OEMsg))
+            #self.log_event(str(OEMsg))
+
+    if self.stim is not None and self.stim.is_alive():
+        ### CHECK STIM Q ###
+        while not self.stimQ.empty():
+            stim = self.stimQ.get() # What do we want here?
+            if stim == "CONTINUE":
+                print('moving on from CL wait')
+                self.Protocol_ln_num+=1
+            else:
+                self.log_event(stim)
 
 
 ###########################################################################################################
@@ -125,7 +129,7 @@ def log_event(self,event, event_other=''):
     if len(self.GUI.events) > 14:  self.start_line = len(self.GUI.events) - 14
     try:
         self.log_file.write(event_string + event_other + '\n')   # To WRITE TO FILE
-        print(event_string + event_other)                   # print to display
+        #print(event_string + event_other)                   # print to display
     except:
         print ('Log file not created yet. Check EXPT PATH, then Press "LOAD EXPT FILE BUTTON"')
 
@@ -134,6 +138,7 @@ def log_event(self,event, event_other=''):
 #   Make sure everything in box is back to false (Called with self.GUI)
 ####################################################################################
 def resetBox(self):
+    # TODO: Create list of DaqAPI elements and loop through them and turn off here (bitwise, bytewise lists)
     self.fan.sendDBit(False)
     self.cabin_light.sendDBit(False)
     if 'EPHYS-2' in self.computer:
@@ -141,9 +146,16 @@ def resetBox(self):
         if self.expt.TOUCHSCREEN_USED:
             self.TSq.put('')
     #if 'EPHYS-1' in self.computer:
-        #self.low_tone.sendDByte(0)
+        #self.low_tone.sendDByte(False)
 
     self.L_condition_Lt.sendDBit(False)
     self.R_condition_Lt.sendDBit(False)
 
     GUIFunctions.EXTEND_LEVERS(self,"Levers_Retracted",False,False)
+
+def isNumber(self, s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False

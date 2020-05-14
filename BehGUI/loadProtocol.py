@@ -5,6 +5,8 @@ import GUIFunctions
 import time
 import webbrowser
 import win32gui
+import shutil
+import numpy as np
 
 def get_val_between_equal_sign_and_hash(line):
     try:
@@ -40,23 +42,29 @@ def get_before_hash(line):
         print("Could not parse line3:", line)
         return clean_line
 
+
 def load_expt_file(self):
     try:
+        currentlySetting = None
         f = open(self.GUI.expt_file_path_name,'r')
         # Read Line by line
         EXPERIMENT = False
+        self.config_file_path = ''
         for ln in f:
             str_before_equal, str_after_equal = get_LR_before_hash(ln)
             line = get_before_hash(ln)
 
-            if not EXPERIMENT: # Makes sure that path is correct
+            if (not EXPERIMENT) and (currentlySetting!='STIM'): # Makes sure that path is correct
                 str_after_equal = str_after_equal.upper()
+                str_before_equal = str_before_equal.upper()
 
             self.exptFileLines.append(line)
 
             if str_before_equal != "" and str_before_equal[0] != "#" : #Skip Blank Lines and Skip lines that are just comments (but still copy them to new file)
                 if '[EXPERIMENT' in str_before_equal:
                     currentlySetting = 'EXPERIMENT'
+                elif '[OPEN_EPHYS' in str_before_equal:
+                    currentlySetting = 'OPEN_EPHYS'
                 elif '[TONE1' in str_before_equal:
                     currentlySetting = 'TONE1'
                 elif '[TONE2' in str_before_equal:
@@ -70,8 +78,18 @@ def load_expt_file(self):
                     self.setTouchGlobals()
                 elif '[BAR_PRESS]' in str_before_equal:
                     currentlySetting = 'BARPRESS'
+                elif '[STIM]' in str_before_equal:
+                    currentlySetting = 'STIM'
+                elif '[ERP]' in str_before_equal:
+                    currentlySetting = 'ERP'
                 elif '[PROTOCOL' in str_before_equal:
                     currentlySetting = 'PROTOCOL'
+                elif '[PARAMETER_SWEEPING' in str_before_equal:
+                    currentlySetting = 'PARAMETER_SWEEPING'
+                elif '[OPEN_LOOP' in str_before_equal:
+                    currentlySetting = 'OPEN_LOOP'
+                elif '[CLOSED_LOOP' in str_before_equal:
+                    currentlySetting = 'CLOSED_LOOP'
                 elif '[SETUP' in str_before_equal:
                     currentlySetting = 'SETUP'
                 elif "[CONDITIONS" in str_before_equal:
@@ -129,49 +147,69 @@ def load_expt_file(self):
                             return False
                         print(video_file_path)
 
-                    elif 'OPEN_EPHYS' in str_before_equal:
-                        self.EPHYS_ENABLED = True
-                        if self.GUI.NIDAQ_AVAILABLE:
-                            ephys = 'Open Ephys GUI'
-                            win32gui.EnumWindows(GUIFunctions.lookForProgram, ephys)
-                            if not GUIFunctions.IsOpenEphysRunning:
-                                oe = str_after_equal
-                                window = subprocess.Popen(oe)# # doesn't capture output
-                                time.sleep(2)
-                                win32gui.EnumWindows(GUIFunctions.lookForProgram, ephys)
-                                #except:
-                                #    print("Could not start Open Ephys")
-                            else: print("Open Ephysis already RUNNING")
-                            print(".............................................")
-
                     elif 'VI_TIMES_LIST_PATH' in str_before_equal:
                         self.VIs_file_path = str_after_equal
                         print(self.VIs_file_path)
 
+                elif currentlySetting == 'OPEN_EPHYS':
+                    if "OPEN_EPHYS_CONFIG_FILE" in str_before_equal:
+                        self.config_file_path = str_after_equal
+
+                    elif 'OPEN_EPHYS_PATH' in str_before_equal:
+                        if self.GUI.NIDAQ_AVAILABLE:
+                            win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
+                            if GUIFunctions.IsOpenEphysRunning:
+                                win32gui.EnumWindows(GUIFunctions.killProgram, 'Open Ephys GUI')
+                                time.sleep(0.5)
+                            if self.config_file_path != '':
+                                dest = shutil.copy(os.getcwd() + '\\RESOURCES\\CONFIGS\\' + self.config_file_path, str_after_equal[:-14] + 'lastConfig.xml')
+                                print('moved config file to oe dir : ', dest)
+                            oe = str_after_equal
+                            window = subprocess.Popen(oe)# # doesn't capture output
+                            time.sleep(0.5)
+                            win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
+                            if GUIFunctions.IsOpenEphysRunning:
+                                self.EPHYS_ENABLED = True
+
+                    elif 'TTL_LEVER_R' == str_before_equal:
+                        self.TTL_LEVER_L = str_after_equal
+
+                    elif 'TTL_LEVER_L' == str_before_equal:
+                        self.TTL_LEVER_R = str_after_equal
+
+                    elif 'TTL_NOSE_L' == str_before_equal:
+                        self.TTL_NOSE_L = str_after_equal
+
+                    elif 'TTL_NOSE_R' == str_before_equal:
+                        self.TTL_NOSE_R = str_after_equal
+
+                    elif 'TTL_FOOD' == str_before_equal:
+                        self.TTL_NOSE_L = str_after_equal
+
                 elif currentlySetting == 'TONE1':#TONE1
                     if 'DURATION' in str_before_equal:
-                        self.Tone1_Duration = float(str_after_equal)
-                        print("self.Tone1_Duration",self.Tone1_Duration)
+                        self.GUI.Tone1_Duration = float(str_after_equal)
+                        print("self.Tone1_Duration",self.GUI.Tone1_Duration)
 
                     if 'FREQ' in str_before_equal:
                         self.GUI.Tone1_Freq = float(str_after_equal)
                         print("self.Tone1_Freq: ",self.GUI.Tone1_Freq)
 
                     if 'VOL' in str_before_equal:
-                        self.Tone1_Vol = float(str_after_equal)
+                        self.GUI.Tone1_Vol = float(str_after_equal)
                         print("self.Tone1_Vol: ",self.GUI.Tone1_Vol)
 
                 elif currentlySetting == 'TONE2':#TONE2
                     if 'DURATION' in str_before_equal:
-                        self.Tone2_Duration = float(str_after_equal)
+                        self.GUI.Tone2_Duration = float(str_after_equal)
                         print("self.Tone2_Duration",self.GUI.Tone2_Duration)
 
                     if 'FREQ' in str_before_equal:
-                        self.Tone2_Freq = float(str_after_equal)
+                        self.GUI.Tone2_Freq = float(str_after_equal)
                         print("self.Tone2_Freq: ",self.GUI.Tone2_Freq)
 
                     if 'VOL' in str_before_equal:
-                        self.Tone2_Vol = float(str_after_equal)
+                        self.GUI.Tone2_Vol = float(str_after_equal)
                         print("self.Tone2_Vol: ",self.GUI.Tone2_Vol)
 
                 elif currentlySetting == 'TOUCHSCREEN':
@@ -179,9 +217,25 @@ def load_expt_file(self):
                         self.TOUCH_IMG_PATH = str_after_equal
 
                     if 'COORDS' in str_before_equal:
+                        self.BANDIT_TRAINING = False
                         words = str_after_equal
                         if "RANDOM" in words:
                             self.RANDOM_IMG_COORDS = True # self.touchImgCoords will be made radom in BehGUI.py
+                        elif "BANDIT_TRAINING" in words:
+                            self.BANDIT_TRAINING = True
+                            self.cur_img_coords = []
+                            self.cur_img_coords_index = 0
+                            coordSets = words.split('%')[1:]
+                            for coord in coordSets:
+                                imageCoords = coord.split(':') # get rid of words before first ':'
+                                touchImgCoords = []
+                                for i in range(len(imageCoords)): # Loop through coord list
+                                    for c in '()':#Remove parenthesis from (x,y)
+                                        imageCoords[i] = imageCoords[i].replace(c, "")
+
+                                    imageCoordsStr = imageCoords[i].split(",")
+                                    touchImgCoords.append((int(imageCoordsStr[0]), int(imageCoordsStr[1])))
+                                self.cur_img_coords.append(touchImgCoords)
                         else:
                             imageCoords = words.split(':')
                             for i in range(len(imageCoords)): # Loop through coord list
@@ -271,6 +325,77 @@ def load_expt_file(self):
 ##                            print("var_RATIO_reward: ",self.var_ratio_reward)
 ##                        except:
 ##                            print ("!!!!!!!!!!!VR must have the form '(10, 1,30,5)' in EXP PROOCOL file!!!!!!!!!!!!!!")
+
+                elif currentlySetting == "STIM":
+                    if 'STIM_ADDRESS_X' == str_before_equal or 'STIM_ADDRESS' == str_before_equal:
+                        self.stimAddressX = str_after_equal
+                    if 'STIM_ADDRESS_Y' == str_before_equal or 'STIM_ADDRESS_SHAM' == str_after_equal:
+                        self.stimAddressY = str_after_equal
+
+                elif currentlySetting == 'CLOSED_LOOP':
+                    if '[CLOSED_LOOP]' == str_before_equal: # Defaults, should do this for all!
+                        self.CLCHANNEL = 1
+                        self.CLMicroAmps = 100
+                        self.CLLag = 0 # Default as fast as possible (milliseconds)
+                        self.CLTimer = 30 # probably won't use this? Use experiment protocol Closed_loop = 30 to run for 30 minutes
+                        self.CLTimeout = 1
+                        self.CLTimeoutVar = 0.2
+                        self.CL_Enabled = False
+                    if 'EVENTCHANNEL' in str_before_equal:
+                        self.CLCHANNEL = str_after_equal
+                    if 'MICROAMPS' in str_before_equal:
+                        self.CLMicroAmps = int(str_after_equal)
+                    if 'STIM_LAG' in str_before_equal: # note 7.5ms delay here
+                        stimLag = float(str_after_equal)
+                        if stimLag < 7.5:
+                            self.CLLag = 0
+                        else:
+                            self.CLLag = (stimLag - 7.5)/1000.0
+                    if 'TIMER' == str_before_equal: #
+                        self.CLTimer = float(str_after_equal)
+                    if 'TIMEOUT' == str_before_equal:
+                        self.CLTimeout = float(str_after_equal)
+                    if 'TIMEOUT_VAR' == str_before_equal:
+                        self.CLTimeoutVar = float(str_after_equal)
+
+
+
+                elif currentlySetting == 'ERP':
+                    if '[ERP]' == str_before_equal: # Defaults, should do this for all!
+                        self.INTER_PULSE_WIDTH = 4
+                        self.PULSE_VAR = 1
+                        self.NUM_ERP_PULSE = 2
+                        self.NUM_ERP_LOCATIONS = 2
+                    if 'INTER_PULSE_WIDTH' == str_before_equal:
+                        self.INTER_PULSE_WIDTH = float(str_after_equal)
+                    if 'PULSE_VAR' == str_before_equal:
+                        self.PULSE_VAR = float(str_after_equal)
+                    if 'NUM_PULSE' == str_before_equal:
+                        self.NUM_ERP_PULSE = int(str_after_equal)
+                    if 'NUM_LOCATIONS' == str_before_equal:
+                        self.NUM_ERP_LOCATIONS = int(str_after_equal)
+
+                elif currentlySetting == 'OPEN_LOOP':
+                    if "PHASE_DELAY" == str_before_equal:
+                        self.openLoopPhaseDelay = float(str_after_equal)
+
+                elif currentlySetting == 'PARAMETER_SWEEPING':
+                    if "INTENSITY" == str_before_equal:
+                        for c in '()':#Remove parenthesis from (x,y)
+                            str_after_equal = str_after_equal.replace(c, "")
+
+                        self.intensityArray = np.asarray(str_after_equal.split(","), dtype=np.float64)
+                    if "DURATION" == str_before_equal:
+                        for c in '()':#Remove parenthesis from (x,y)
+                            str_after_equal = str_after_equal.replace(c, "")
+
+                        self.durationArray = np.asarray(str_after_equal.split(","), dtype=np.float64)
+                    if "DELAY" == str_before_equal:
+                        self.paramDelay = float(str_after_equal)
+                    if "DELAY_VAR" == str_before_equal:
+                        self.paramDelayVar = float(str_after_equal)
+                    if "SET_SIZE" == str_before_equal:
+                        self.paramSetSize = int(str_after_equal)
 
                 elif currentlySetting == 'SHOCK':
                     if 'DURATION' in str_before_equal:
@@ -457,7 +582,9 @@ def create_files(self):
     ###### EXPT COPY FILE #####
     new_dir = os.path.join(self.GUI.datapath,self.GUI.Expt_Name)
     if not os.path.exists(new_dir ):  os.mkdir(new_dir)
-    new_sub_dir = os.path.join(new_dir,self.date)
+    new_sub_dir = os.path.join(new_dir,self.GUI.Subject)
+    if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
+    new_sub_dir = os.path.join(new_sub_dir,self.date)
     if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)
     new_sub_dir = os.path.join(new_sub_dir,self.exptTime)
     if not os.path.exists(new_sub_dir ):os.mkdir(new_sub_dir)

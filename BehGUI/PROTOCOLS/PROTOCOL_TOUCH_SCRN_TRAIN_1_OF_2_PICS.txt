@@ -9,7 +9,8 @@ IMAGES_PATH = C:\Users\ephys-2\Documents\GitHub\py-behav-box\BehGUI\RESOURCES
 #       Image size is controlled in whiskerTouchZMQ.py
 COORDS=RANDOM          # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 IMG1= FLOWER_REAL.bmp  # Image name
-TRAIN_TOUCH =1,100  # note: TRAIN_TOUCH =a,b.  a = initial VI for img touch, b = initial VI for background touch
+TRAIN_TOUCH =1,1  # note: a,b.  a = initial VI for img touch (a random num between 0 and 2*a), b = initial VI for background touch (a random number between 0 and 2*b)
+background touch
 
 [SETUP]
 MAX_EXPT_TIME = 60     # NOTE: In minutes.   Generally 60 min max for rats
@@ -24,12 +25,12 @@ FOOD_LIGHT=TRUE
 START_LOOP1 = 600  # Max trials should be no more than 100
   DRAW_IMAGES=True
   CONDITIONS=0    # NOTE: starts at 0
-  PAUSE = 2   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet...
+  PAUSE = 5   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet...
 END_LOOP
 
 FOOD_LIGHT=False
 REC=False
-CAMERA= False
+CAMERA= True
 CAB_LIGHT=False
 FAN_ON=False
 [END PROTOCOL]

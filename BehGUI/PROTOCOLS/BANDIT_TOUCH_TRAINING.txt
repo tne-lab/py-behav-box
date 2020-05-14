@@ -1,0 +1,64 @@
+[EXPERIMENT]
+EXPT_NAME = Bandit_Touch_TEST # Don't use "-" in name, use underscores "_" instead
+EXPT_PATH 	= C:\Users\ABET User\Documents\Github\py-behav-box\BehGUI\DATA
+#OPEN_EPHYS_PATH =  C:\Users\ephys-2\Documents\GitHub\plugin-GUI\Builds\VisualStudio2013\x64\Release\bin\open-ephys.exe # on Flav's PC Ephys-2
+###               E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe # on Jean's PC Ephys-1
+
+
+[TONE1] # Need TONE1, TONE2 # Tone1 associated with GOOD response
+Duration(s) 	= 1
+Freq(Hz)	= 1000
+Volume(0-1)	= 1.0
+
+[TONE2] # Need TONE1, TONE2  # Tone2 associated with BAD response
+Duration(s) 	= 1
+Freq(Hz)	= 5000
+Volume(0-1)	= 1.0
+
+#[SHOCK]
+#Duration(s) 	= 3test
+#Volts		= 5.5  # NOTE:  only duration is controlled here.
+#Amps(mA)	= 100  # V and amps are set manually on scrambled grid generator
+
+#[FREEZE]
+#Min Duration(s)	= 2
+#Min Moving Pix	= 5000
+#ROI=GENERATE            # Generate = asks user for ROI, or (x,y,w,h).  This also starts FREEZE detection  FREEZE=TRUE
+
+[TOUCHSCREEN]
+IMAGES_PATH = C:\Users\ABET User\Documents\Github\py-behav-box\BehGUI\RESOURCES
+COORDS=BANDIT_TRAINING%(200,425):(530,425)%(530,425):(200,425)%(200,425):(530,425)%(200,425):(530,425)%(530,425):(200,425)%(530,425):(200,425)%(200,425):(530,425)%(530,425):(200,425)%(200,425):(530,425)%(200,425):(530,425)%(200,425):(530,425)%(530,425):(200,425)%(530,425):(200,425)%(530,425):(200,425)   # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+# Image name: probability of reward on each trial
+IMG1= 6a.bmp:(100x120)
+IMG2= 6b.bmp:(0x120)
+
+[SETUP]
+FAN_ON=TRUE
+CAMERA=FALSE
+REC=FALSE
+
+[PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
+START_LOOP1 = 200#NOTE: 1st 50 reward probabilities next to img name under [TOUCH]
+FOOD_LIGHT = True
+# PAUSE = NOSEPOKE_TO_START
+# PAUSE = TOUCH_TO_START
+PAUSE = EAT_TO_START
+FOOD_LIGHT = False
+# PAUSE = 3 # time between nosepoke and presentation
+#  TONE1 # When Spider is high prob img
+#  PAUSE = 1  # to wait for tone to finish
+ DRAW_IMAGES=True
+ CONDITIONS=0
+CHECK_NUM_CORRECT=50
+ #IF WRONG PAUSE 10 with house light
+  PAUSE = 5    # sec
+END_LOOP
+
+REC=False
+CAMERA= False
+FAN_ON=False
+[END PROTOCOL]
+
+[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE.  Also, HERE WE NEED COMMAS.
+MAX_TIME, RESET,        CORRECT,        WRONG,   NO_ACTION
+60,       ON_RESPONSE,  PELLET_VAR,     DN_PUNISH,    NONE

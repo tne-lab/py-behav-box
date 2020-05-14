@@ -11,6 +11,7 @@ from queue import Queue
 import whiskerTouch
 try:
     import win32gui
+    import win32con
     LINUX = False
 except:
     LINUX = True
@@ -28,12 +29,18 @@ def closeWindow(hwnd, windowName):
 def lookForProgram(hwnd, programName):
     global IsWhiskerRunning, IsOpenEphysRunning
     if programName in win32gui.GetWindowText(hwnd):
-        win32gui.CloseWindow(hwnd) # Minimize Window
         if 'Whisker' in programName:
+            win32gui.CloseWindow(hwnd) # Minimize Windo
             IsWhiskerRunning = True
         elif 'Ephys' in programName:
-            print('found ephys!')
             IsOpenEphysRunning = True
+
+def killProgram(hwnd, programName):
+    global IsOpenEphysRunning
+    if programName in win32gui.GetWindowText(hwnd):
+        win32gui.PostMessage(hwnd,win32con.WM_CLOSE,0,0)
+        if 'Ephys' in programName:
+            IsOpenEphysRunning = False
 
 def openWhiskerEphys(NIDAQ_AVAILABLE):
     global IsWhiskerRunning, IsOpenEphysRunning #, self.NIDAQ_AVAILABLE
@@ -56,8 +63,7 @@ def choose_file():
     #Tk.withdraw() # we don't want a full GUI, so keep the root window from appearing
     chosenFileName = askopenfilename() # show an "Open" dialog box and return the path to the selected file
     filename = os.path.basename(chosenFileName)
-    win32gui.EnumWindows(closeWindow, 'tk')
-
+    #win32gui.EnumWindows(closeWindow, 'tk') # was stalling here?
     return filename
 
 def FAN_ON_OFF(self, FAN_ON):
@@ -89,7 +95,7 @@ def PLAY_TONE(self, TONE_ID):  # Plays tone using computer speaker
     if TONE_ID == 'TONE1':
         if not self.TONE_ON:
             if self.EXPT_LOADED: self.expt.log_event("Tone_ON",("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
-            newThread = threading.Thread(target=play_sound, args=(self.Tone1_Freq, self.Tone1_Vol,self.Tone1_Duration))
+            newThread = threading.Thread(target=play_sound, args=(self.Tone1_Freq, self.Tone1_Vol,self.Tone1_Duration)) #
             print("freq: ",self.Tone1_Freq,"Vol: ", self.Tone1_Vol, "Duration: ",self.Tone1_Duration)
             # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
             newThread.start()
@@ -101,7 +107,7 @@ def PLAY_TONE(self, TONE_ID):  # Plays tone using computer speaker
     elif TONE_ID == 'TONE2':
         if not self.TONE_ON:
             if self.EXPT_LOADED: self.expt.log_event("Tone_ON",("Freq(Hz)", str(self.Tone2_Freq), "Vol(0-1)",str(self.Tone2_Vol), "Duration(S)",str(self.Tone2_Duration)))
-            newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration))
+            newThread = threading.Thread(target=play_sound, args=(self.Tone2_Freq, self.Tone2_Vol,self.Tone2_Duration)) # self.Tone2_Freq
             # Note: play_sound is in RESOURCES\GUI_elements_by_flav.property
             newThread.start()
             self.TONE_TIME = time.perf_counter()
@@ -114,16 +120,16 @@ def CAB_LIGHT(self, ON_OFF):
     gray        = (100,100,100)
     darkgray    = (50,50,50)
     if ON_OFF: # ON
-       if self.EXPT_LOADED: self.expt.log_event("Cabin Light ON")
-       Background_color = gray
-       #self.cabin_light = daqAPI.cabinLightSetup()
-       if self.NIDAQ_AVAILABLE:  self.cabin_light.sendDBit(True)
+        if self.EXPT_LOADED: self.expt.log_event("Cabin Light ON")
+        Background_color = gray
+        #self.cabin_light = daqAPI.cabinLightSetup()
+        if self.NIDAQ_AVAILABLE:  self.cabin_light.sendDBit(True)
 
     else: # ON_OFF = False
-       if self.EXPT_LOADED: self.expt.log_event("Cabin Light OFF")
-       Background_color = darkgray
-       if self.NIDAQ_AVAILABLE: self.cabin_light.sendDBit(False)
-       #self.cabin_light.end()
+        if self.EXPT_LOADED: self.expt.log_event("Cabin Light OFF")
+        Background_color = darkgray
+        if self.NIDAQ_AVAILABLE: self.cabin_light.sendDBit(False)
+        #self.cabin_light.end()
     return Background_color
 
 
@@ -156,36 +162,36 @@ def EXTEND_LEVERS(self, text, L_LVR, R_LVR):
 
 def L_CONDITIONING_LIGHT(self, ON_OFF):
     if ON_OFF : # ON
-       if self.EXPT_LOADED: self.expt.log_event("Left_Light_ON")
-       if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(True)
+        if self.EXPT_LOADED: self.expt.log_event("Left_Light_ON")
+        if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(True)
 
     else: # ON_OFF = False
-       if self.EXPT_LOADED: self.expt.log_event("Left_Light_OFF")
-       if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(False)
+        if self.EXPT_LOADED: self.expt.log_event("Left_Light_OFF")
+        if self.NIDAQ_AVAILABLE:  self.L_condition_Lt.sendDBit(False)
 
 def R_CONDITIONING_LIGHT(self, ON_OFF):
     if ON_OFF: # ON
-       if self.EXPT_LOADED: self.expt.log_event("Right_Light_ON")
-       if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(True)
+        if self.EXPT_LOADED: self.expt.log_event("Right_Light_ON")
+        if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(True)
 
     else: # ON_OFF = False
-       if self.EXPT_LOADED: self.expt.log_event("Right_Light_OFF")
-       if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(False)
+        if self.EXPT_LOADED: self.expt.log_event("Right_Light_OFF")
+        if self.NIDAQ_AVAILABLE:   self.R_condition_Lt.sendDBit(False)
 
 def Food_Light_ONOFF(self, ON_OFF):
     gray = (100,100,100)
     black = (0,0,0)
     if ON_OFF: # ON
-          fill_color = gray
-          LEDsONOFF = "ON"
-          if self.EXPT_LOADED: self.expt.log_event("Feeder_Light_ON")
-          if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(True)
+        fill_color = gray
+        LEDsONOFF = "ON"
+        if self.EXPT_LOADED: self.expt.log_event("Feeder_Light_ON")
+        if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(True)
 
     else:
-          fill_color = black
-          LEDsONOFF = "OFF"
-          if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(False)
-          if self.EXPT_LOADED: self.expt.log_event("Feeder_Light_OFF")
+        fill_color = black
+        LEDsONOFF = "OFF"
+        if self.NIDAQ_AVAILABLE:  self.food_light.sendDBit(False)
+        if self.EXPT_LOADED: self.expt.log_event("Feeder_Light_OFF")
 
     return fill_color,LEDsONOFF
 
@@ -218,6 +224,9 @@ def StartTouchScreen(self):
         self.TOUCH_TRHEAD_STARTED = True
         self.TSq.put('') # Send an emtpy string so it draws a blank screen to start!
 
+###########################################################################################################
+# EXIT GAME
+###########################################################################################################
 def exit_game(self):
     #Exit things
     if self.EXPT_LOADED: self.expt.endExpt()
@@ -225,26 +234,25 @@ def exit_game(self):
 
     #Close all NIDAQ tasks
     if self.NIDAQ_AVAILABLE:
-      self.fan.end()
-      self.cabin_light.end()
-      if 'EPHYS-2' in self.computer:
-          self.food_light.end()
-      #if 'EPHYS-1' in self.computer:
-          #self.low_tone.end()
-      self.give_food.end()
-      self.eaten.end()
+        self.fan.end()
+        self.cabin_light.end()
+        if 'EPHYS-2' in self.computer:
+            self.food_light.end()
+        if 'EPHYS-1' in self.computer:
+            self.low_tone.end()
+        self.give_food.end()
+        self.eaten.end()
 
-      self.leverOut.end()
+        self.leverOut.end()
 
-      self.L_condition_Lt.end()
-      self.R_condition_Lt.end()
-      #self.high_tone.end()
-      self.L_nose_poke.end()
-      self.R_nose_poke.end()
-      self.checkPressLeft.end()
-      self.checkPressRight.end()
+        self.L_condition_Lt.end()
+        self.R_condition_Lt.end()
+        #self.high_tone.end()
+        self.L_nose_poke.end()
+        self.R_nose_poke.end()
+        self.checkPressLeft.end()
+        self.checkPressRight.end()
 
-      #self.stimQ.put('STOP')
     pygame.quit()
     sys.exit()
 

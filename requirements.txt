@@ -1,0 +1,5 @@
+The following non-standard dependencies are required. All can be installed using pip.
+
+- whisker
+- opencv 
+- nidaqmx

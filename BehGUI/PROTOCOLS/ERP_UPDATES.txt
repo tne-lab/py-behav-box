@@ -1,0 +1,51 @@
+[EXPERIMENT]
+EXPT_NAME = ERP_UPDATES # Don't use "-" in name, use underscores "_" instead
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+
+[OPEN_EPHYS]
+OPEN_EPHYS_CONFIG_FILE = laa_test.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
+OPEN_EPHYS_PATH =  E:\GitHub\OE\plugin-GUI-private\Build\Release\open-ephys.exe # on Flav's PC Ephys-2
+TTL_STIM = 1 # Not used, only for your knowledge. Hardware used.
+TTL_LEVER_R = 2 # Can be TTL_*, * = NOSE_L/R, FOOD
+TTL_LEVER_L = 3
+
+[STIM]
+STIM_ADDRESS = Dev3/ao0 # Leading stim location
+STIM_ADDRESS_SHAM = Dev3/ao1 # Following stim location
+
+[CLOSED_LOOP]
+EVENTCHANNEL = 1
+MICROAMPS = 100
+
+
+[ERP]
+INTER_PULSE_WIDTH = 4
+PUSLE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
+NUM_PULSE = 50 # number of pulses to region X
+NUM_LOCATIONS = 2
+
+[SETUP]
+FAN_ON=TRUE
+CAB_LIGHT=TRUE
+FOOD_LIGHT=TRUE
+REC=TRUE
+
+[PROTOCOL]
+
+#CLOSED_LOOP = TRUE
+#PAUSE = 10
+#CLOSED_LOOP = FALSE
+
+#PAUSE = 5 #* 60 # 5 min post
+ERP = PRE
+
+PAUSE = 15 #* 60 # 15 min post
+ERP = 15
+
+PAUSE = 15 #* 60 # 30 min post
+ERP = 30
+
+FAN_ON=FALSE
+CAB_LIGHT=FALSE
+FOOD_LIGHT=FALSE
+REC=FALSE
