@@ -233,8 +233,8 @@ Same as Tone 1
 - Puts images in random locations on the screen
 
 #### BANDIT_TRAINING
-- hard coded paradigm to train touching the screen
-- UPDATE ME w/ exact paradigm
+- tells code to look for probablities of pellets based on img
+- Same as TOUCH_BANDIT, but the image locations are hardcoded. 
 
 ### IMG
 - = img name(stored in IMAGES_PATH) : (probablity of reward OPTIONAL)
@@ -244,10 +244,11 @@ Same as Tone 1
 
 ### TRAIN_TOUCH
 - hard coded paradigm to train touching the screen
-- UPDATE ME w/ exact paradigm
+- Any touch of an image returns a pellet regardless of where has been pressed. 
 
 ### TOUCH_BANDIT
 - tells code to look for probablities of pellets based on img
+- Places the images in random locations based upon the coords given in protocol file. 
 
 ------
 ## [BAR_PRESS]
