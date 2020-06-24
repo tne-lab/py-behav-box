@@ -286,6 +286,15 @@ def load_expt_file(self):
                     elif 'TOUCH_BANDIT' in str_before_equal:
                         self.TOUCH_BANDIT = True
 
+                    elif 'SPAL' == str_before_equal:
+                        self.SPAL = True
+                        self.DesImgCoords = {}
+                        i = 0
+                        for img in self.touchImgs:
+                            self.DesImgCoords[img] = self.touchImageCoords[i]
+                            i=i+1
+
+
                 elif currentlySetting == 'BARPRESS':
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
                     if "VI" in str_before_equal: # Needs to line befroe = sign

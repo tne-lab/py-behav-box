@@ -401,6 +401,47 @@ class Experiment:
 
                     print('log_string', log_string)
                     self.log_event( log_string)
+                elif self.SPAL:
+                    # Choose rand  image to show
+                    imgSelect = random.randint(0,len(self.touchImgs))
+                    imgKey = list(self.touchImgs.keys())[0]
+                    
+                    imgList = {}
+                    wrongCoords = []
+                    for key in self.DesImgCoords.keys():
+                        if key == imgKey:
+                            imgList[key] = self.DesImgCoords[key]
+                            #self.GUI.TSq.put(imgList)
+                        else:
+                            wrongCoords.append(self.DesImgCoords[key])
+
+                    imgList[imgKey[:-4]+'_WRONG.bmp'] = random.choice(wrongCoords)
+                    self.GUI.TSq.put(imgList)
+
+                    # Send images out to whisker
+                    self.Protocol_ln_num +=1
+
+                    log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
+                    log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
+                    log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
+                    log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
+                    log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                    idx = log_string.find(")")
+                    #print("IDX: ", idx, "logstring: ", log_string)
+                    while idx != -1: # returns -1 if string not found
+                        try:
+                            if log_string[idx+1] == ";": # Could be out of range if ")" is last char
+                                log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
+                            idx = log_string.find[:idx+2](")")
+                            print("IDX: ", idx, "logstring: ", log_string)
+                        except:
+                            print("\n\n FAILED creating log string\n\n")
+                            break
+
+                    print('log_string', log_string)
+                    self.log_event( log_string)
+
+
                 else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
 
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
@@ -1091,7 +1132,24 @@ class Experiment:
 
 
 
-
+                       elif self.SPAL:
+                           for img in self.touchImgs.keys():
+                               if self.touchMsg['picture'] == img:
+                                   #desCoords = self.DesImgCoords[img]
+                                   #if (desCoords[0] < x and x < desCoords[0] + 290) and (desCoords[1] < y and y < desCoords[1] + 290):
+                                    self.correct_img_hits.append((int(x/4),int(y/4)))
+                                    self.log_event("Correct: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
+                                    self.correct_img_touches += 1
+                                    self.CORECT = True
+                                    #else
+                                    #    self.wrong_img_hits.append((int(x/4),int(y/4)))
+                                    #    self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
+                                    #   self.WRONG = True
+                           # If _TEMP img pressed
+                           if self.CORRECT = False and self.WRONG = False:
+                               self.wrong_img_hits.append((int(x/4),int(y/4)))
+                                self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
+                                self.WRONG = True
                        #################################
                        # TOUCH TRAINING
                        #################################
