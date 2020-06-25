@@ -291,7 +291,7 @@ def load_expt_file(self):
                         self.DesImgCoords = {}
                         i = 0
                         for img in self.touchImgs:
-                            self.DesImgCoords[img] = self.touchImageCoords[i]
+                            self.DesImgCoords[img] = self.touchImgCoords[i]
                             i=i+1
 
 

@@ -403,14 +403,17 @@ class Experiment:
                     self.log_event( log_string)
                 elif self.SPAL:
                     # Choose rand  image to show
-                    imgSelect = random.randint(0,len(self.touchImgs))
-                    imgKey = list(self.touchImgs.keys())[0]
-                    
+                    imgSelect = random.randint(0,len(self.touchImgs.keys())-1)
+                    print('imgSelsct', imgSelect)
+                    imgKey = list(self.touchImgs.keys())[imgSelect]
+                    print('chosen ', imgKey)
+
                     imgList = {}
                     wrongCoords = []
                     for key in self.DesImgCoords.keys():
                         if key == imgKey:
                             imgList[key] = self.DesImgCoords[key]
+                            print('correct location: ', self.DesImgCoords[key])
                             #self.GUI.TSq.put(imgList)
                         else:
                             wrongCoords.append(self.DesImgCoords[key])
@@ -1139,17 +1142,17 @@ class Experiment:
                                    #if (desCoords[0] < x and x < desCoords[0] + 290) and (desCoords[1] < y and y < desCoords[1] + 290):
                                     self.correct_img_hits.append((int(x/4),int(y/4)))
                                     self.log_event("Correct: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
-                                    self.correct_img_touches += 1
-                                    self.CORECT = True
+                                    self.correct_image_touches += 1
+                                    self.CORRECT = True
                                     #else
                                     #    self.wrong_img_hits.append((int(x/4),int(y/4)))
                                     #    self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
                                     #   self.WRONG = True
                            # If _TEMP img pressed
-                           if self.CORRECT = False and self.WRONG = False:
+                           if self.CORRECT == False:
                                self.wrong_img_hits.append((int(x/4),int(y/4)))
-                                self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
-                                self.WRONG = True
+                               self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
+                               self.WRONG = True
                        #################################
                        # TOUCH TRAINING
                        #################################
