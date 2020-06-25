@@ -1,6 +1,7 @@
 [EXPERIMENT]
-EXPT_NAME = Screen_Touch_train_2PICS
+EXPT_NAME = PAL_TRAIN_STEP_1
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+
 
 [TOUCHSCREEN]
 IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
@@ -10,21 +11,23 @@ IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
 #       For picture area to equal to active background area, picture must be 364 x 364
 #       Image size is controlled in whiskerTouchZMQ.py
 COORDS=(220,425):(530,425)          # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
-IMG1= FLOWER_REAL.bmp  # Image name
-IMG2= SPIDER_REAL.bmp
-TRAIN_TOUCH =1,100  # note: a,b.  a = initial VI for img touch (a random num between 0 and 2*a), b = initial VI for background touch (a random number between 0 and 2*b)
+IMG1= 6B.bmp  # Image name
+IMG2= 6A.bmp
+
+#SPAL
 
 [SETUP]
 MAX_EXPT_TIME = 60     # NOTE: In minutes.   Generally 60 min max for rats
 FAN_ON=TRUE
 CAB_LIGHT=TRUE
-#CAMERA=TRUE
 REC=TRUE
-FOOD_LIGHT=TRUE
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 
-START_LOOP1 = 50  # Max trials should be no more than 100
+START_LOOP1 = 100
+FOOD_LIGHT = TRUE
+PAUSE = EAT_TO_START  
+FOOD_LIGHT = FALSE
   DRAW_IMAGES=True
   CONDITIONS=0    # NOTE: starts at 0
   PAUSE = 5   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet...
@@ -37,9 +40,6 @@ CAB_LIGHT=False
 FAN_ON=False
 [END PROTOCOL]
 
-[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE or AFTER_EATING.  Also, HERE WE NEED COMMAS.
+[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE or AFTER_EATING.  Also, HERE WE NEED COMMAS. Max time in seconds
 MAX_TIME, RESET,        CORRECT,          WRONG,             NO_ACTION
-60,       ON_RESPONSE,  PELLET_TOUCHVI1,  PELLET_TOUCHVI2,   NONE
-
-# Max Time for stimulus presentation should be 30 s
-# For training:
+30,       ON_RESPONSE,  PELLETx3,         PELLETx3,   	     PELLET

@@ -1090,8 +1090,6 @@ class Experiment:
                                    self.CORRECT = True
 
 
-
-
                        #################################
                        # TOUCH TRAINING
                        #################################
@@ -1103,6 +1101,18 @@ class Experiment:
                                   self.correct_image_touches += 1
                                   self.CORRECT = True
                                   self.log_event(self.touchMsg['picture'] + " Pressed," + "(" + str(x) + ";" + str(y) + ")" )
+
+                       else:
+                            self.correct_image_touches += 1
+                            self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+
+                            for img in self.touchImgs.keys():
+                                if self.touchMsg['picture'] == img:  # Touched an image
+                                   self.correct_image_touches += 1
+                                   self.CORRECT = True
+                                   self.log_event(self.touchMsg['picture'] + " Pressed," + "(" + str(x) + ";" + str(y) + ")" )
+
+
 
                # CALCULATE TOUCHES PER MINUTE (TPMs)
                if TPM_time_interval > 60.0: #60.0: #Calculate TPM every minute (60 sec)
@@ -1249,6 +1259,12 @@ class Experiment:
                            else:
                                #print("Reward NOT given w " + str(self.cur_probability)+"% probability")
                                self.log_event("Reward NOT given," + str(self.cur_probability)+",% probability")
+
+                       elif "x" or "X" == left_of_outcome_str[0]:
+                           nPellets = int(left_of_outcome_str[1:])
+                           for i in range(nPellets):
+                               GUIFunctions.FOOD_REWARD(self.GUI, "Food_Pellet")
+                               time.sleep(1)
 
                        else: # if PELLET80 or something like it.  NOTE: PELLETXX, converts XX into probability
                            if random.random()*100 <= float(left_of_outcome_str):
