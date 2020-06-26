@@ -597,6 +597,10 @@ class Experiment:
                         self.BARPRESS_TO_START = True
                     elif "NOSEPOKE_TO_START" in protocolDict["PAUSE"]:
                         self.NOSEPOKE_TO_START = True
+                    elif "+-" in protocolDict["PAUSE"]:
+                        baseNum = protocolDict["PAUSE"].split('+')[0]
+                        randNum = protocolDict["PAUSE"].split('-')[1]
+                        self.PAUSE_TIME = baseNum + random.randint(-1 * randNum, randNum)
 
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
