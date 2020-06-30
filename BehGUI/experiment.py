@@ -409,6 +409,50 @@ class Experiment:
 
                     print('log_string', log_string)
                     self.log_event( log_string)
+                elif self.SPAL:
+                    # Choose rand  image to show
+                    imgSelect = random.randint(0,len(self.touchImgs.keys())-1)
+                    print('imgSelsct', imgSelect)
+                    imgKey = list(self.touchImgs.keys())[imgSelect]
+                    print('chosen ', imgKey)
+
+                    imgList = {}
+                    wrongCoords = []
+                    for key in self.DesImgCoords.keys():
+                        if key == imgKey:
+                            imgList[key] = self.DesImgCoords[key]
+                            print('correct location: ', self.DesImgCoords[key])
+                            #self.GUI.TSq.put(imgList)
+                        else:
+                            wrongCoords.append(self.DesImgCoords[key])
+
+                    imgList[imgKey[:-4]+'_WRONG.bmp'] = random.choice(wrongCoords)
+                    self.GUI.TSq.put(imgList)
+
+                    # Send images out to whisker
+                    self.Protocol_ln_num +=1
+
+                    log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
+                    log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
+                    log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
+                    log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
+                    log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                    idx = log_string.find(")")
+                    #print("IDX: ", idx, "logstring: ", log_string)
+                    while idx != -1: # returns -1 if string not found
+                        try:
+                            if log_string[idx+1] == ";": # Could be out of range if ")" is last char
+                                log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
+                            idx = log_string.find[:idx+2](")")
+                            print("IDX: ", idx, "logstring: ", log_string)
+                        except:
+                            print("\n\n FAILED creating log string\n\n")
+                            break
+
+                    print('log_string', log_string)
+                    self.log_event( log_string)
+
+
                 else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
 
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
@@ -561,6 +605,10 @@ class Experiment:
                         self.BARPRESS_TO_START = True
                     elif "NOSEPOKE_TO_START" in protocolDict["PAUSE"]:
                         self.NOSEPOKE_TO_START = True
+                    elif "+-" in protocolDict["PAUSE"]:
+                        baseNum = protocolDict["PAUSE"].split('+')[0]
+                        randNum = protocolDict["PAUSE"].split('-')[1]
+                        self.PAUSE_TIME = baseNum + random.randint(-1 * randNum, randNum)
 
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
@@ -1096,10 +1144,24 @@ class Experiment:
                                    # Holds the probability for each trial
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
-
-
-
-
+                       elif self.SPAL:
+                           for img in self.touchImgs.keys():
+                               if self.touchMsg['picture'] == img:
+                                   #desCoords = self.DesImgCoords[img]
+                                   #if (desCoords[0] < x and x < desCoords[0] + 290) and (desCoords[1] < y and y < desCoords[1] + 290):
+                                    self.correct_img_hits.append((int(x/4),int(y/4)))
+                                    self.log_event("Correct: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
+                                    self.correct_image_touches += 1
+                                    self.CORRECT = True
+                                    #else
+                                    #    self.wrong_img_hits.append((int(x/4),int(y/4)))
+                                    #    self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
+                                    #   self.WRONG = True
+                           # If _TEMP img pressed
+                           if self.CORRECT == False:
+                               self.wrong_img_hits.append((int(x/4),int(y/4)))
+                               self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
+                               self.WRONG = True
                        #################################
                        # TOUCH TRAINING
                        #################################
@@ -1111,6 +1173,18 @@ class Experiment:
                                   self.correct_image_touches += 1
                                   self.CORRECT = True
                                   self.log_event(self.touchMsg['picture'] + " Pressed," + "(" + str(x) + ";" + str(y) + ")" )
+
+                       else:
+                            self.correct_image_touches += 1
+                            self.correct_img_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+
+                            for img in self.touchImgs.keys():
+                                if self.touchMsg['picture'] == img:  # Touched an image
+                                   self.correct_image_touches += 1
+                                   self.CORRECT = True
+                                   self.log_event(self.touchMsg['picture'] + " Pressed," + "(" + str(x) + ";" + str(y) + ")" )
+
+
 
                # CALCULATE TOUCHES PER MINUTE (TPMs)
                if TPM_time_interval > 60.0: #60.0: #Calculate TPM every minute (60 sec)
@@ -1257,6 +1331,12 @@ class Experiment:
                            else:
                                #print("Reward NOT given w " + str(self.cur_probability)+"% probability")
                                self.log_event("Reward NOT given," + str(self.cur_probability)+",% probability")
+
+                       elif "x" or "X" == left_of_outcome_str[0]:
+                           nPellets = int(left_of_outcome_str[1:])
+                           for i in range(nPellets):
+                               GUIFunctions.FOOD_REWARD(self.GUI, "Food_Pellet")
+                               time.sleep(1)
 
                        else: # if PELLET80 or something like it.  NOTE: PELLETXX, converts XX into probability
                            if random.random()*100 <= float(left_of_outcome_str):
