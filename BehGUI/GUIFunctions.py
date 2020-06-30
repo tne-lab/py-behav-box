@@ -92,6 +92,8 @@ def PLAY_TONE_LAF(self, TONE_ID):  # Plays tone using lafayette Tone generator
 ###################################################
 def PLAY_TONE(self, TONE_ID):  # Plays tone using computer speaker
     # NOTE: Tone_OFF logged while drawing speeker above in main loop
+    if 'EPHYS-1' in self.computer:
+        PLAY_TONE_LAF(self, 'TONE1')
     if TONE_ID == 'TONE1':
         if not self.TONE_ON:
             if self.EXPT_LOADED: self.expt.log_event("Tone_ON",("Freq(Hz)", str(self.Tone1_Freq), "Vol(0-1)",str(self.Tone1_Vol), "Duration(S)",str(self.Tone1_Duration)))
