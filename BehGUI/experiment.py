@@ -457,6 +457,15 @@ class Experiment:
 
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
                     print(placementList, self.touchImgCoords)
+                    
+                    # Single location/multiple coords can't be same loc 3 times in a row check
+                    if len(self.touchImgs.keys()) == 1 and len(self.touchImgCoords) > 1: # only 1 image that can randomly go in multiple locations
+                        if placementList[0] in self.prev_img_loc_index: # can't be same location 3 times in a row
+                            continue
+                        else:
+                            self.prev_img_loc_index[1] = self.prev_img_loc_index[0]
+                            self.prev_img_loc_index[0] = placementList[0]
+
 
                     # NOTE: random.sample(population, k)
                     #       Returns a new list containing elements from the population while leaving
