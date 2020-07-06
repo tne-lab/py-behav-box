@@ -242,11 +242,11 @@ class Experiment:
             idx = key[4:]
             #print("TONE idx: ",idx)
             if idx == '1':
-                 GUIFunctions.PLAY_TONE(self.GUI,"TONE1")
-                 self.TONE_TIME = self.cur_time
+                GUIFunctions.PLAY_TONE(self.GUI,"TONE1")
+                self.TONE_TIME = self.cur_time
             elif idx == '2':
-                 GUIFunctions.PLAY_TONE(self.GUI,"TONE2")
-                 self.TONE_TIME = self.cur_time
+                GUIFunctions.PLAY_TONE(self.GUI,"TONE2")
+                self.TONE_TIME = self.cur_time
             self.TONE_ON = True
 
         elif key == "FOOD_LIGHT":
@@ -260,8 +260,16 @@ class Experiment:
             GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
 
         elif key  == 'SHOCK':
-            self.log_event("Shock_ON",("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
-            self.SHOCK_ON = True
+            val = str2bool(protocolDict[key])
+            self.Protocol_ln_num +=1
+            if val:
+                self.log_event("Shock_ON")
+                GUIFunctions.shock(self.GUI, True)
+                self.SHOCK_ON = True
+            else:
+                self.log_event("Shock_OFF")
+                GUIFunctions.shock(self.GUI, False)
+                self.SHOCK_ON = False
 
         elif key == "L_CONDITIONING_LIGHT":
             val = str2bool(protocolDict[key])
@@ -449,6 +457,15 @@ class Experiment:
 
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
                     print(placementList, self.touchImgCoords)
+                    
+                    # Single location/multiple coords can't be same loc 3 times in a row check
+                    if len(self.touchImgs.keys()) == 1 and len(self.touchImgCoords) > 1: # only 1 image that can randomly go in multiple locations
+                        if placementList[0] in self.prev_img_loc_index: # can't be same location 3 times in a row
+                            continue
+                        else:
+                            self.prev_img_loc_index[1] = self.prev_img_loc_index[0]
+                            self.prev_img_loc_index[0] = placementList[0]
+
 
                     # NOTE: random.sample(population, k)
                     #       Returns a new list containing elements from the population while leaving
@@ -597,6 +614,10 @@ class Experiment:
                         self.BARPRESS_TO_START = True
                     elif "NOSEPOKE_TO_START" in protocolDict["PAUSE"]:
                         self.NOSEPOKE_TO_START = True
+                    elif "+-" in protocolDict["PAUSE"]:
+                        baseNum = protocolDict["PAUSE"].split('+')[0]
+                        randNum = protocolDict["PAUSE"].split('-')[1]
+                        self.PAUSE_TIME = baseNum + random.randint(-1 * randNum, randNum)
 
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
