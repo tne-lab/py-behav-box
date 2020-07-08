@@ -2,10 +2,6 @@
 EXPT_NAME = PAL_Stage_4_initial_touch
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
-####  FOR MARK, this stage I need your help with
-####  1) draw one image each time instead of two and the image can not be at the same location 3 times in a row.
-
-
 
 ##############################################################################################################
 ##  Stage 4: 'Initial touch'                                                                                ##
@@ -38,7 +34,7 @@ IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
 COORDS=(31,425):(341,425):(651,425)         # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 IMG1= BLANK.bmp  # Image name
 #IMG2= BLANK_WRONG.bmp
-SPAL
+#SPAL
 
 [TONE1]
 Duration(s) 	= 1

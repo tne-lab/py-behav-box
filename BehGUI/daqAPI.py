@@ -144,7 +144,7 @@ Returns a new food light task
 '''
 def foodLightSetup():
     if 'EPHYS-2' in computer:
-        foodLightAddress = dev + '/port1/line6' #Output line 7
+        foodLightAddress = dev + '/port3/line6' #Output line 7
     if 'ABETUSER-PC' == computer:
         foodLightAddress = dev + '/port3/line5'
     try:
@@ -315,7 +315,7 @@ def leverInputSetup():
 Returns a new input task for when rat eats food
 '''
 def foodEatInputSetup():
-    foodEatAddress = dev + '/port6/line2'
+    foodEatAddress = dev + '/port7/line2'
     foodEat = InterfaceIn(foodEatAddress)
     foodEat.startTask()
     return foodEat

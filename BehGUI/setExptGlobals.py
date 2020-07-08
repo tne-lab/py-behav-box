@@ -223,3 +223,4 @@ def setTouchGlobals(self):
     self.TOUCH_IMG_PATH = ''
     self.touch_img_files = []
     self.TOUCH_IMAGES_SENT = False
+    self.SPAL = False
