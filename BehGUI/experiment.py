@@ -1364,6 +1364,24 @@ class Experiment:
                            self.GUI.cabin_light.sendDBit(False)
                            self.NEXT_TRIAL = True
                            self.PAUSE_STARTED = False
+               
+               elif "PAUSE" in outcome:
+                   if not self.PAUSE_STARTED:
+                       pause_string = outcome.split('=')[1]
+                       if 'min' in pause_string or 'm' in pause_string:
+                            self.PAUSE_TIME = float(pause_string.split('m')[0]) * 60
+                       else
+                            self.PAUSE_TIME = float(pause_string)
+                       self.PAUSE_STARTED = True
+                       self.pause_start_time = time.perf_counter()
+                       self.NEXT_TRIAL = False
+                   else:
+                       time_elapsed = time.perf_counter() - self.pause_start_time
+                       self.NEXT_TRIAL = False
+                           self.NEXT_TRIAL = True
+                           self.PAUSE_STARTED = False
+
+
                else: #outcome == 'NONE'
                    self.log_event("NONE")
                    #print("Outcome = NONE")
