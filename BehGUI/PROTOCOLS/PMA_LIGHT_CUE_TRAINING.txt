@@ -1,0 +1,38 @@
+[EXPERIMENT]
+EXPT_NAME = Platform_Mediated_Avoidance
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+VI_TIMES_LIST_PATH	=  E:\py-behav-box\BehGUI\PROTOCOLS\PMA_TRAINING_VIs.txt
+#OPEN_EPHYS_PATH = E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe
+
+[SETUP]
+FAN_ON=True
+CAB_LIGHT=True
+CAMERA=True
+REC=True
+
+[BAR_PRESS]
+VI=0
+
+[PROTOCOL]
+
+R_CONDITIONING_LIGHT = FALSE
+START_LOOP = 20
+  BARPRESS = FALSE
+  PAUSE = CONDITIONING  #This will use VI on each line of file, one line per loop
+  EXTEND_LEVERS = R_LVR
+  BARPRESS = TRUE
+  R_CONDITIONING_LIGHT = TRUE
+  PAUSE = 30
+  R_CONDITIONING_LIGHT = FALSE
+  BARPRESS = FALSE
+  EXTEND_LEVERS = FALSE
+END_LOOP
+
+EXTEND_LEVERS=False
+#FOOD_LIGHT=False
+REC=False
+CAMERA= False
+CAB_LIGHT=False
+FAN_ON=False
+[END PROTOCOL]
+

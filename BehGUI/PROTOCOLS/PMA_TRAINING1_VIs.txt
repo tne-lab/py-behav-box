@@ -1,0 +1,3 @@
+NOTE: All numbers are in seconds and will be used a VI reward scheduling.
+Training: 20, 30, 120, 150, 90, 160, 120, 84, 170, 150
+Light Training: 10, 20, 30, 40, 50

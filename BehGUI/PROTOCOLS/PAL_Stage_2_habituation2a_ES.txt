@@ -1,0 +1,70 @@
+[EXPERIMENT]
+EXPT_NAME = PAL_Stage_2_habituation2a
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+
+#######################################################################################
+##  Stage 2: habituation2a                                                           ##
+##  Duration: 2 sessions, 1200s (20 minutes)                                         ##
+##  Trial number: Unlimited                                                          ##
+##  Description: The tray light is initially turned on. A tone is played and         ##
+##  the food-tray/magazine is primed with strawberry milkshake (SM) delivered        ##
+##   for 6000ms (150µl). The program waits for the mouse to enter the food tray.     ##
+##  When the mouse leaves the reward tray, the reward tray light is turned off.      ##
+##  There is a 10s delay before the tray light is turned on, a tone is played        ##
+##  and SM is then delivered for 800ms (20 µl)1. If the mouse is in the reward       ##
+##  tray at the end of the 10s delay, an extra 1s is added to the delay.             ##
+##  The procedure is repeated until the session ends. It is critical that the mouse  ##
+##  is removed from the cabinet as soon as the habituation is complete.              ##
+##  Criterion: Drinks milkshake (none observed in tray).                             ##
+#######################################################################################
+
+[TOUCHSCREEN]
+IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
+# Note: Touchscreen is 1024 x 768. If we discount the deadzone, the
+#       screen is 1024 x 518.  For picture area to equal to active
+#       background area, picture must be 364 x 364
+#       For picture area to equal to active background area, picture must be 364 x 364
+#       Image size is controlled in whiskerTouchZMQ.py
+#COORDS=(197,425):(407,425):(604,425)         # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+IMG1= 6B.bmp  # Image name
+IMG2= 6A.bmp
+IMG3= 2A.bmp
+
+#SPAL
+
+[TONE1] 
+Duration(s) 	= 1
+Freq(Hz)	= 3000
+Volume(0-1)	= 1.0
+
+[SETUP]
+MAX_EXPT_TIME = 20     # NOTE: In minutes.   Generally 60 min max for rats
+FAN_ON=TRUE
+CAB_LIGHT=FALSE
+FOOD_LIGHT = TRUE
+#REC=TRUE
+
+
+[PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
+
+START_LOOP1 = 100
+#TONE1
+FOOD_LIGHT = TRUE
+PELLET
+PAUSE = EAT_TO_START
+FOOD_LIGHT = FALSE
+  #DRAW_IMAGES=True
+  #CONDITIONS=0    # NOTE: starts at 0
+  PAUSE = 10   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet...
+END_LOOP
+
+FOOD_LIGHT=False
+REC=False
+CAMERA= False
+CAB_LIGHT=False
+FAN_ON=False
+[END PROTOCOL]
+
+[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE or AFTER_EATING.  Also, HERE WE NEED COMMAS. Max time in seconds
+MAX_TIME, RESET,        CORRECT,          WRONG,             NO_ACTION
+30,       ON_RESPONSE,  PELLETx3,         PELLETx3,   	     PELLET

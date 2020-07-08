@@ -242,11 +242,11 @@ class Experiment:
             idx = key[4:]
             #print("TONE idx: ",idx)
             if idx == '1':
-                 GUIFunctions.PLAY_TONE(self.GUI,"TONE1")
-                 self.TONE_TIME = self.cur_time
+                GUIFunctions.PLAY_TONE(self.GUI,"TONE1")
+                self.TONE_TIME = self.cur_time
             elif idx == '2':
-                 GUIFunctions.PLAY_TONE(self.GUI,"TONE2")
-                 self.TONE_TIME = self.cur_time
+                GUIFunctions.PLAY_TONE(self.GUI,"TONE2")
+                self.TONE_TIME = self.cur_time
             self.TONE_ON = True
 
         elif key == "FOOD_LIGHT":
@@ -260,8 +260,16 @@ class Experiment:
             GUIFunctions.FOOD_REWARD(self.GUI,"Food_Pellet")
 
         elif key  == 'SHOCK':
-            self.log_event("Shock_ON",("Voltage", str(self.Shock_V),"Amps",str(self.Shock_Amp),"Duration(S)",str(self.Shock_Duration)))
-            self.SHOCK_ON = True
+            val = str2bool(protocolDict[key])
+            self.Protocol_ln_num +=1
+            if val:
+                self.log_event("Shock_ON")
+                GUIFunctions.shock(self.GUI, True)
+                self.SHOCK_ON = True
+            else:
+                self.log_event("Shock_OFF")
+                GUIFunctions.shock(self.GUI, False)
+                self.SHOCK_ON = False
 
         elif key == "L_CONDITIONING_LIGHT":
             val = str2bool(protocolDict[key])
@@ -446,43 +454,56 @@ class Experiment:
 
 
                 else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
-
+                    print('hello')
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
                     print(placementList, self.touchImgCoords)
 
-                    # NOTE: random.sample(population, k)
-                    #       Returns a new list containing elements from the population while leaving
-                    #       the original population unchanged.
-                    #       Here: for 2 images, population = (0,2), k = 2.  returns (0,1) or (1,0)
-                    imgList = {}
-                    i=0
-                    for key in self.touchImgs.keys():
-                        imgList[key] = self.touchImgCoords[placementList[i]] #places images
-                        print('ImgList', imgList)
-                        i+=1
-                        self.GUI.TSq.put(imgList)
+                    skip = False
+                    # Single location/multiple coords can't be same loc 3 times in a row check
+                    if len(self.touchImgs.keys()) == 1 and len(self.touchImgCoords) > 1: # only 1 image that can randomly go in multiple locations
+                        if placementList[0] in self.prev_img_loc_index: # can't be same location 3 times in a row
+                            skip = True
+                        else:
+                            self.prev_img_loc_index[1] = self.prev_img_loc_index[0]
+                            self.prev_img_loc_index[0] = placementList[0]
+                    print('hello 2')
 
-                    self.Protocol_ln_num +=1
+                    if not skip:
+                        # NOTE: random.sample(population, k)
+                        #       Returns a new list containing elements from the population while leaving
+                        #       the original population unchanged.
+                        #       Here: for 2 images, population = (0,2), k = 2.  returns (0,1) or (1,0)
+                        imgList = {}
+                        i=0
+                        for key in self.touchImgs.keys():
+                            print('trying loop')
+                            imgList[key] = self.touchImgCoords[placementList[i]] #places images
+                            print('ImgList', imgList)
+                            i+=1
+                            self.GUI.TSq.put(imgList)
 
-                    log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
-                    log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
-                    log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
-                    log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
-                    log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
-                    idx = log_string.find(")")
-                    #print("IDX: ", idx, "logstring: ", log_string)
-                    while idx != -1: # returns -1 if string not found
-                        try:
-                            if log_string[idx+1] == ";": # Could be out of range if ")" is last char
-                                log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
-                            idx = log_string.find[:idx+2](")")
-                            print("IDX: ", idx, "logstring: ", log_string)
-                        except:
-                            print("\n\n FAILED creating log string\n\n")
-                            break
+                        self.Protocol_ln_num +=1
 
-                    print('log_string', log_string)
-                    self.log_event( log_string)
+                        log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
+                        log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
+                        log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
+                        log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
+                        log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                        idx = log_string.find(")")
+                        #print("IDX: ", idx, "logstring: ", log_string)
+                        while idx != -1: # returns -1 if string not found
+                            try:
+                                if log_string[idx+1] == ";": # Could be out of range if ")" is last char
+                                    log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
+                                idx = log_string.find[:idx+2](")")
+                                print("IDX: ", idx, "logstring: ", log_string)
+                            except:
+                                print("\n\n FAILED creating log string\n\n")
+                                break
+
+                        print('log_string', log_string)
+                        self.log_event( log_string)
+                        print( ' all done')
         ###############################
         # START LOOP
         ###############################

@@ -2,7 +2,7 @@
 # This experiment will place an image in a random location on the screen
 EXPT_NAME = Platform_Mediated_Avoidance
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
-VI_TIMES_LIST_PATH	=  E:\py-behav-box\BehGUI\PROTOCOLS\PMA_TRAINING1_VIs.txt #different ITI
+VI_TIMES_LIST_PATH	=  E:\py-behav-box\BehGUI\PROTOCOLS\PMA_TRAINING_VIs.txt #different ITI
 #OPEN_EPHYS_PATH = E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe
 
 
@@ -22,30 +22,34 @@ FAN_ON=True
 CAB_LIGHT=True
 CAMERA=True
 REC=True
-EXTEND_LEVERS = R_LVR
-R_CONDITIONING_LIGHT = TRUE
 
-
-[BAR_PRESS] #NOTE: This is an independent process. PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
-VI=30       #NOTE: VI=15 is variable interval with meant time of 15.  PELLET GIVEN ON PRESS AFTER VI TIME regardless of CONDITIONS
+[BAR_PRESS]
+VI=0
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 
-#R_CONDITIONING_LIGHT = TRUE
-#EXTEND_LEVERS = R_LVR
+R_CONDITIONING_LIGHT = FALSE
+EXTEND_LEVERS = FALSE
 START_LOOP = 9 #NOTE:PMA training
-  PAUSE = Training  #This will use VI on each line of file, one line per loop
+  BARPRESS = FALSE
+  PAUSE = CONDITIONING  #This will use VI on each line of file, one line per loop
   TONE1
+  EXTEND_LEVERS = R_LVR 
+  BARPRESS = TRUE
+  R_CONDITIONING_LIGHT = TRUE
   PAUSE = 28
   SHOCK = FALSE
   PAUSE = 2
   SHOCK = TRUE
+  R_CONDITIONING_LIGHT = FALSE
+  BARPRESS = FALSE
+  EXTEND_LEVERS=FALSE
 END_LOOP
+EXTEND_LEVERS=FALSE
 
-EXTEND_LEVERS = FALSE
-R_CONDITIONING_LIGHT = FALSE
 REC=False
 CAMERA= False
 CAB_LIGHT=False
 FAN_ON=False
+TONE = FALSE
 [END PROTOCOL]

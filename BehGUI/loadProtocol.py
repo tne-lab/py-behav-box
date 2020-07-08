@@ -237,6 +237,7 @@ def load_expt_file(self):
                                     touchImgCoords.append((int(imageCoordsStr[0]), int(imageCoordsStr[1])))
                                 self.cur_img_coords.append(touchImgCoords)
                         else:
+                            self.prev_img_loc_index = [-1, -1]
                             imageCoords = words.split(':')
                             for i in range(len(imageCoords)): # Loop through coord list
                                 for c in '()':#Remove parenthesis from (x,y)
