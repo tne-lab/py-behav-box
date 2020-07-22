@@ -2,7 +2,6 @@
 EXPT_NAME = PAL_Stage_4_initial_touch
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
-
 ##############################################################################################################
 ##  Stage 4: 'Initial touch'                                                                                ##
 ##  Duration: Number of sessions varies across mice, 3600s (60 minutes)                                     ##
@@ -31,43 +30,29 @@ IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
 #       background area, picture must be 364 x 364
 #       For picture area to equal to active background area, picture must be 364 x 364
 #       Image size is controlled in whiskerTouchZMQ.py
-COORDS=(31,425):(341,425):(651,425)         # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+# COORDS=(31,10):(341,10):(651,10)         # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+COORDS=(61,10):(371,10):(681,10)
 IMG1= BLANK.bmp  # Image name
-#IMG2= BLANK_WRONG.bmp
-#SPAL
-
-[TONE1]
-Duration(s) 	= 1
-Freq(Hz)	= 3000
-Volume(0-1)	= 1.0
 
 [SETUP]
 MAX_EXPT_TIME = 60     # NOTE: In minutes.   Generally 60 min max for rats
 FAN_ON=TRUE
 CAB_LIGHT=FALSE
 FOOD_LIGHT =FALSE
-#REC=TRUE
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 
-START_LOOP1 = 30
-#TONE1
-#FOOD_LIGHT = TRUE
-#PELLET
-#PAUSE = EAT_TO_START
+START_LOOP1 = 300
   DRAW_IMAGES=TRUE
   CONDITIONS=0    # NOTE: starts at 0
   FOOD_LIGHT = TRUE
   PAUSE = EAT_TO_START
   FOOD_LIGHT = FALSE
-
-  PAUSE = 10   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet...
+  PAUSE = 10   # Inter trial Interval (ITI)
 END_LOOP
 
 FOOD_LIGHT=False
-REC=False
-CAMERA= False
-CAB_LIGHT=False
+CAB_LIGHT=TRUE
 FAN_ON=False
 [END PROTOCOL]
 

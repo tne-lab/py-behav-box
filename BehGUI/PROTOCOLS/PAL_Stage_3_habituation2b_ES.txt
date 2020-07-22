@@ -1,4 +1,4 @@
-EXPERIMENT]
+[EXPERIMENT]
 EXPT_NAME = PAL_Stage_3_habituation2b
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
@@ -17,53 +17,25 @@ EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 ##  Criterion: Drinks milkshake (none observed in tray).                             ##
 #######################################################################################
 
-[TOUCHSCREEN]
-IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
-# Note: Touchscreen is 1024 x 768. If we discount the deadzone, the
-#       screen is 1024 x 518.  For picture area to equal to active
-#       background area, picture must be 364 x 364
-#       For picture area to equal to active background area, picture must be 364 x 364
-#       Image size is controlled in whiskerTouchZMQ.py
-#COORDS=(31,425):(341,425):(651,425)         # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
-#IMG1= 6B.bmp  # Image name
-#IMG2= 6A.bmp
-#IMG3= 2A.bmp
-
-#SPAL
-
-[TONE1]
-Duration(s) 	= 1
-Freq(Hz)	= 3000
-Volume(0-1)	= 1.0
-
 [SETUP]
-MAX_EXPT_TIME = 40     # NOTE: In minutes.   Generally 60 min max for rats
+MAX_EXPT_TIME = 40     # NOTE: In minutes.
 FAN_ON=TRUE
 CAB_LIGHT=FALSE
-FOOD_LIGHT = TRUE
+FOOD_LIGHT = FALSE
 #REC=TRUE
 
 
-[PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
+[PROTOCOL]
 
 START_LOOP1 = 100
-#TONE1
 FOOD_LIGHT = TRUE
 PELLET
 PAUSE = EAT_TO_START
 FOOD_LIGHT = FALSE
-  #DRAW_IMAGES=True
-  #CONDITIONS=0    # NOTE: starts at 0
-  PAUSE = 10   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet...
+   PAUSE = 10   # Inter trial Interval (ITI)
 END_LOOP
 
 FOOD_LIGHT=False
-REC=False
-CAMERA= False
-CAB_LIGHT=False
+CAB_LIGHT=TRUE
 FAN_ON=False
 [END PROTOCOL]
-
-[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE or AFTER_EATING.  Also, HERE WE NEED COMMAS. Max time in seconds
-MAX_TIME, RESET,        CORRECT,          WRONG,             NO_ACTION
-30,       ON_RESPONSE,  PELLETx3,         PELLETx3,   	     PELLET

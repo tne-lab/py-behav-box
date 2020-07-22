@@ -1,11 +1,10 @@
-EXPERIMENT]
+ï»¿[EXPERIMENT]
 EXPT_NAME = PAL_Stage_5_must_touch
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
-
 ###########################################################################################################
 ##  Stage 5: 'Must touch'                                                                                ##
-##  Description: Make sure tone duration is set to 1000 ms (from the ‘Tone Duration’ variable)           ##
+##  Description: Make sure tone duration is set to 1000 ms (from the ï¿½Tone Durationï¿½ variable)           ##
 ##  and ITI period is set to 20s. The stimulus is presented in only one window at a time.                ##
 ##  The other windows are blank. The position is chosen pseudo randomly, such that the stimulus          ##
 ##  will not be displayed in the same position more than 3 times in a row. The mouse must touch          ##
@@ -13,8 +12,8 @@ EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 ##  blank part of the screen. Reinforcer delivery is accompanied by illumination of the tray             ##
 ##  light and a tone. The tone frequency default is 3 KHz. Entry to collect the food turns off           ##
 ##  the tray light and starts the ITI. After the ITI period (20s) another stimulus is displayed.         ##
-##  Criterion: Completion of 30 trials within 60 min. Repeat sessions until criterion is achieved.       ##               ###########################################################################################################
-
+##  Criterion: Completion of 30 trials within 60 min. Repeat sessions until criterion is achieved.       ##
+###########################################################################################################
 
 [TOUCHSCREEN]
 IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
@@ -23,46 +22,31 @@ IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
 #       background area, picture must be 364 x 364
 #       For picture area to equal to active background area, picture must be 364 x 364
 #       Image size is controlled in whiskerTouchZMQ.py
-COORDS=(31,425):(341,425):(651,425)         # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+COORDS=(61,10):(371,10):(681,10)         # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 IMG1= BLANK.bmp  # Image name
-#SPAL
-
-
-[TONE1]
-Duration(s) 	= 1
-Freq(Hz)	= 3000
-Volume(0-1)	= 1.0
+SKIP_MISSES = TRUE
 
 [SETUP]
 MAX_EXPT_TIME = 60     # NOTE: In minutes.   Generally 60 min max for rats
 FAN_ON=TRUE
 CAB_LIGHT=FALSE
 FOOD_LIGHT =FALSE
-#REC=TRUE
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
-
-START_LOOP1 = 30
-#TONE1
-#FOOD_LIGHT = TRUE
-#PELLET
-#PAUSE = EAT_TO_START
+START_LOOP1 = 100
   DRAW_IMAGES=TRUE
   CONDITIONS=0    # NOTE: starts at 0
   FOOD_LIGHT = TRUE
   PAUSE = EAT_TO_START
   FOOD_LIGHT = FALSE
-
   PAUSE = 10   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet...
 END_LOOP
 
-FOOD_LIGHT=False
-REC=False
-CAMERA= False
-CAB_LIGHT=False
-FAN_ON=False
+FOOD_LIGHT=FALSE
+CAB_LIGHT=TRUE
+FAN_ON=FALSE
 [END PROTOCOL]
 
 [CONDITIONS] #Note: reset = FIXED or ON_RESPONSE or AFTER_EATING.  Also, HERE WE NEED COMMAS. Max time in seconds
 MAX_TIME, RESET,        CORRECT,          WRONG,             NO_ACTION
-300,       ON_RESPONSE,  PELLETx3,              ,             
+300,      ON_RESPONSE,  PELLET,       ,

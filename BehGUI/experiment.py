@@ -164,7 +164,7 @@ class Experiment:
 
             elif "MAX_EXPT_TIME" in key:
                 self.setup_ln_num +=1
-                self.MAX_EXPT_TIME = float(setupDict["MAX_EXPT_TIME"])
+                self.MAX_EXPT_TIME = float(setupDict["MAX_EXPT_TIME"]) * 60
                 print("Max Expt Time :", self.MAX_EXPT_TIME * 60.0, " sec")
 
 
@@ -945,8 +945,8 @@ class Experiment:
         #########################################################
         #  PROTOCOL ENDED (Reset everything for next run
         #########################################################
-        #print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.max_time * 60.0, " sec")
-        if self.cur_time >= self.MAX_EXPT_TIME * 10000.0: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
+        print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.MAX_EXPT_TIME , " sec")
+        if self.cur_time >= self.MAX_EXPT_TIME: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
             self.log_event("Exceeded MAX_EXPT_TIME")
             print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX_EXPT_TIME: ",self.MAX_EXPT_TIME)
             self.log_event("PROTOCOL ENDED-max time exceeded")
@@ -1095,10 +1095,13 @@ class Experiment:
                    #  BACKGROUND TOUCHED (image missed)
                    ##########################################
                    if self.touchMsg['picture'] == 'missed': # Touched background
-                       self.log_event(" missed ," + "(" + str(x) + ";" + str(y)  + ")")
-                       self.background_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
-                       self.background_touches += 1
-                       self.WRONG = True # When TOUCHSCREEN TRAING, ANY TOUCH RESULTS IN TRUE (??????????)
+                       if self.SKIP_MISSES:
+                            self.log_event(" missed ," + "(" + str(x) + ";" + str(y)  + ")")
+                       else:
+                           self.log_event(" missed ," + "(" + str(x) + ";" + str(y)  + ")")
+                           self.background_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+                           self.background_touches += 1
+                           self.WRONG = True # When TOUCHSCREEN TRAING, ANY TOUCH RESULTS IN TRUE (??????????)
 
                    ###################
                    #  IMAGE TOUCHED
@@ -1385,20 +1388,24 @@ class Experiment:
                            self.GUI.cabin_light.sendDBit(False)
                            self.NEXT_TRIAL = True
                            self.PAUSE_STARTED = False
-               
+
                elif "PAUSE" in outcome:
                    if not self.PAUSE_STARTED:
                        pause_string = outcome.split('=')[1]
-                       if 'min' in pause_string or 'm' in pause_string:
+                       if 'M' in pause_string:
+                           self.PAUSE_TIME = float(pause_string.split('M')[0]) * 60
+                       elif 'm' in pause_string:
                             self.PAUSE_TIME = float(pause_string.split('m')[0]) * 60
-                       else
+                       else:
                             self.PAUSE_TIME = float(pause_string)
+                       self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                        self.PAUSE_STARTED = True
                        self.pause_start_time = time.perf_counter()
                        self.NEXT_TRIAL = False
                    else:
                        time_elapsed = time.perf_counter() - self.pause_start_time
                        self.NEXT_TRIAL = False
+                       if time_elapsed > self.PAUSE_TIME:
                            self.NEXT_TRIAL = True
                            self.PAUSE_STARTED = False
 
@@ -1423,8 +1430,8 @@ class Experiment:
         if self.VID_ENABLED:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
-            while self.vid_thread.is_alive():
-                pass
+            #while self.vid_thread.is_alive():
+            #    pass
 
         if self.stim is not None and self.stim.is_alive():
             self.stimBackQ.put('STOP')

@@ -132,7 +132,8 @@ def conditioningLightsRightSetup():
 Returns a new food task
 '''
 def giveFoodSetup():
-    foodAddress = dev + '/port1/line4' #Output line 5
+    if 'EPHYS-2' in computer:
+        foodAddress = dev + '/port3/line4' #Output line 5
     if 'ABETUSER-PC' == computer:
         foodAddress = dev + '/port3/line4'
     food = InterfaceOut(foodAddress)
@@ -194,7 +195,7 @@ def fanSetup():
 Returns a new cabin light task
 '''
 def cabinLightSetup():
-    cabinLightAddress = dev + '/port2/line1'
+    cabinLightAddress = dev + '/port4/line1'
     if 'ABETUSER-PC' == computer:
         cabinLightAddress = dev + '/port3/line7'
     cabinLight = InterfaceOut(cabinLightAddress)
