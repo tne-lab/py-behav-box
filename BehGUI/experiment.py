@@ -411,22 +411,29 @@ class Experiment:
                     self.log_event( log_string)
                 elif self.SPAL:
                     # Choose rand  image to show
-                    imgSelect = random.randint(0,len(self.touchImgs.keys())-1)
-                    print('imgSelsct', imgSelect)
-                    imgKey = list(self.touchImgs.keys())[imgSelect]
-                    print('chosen ', imgKey)
+                    if self.prev_imgList is None:
+                        imgSelect = random.randint(0,len(self.touchImgs.keys())-1)
+                        print('imgSelsct', imgSelect)
+                        imgKey = list(self.touchImgs.keys())[imgSelect]
+                        print('chosen ', imgKey)
 
-                    imgList = {}
-                    wrongCoords = []
-                    for key in self.DesImgCoords.keys():
-                        if key == imgKey:
-                            imgList[key] = self.DesImgCoords[key]
-                            print('correct location: ', self.DesImgCoords[key])
-                            #self.GUI.TSq.put(imgList)
-                        else:
-                            wrongCoords.append(self.DesImgCoords[key])
+                        imgList = {}
+                        wrongCoords = []
+                        for key in self.DesImgCoords.keys():
+                            if key == imgKey:
+                                imgList[key] = self.DesImgCoords[key]
+                                print('correct location: ', self.DesImgCoords[key])
+                                #self.GUI.TSq.put(imgList)
+                            else:
+                                wrongCoords.append(self.DesImgCoords[key])
 
-                    imgList[imgKey[:-4]+'_WRONG.bmp'] = random.choice(wrongCoords)
+                        imgList[imgKey[:-4]+'_WRONG.bmp'] = random.choice(wrongCoords)
+                        
+                    
+                        self.prev_imgList = imgList # Save imgList in case we need to restart trial
+                    else:
+                        imgList = self.prev_imgList
+                    
                     self.GUI.TSq.put(imgList)
 
                     # Send images out to whisker
@@ -454,7 +461,6 @@ class Experiment:
 
 
                 else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
-                    print('hello')
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
                     print(placementList, self.touchImgCoords)
 
@@ -466,7 +472,6 @@ class Experiment:
                         else:
                             self.prev_img_loc_index[1] = self.prev_img_loc_index[0]
                             self.prev_img_loc_index[0] = placementList[0]
-                    print('hello 2')
 
                     if not skip:
                         # NOTE: random.sample(population, k)
@@ -476,7 +481,6 @@ class Experiment:
                         imgList = {}
                         i=0
                         for key in self.touchImgs.keys():
-                            print('trying loop')
                             imgList[key] = self.touchImgCoords[placementList[i]] #places images
                             print('ImgList', imgList)
                             i+=1
@@ -1178,6 +1182,8 @@ class Experiment:
                                self.wrong_img_hits.append((int(x/4),int(y/4)))
                                self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
                                self.WRONG = True
+                               self.loop -= 1 # Don't move forward
+                               self.trial_num -= 1 # Don't move forward
                        #################################
                        # TOUCH TRAINING
                        #################################
