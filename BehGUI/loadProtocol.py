@@ -213,6 +213,8 @@ def load_expt_file(self):
                         print("self.Tone2_Vol: ",self.GUI.Tone2_Vol)
 
                 elif currentlySetting == 'TOUCHSCREEN':
+                    if '[TOUCHSCREEN]' in str_before_equal:
+                        self.SKIP_MISSES = False
                     if 'IMAGES_PATH' in str_before_equal:
                         self.TOUCH_IMG_PATH = str_after_equal
 
@@ -237,6 +239,7 @@ def load_expt_file(self):
                                     touchImgCoords.append((int(imageCoordsStr[0]), int(imageCoordsStr[1])))
                                 self.cur_img_coords.append(touchImgCoords)
                         else:
+                            self.prev_img_loc_index = [-1, -1]
                             imageCoords = words.split(':')
                             for i in range(len(imageCoords)): # Loop through coord list
                                 for c in '()':#Remove parenthesis from (x,y)
@@ -293,6 +296,9 @@ def load_expt_file(self):
                         for img in self.touchImgs:
                             self.DesImgCoords[img] = self.touchImgCoords[i]
                             i=i+1
+
+                    elif 'SKIP_MISSES' == str_before_equal:
+                        self.SKIP_MISSES = True
 
 
                 elif currentlySetting == 'BARPRESS':

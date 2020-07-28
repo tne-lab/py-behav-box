@@ -164,7 +164,7 @@ class Experiment:
 
             elif "MAX_EXPT_TIME" in key:
                 self.setup_ln_num +=1
-                self.MAX_EXPT_TIME = float(setupDict["MAX_EXPT_TIME"])
+                self.MAX_EXPT_TIME = float(setupDict["MAX_EXPT_TIME"]) * 60
                 print("Max Expt Time :", self.MAX_EXPT_TIME * 60.0, " sec")
 
 
@@ -454,43 +454,56 @@ class Experiment:
 
 
                 else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
-
+                    print('hello')
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
                     print(placementList, self.touchImgCoords)
 
-                    # NOTE: random.sample(population, k)
-                    #       Returns a new list containing elements from the population while leaving
-                    #       the original population unchanged.
-                    #       Here: for 2 images, population = (0,2), k = 2.  returns (0,1) or (1,0)
-                    imgList = {}
-                    i=0
-                    for key in self.touchImgs.keys():
-                        imgList[key] = self.touchImgCoords[placementList[i]] #places images
-                        print('ImgList', imgList)
-                        i+=1
-                        self.GUI.TSq.put(imgList)
+                    skip = False
+                    # Single location/multiple coords can't be same loc 3 times in a row check
+                    if len(self.touchImgs.keys()) == 1 and len(self.touchImgCoords) > 1: # only 1 image that can randomly go in multiple locations
+                        if placementList[0] in self.prev_img_loc_index: # can't be same location 3 times in a row
+                            skip = True
+                        else:
+                            self.prev_img_loc_index[1] = self.prev_img_loc_index[0]
+                            self.prev_img_loc_index[0] = placementList[0]
+                    print('hello 2')
 
-                    self.Protocol_ln_num +=1
+                    if not skip:
+                        # NOTE: random.sample(population, k)
+                        #       Returns a new list containing elements from the population while leaving
+                        #       the original population unchanged.
+                        #       Here: for 2 images, population = (0,2), k = 2.  returns (0,1) or (1,0)
+                        imgList = {}
+                        i=0
+                        for key in self.touchImgs.keys():
+                            print('trying loop')
+                            imgList[key] = self.touchImgCoords[placementList[i]] #places images
+                            print('ImgList', imgList)
+                            i+=1
+                            self.GUI.TSq.put(imgList)
 
-                    log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
-                    log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
-                    log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
-                    log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
-                    log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
-                    idx = log_string.find(")")
-                    #print("IDX: ", idx, "logstring: ", log_string)
-                    while idx != -1: # returns -1 if string not found
-                        try:
-                            if log_string[idx+1] == ";": # Could be out of range if ")" is last char
-                                log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
-                            idx = log_string.find[:idx+2](")")
-                            print("IDX: ", idx, "logstring: ", log_string)
-                        except:
-                            print("\n\n FAILED creating log string\n\n")
-                            break
+                        self.Protocol_ln_num +=1
 
-                    print('log_string', log_string)
-                    self.log_event( log_string)
+                        log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
+                        log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
+                        log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
+                        log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
+                        log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                        idx = log_string.find(")")
+                        #print("IDX: ", idx, "logstring: ", log_string)
+                        while idx != -1: # returns -1 if string not found
+                            try:
+                                if log_string[idx+1] == ";": # Could be out of range if ")" is last char
+                                    log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
+                                idx = log_string.find[:idx+2](")")
+                                print("IDX: ", idx, "logstring: ", log_string)
+                            except:
+                                print("\n\n FAILED creating log string\n\n")
+                                break
+
+                        print('log_string', log_string)
+                        self.log_event( log_string)
+                        print( ' all done')
         ###############################
         # START LOOP
         ###############################
@@ -932,8 +945,8 @@ class Experiment:
         #########################################################
         #  PROTOCOL ENDED (Reset everything for next run
         #########################################################
-        #print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.max_time * 60.0, " sec")
-        if self.cur_time >= self.MAX_EXPT_TIME * 10000.0: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
+        print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.MAX_EXPT_TIME , " sec")
+        if self.cur_time >= self.MAX_EXPT_TIME: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
             self.log_event("Exceeded MAX_EXPT_TIME")
             print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX_EXPT_TIME: ",self.MAX_EXPT_TIME)
             self.log_event("PROTOCOL ENDED-max time exceeded")
@@ -1082,10 +1095,13 @@ class Experiment:
                    #  BACKGROUND TOUCHED (image missed)
                    ##########################################
                    if self.touchMsg['picture'] == 'missed': # Touched background
-                       self.log_event(" missed ," + "(" + str(x) + ";" + str(y)  + ")")
-                       self.background_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
-                       self.background_touches += 1
-                       self.WRONG = True # When TOUCHSCREEN TRAING, ANY TOUCH RESULTS IN TRUE (??????????)
+                       if self.SKIP_MISSES:
+                            self.log_event(" missed ," + "(" + str(x) + ";" + str(y)  + ")")
+                       else:
+                           self.log_event(" missed ," + "(" + str(x) + ";" + str(y)  + ")")
+                           self.background_hits.append((int(x/4),int(y/4)))# To draw on gui. Note:(40,320) is top left of gui touchscreen, 1/4 is the gui scale factor
+                           self.background_touches += 1
+                           self.WRONG = True # When TOUCHSCREEN TRAING, ANY TOUCH RESULTS IN TRUE (??????????)
 
                    ###################
                    #  IMAGE TOUCHED
@@ -1372,6 +1388,28 @@ class Experiment:
                            self.GUI.cabin_light.sendDBit(False)
                            self.NEXT_TRIAL = True
                            self.PAUSE_STARTED = False
+
+               elif "PAUSE" in outcome:
+                   if not self.PAUSE_STARTED:
+                       pause_string = outcome.split('=')[1]
+                       if 'M' in pause_string:
+                           self.PAUSE_TIME = float(pause_string.split('M')[0]) * 60
+                       elif 'm' in pause_string:
+                            self.PAUSE_TIME = float(pause_string.split('m')[0]) * 60
+                       else:
+                            self.PAUSE_TIME = float(pause_string)
+                       self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
+                       self.PAUSE_STARTED = True
+                       self.pause_start_time = time.perf_counter()
+                       self.NEXT_TRIAL = False
+                   else:
+                       time_elapsed = time.perf_counter() - self.pause_start_time
+                       self.NEXT_TRIAL = False
+                       if time_elapsed > self.PAUSE_TIME:
+                           self.NEXT_TRIAL = True
+                           self.PAUSE_STARTED = False
+
+
                else: #outcome == 'NONE'
                    self.log_event("NONE")
                    #print("Outcome = NONE")
@@ -1392,8 +1430,8 @@ class Experiment:
         if self.VID_ENABLED:
             self.vidDict['STATE'] = 'OFF'
             self.VIDq.append(self.vidDict)
-            while self.vid_thread.is_alive():
-                pass
+            #while self.vid_thread.is_alive():
+            #    pass
 
         if self.stim is not None and self.stim.is_alive():
             self.stimBackQ.put('STOP')

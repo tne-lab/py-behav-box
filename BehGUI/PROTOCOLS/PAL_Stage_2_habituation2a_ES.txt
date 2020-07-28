@@ -1,0 +1,40 @@
+﻿[EXPERIMENT]
+EXPT_NAME = PAL_Stage_2_habituation2a
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+
+#######################################################################################
+##  Stage 2: habituation2a                                                           ##
+##  Duration: 2 sessions, 1200s (20 minutes)                                         ##
+##  Trial number: Unlimited                                                          ##
+##  Description: The tray light is initially turned on. A tone is played and         ##
+##  the food-tray/magazine is primed with strawberry milkshake (SM) delivered        ##
+##   for 6000ms (150�l). The program waits for the mouse to enter the food tray.     ##
+##  When the mouse leaves the reward tray, the reward tray light is turned off.      ##
+##  There is a 10s delay before the tray light is turned on, a tone is played        ##
+##  and SM is then delivered for 800ms (20 �l)1. If the mouse is in the reward       ##
+##  tray at the end of the 10s delay, an extra 1s is added to the delay.             ##
+##  The procedure is repeated until the session ends. It is critical that the mouse  ##
+##  is removed from the cabinet as soon as the habituation is complete.              ##
+##  Criterion: Drinks milkshake (none observed in tray).                             ##
+#######################################################################################
+
+[SETUP]
+MAX_EXPT_TIME = 20     # NOTE: In minutes.
+FAN_ON=TRUE
+CAB_LIGHT=FALSE
+FOOD_LIGHT=FALSE
+
+[PROTOCOL]
+
+START_LOOP1 = 100
+FOOD_LIGHT = TRUE
+PELLET
+PAUSE = EAT_TO_START
+FOOD_LIGHT = FALSE
+    PAUSE = 10   # Inter trial Interval (ITI)
+END_LOOP
+
+FOOD_LIGHT=FALSE
+CAB_LIGHT=TRUE
+FAN_ON=FALSE
+[END PROTOCOL]
