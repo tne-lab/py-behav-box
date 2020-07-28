@@ -18,7 +18,7 @@ VI=0
 R_CONDITIONING_LIGHT = FALSE
 START_LOOP = 20
   BARPRESS = FALSE
-  PAUSE = CONDITIONING  #This will use VI on each line of file, one line per loop
+  PAUSE = 180+-30  #This will use VI on each line of file, one line per loop
   EXTEND_LEVERS = R_LVR
   BARPRESS = TRUE
   R_CONDITIONING_LIGHT = TRUE
@@ -35,4 +35,3 @@ CAMERA= False
 CAB_LIGHT=False
 FAN_ON=False
 [END PROTOCOL]
-

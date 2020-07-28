@@ -606,8 +606,8 @@ class Experiment:
                     elif "NOSEPOKE_TO_START" in protocolDict["PAUSE"]:
                         self.NOSEPOKE_TO_START = True
                     elif "+-" in protocolDict["PAUSE"]:
-                        baseNum = protocolDict["PAUSE"].split('+')[0]
-                        randNum = protocolDict["PAUSE"].split('-')[1]
+                        baseNum = float(protocolDict["PAUSE"].split('+')[0])
+                        randNum = float(protocolDict["PAUSE"].split('-')[1])
                         self.PAUSE_TIME = baseNum + random.randint(-1 * randNum, randNum)
 
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
@@ -870,7 +870,7 @@ class Experiment:
                                                   #  BAR_PRESS_TRAIN=VI(1,15)
                                                   #  note: VI(a,b); a = initial VI for bar PRESS, b = final VI for session
 
-                            if self.meanBPPM10 >= 10.0: #increae VI reward interval if mean over 1st 10 min exceeeds 10 BPPM
+                            if self.meanBPPM10 >= self.DesBPPM: #increae VI reward interval if mean over 1st 10 min exceeeds 10 BPPM
                                 self.var_interval_reward += 15 # Increases VI by 15
                                 if self.var_interval_reward >=  self.VI_final:
                                     self.var_interval_reward =  self.VI_final # Limit VI to final value (b above)
