@@ -297,12 +297,23 @@ def load_expt_file(self):
                             self.DesImgCoords[img] = self.touchImgCoords[i]
                             i=i+1
 
+                    elif 'DPAL' == str_before_equal:
+                        self.DPAL = True
+                        self.DesImgCoords = {}
+                        i = 0
+                        for img in self.touchImgs:
+                            self.DesImgCoords[img] = self.touchImgCoords[i]
+                            i=i+1
+
                      elif 'SKIP_MISSES' == str_before_equal:
                         self.SKIP_MISSES = True
 
 
                 elif currentlySetting == 'BARPRESS':
-                    self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
+                    if '[BARPRESS]' == str_before_equal:
+                        self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
+                        self.BAR_PRESS_TRAINING = False
+                        self.DesBBPM = 10
                     if "VI" in str_before_equal: # Needs to line befroe = sign
                         self.VI_REWARDING = True
                         VI = str_after_equal
@@ -341,6 +352,11 @@ def load_expt_file(self):
 ##                        except:
 ##                            print ("!!!!!!!!!!!VR must have the form '(10, 1,30,5)' in EXP PROOCOL file!!!!!!!!!!!!!!")
 
+                if "BBPM" in str_before_equal:
+                    self.DesBBPM = float(str_after_equal)
+
+
+                    
                 elif currentlySetting == "STIM":
                     if 'STIM_ADDRESS_X' == str_before_equal or 'STIM_ADDRESS' == str_before_equal:
                         self.stimAddressX = str_after_equal
