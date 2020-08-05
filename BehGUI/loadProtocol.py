@@ -297,7 +297,7 @@ def load_expt_file(self):
                             self.DesImgCoords[img] = self.touchImgCoords[i]
                             i=i+1
 
-                     elif 'SKIP_MISSES' == str_before_equal:
+                    elif 'SKIP_MISSES' == str_before_equal:
                         self.SKIP_MISSES = True
 
 

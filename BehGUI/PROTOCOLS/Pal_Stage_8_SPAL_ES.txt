@@ -1,9 +1,7 @@
-[EXPERIMENT]
+﻿[EXPERIMENT]
 EXPT_NAME = SPAL
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
-######## for Mark, 1) cabin light is not working, 2) for wrong action, CAB_LIGHT TURNS ON FOR HOW LONG?
-######## 3) Can you do no consequence for touching outside of correct and wrong images?
 
 ###########################################################################################################
 ##  Stage 8: sPAL                                                                                        ##

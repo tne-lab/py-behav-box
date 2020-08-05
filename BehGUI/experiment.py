@@ -428,12 +428,12 @@ class Experiment:
                                 wrongCoords.append(self.DesImgCoords[key])
 
                         imgList[imgKey[:-4]+'_WRONG.bmp'] = random.choice(wrongCoords)
-                        
-                    
+
+
                         self.prev_imgList = imgList # Save imgList in case we need to restart trial
                     else:
                         imgList = self.prev_imgList
-                    
+
                     self.GUI.TSq.put(imgList)
 
                     # Send images out to whisker
@@ -512,7 +512,7 @@ class Experiment:
         # START LOOP
         ###############################
         elif "START_LOOP" in key:
-            print("\n.............TRIAL = ",self.trial_num, "LOOP: ", self.loop,"..................")
+            #print("\n.............TRIAL = ",self.trial_num, "LOOP: ", self.loop,"..................")
             self.loop +=1
             self.trial_num +=1
         #    for user_input in self.GUI.user_inputs:
@@ -949,7 +949,7 @@ class Experiment:
         #########################################################
         #  PROTOCOL ENDED (Reset everything for next run
         #########################################################
-        print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.MAX_EXPT_TIME , " sec")
+        #print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.MAX_EXPT_TIME , " sec")
         if self.cur_time >= self.MAX_EXPT_TIME: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
             self.log_event("Exceeded MAX_EXPT_TIME")
             print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX_EXPT_TIME: ",self.MAX_EXPT_TIME)
@@ -1173,6 +1173,7 @@ class Experiment:
                                     self.log_event("Correct: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
                                     self.correct_image_touches += 1
                                     self.CORRECT = True
+                                    self.prev_imgList = None
                                     #else
                                     #    self.wrong_img_hits.append((int(x/4),int(y/4)))
                                     #    self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
@@ -1288,17 +1289,20 @@ class Experiment:
                   GUIFunctions.PLAY_TONE(self.GUI,'TONE1 for Correct Response') #THIS IS DONE EVERY CORRECT RESPOSE EVEN IF REWARD NOT GIVEN
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
-                  self.correctPercentage = self.num_correct/self.trial_num * 100
+                  if self.trial_num > 0:
+                    self.correctPercentage = self.num_correct/self.trial_num * 100
                   #print("Correct")
                elif self.WRONG:
                   outcome = self.cond['WRONG'].upper()    # Outcome for wrong response(in Expt File)
                   self.num_wrong += 1
-                  self.wrongPercentage = self.num_wrong/self.trial_num * 100
+                  if self.trial_num > 0:
+                    self.wrongPercentage = self.num_wrong/self.trial_num * 100
                   #print("Wrong")
                else:
                   outcome = self.cond['NO_ACTION'].upper()# Outcome for No_Action taken(in Expt File)
                   self.num_no_action += 1
-                  self.no_actionPercentage = self.num_no_action/self.trial_num * 100
+                  if self.trial_num > 0:
+                    self.no_actionPercentage = self.num_no_action/self.trial_num * 100
                   #print("No Action Taken")
                self.NEXT_TRIAL = True
 

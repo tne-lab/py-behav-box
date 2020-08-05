@@ -11,7 +11,7 @@ IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
 #       Image size is controlled in whiskerTouchZMQ.py
 COORDS=(61,10):(371,10):(681,10)        # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
 IMG1= BLANK.bmp  # Image name
-SKIP_MISSES = TRUE
+#SKIP_MISSES = TRUE
 
 [SETUP]
 MAX_EXPT_TIME = 60     # NOTE: In minutes.   Generally 60 min max for rats
