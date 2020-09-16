@@ -225,3 +225,4 @@ def setTouchGlobals(self):
     self.TOUCH_IMAGES_SENT = False
     self.SPAL = False
     self.prev_imgList = None
+    self.DPAL = False

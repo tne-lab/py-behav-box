@@ -1,0 +1,31 @@
+[EXPERIMENT]
+EXPT_NAME = PAL_Stage_1_habituation1
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+
+#######################################################################################
+##  Stage 1: habituation1                                                            ##
+##  Duration: 1 session, 600s (10 minutes).                                          ##
+##  Trial number: Unlimited                                                          ##
+##  Description: Mouse is left in the chamber for 10 min. All lights are turned off. ##
+##  No stimulus or reward is presented. It is critical that the mouse is removed     ##
+##  from the cabinet as soon as the habituation is complete.                         ##
+##  Criterion: None                                                                  ##
+#######################################################################################
+
+[SETUP]
+MAX_EXPT_TIME = 10     # NOTE: In minutes.   Generally 60 min max for rats
+FAN_ON=TRUE
+CAB_LIGHT=FALSE
+CAMERA = TRUE
+#REC=TRUE
+
+[PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
+
+START_LOOP1 = 1
+  PAUSE = 600
+END_LOOP
+
+#FOOD_LIGHT=False
+CAB_LIGHT=TRUE
+FAN_ON=False
+[END PROTOCOL]

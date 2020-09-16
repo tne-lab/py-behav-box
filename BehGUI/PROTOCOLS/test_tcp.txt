@@ -1,0 +1,20 @@
+[EXPERIMENT]
+EXPT_NAME = TEST_TCP
+EXPT_PATH 	=  E:\py-behav-box\BehGUI\DATA
+
+[OPEN_EPHYS]
+OPEN_EPHYS_ADDRESS = 134.84.77.210
+OPEN_EPHYS_DATAPATH = D:\test
+
+[SETUP]
+FAN_ON=True
+REC = True
+
+[PROTOCOL]
+START_LOOP = 1          # Loops are trials
+  PAUSE = 10            #10 sec
+END_LOOP
+
+FAN_ON=FALSE
+REC = False
+[END PROTOCOL]

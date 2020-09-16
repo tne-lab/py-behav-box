@@ -152,11 +152,22 @@ def load_expt_file(self):
                         print(self.VIs_file_path)
 
                 elif currentlySetting == 'OPEN_EPHYS':
+                    if '[OPEN_EPHYS]' in str_before_equal:
+                        self.OE_Address = "localhost"
+                        self.oedatapath = ''
+
+                    if "OPEN_EPHYS_ADDRESS" in str_before_equal: # Open ephys not running on local machine
+                        if str_before_equal != "localhost":
+                            self.OE_Address = str_after_equal
+                            self.EPHYS_ENABLED = True
+                    if "OPEN_EPHYS_DATAPATH" in str_before_equal:
+                        self.oedatapath = str_after_equal
+
                     if "OPEN_EPHYS_CONFIG_FILE" in str_before_equal:
                         self.config_file_path = str_after_equal
 
                     elif 'OPEN_EPHYS_PATH' in str_before_equal:
-                        if self.GUI.NIDAQ_AVAILABLE:
+                        if self.GUI.NIDAQ_AVAILABLE and self.OE_Address == "localhost":
                             win32gui.EnumWindows(GUIFunctions.lookForProgram, 'Open Ephys GUI')
                             if GUIFunctions.IsOpenEphysRunning:
                                 win32gui.EnumWindows(GUIFunctions.killProgram, 'Open Ephys GUI')
@@ -297,12 +308,23 @@ def load_expt_file(self):
                             self.DesImgCoords[img] = self.touchImgCoords[i]
                             i=i+1
 
+                    elif 'DPAL' == str_before_equal:
+                        self.DPAL = True
+                        self.DesImgCoords = {}
+                        i = 0
+                        for img in self.touchImgs:
+                            self.DesImgCoords[img] = self.touchImgCoords[i]
+                            i=i+1
+
                     elif 'SKIP_MISSES' == str_before_equal:
                         self.SKIP_MISSES = True
 
 
                 elif currentlySetting == 'BARPRESS':
-                    self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
+                    if '[BARPRESS]' == str_before_equal:
+                        self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
+                        self.BAR_PRESS_TRAINING = False
+                        self.DesBBPM = 10
                     if "VI" in str_before_equal: # Needs to line befroe = sign
                         self.VI_REWARDING = True
                         VI = str_after_equal
@@ -340,6 +362,11 @@ def load_expt_file(self):
 ##                            print("var_RATIO_reward: ",self.var_ratio_reward)
 ##                        except:
 ##                            print ("!!!!!!!!!!!VR must have the form '(10, 1,30,5)' in EXP PROOCOL file!!!!!!!!!!!!!!")
+
+                if "BBPM" in str_before_equal:
+                    self.DesBBPM = float(str_after_equal)
+
+
 
                 elif currentlySetting == "STIM":
                     if 'STIM_ADDRESS_X' == str_before_equal or 'STIM_ADDRESS' == str_before_equal:
@@ -634,7 +661,10 @@ def create_files(self):
 
     ###### Change open ephys recoding dir #####
     if self.EPHYS_ENABLED:
-        self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.GUI.Subject)
+        if self.OE_Address == "localhost":
+            self.snd.changeVars(recordingDir = self.newdatapath, prependText = 'OPEN-EPHYS-' + self.GUI.Subject)
+        else:
+            self.snd.changeVars(recordingDir = self.oedatapath, prependText = 'OPEN-EPHYS-' + self.GUI.Subject)
         #self.snd.send(self.snd.START_REC)
         #time.sleep(0.5) # Let Open Ephys record for a bit (maybe remove?)
 

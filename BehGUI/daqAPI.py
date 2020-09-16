@@ -110,7 +110,7 @@ def leverOutputSetup():
 Returns a new left conditioning light task
 '''
 def conditioningLightsLeftSetup():
-    conditioningLightAddress = dev + '/port1/line2'
+    conditioningLightAddress = dev + '/port3/line2'
     if 'ABETUSER-PC' == computer:
         conditioningLightAddress = dev +'/port3/line2'
     conditioningLight = InterfaceOut(conditioningLightAddress)
@@ -139,7 +139,6 @@ def giveFoodSetup():
     food = InterfaceOut(foodAddress)
     food.startTask()
     return food
-
 '''
 Returns a new food light task
 '''
@@ -325,7 +324,7 @@ def foodEatInputSetup():
 Returns left nose poke input Task
 '''
 def leftNoseInputSetup(): # 3
-    leftNoseInputAddress = dev + '/port6/line3'
+    leftNoseInputAddress = dev + '/port7/line3'
     leftNose = InterfaceIn(leftNoseInputAddress)
     leftNose.startTask()
     return leftNose
