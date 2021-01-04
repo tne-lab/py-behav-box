@@ -32,7 +32,7 @@ R_CONDITIONING_LIGHT = FALSE
 EXTEND_LEVERS = FALSE
 START_LOOP = 9 #NOTE:PMA training
   BARPRESS = FALSE
-  PAUSE = 180+-5  #This will use VI on each line of file, one line per loop
+  PAUSE = LOWCONFLICT  #This will use VI on each line of file, one line per loop
   TONE1
   EXTEND_LEVERS = R_LVR 
   BARPRESS = TRUE

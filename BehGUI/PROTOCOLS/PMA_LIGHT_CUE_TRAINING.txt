@@ -4,21 +4,21 @@ EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 VI_TIMES_LIST_PATH	=  E:\py-behav-box\BehGUI\PROTOCOLS\PMA_TRAINING_VIs.txt
 #OPEN_EPHYS_PATH = E:\Python-Open-Ephys\Builds\VisualStudio2013\x64\Release64\bin\open-ephys.exe
 
+[BAR_PRESS]
+VI=0
+
 [SETUP]
 FAN_ON=True
 CAB_LIGHT=True
 CAMERA=True
 REC=True
 
-[BAR_PRESS]
-VI=0
-
 [PROTOCOL]
 
 R_CONDITIONING_LIGHT = FALSE
 START_LOOP = 20
   BARPRESS = FALSE
-  PAUSE = 180+-30  #This will use VI on each line of file, one line per loop
+  PAUSE = LIGHTCUE  #This will use VI on each line of file, one line per loop
   EXTEND_LEVERS = R_LVR
   BARPRESS = TRUE
   R_CONDITIONING_LIGHT = TRUE

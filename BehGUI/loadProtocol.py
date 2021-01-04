@@ -302,7 +302,7 @@ def load_expt_file(self):
 
 
                 elif currentlySetting == 'BARPRESS':
-                    if '[BAR_PRESS]' == str_before_equal:
+                    if '[BAR_PRESS]' in str_before_equal:
                         self.BAR_PRESS_TRAINING = False
                         self.BAR_PRESS_INDEPENDENT_PROTOCOL = True
                         self.DesBPPM = 10
@@ -350,7 +350,7 @@ def load_expt_file(self):
                 elif currentlySetting == "STIM":
                     if 'STIM_ADDRESS_X' == str_before_equal or 'STIM_ADDRESS' == str_before_equal:
                         self.stimAddressX = str_after_equal
-                    if 'STIM_ADDRESS_Y' == str_before_equal or 'STIM_ADDRESS_SHAM' == str_after_equal:
+                    if 'STIM_ADDRESS_Y' == str_before_equal or 'STIM_ADDRESS_SHAM' == str_before_equal:
                         self.stimAddressY = str_after_equal
 
                 elif currentlySetting == 'CLOSED_LOOP':
@@ -532,6 +532,7 @@ def load_expt_file(self):
 
     if self.VIs_file_path != "":
         print("Loading VIs ...")
+        #self.vis = {}
         try:
             #path,name = os.path.split(self.VIs_file_path)
             #VIs_file_path_COPY = name[:-4] + '_copy.txt'
@@ -540,6 +541,18 @@ def load_expt_file(self):
             #fw = open(VIs_file_path_COPY,'w')
             # Read Line by line
             for line in f:
+                words = line.split(':')
+                title = words[0]
+                if title == "NOTE":
+                    continue
+                words = words[1].strip()
+                words = words.split(',')
+                vi_list = []
+                for items in words:
+                    num = items.strip()
+                    vi_list.append(int(num))
+                self.vis[title] = vi_list
+
                 #fw.write(line)
                 self.VIFileLines.append(line)
                 line = line.strip() # Remove leading and trailoing blanks and \n

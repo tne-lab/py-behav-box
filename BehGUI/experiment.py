@@ -622,6 +622,10 @@ class Experiment:
                         baseNum = float(protocolDict["PAUSE"].split('+')[0])
                         randNum = float(protocolDict["PAUSE"].split('-')[1])
                         self.PAUSE_TIME = baseNum + random.randint(-1 * randNum, randNum)
+                    else:
+                        for k in self.vis.keys():
+                            if protocolDict["PAUSE"] == k:
+                                self.PAUSE_TIME = self.vis[k][self.VI_index]
 
                 self.log_event("PAUSEING FOR "+str(self.PAUSE_TIME)+" sec")
                 self.PAUSE_STARTED = True
@@ -945,7 +949,7 @@ class Experiment:
         #########################################################
         #  PROTOCOL ENDED (Reset everything for next run
         #########################################################
-        print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.MAX_EXPT_TIME , " sec")
+        #print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.MAX_EXPT_TIME , " sec")
         if self.cur_time >= self.MAX_EXPT_TIME: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
             self.log_event("Exceeded MAX_EXPT_TIME")
             print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX_EXPT_TIME: ",self.MAX_EXPT_TIME)

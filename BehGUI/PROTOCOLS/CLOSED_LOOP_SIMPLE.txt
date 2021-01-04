@@ -1,0 +1,48 @@
+[EXPERIMENT]
+EXPT_NAME = CLOSED_LOOP_SIMPLE # Don't use "-" in name, use underscores "_" instead
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+
+[OPEN_EPHYS]
+OPEN_EPHYS_CONFIG_FILE = CLOSED_LOOP_SIMPLE.xml # MUST BE BEFORE PATH!!!!!!!!!!!!!! Move this to lastConfig.xml in O_E_PATH, must happen before OE is opened
+OPEN_EPHYS_PATH =  E:\plugin-GUI-private\Builds\VisualStudio2013\x64\Release\bin\open-ephys.exe # on Flav's PC Ephys-2
+
+[CLOSED_LOOP]
+
+[STIM]
+STIM_ADDRESS_X = pciDAQ/ao0
+STIM_ADDRESS_SHAM = pciDAQ/ao2
+
+[ERP]
+INTER_PULSE_WIDTH = 4
+PULSE_VAR = 1 # PULSE_WIDTH +- PULSE_VAR = range of time between pulses
+NUM_PULSE = 2 # number of pulses to region X
+NUM_LOCATIONS = 2
+
+[SETUP]
+FAN_ON=TRUE
+CAMERA=TRUE
+CAB_LIGHT=TRUE
+REC=TRUE
+
+[BAR_PRESS]
+VI=60
+
+[PROTOCOL]
+RAW_PRE = 10  # 2 min pre record to set thresholds
+
+ERP = PRE # PRE = Folder name
+
+CLOSED_LOOP = 1800 # Begin closed loop stim thread
+PAUSE = 10 # closed loop for 30 minutes.  Stim at threshold crossing
+CLOSED_LOOP = FALSE # Kill thread
+
+RAW_POST = 10 # Seconds to record
+ERP = 5       # 5 = folder name
+
+RAW_POST = 10
+ERP = 30
+
+FAN_ON=FALSE
+CAB_LIGHT=False
+FOOD_LIGHT=False
+REC=False

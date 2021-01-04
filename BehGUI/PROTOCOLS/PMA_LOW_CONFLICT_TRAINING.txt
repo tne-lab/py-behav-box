@@ -36,7 +36,7 @@ REC=True
 R_CONDITIONING_LIGHT = TRUE
 EXTEND_LEVERS = R_LVR
 START_LOOP = 9 #NOTE:PMA training
-  PAUSE = Lowconflict #might need to change back to HABITUATION
+  PAUSE = LOWCONFLICT #might need to change back to HABITUATION
   TONE1
   PAUSE = 28
   SHOCK = TRUE

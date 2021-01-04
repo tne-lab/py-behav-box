@@ -114,7 +114,7 @@ def setExptGlobals(self):
     self.VI_start = 0.0       # To see if VI time has passed
     self.VI_calc_start = 0.0  # To recalc PRESSES PER MINUTE every minute
     self.VI_index = 0
-
+    self.vis = {}
     ################################################################
     # Touches Per Minute
     ################################################################
@@ -146,7 +146,7 @@ def setExptGlobals(self):
     ################################################################
     self.Experiment_Start_time = 0.0
     self.cur_time = 0.0
-    self.MAX_EXPT_TIME = 60 # in min
+    self.MAX_EXPT_TIME = 60 * 60 # in min
 
     ################################################################
     # PAUSE
