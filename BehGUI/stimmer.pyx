@@ -50,14 +50,14 @@ def createWaveform(amplitude, numPulse = 1):
 
   return np.array(waveform, dtype=np.float64)
 
-def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, timeout, timeoutVar):
+def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, timeout, timeoutVar, oeAddress):
   '''
   waiting for OPEN EPHYS trigger. then tells GUI that it sent the stim
   '''
   while not backQ.empty():
       msg = backQ.get()
   # Create socket to listen to
-  rcv = zmqClasses.RCVEvent(5557, [b'ttl', b'event'])
+  rcv = zmqClasses.RCVEvent(oeAddress, 5557, [b'ttl', b'event'])
   voltage = microamps / 100
   npWave = createWaveform(voltage)
   window = Tk()

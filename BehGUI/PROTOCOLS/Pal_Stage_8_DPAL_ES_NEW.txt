@@ -1,0 +1,71 @@
+﻿[EXPERIMENT]
+EXPT_NAME = DPAL
+EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
+
+
+###########################################################################################################
+##  Stage 8: dPAL                                                                                        ##
+##  Duration: 45 sessions, 3600s (60 minutes)                                                            ##
+##  Trial number: 36                                                                                     ##
+##  Description: Make sure tone duration is set to 1000 ms, ITI period is set to 20s, Food/CM            ##
+##  pulse time [800ms (20 �l SM), time out (TO, 5s). The session begins with a priming                   ##
+##  delivery of reinforcer and on exiting the food magazine the first trial begins. Following tray       ##
+##  exit a S+ image/location pair and a S- image/location pair are presented in 2 windows                ##
+##  and the third window is blank. A correct response, touching at the location in which the             ##
+##  S+ stimulus was presented, will trigger the presentation of a reinforcer into the food               ##
+##  magazine. Reinforcer delivery is accompanied by illumination of the tray light and a tone.           ##
+##  The tone duration is 1000 ms. The subject collects the food by making an entry at the                ##
+##  food magazine. On exiting the food tray, the ITI (20s) will begin. After the ITI period, the         ##
+##  tray light comes on again and the mouse must enter and exit the food tray to start the               ##
+##  next trial. An incorrect response, i.e. touching the S- image/location pair will cause a time        ##
+##  out (TO, 5s) and the house light to be turned ON. After the TO, the house light will be              ##
+##  turned OFF and the ITI will begin (20s). After the ITI the tray light will come on and the           ##
+##  mouse must enter and exit the food tray to start the correction trial. The next trial does           ##
+##  not begin until a response is made, ie. no time-out/no omissions. In a correction trial the          ##
+##  same S+/S- image/location pairs are repeated from the previous trial and repeated each               ##
+##  subsequent trial until a correct choice is made. The results of correction trials do not count       ##
+##  toward criteria for completion of the session.                                                       ##
+##  Criterion: 36 trials within 60 min, for 45 days.6                                                    ##
+###########################################################################################################
+
+[TOUCHSCREEN]
+IMAGES_PATH = E:\py-behav-box\BehGUI\RESOURCES
+# Note: Touchscreen is 1024 x 768. If we discount the deadzone, the
+#       screen is 1024 x 518.  For picture area to equal to active
+#       background area, picture must be 364 x 364
+#       For picture area to equal to active background area, picture must be 364 x 364
+#       Image size is controlled in whiskerTouchZMQ.py
+COORDS=(61,10):(371,10):(681,10) # COORDINATES OF THE FOLLOWING IMAGES (separate with ':')
+IMG1= 6B.bmp  # Image name
+IMG2= 6A.bmp
+IMG3= 2A.bmp
+DPAL
+
+[SETUP]
+MAX_EXPT_TIME = 60     # NOTE: In minutes.   Generally 60 min max for rats
+FAN_ON=TRUE
+CAB_LIGHT=FALSE
+CAMERA=TRUE
+#REC=TRUE
+
+[PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
+
+START_LOOP1 = 100
+L_CONDITIONING_LIGHT= TRUE
+PAUSE = NOSEPOKE_TO_START
+L_CONDITIONING_LIGHT= FALSE
+  DRAW_IMAGES=True
+  CONDITIONS=0    # NOTE: starts at 0
+  PAUSE = 10   # Inter trial Interval (ITI) NOTE:  needs time to eat pellet...
+END_LOOP
+
+#FOOD_LIGHT=False
+REC=False
+CAMERA= False
+CAB_LIGHT=False
+FAN_ON=False
+[END PROTOCOL]
+
+[CONDITIONS] #Note: reset = FIXED or ON_RESPONSE or AFTER_EATING.  Also, HERE WE NEED COMMAS. Max time in seconds
+MAX_TIME, RESET,        CORRECT,          WRONG,             NO_ACTION
+300,       ON_RESPONSE,  PELLET,         DN_PUNISH,

@@ -6,10 +6,11 @@ import time
 
 class RCVEvent:
     # SUBSCRIBE can be a list of vars, need to be in byte string format => b'spike'
-    def __init__(self, port, SUBSCRIBE, delay = 200):
+    def __init__(self, address, port, SUBSCRIBE, delay = 200):
         context = zmq.Context()
         self.socket = context.socket(zmq.SUB)
-        self.socket.connect("tcp://localhost:" + str(port))
+        #self.socket.connect("tcp://localhost:" + str(port))
+        self.socket.connect("tcp://" + address + ":" + str(port))
         self.poller = zmq.Poller()
         self.poller.register(self.socket, zmq.POLLIN)
         self.delay = delay
@@ -60,12 +61,13 @@ class SNDEvent:
     # port default is 5556 for event rcver on OE
     # recordingDir changes the dir..
     # prependText and appendText add info to either the beginning or end of filename
-    def __init__(self, port, recordingDir = '', prependText = '', appendText = '', TTLChannel = 0):
+    def __init__(self, address, port, recordingDir = '', prependText = '', appendText = '', TTLChannel = 0):
         context = zmq.Context()
         #  Socket to talk to OE
         print("Connecting sender to Open Ephys \n")
         self.socket = context.socket(zmq.REQ)
-        self.socket.connect("tcp://localhost:" + str(port))
+        #self.socket.connect("tcp://localhost:" + str(port))
+        self.socket.connect("tcp://" + address + ":" + str(port))
 
         # Store the vars needed for recording right away. Defaults to blank
         self.recordingDir = recordingDir.encode("utf-8")

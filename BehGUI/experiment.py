@@ -40,11 +40,11 @@ class Experiment:
         # Open ephys stuff
         #self.EPHYS_ENABLED = True
         if self.EPHYS_ENABLED:
-            self.snd = zmqClasses.SNDEvent(5556) # subject number or something
+            self.snd = zmqClasses.SNDEvent(self.OE_Address, 5556) # subject number or something
             self.openEphysBack_q = Queue()
             self.openEphysQ = Queue()
             # Start thread
-            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'event',b'ttl']})
+            open_ephys_rcv = threading.Thread(target=eventRECV.rcv, args=(self.OE_Address, self.openEphysBack_q,self.openEphysQ), kwargs={'flags' : [b'event',b'ttl']})
             open_ephys_rcv.start()
 
         self.GUI.EXPT_LOADED = True
@@ -411,22 +411,81 @@ class Experiment:
                     self.log_event( log_string)
                 elif self.SPAL:
                     # Choose rand  image to show
-                    imgSelect = random.randint(0,len(self.touchImgs.keys())-1)
-                    print('imgSelsct', imgSelect)
-                    imgKey = list(self.touchImgs.keys())[imgSelect]
-                    print('chosen ', imgKey)
+                    if self.prev_imgList is None:
+                        imgSelect = random.randint(0,len(self.touchImgs.keys())-1)
+                        print('imgSelsct', imgSelect)
+                        imgKey = list(self.touchImgs.keys())[imgSelect]
+                        print('chosen ', imgKey)
 
-                    imgList = {}
-                    wrongCoords = []
-                    for key in self.DesImgCoords.keys():
-                        if key == imgKey:
-                            imgList[key] = self.DesImgCoords[key]
-                            print('correct location: ', self.DesImgCoords[key])
-                            #self.GUI.TSq.put(imgList)
-                        else:
-                            wrongCoords.append(self.DesImgCoords[key])
+                        imgList = {}
+                        wrongCoords = []
+                        for key in self.DesImgCoords.keys():
+                            if key == imgKey:
+                                imgList[key] = self.DesImgCoords[key]
+                                print('correct location: ', self.DesImgCoords[key])
+                                #self.GUI.TSq.put(imgList)
+                            else:
+                                wrongCoords.append(self.DesImgCoords[key])
 
-                    imgList[imgKey[:-4]+'_WRONG.bmp'] = random.choice(wrongCoords)
+                        imgList[imgKey[:-4]+'_WRONG.bmp'] = random.choice(wrongCoords)
+
+
+                        self.prev_imgList = imgList # Save imgList in case we need to restart trial
+                    else:
+                        imgList = self.prev_imgList
+
+                    self.GUI.TSq.put(imgList)
+
+                    # Send images out to whisker
+                    self.Protocol_ln_num +=1
+
+                    log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
+                    log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
+                    log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
+                    log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
+                    log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                    idx = log_string.find(")")
+                    #print("IDX: ", idx, "logstring: ", log_string)
+                    while idx != -1: # returns -1 if string not found
+                        try:
+                            if log_string[idx+1] == ";": # Could be out of range if ")" is last char
+                                log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
+                            idx = log_string.find[:idx+2](")")
+                            print("IDX: ", idx, "logstring: ", log_string)
+                        except:
+                            print("\n\n FAILED creating log string\n\n")
+                            break
+
+                    print('log_string', log_string)
+                    self.log_event( log_string)
+
+                elif self.DPAL:
+                    # Choose rand  image to show
+                    if self.prev_imgList is None:
+                        imgSelect = random.randint(0,len(self.touchImgs.keys())-1)
+                        print('imgSelsct', imgSelect)
+                        imgKey = list(self.touchImgs.keys())[imgSelect]
+                        print('chosen ', imgKey)
+
+
+                        imgSelectWrong = imgSelect
+                        while(imgSelectWrong==imgSelect):
+                            imgSelectWrong = random.randint(0,len(self.touchImgs.keys())-1)
+                        print('imgSelsctwrong', imgSelectWrong)
+                        imgKeyWrong = list(self.touchImgs.keys())[imgSelectWrong]
+
+                        imgList = {}
+                        wrongCoords = []
+                        for key in self.DesImgCoords.keys():
+                            if key == imgKey:
+                                imgList[key] = self.DesImgCoords[key]
+                            elif key != imgKey and key != imgKeyWrong: # key corresponding to 3rd unchosen img. Use that coord for wrong img.
+                                imgList[imgKeyWrong[:-4]+'_WRONG.bmp'] = self.DesImgCoords[key]
+
+                        self.prev_imgList = imgList # Save imgList in case we need to restart trial
+                    else:
+                        imgList = self.prev_imgList
+
                     self.GUI.TSq.put(imgList)
 
                     # Send images out to whisker
@@ -454,7 +513,6 @@ class Experiment:
 
 
                 else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
-                    print('hello')
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
                     print(placementList, self.touchImgCoords)
 
@@ -466,7 +524,6 @@ class Experiment:
                         else:
                             self.prev_img_loc_index[1] = self.prev_img_loc_index[0]
                             self.prev_img_loc_index[0] = placementList[0]
-                    print('hello 2')
 
                     if not skip:
                         # NOTE: random.sample(population, k)
@@ -476,7 +533,6 @@ class Experiment:
                         imgList = {}
                         i=0
                         for key in self.touchImgs.keys():
-                            print('trying loop')
                             imgList[key] = self.touchImgCoords[placementList[i]] #places images
                             print('ImgList', imgList)
                             i+=1
@@ -508,7 +564,7 @@ class Experiment:
         # START LOOP
         ###############################
         elif "START_LOOP" in key:
-            print("\n.............TRIAL = ",self.trial_num, "LOOP: ", self.loop,"..................")
+            #print("\n.............TRIAL = ",self.trial_num, "LOOP: ", self.loop,"..................")
             self.loop +=1
             self.trial_num +=1
         #    for user_input in self.GUI.user_inputs:
@@ -685,7 +741,7 @@ class Experiment:
                         self.stimY = daqAPI.AnalogOut(self.stimAddressY)
                         self.stimQ = Queue()
                         self.stimBackQ = Queue()
-                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps, self.CLLag, CLTimer, self.CLTimeout, self.CLTimeoutVar))
+                        self.stim = threading.Thread(target=stimmer.waitForEvent, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.CLCHANNEL, self.CLMicroAmps, self.CLLag, CLTimer, self.CLTimeout, self.CLTimeoutVar, self.OE_Address))
                         self.stim.start()
                         self.CL_Enabled = True
                         #self.Protocol_ln_num += 1 # Doing this from check q function. Gross but works
@@ -1164,7 +1220,7 @@ class Experiment:
                                    # Holds the probability for each trial
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
-                       elif self.SPAL:
+                       elif self.SPAL or self.DPAL:
                            for img in self.touchImgs.keys():
                                if self.touchMsg['picture'] == img:
                                    #desCoords = self.DesImgCoords[img]
@@ -1173,6 +1229,7 @@ class Experiment:
                                     self.log_event("Correct: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
                                     self.correct_image_touches += 1
                                     self.CORRECT = True
+                                    self.prev_imgList = None
                                     #else
                                     #    self.wrong_img_hits.append((int(x/4),int(y/4)))
                                     #    self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
@@ -1182,6 +1239,28 @@ class Experiment:
                                self.wrong_img_hits.append((int(x/4),int(y/4)))
                                self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
                                self.WRONG = True
+                               self.loop -= 1 # Don't move forward
+                               self.trial_num -= 1 # Don't move forward
+                       #elif self.DPAL:
+                       #    for img in self.touchImgs.keys():
+                       #        if self.touchMsg['picture'] == img:
+                       #            #desCoords = self.DesImgCoords[img]
+                       #            #if (desCoords[0] < x and x < desCoords[0] + 290) and (desCoords[1] < y and y < desCoords[1] + 290):
+                       #             self.correct_img_hits.append((int(x/4),int(y/4)))
+                       #             self.log_event("Correct: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
+                       #             self.correct_image_touches += 1
+                       #             self.CORRECT = True
+                                    #else
+                                    #    self.wrong_img_hits.append((int(x/4),int(y/4)))
+                                    #    self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
+                                    #   self.WRONG = True
+                           # If _TEMP img pressed
+                       #    if self.CORRECT == False: #Didn't find a correct img, must be _WRONG
+                       #        self.wrong_img_hits.append((int(x/4),int(y/4)))
+                       #        self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
+                       #        self.WRONG = True
+                       #        self.loop -= 1 # Don't move forward
+                       #        self.trial_num -= 1 # Don't move forward
                        #################################
                        # TOUCH TRAINING
                        #################################
@@ -1286,17 +1365,20 @@ class Experiment:
                   GUIFunctions.PLAY_TONE(self.GUI,'TONE1 for Correct Response') #THIS IS DONE EVERY CORRECT RESPOSE EVEN IF REWARD NOT GIVEN
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
-                  self.correctPercentage = self.num_correct/self.trial_num * 100
+                  if self.trial_num > 0:
+                    self.correctPercentage = self.num_correct/self.trial_num * 100
                   #print("Correct")
                elif self.WRONG:
                   outcome = self.cond['WRONG'].upper()    # Outcome for wrong response(in Expt File)
                   self.num_wrong += 1
-                  self.wrongPercentage = self.num_wrong/self.trial_num * 100
+                  if self.trial_num > 0:
+                    self.wrongPercentage = self.num_wrong/self.trial_num * 100
                   #print("Wrong")
                else:
                   outcome = self.cond['NO_ACTION'].upper()# Outcome for No_Action taken(in Expt File)
                   self.num_no_action += 1
-                  self.no_actionPercentage = self.num_no_action/self.trial_num * 100
+                  if self.trial_num > 0:
+                    self.no_actionPercentage = self.num_no_action/self.trial_num * 100
                   #print("No Action Taken")
                self.NEXT_TRIAL = True
 

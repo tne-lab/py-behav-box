@@ -1,12 +1,10 @@
-[EXPERIMENT]
-EXPT_NAME = SPAL
+﻿[EXPERIMENT]
+EXPT_NAME = DPAL
 EXPT_PATH 	= E:\py-behav-box\BehGUI\DATA
 
-######## for Mark, 1) cabin light is not working, 2) for wrong action, CAB_LIGHT TURNS ON FOR HOW LONG?
-######## 3) Can you do no consequence for touching outside of correct and wrong images?
 
 ###########################################################################################################
-##  Stage 8: sPAL                                                                                        ##
+##  Stage 8: dPAL                                                                                        ##
 ##  Duration: 45 sessions, 3600s (60 minutes)                                                            ##
 ##  Trial number: 36                                                                                     ##
 ##  Description: Make sure tone duration is set to 1000 ms, ITI period is set to 20s, Food/CM            ##
@@ -41,13 +39,14 @@ COORDS=(61,10):(371,10):(681,10) # COORDINATES OF THE FOLLOWING IMAGES (separate
 IMG1= 6B.bmp  # Image name
 IMG2= 6A.bmp
 IMG3= 2A.bmp
-SPAL
+DPAL
 
 [SETUP]
 MAX_EXPT_TIME = 60     # NOTE: In minutes.   Generally 60 min max for rats
 FAN_ON=TRUE
 CAB_LIGHT=FALSE
-#REC=TRUE
+CAMERA=TRUE
+REC=TRUE
 
 [PROTOCOL] #Note: CONDITIONS can be "RANDOM" or "SEQUENTIAL" in the order they are listed below in [CONDITIONS]
 

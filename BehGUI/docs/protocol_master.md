@@ -4,27 +4,27 @@ I believe this is every option currently available to include with your protocol
 
 ## [EXPERIMENT] - Start of every protocol file. Import expt info.
 
-### EXPT_NAME 
+### EXPT_NAME
 - = string
 - Name of folder
 
-### SUBJECT 
+### SUBJECT
 - = string
 - Subject name (don't think is used)
 
-### EXPT_PATH 
+### EXPT_PATH
 - = path
 - Where to save data (NEED)
 
-### LOG_FILE_PATH 
+### LOG_FILE_PATH
 - = path
 - Where to save log file
 
-### VIDEO_FILE_PATH 
+### VIDEO_FILE_PATH
 - = path
 - Where to save video
 
-### VI_TIMES_LIST_PATH 
+### VI_TIMES_LIST_PATH
 - = path
 - Path to vi file (only needed if used)
 ------
@@ -39,15 +39,15 @@ I believe this is every option currently available to include with your protocol
 - ON or OFF
 
 ### TONE1 or TONE2
-- = TRUE 
-- Turns on tone based on [TONE1/2] 
+- = TRUE
+- Turns on tone based on [TONE1/2]
 
 ### FOOD_LIGHT
 - = TRUE or FALSE
 - ON or OFF
 
 ### PELLET
-- = TRUE 
+- = TRUE
 - Gives food pellet
 
 ### SHOCK
@@ -71,11 +71,11 @@ I believe this is every option currently available to include with your protocol
 - Extend or retract levers
 
 ### DRAW_IMAGES
-- = TRUE 
+- = TRUE
 - (Draws images on screen according to what was set up in [TOUCHSCREEN])
 
 ### START_LOOP
-- = Number 
+- = Number
 - how many of loops
 
 ### END_LOOP
@@ -105,22 +105,22 @@ I believe this is every option currently available to include with your protocol
 - ON or OFF
 
 ### ERP
--  = text 
+-  = text
 - to prepend to folder
 - example: ERP = PRE
 
-### RAW 
+### RAW
 - _text = NUMBER
 - to prepend to folder
-- example: RAW_PRE = 120 
+- example: RAW_PRE = 120
 - record raw for 120 seconds
 
 ### CHECK_NUM_CORRECT
-- = NUMBER 
+- = NUMBER
 - (if num correct img touches > NUMBER then end expt)
 
 ### CONDITIONS
-- = NUMBER 
+- = NUMBER
 - (run corresponding condition line)
 
 ------
@@ -175,21 +175,29 @@ MAX_TIME, RESET, L_CONDITION_LT, R_CONDITION_LT, DES_L_LEVER_PRESS, DES_R_LEVER_
 ------
 ## [OPEN_EPHYS]
 
-### OPEN_EPHYS_CONFIG_FILE 
+### OPEN_EPHYS_ADDRESS
+- Default is localhost (Open ephys is running on same machine)
+- To determine if connecting to another computer type ipconfig in a cmd terminal on the computer with open-ephys.
+- Note: Must be before OPEN_EPHYS_PATH
+- NP computer is 134.84.77.210
+
+- OPEN_EPHYS_ADDRESS = 134.84.77.210
+
+### OPEN_EPHYS_CONFIG_FILE
 - Needs to be before OPEN_EPHYS_PATH if used
 
-### OPEN_EPHYS_PATH 
+### OPEN_EPHYS_PATH
 - Path to exe file (NEED)
 ------
 ## [TONE1]
 
-### DURATION 
+### DURATION
 - How long tone is
 
-### FREQ 
+### FREQ
 - freq of tone
 
-### VOL 
+### VOL
 - Scale of 0-1 (need to test to find db range)
 ------
 ## [TONE2]
@@ -198,7 +206,7 @@ Same as Tone 1
 ------
 ## [SHOCK] - Not tested
 
-### DURATION 
+### DURATION
 
 ### VOLTS
 
@@ -206,15 +214,15 @@ Same as Tone 1
 ------
 ## [FREEZE]
 
-### DURATION 
+### DURATION
 - How long "frozen" to be considered a freeze event.
 
-### PIX 
+### PIX
 - How many pixels need to change between frames
 
 ### ROI
 
-##### GENERATE 
+##### GENERATE
 - asks user to create ROI
 
 ##### (x,y,h,w) (h,w needs to be tested, may be flipped)
@@ -234,7 +242,7 @@ Same as Tone 1
 
 #### BANDIT_TRAINING
 - tells code to look for probablities of pellets based on img
-- Same as TOUCH_BANDIT, but the image locations are hardcoded. 
+- Same as TOUCH_BANDIT, but the image locations are hardcoded.
 
 ### IMG
 - = img name(stored in IMAGES_PATH) : (probablity of reward OPTIONAL)
@@ -244,11 +252,11 @@ Same as Tone 1
 
 ### TRAIN_TOUCH
 - hard coded paradigm to train touching the screen
-- Any touch of an image returns a pellet regardless of where has been pressed. 
+- Any touch of an image returns a pellet regardless of where has been pressed.
 
 ### TOUCH_BANDIT
 - tells code to look for probablities of pellets based on img
-- Places the images in random locations based upon the coords given in protocol file. 
+- Places the images in random locations based upon the coords given in protocol file.
 
 ------
 ## [BAR_PRESS]
@@ -260,8 +268,8 @@ Same as Tone 1
 
 ### BAR_PRESS_TRAIN
 - = VI(a,b)
-- Increments VI over time 
-- a = initial VI for bar PRESS 
+- Increments VI over time
+- a = initial VI for bar PRESS
 - b = final VI for session
 
 ------
@@ -269,23 +277,23 @@ Same as Tone 1
 - daq addresses
 
 ### STIM_ADDRESS_X
-- address to stim at. Defaults as first stim location 
+- address to stim at. Defaults as first stim location
 
 ### STIM_ADDRESS_Y
 - address to stim at. Defaults as second stim location (sham in closed loop and second stim location in open look)
 ------
 ## [ERP]
 
-### INTER_PULSE_WIDTH 
+### INTER_PULSE_WIDTH
 - Time between stims (default = 4)
 
-### PULSE_VAR 
+### PULSE_VAR
 - Variation between IPW +- value (default = 1)
 
-### NUM_PULSE 
+### NUM_PULSE
 - Num pulses at each location (default = 2)
 
-### NUM_LOCATIONS 
+### NUM_LOCATIONS
 - Num locations to ERP (default = 2)
 ------
 ## [PARAMETER_SWEEPING]
@@ -306,16 +314,16 @@ Same as Tone 1
 ------
 ## [CLOSED_LOOP]
 
-### EVENTCHANNEL 
+### EVENTCHANNEL
 - channel to look for events (default  = 1)
 
-### MICROAMPS 
+### MICROAMPS
 - Amps to stim (Default = 100)
 
-### STIM_LAG 
+### STIM_LAG
 - how long between event occurence and stim (Default = 0)
 
-### TIMEOUT 
+### TIMEOUT
 - min time between stim events in seconds (Default = 1)
 
 ### TIMEOUT_VAR
