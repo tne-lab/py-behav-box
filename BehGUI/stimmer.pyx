@@ -116,7 +116,7 @@ def waitForEvent(stimX, stimY, q, backQ, channel, microamps, stimLag, timer, tim
             stimSent = 0
             curTimeout = random.uniform(timeoutHigh, timeoutLow)
 
-def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIONS):
+def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIONS, snd, suffix):
     '''
     ERP stimulation paradigm
     '''
@@ -129,16 +129,19 @@ def ERP(stimX, stimY, q, backQ, nERP, ERP_INTER_LOW, ERP_INTER_HIGH, NUM_LOCATIO
     for i in randint:
       optText = ''
       if i == 0:
-        optText = ',(CH 1-8)'
+        optText = 'CH_1_8'
       elif i == 1:
-        optText = ',(CH 9-16)'
+        optText = 'CH_9_16'
       window = Tk()
-      winText = "Change to location #" + str(i) + ' ' + optText
+      winText = "Change to location #" + str(i) + ' ' + ',(' + optText + ')'
       lbl = Label(window, text=winText, font=("Arial Bold", 100))
       lbl.grid(column=0, row=0)
       window.mainloop()
       pause = False
       j = 0
+      snd.send(snd.STOP_REC)
+      snd.changeVars(prependText = 'ERP_'   + suffix + '_' + optText)
+      snd.send(snd.START_REC)
       while j < nERP:
         if not backQ.empty():
             msg = backQ.get()

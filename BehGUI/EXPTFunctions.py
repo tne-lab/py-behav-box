@@ -79,7 +79,10 @@ def checkQs(self):
         self.vidDict['STATE'] = self.vidSTATE
         self.vidDict['PATH_FILE'] = self.video_file_path_name
         self.vidDict['FLIP'] = self.FLIP
-        self.vidDict['REC'] = self.RECORDING
+        if self.vidRecState == 'REC_VID':
+            self.vidDict['REC'] = True
+        else:
+            self.vidDict['REC'] = False
         self.vidDict['ROI'] = self.ROI
         self.VIDq.append(self.vidDict)
 

@@ -191,6 +191,7 @@ def setVidGlobals(self):
     self.video_file_path_name = ''
     self.ROIstr = ""
     self.vidSTATE= ''
+    self.vidRecState = ''
     self.FLIP = False
     self.FROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video
     self.UNFROZEN_ALREADY_LOGGED = False #Used for "DEBOUNCING" Frozen msg from video

@@ -127,13 +127,33 @@ class Experiment:
                     if self.EPHYS_ENABLED:
                         self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
                         self.snd.send(self.snd.START_REC) # OPEN_EPHYS
-                    self.vidSTATE = 'REC_VID'
+                    self.vidRecState = 'REC_VID'
                     if self.FREEZE_DETECTION_ENABLED:
                         print("\nFREEZE DETECTION ENABLED")
                         self.vidROI = self.ROI
                         print("Slef.ROI: ",self.ROI,"\n")
                 else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
-                    self.vidSTATE = 'REC_STOP'
+                    self.vidRecState = 'REC_STOP'
+                    print("\nREC = False, Self.ROI: ",self.ROI,"\n")
+                    if self.EPHYS_ENABLED:
+                        self.snd.send(self.snd.STOP_REC) # OPEN_EPHYS
+
+            elif key == "REC_NO_VID":
+                val = str2bool(setupDict[key])
+                self.setup_ln_num +=1
+                if val:  # REC == TRUE.  Remember Camera NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
+                    print ("recording ....")
+                    self.RECORDING = True
+                    if self.EPHYS_ENABLED:
+                        self.snd.send(self.snd.START_ACQ) # OPEN_EPHYS
+                        self.snd.send(self.snd.START_REC) # OPEN_EPHYS
+                    #self.vidSTATE = 'REC_VID'
+                    #if self.FREEZE_DETECTION_ENABLED:
+                    #    print("\nFREEZE DETECTION ENABLED")
+                    #    self.vidROI = self.ROI
+                    #    print("Slef.ROI: ",self.ROI,"\n")
+                else:  # REC == False.  Remember Camera  NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT), so KEEP CAMERA ON, JUST STOP RECORDING
+                    self.vidRecState = 'REC_STOP'
                     print("\nREC = False, Self.ROI: ",self.ROI,"\n")
                     if self.EPHYS_ENABLED:
                         self.snd.send(self.snd.STOP_REC) # OPEN_EPHYS
@@ -319,9 +339,10 @@ class Experiment:
             val = str2bool(protocolDict[key])
             self.Protocol_ln_num +=1
             if val:  # REC == TRUE.  Remember Camera STATE = (ON,OFF,REC, START_EXPT,STOP_EXPT)
-                self.vidSTATE = 'REC_VID'
+                self.vidRecState = 'REC_VID'
             else:  # KEEP CAMERA ON, JUST STOP RECORDING
-                self.vidSTATE = 'REC_STOP'
+                self.vidRecState = 'REC_STOP'
+
 
         elif "EXTEND_LEVERS" in key:
             self.Protocol_ln_num +=1
@@ -747,7 +768,7 @@ class Experiment:
                         #self.Protocol_ln_num += 1 # Doing this from check q function. Gross but works
                 else: # Can still use CLOSED_LOOP=False to kill the stim
                     self.stimBackQ.put('STOP')
-                    if not self.stim.is_alive():
+                    if self.stim is None or not self.stim.is_alive():
                         self.stimX.end()
                         self.stimY.end()
                         self.stim = None
@@ -810,15 +831,15 @@ class Experiment:
         elif "ERP" == key:
             if self.GUI.NIDAQ_AVAILABLE and self.EPHYS_ENABLED:
                 if self.stim is None:
-                    self.snd.send(self.snd.STOP_REC)
-                    self.snd.changeVars(prependText = 'ERP_' + protocolDict[key])
-                    self.snd.send(self.snd.START_REC)
+                    #self.snd.send(self.snd.STOP_REC)
+                    #self.snd.changeVars(prependText = 'ERP_' + protocolDict[key])
+                    #self.snd.send(self.snd.START_REC)
                     self.log_event("Starting ERP, " + protocolDict[key])
                     self.stimQ = Queue()
                     self.stimBackQ = Queue()
                     self.stimX = daqAPI.AnalogOut(self.stimAddressX)
                     self.stimY = daqAPI.AnalogOut(self.stimAddressY)
-                    self.stim = threading.Thread(target=stimmer.ERP, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.NUM_ERP_PULSE, self.INTER_PULSE_WIDTH - self.PULSE_VAR, self.INTER_PULSE_WIDTH + self.PULSE_VAR, self.NUM_ERP_LOCATIONS))
+                    self.stim = threading.Thread(target=stimmer.ERP, args=(self.stimX, self.stimY, self.stimQ, self.stimBackQ, self.NUM_ERP_PULSE, self.INTER_PULSE_WIDTH - self.PULSE_VAR, self.INTER_PULSE_WIDTH + self.PULSE_VAR, self.NUM_ERP_LOCATIONS, self.snd, protocolDict[key]))
                     self.stim.start()
                 else:
                     if not self.stim.is_alive():

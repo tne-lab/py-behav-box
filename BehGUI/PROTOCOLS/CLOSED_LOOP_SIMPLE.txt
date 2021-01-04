@@ -22,7 +22,7 @@ NUM_LOCATIONS = 2
 FAN_ON=TRUE
 CAMERA=TRUE
 CAB_LIGHT=TRUE
-REC=TRUE
+REC_NO_VID=TRUE
 
 [BAR_PRESS]
 VI=60
@@ -32,7 +32,7 @@ RAW_PRE = 10  # 2 min pre record to set thresholds
 
 ERP = PRE # PRE = Folder name
 
-CLOSED_LOOP = 1800 # Begin closed loop stim thread
+CLOSED_LOOP = TRUE # Begin closed loop stim thread
 PAUSE = 10 # closed loop for 30 minutes.  Stim at threshold crossing
 CLOSED_LOOP = FALSE # Kill thread
 
@@ -44,5 +44,4 @@ ERP = 30
 
 FAN_ON=FALSE
 CAB_LIGHT=False
-FOOD_LIGHT=False
 REC=False
