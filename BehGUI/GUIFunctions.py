@@ -20,6 +20,8 @@ import subprocess
 IsWhiskerRunning = False
 IsOpenEphysRunning = False
 
+# quick test 
+
 # Add open ephys here possibly?
 def closeWindow(hwnd, windowName):
     if windowName in win32gui.GetWindowText(hwnd):
