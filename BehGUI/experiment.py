@@ -856,6 +856,7 @@ class Experiment:
                 s = float(sum(self.prevtrials[-n:]))
                 if s/float(n) >= perc:
                     self.log_event("Last " + str(n) + " trials above " + str(perc*100) + "% correct")
+                    self.prevtrials = []
                     if int(self.NUM_LOOPS) > 0:
                         self.loop = int(self.NUM_LOOPS)
                     else:
@@ -870,6 +871,7 @@ class Experiment:
             self.Protocol_ln_num += 1
 
         elif "FLIP_HIGH_LOW_PROB" == key:
+            print('old touchimgs, ' ,self.touchImgs)
             tmpTouchImgs = {}
             keys = list(self.touchImgs)
             maxProb = -1
@@ -879,17 +881,19 @@ class Experiment:
 
             for i in range(len(keys)):
                 if maxProb == -1:
-                    maxProb = tmpTouchImgs[keys[i]]
-                    minProb = tmpTouchImgs[keys[i]]
-                elif maxProb < tmpTouchImgs[keys[i]]:
-                    maxProb = tmpTouchImgs[keys[i]]
+                    maxProb = self.touchImgs[keys[i]]
+                    minProb = self.touchImgs[keys[i]]
+                elif maxProb < self.touchImgs[keys[i]]:
+                    maxProb = self.touchImgs[keys[i]]
                     maxProbi = i
-                elif minProb > tmpTouchImgs[keys[i]]:
-                    minProb = tmpTouchImgs[keys[i]]
+                elif minProb > self.touchImgs[keys[i]]:
+                    minProb = self.touchImgs[keys[i]]
                     minProbi = i
             tmpTouchImgs[keys[minProbi]] = self.touchImgs[keys[maxProbi]]
             tmpTouchImgs[keys[maxProbi]] = self.touchImgs[keys[minProbi]]
-            self.touchImgs = tmpTouchImgs
+            self.touchImgs[keys[minProbi]] = tmpTouchImgs[keys[minProbi]]
+            self.touchImgs[keys[maxProbi]] = tmpTouchImgs[keys[maxProbi]]
+            print('new touchimgs, ' ,self.touchImgs)
             self.Protocol_ln_num += 1
             
         elif key == "CONDITIONS":
