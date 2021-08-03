@@ -237,6 +237,7 @@ def load_expt_file(self):
                                     touchImgCoords.append((int(imageCoordsStr[0]), int(imageCoordsStr[1])))
                                 self.cur_img_coords.append(touchImgCoords)
                         else:
+                            self.prev_img_loc_index = [-1, -1]
                             imageCoords = words.split(':')
                             for i in range(len(imageCoords)): # Loop through coord list
                                 for c in '()':#Remove parenthesis from (x,y)
@@ -285,6 +286,10 @@ def load_expt_file(self):
                         #self.cur_probability = 100.0 # 100% To start. Reduced by 15% after 10 Presses/min for 10 min in BEH_GUI_MAIN
                     elif 'TOUCH_BANDIT' in str_before_equal:
                         self.TOUCH_BANDIT = True
+                        self.catchTrial = False
+                    elif "BANDIT_THREE" in str_before_equal:
+                        self.BANDIT_THREE = True
+                        
 
                 elif currentlySetting == 'BARPRESS':
                     self.BAR_PRESS_INDEPENDENT_PROTOCOL = True

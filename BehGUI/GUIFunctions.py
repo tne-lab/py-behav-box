@@ -91,6 +91,9 @@ def PLAY_TONE_LAF(self, TONE_ID):  # Plays tone using lafayette Tone generator
     self.TONE_ON = True
 ###################################################
 def PLAY_TONE(self, TONE_ID):  # Plays tone using computer speaker
+    #if 'ABETUSER-PC' in self.computer:
+    #    PLAY_TONE_LAF(self, 'TONE1')
+    #   return
     # NOTE: Tone_OFF logged while drawing speeker above in main loop
     if TONE_ID == 'TONE1':
         if not self.TONE_ON:

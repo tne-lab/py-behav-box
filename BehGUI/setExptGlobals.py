@@ -29,6 +29,7 @@ def setExptGlobals(self):
     self.EXPT_FILE_LOADED = False
     self.RECORDING = False
     self.MASTER_PAUSE = False
+    self.MAX_TRIALS = 0
 
     ################################################################
     # STIM PARAMETERS
@@ -59,6 +60,8 @@ def setExptGlobals(self):
     self.CONDITION_STARTED = False
     self.RUN_SETUP = False
     self.START_EXPT = False
+    self.prevtrials = []
+    self.NUM_LOOPS = 0
 
     ################################################################
     # EXPERIMENT PARAMETERS
@@ -209,6 +212,7 @@ def setTouchGlobals(self):
     self.TOUCHSCREEN_USED = True
     self.TOUCH_TRAINING = False
     self.TOUCH_BANDIT = False
+    self.BANDIT_THREE = False
     self.touchImgCoords = []
     self.touchImgs = {}
     self.touch_time = 0.0

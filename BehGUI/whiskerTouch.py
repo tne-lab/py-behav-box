@@ -164,9 +164,13 @@ class MyWhiskerTask(WhiskerTwistedTask):
                 #       screen is 1024 x 518.  For picture area to equal to active
                 #       background area, picture must be 364 x 364
 
+                #bit = self.whisker.display_add_obj_bitmap(
+                #    DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
+                #    stretch = True , height = 289, width = 290) # Returns T or F
                 bit = self.whisker.display_add_obj_bitmap(
                     DOC,"picture" + str(i), self.XYarray[i], filename=self.pics[i],
-                    stretch = True , height = 289, width = 290) # Returns T or F
+                    stretch = True , height = 150, width = 150) # Returns T or F
+                
                 if not bit:
                     pass
             self.whisker.display_send_to_back(DOC, "background")

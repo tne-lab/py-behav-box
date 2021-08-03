@@ -164,8 +164,12 @@ class Experiment:
 
             elif "MAX_EXPT_TIME" in key:
                 self.setup_ln_num +=1
-                self.MAX_EXPT_TIME = float(setupDict["MAX_EXPT_TIME"])
+                self.MAX_EXPT_TIME = int(setupDict["MAX_EXPT_TIME"])
                 print("Max Expt Time :", self.MAX_EXPT_TIME * 60.0, " sec")
+
+            elif "MAX_TRIALS" in key:
+                self.setup_ln_num += 1
+                self.MAX_TRIALS = float(setupDict["MAX_TRIALS"])
 
 
 
@@ -214,6 +218,8 @@ class Experiment:
         '''
         if self.MASTER_PAUSE:
             return
+        if self.MAX_TRIALS != 0 and (self.trial_num > self.MAX_TRIALS):
+            self.endExpt()
         #if self.stim is not None and not self.stim.is_alive():
         #    self.stim = None
         protocolDict = self.protocol[self.Protocol_ln_num]
@@ -401,25 +407,82 @@ class Experiment:
 
                     print('log_string', log_string)
                     self.log_event( log_string)
-                else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
 
+                elif self.TOUCH_BANDIT:
+                    catchTrialPerc = random.randint(0, 9)
+                    self.catchTrial = (catchTrialPerc == 0)
+                    imgList = {}
                     placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
                     print(placementList, self.touchImgCoords)
+                    skip = False
+                    if (placementList[0] == self.prev_img_loc_index[1]) and(placementList[0] == self.prev_img_loc_index[0]):
+                        skip = True
+                    else:
+                        self.prev_img_loc_index[1] = self.prev_img_loc_index[0]
+                        self.prev_img_loc_index[0] = placementList[0]
+                    if not skip:  
+                        if False: # change to self.catchTrial if using catch trials
+                            self.catchTrial = False
+                            print('catch trial')
+                            coord = self.touchImgCoords[random.randint(0, len(self.touchImgCoords)-1)]
+                            imgInd = random.randint(0,len(self.touchImgs.keys())-1)
+                            i=0
+                            for key in self.touchImgs.keys():
+                                if i == imgInd:
+                                    imgList[key] = coord #places images
+                                    self.GUI.TSq.put(imgList)
+                                    break
+                                else:
+                                    i+=1
+                                   
+                        else:
+                            
 
-                    # NOTE: random.sample(population, k)
-                    #       Returns a new list containing elements from the population while leaving
-                    #       the original population unchanged.
-                    #       Here: for 2 images, population = (0,2), k = 2.  returns (0,1) or (1,0)
+
+                            # NOTE: random.sample(population, k)
+                            #       Returns a new list containing elements from the population while leaving
+                            #       the original population unchanged.
+                            #       Here: for 2 images, population = (0,2), k = 2.  returns (0,1) or (1,0)
+      
+                                i=0
+                                for key in self.touchImgs.keys():
+                                    imgList[key] = self.touchImgCoords[placementList[i]] #places images
+                                    print('ImgList', imgList)
+                                    i+=1
+                                    self.GUI.TSq.put(imgList)
+
+                        self.Protocol_ln_num +=1
+
+                        log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
+                        log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
+                        log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
+                        log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
+                        log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                        idx = log_string.find(")")
+                        #print("IDX: ", idx, "logstring: ", log_string)
+                        while idx != -1: # returns -1 if string not found
+                            try:
+                                if log_string[idx+1] == ";": # Could be out of range if ")" is last char
+                                    log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
+                                idx = log_string.find[:idx+2](")")
+                                print("IDX: ", idx, "logstring: ", log_string)
+                            except:
+                                print("\n\n FAILED creating log string\n\n")
+                                break
+
+                        self.log_event( log_string)
+
+                elif self.BANDIT_THREE:
+                    placementList = range(len(self.touchImgCoords)) # Stable order of images
                     imgList = {}
                     i=0
                     for key in self.touchImgs.keys():
                         imgList[key] = self.touchImgCoords[placementList[i]] #places images
-                        print('ImgList', imgList)
                         i+=1
                         self.GUI.TSq.put(imgList)
+                        print(imgList)
 
                     self.Protocol_ln_num +=1
-
                     log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
                     log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
                     log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
@@ -439,6 +502,57 @@ class Experiment:
 
                     print('log_string', log_string)
                     self.log_event( log_string)
+
+                else: # PALCE IMAGES IN COORDINATES PRESSCRIBED I PROTOCOL
+                    
+                    placementList = random.sample(range(0,len(self.touchImgCoords)), len(self.touchImgCoords)) # Randomize order of images
+                    print(placementList, self.touchImgCoords)
+                    
+                    # NOTE: random.sample(population, k)
+                    #       Returns a new list containing elements from the population while leaving
+                    #       the original population unchanged.
+                    #       Here: for 2 images, population = (0,2), k = 2.  returns (0,1) or (1,0)
+                    skip = False
+                    if (len(self.touchImgs.keys()) >= 1 and len(self.touchImgCoords) > 1):
+                        if (placementList[0] == self.prev_img_loc_index[1]) and(placementList[0] == self.prev_img_loc_index[0]):
+                            skip = True
+                        else:
+                            self.prev_img_loc_index[1] = self.prev_img_loc_index[0]
+                            self.prev_img_loc_index[0] = placementList[0]
+                    
+                    if not skip:
+                        imgList = {}
+                        i=0
+                        for key in self.touchImgs.keys():
+                            print(key)
+                            print(self.touchImgCoords[placementList[i]])
+                            imgList[key] = self.touchImgCoords[placementList[i]] #places images
+                            print('ImgList', imgList)
+                            i+=1
+                            self.GUI.TSq.put(imgList)
+                            print(imgList)
+
+                        self.Protocol_ln_num +=1
+                        print('next line')
+                        log_string = str(imgList) # Looks like this:  {'FLOWER_REAL.BMP': (181, 264)}
+                        log_string = log_string.replace('{', "") #Remove dictionary bracket from imgList
+                        log_string = log_string.replace('}', "") #Remove dictionary bracket from imgList
+                        log_string = log_string.replace(',', ';') #replace ',' with ';' so it is not split in CSV file
+                        log_string = log_string.replace(':', ',') #put ',' between image name and coordinates to split coord from name in CSV file
+                        idx = log_string.find(")")
+                        #print("IDX: ", idx, "logstring: ", log_string)
+                        while idx != -1: # returns -1 if string not found
+                            try:
+                                if log_string[idx+1] == ";": # Could be out of range if ")" is last char
+                                    log_string = log_string[:idx+1]+ "," + log_string[idx+2:] # This will change the ";" separating images into "," to separate images and coordinates in CSV file
+                                idx = log_string.find[:idx+2](")")
+                                print("IDX: ", idx, "logstring: ", log_string)
+                            except:
+                                print("\n\n FAILED creating log string\n\n")
+                                break
+
+                        print('log_string', log_string)
+                        self.log_event( log_string)
         ###############################
         # START LOOP
         ###############################
@@ -521,6 +635,7 @@ class Experiment:
             else:
                 self.Protocol_ln_num +=1
                 self.log_event("END_OF_LOOP")
+                self.prevtrials = []
                 self.loop = 0
                 self.LOOP_FIRST_PASS = True
                 self.VI_index = 0
@@ -724,6 +839,59 @@ class Experiment:
             if self.correct_image_touches > int(protocolDict[key])-1:
                 self.endExpt()
 
+        elif "CHECK_LAST_N_PERC" == key:
+            self.Protocol_ln_num += 1
+            wopara = protocolDict[key].strip(' ()')
+            n, perc = wopara.split(',')
+            n = int(n)
+            #print('n', n)
+            perc = float(perc) / 100.0
+            print('num trials to look at:', n)
+            print('perc:', perc)
+            print('prevtriallen:', len(self.prevtrials))
+            
+            if n <= len(self.prevtrials):
+                print('sum', float(sum(self.prevtrials[-n:])))
+                print('last n trials (1=correct, 0 =incorrect): ', self.prevtrials[-n:])
+                s = float(sum(self.prevtrials[-n:]))
+                if s/float(n) >= perc:
+                    self.log_event("Last " + str(n) + " trials above " + str(perc*100) + "% correct")
+                    if int(self.NUM_LOOPS) > 0:
+                        self.loop = int(self.NUM_LOOPS)
+                    else:
+                        self.endExpt()
+
+        elif "FLIP_2_IMG_PROB" == key:
+            tmpTouchImgs = {}
+            keys = list(self.touchImgs)
+            tmpTouchImgs[keys[0]] = self.touchImgs[keys[1]]
+            tmpTouchImgs[keys[1]] = self.touchImgs[keys[0]]
+            self.touchImgs = tmpTouchImgs
+            self.Protocol_ln_num += 1
+
+        elif "FLIP_HIGH_LOW_PROB" == key:
+            tmpTouchImgs = {}
+            keys = list(self.touchImgs)
+            maxProb = -1
+            maxProbi = 0
+            minProb = -1
+            minProbi = 0
+
+            for i in range(len(keys)):
+                if maxProb == -1:
+                    maxProb = tmpTouchImgs[keys[i]]
+                    minProb = tmpTouchImgs[keys[i]]
+                elif maxProb < tmpTouchImgs[keys[i]]:
+                    maxProb = tmpTouchImgs[keys[i]]
+                    maxProbi = i
+                elif minProb > tmpTouchImgs[keys[i]]:
+                    minProb = tmpTouchImgs[keys[i]]
+                    minProbi = i
+            tmpTouchImgs[keys[minProbi]] = self.touchImgs[keys[maxProbi]]
+            tmpTouchImgs[keys[maxProbi]] = self.touchImgs[keys[minProbi]]
+            self.touchImgs = tmpTouchImgs
+            self.Protocol_ln_num += 1
+            
         elif key == "CONDITIONS":
             self.runConditions(protocolDict)
 
@@ -877,7 +1045,7 @@ class Experiment:
         #  PROTOCOL ENDED (Reset everything for next run
         #########################################################
         #print("TIME ELAPSED: ", self.cur_time, "MAX EXPT TIME: ", self.max_time * 60.0, " sec")
-        if self.cur_time >= self.MAX_EXPT_TIME * 10000.0: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
+        if self.cur_time >= self.MAX_EXPT_TIME * 60.0: # Limits the amout of time rat can be in chamber (self.MAX_EXPT_TIME in PROTOCOL.txt file (in min)
             self.log_event("Exceeded MAX_EXPT_TIME")
             print("MAX EXPT TIME EXCEEDED: ", self.cur_time, " MAX_EXPT_TIME: ",self.MAX_EXPT_TIME)
             self.log_event("PROTOCOL ENDED-max time exceeded")
@@ -970,10 +1138,11 @@ class Experiment:
            self.CORRECT = False
            self.WRONG = False
            self.NO_ACTION_TAKEN = False
+           self.TRIAL_RECORDED = False
+           
 
         else: # CONDITION STARTED
            cond_time_elapsed = self.cur_time - self.condition_start_time
-
            if self.LEVER_PRESSED_L: # LEFT LEVER
                self.log_event("Left_Lever_Pressed")
                if not self.HAS_ALREADY_RESPONDED:# Prevents rewarding for multiple presses. Ensures max of one press per trial.
@@ -1042,7 +1211,7 @@ class Experiment:
                        ##################################
                        # BANDIT TOUCH
                        ##################################
-                       if self.TOUCH_BANDIT:
+                       if self.TOUCH_BANDIT or self.BANDIT_THREE:
                            for img, probabilityList in self.touchImgs.items():
                                #print(probabilityList,'problist\n')
 
@@ -1066,6 +1235,7 @@ class Experiment:
                                    self.cur_probability = probabilityList[self.trial_num] # List of probabilities specified after images in protocol files
                                    self.CORRECT = True
                                    self.correct_image_touches += 1
+                                   
                        
                        elif self.BANDIT_TRAINING:
                            for img, probabilityList in self.touchImgs.items():
@@ -1181,15 +1351,21 @@ class Experiment:
                # SET OUTCOMES
                if self.CORRECT:
                   #self.TONE_ON = True
-                  GUIFunctions.PLAY_TONE(self.GUI,'TONE1 for Correct Response') #THIS IS DONE EVERY CORRECT RESPOSE EVEN IF REWARD NOT GIVEN
+                  #GUIFunctions.PLAY_TONE(self.GUI,'TONE1 for Correct Response') #THIS IS DONE EVERY CORRECT RESPOSE EVEN IF REWARD NOT GIVEN
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
                   self.correctPercentage = self.num_correct/self.trial_num * 100
+                  if self.TRIAL_RECORDED == False:
+                    self.TRIAL_RECORDED = True
+                    self.prevtrials.append(1)
                   #print("Correct")
                elif self.WRONG:
                   outcome = self.cond['WRONG'].upper()    # Outcome for wrong response(in Expt File)
                   self.num_wrong += 1
                   self.wrongPercentage = self.num_wrong/self.trial_num * 100
+                  if self.TRIAL_RECORDED == False:
+                    self.TRIAL_RECORDED = True
+                    self.prevtrials.append(0)
                   #print("Wrong")
                else:
                   outcome = self.cond['NO_ACTION'].upper()# Outcome for No_Action taken(in Expt File)
@@ -1236,6 +1412,7 @@ class Experiment:
                                GUIFunctions.PLAY_TONE(self.GUI,"TONE1")
                            else:  # Low prob image pressed, so different tone.
                                GUIFunctions.PLAY_TONE(self.GUI,"TONE2")
+                               self.prevtrials[-1] = 0
                                if self.cond['WRONG'].upper() == 'DN_PUNISH':
                                    self.NEXT_TRIAL = False
                                    self.WRONG = True
