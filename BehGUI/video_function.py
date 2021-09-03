@@ -1,5 +1,7 @@
 import cv2
 import time
+import os
+import numpy as np
 
 class Vid:
     def __init__(self, videoPath, q, back_q, freeze_file_path, winName = 'vid'):
@@ -17,6 +19,9 @@ class Vid:
         else: self.freezeEnable = False
         self.FLIP = False
         self.rec = False
+        self.recFrames = 0
+        self.recEndTime = 0
+        self.recStartTime = 0
         cv2.namedWindow('vid')
         if self.cap.isOpened():
             if not self.vidOrLive(videoPath):
@@ -125,6 +130,7 @@ class Vid:
                     self.exptStarted = True
                 if msg['REC']: # NOTE: STATE = (ON,OFF,REC_VID,REC_STOP, START_EXPT)
                     self.rec = True
+                    
                 else:
                     self.rec = False
                 if msg['ROI'] != '' and not self.ROIenabled:
@@ -185,6 +191,10 @@ class Vid:
 
             if self.rec:
                 self.out.write(frame)
+                if self.recFrames == 0:
+                    self.recStartTime = time.time()
+                self.recFrames += 1
+                self.recEndTime = time.time()
 
             # Show the frames
             cv2.imshow(self.winName,frame)
@@ -227,7 +237,11 @@ class Vid:
     def close(self):
         if self.freezeEnable: self.freezeFile.close()
         self.cap.release()
-        try: self.out.release()
+        try: 
+            self.out.release()
+            actualFps = np.ceil(self.recFrames/(self.recEndTime - self.recStartTime))
+            os.system('ffmpeg -y -i {} -c copy -f h264 tmp.h264'.format(self.outPath))
+            os.system('ffmpeg -y -r {} -i tmp.h264 -c copy {}'.format(actualFps,self.outPath))
         except: print('failed to release video outfile')
         cv2.destroyAllWindows()
         for i in range(1,10):
