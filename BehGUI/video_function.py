@@ -76,7 +76,7 @@ class Vid:
             # Time elapsed
             seconds = end - start
             # Calculate frames per second
-            fps  = numFrames / seconds;
+            fps  = numFrames / seconds
             self.mspf = int(1/fps * 1000)
             self.length = None
             return True
