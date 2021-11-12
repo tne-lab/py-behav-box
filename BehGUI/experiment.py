@@ -1250,6 +1250,7 @@ class Experiment:
                                     self.log_event("Correct: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
                                     self.correct_image_touches += 1
                                     self.CORRECT = True
+                                    GUIFunctions.PLAY_TONE(self.GUI,'TONE1')
                                     self.prev_imgList = None
                                     #else
                                     #    self.wrong_img_hits.append((int(x/4),int(y/4)))
@@ -1260,6 +1261,7 @@ class Experiment:
                                self.wrong_img_hits.append((int(x/4),int(y/4)))
                                self.log_event("Incorrect: " + self.touchMsg['picture'] + ":" + img + " TOUCHED, " +  "(" + str(x) + ";" + str(y)  + ")")
                                self.WRONG = True
+                               GUIFunctions.PLAY_TONE(self.GUI,'TONE2')
                                self.loop -= 1 # Don't move forward
                                self.trial_num -= 1 # Don't move forward
                        #elif self.DPAL:
@@ -1383,7 +1385,7 @@ class Experiment:
                # SET OUTCOMES
                if self.CORRECT:
                   #self.TONE_ON = True
-                  GUIFunctions.PLAY_TONE(self.GUI,'TONE1 for Correct Response') #THIS IS DONE EVERY CORRECT RESPOSE EVEN IF REWARD NOT GIVEN
+                  #GUIFunctions.PLAY_TONE(self.GUI,'TONE1 for Correct Response') #THIS IS DONE EVERY CORRECT RESPOSE EVEN IF REWARD NOT GIVEN
                   outcome = self.cond['CORRECT'].upper()  # Outcome for correct response(in Expt File)
                   self.num_correct += 1
                   if self.trial_num > 0:

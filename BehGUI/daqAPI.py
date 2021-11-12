@@ -15,6 +15,8 @@ NOTE: 1. Please Start Whisker server first
 
          on Ephis-2 'Dev2' runs behavior box
                     'Dev1' runs open ephis
+
+
 """
 import nidaqmx
 from nidaqmx.constants import (LineGrouping)
@@ -30,6 +32,14 @@ elif 'EPHYS-1' in computer:
         dev = 'Dev2'
 elif 'ABETUSER-PC' == computer:
         dev = 'Dev1'
+
+elif 'ERICWORKPC' == computer:
+        dev = 'Dev1'
+
+from nidaqmx import system
+dev_obj = system.Device(dev)
+dev_obj.reset_device()
+time.sleep(5)
 
 #dev = 'Dev2' #Flav's PC ephys-2
 #dev = 'Dev1' #Jean's PC ephys-1
@@ -134,8 +144,10 @@ Returns a new food task
 def giveFoodSetup():
     foodAddress = dev + '/port1/line4'
     if 'EPHYS-2' in computer:
-        foodAddress = dev + '/port3/line4' #Output line 5
+        foodAddress = dev + '/port3/line4' #Output line 5; #36
     if 'ABETUSER-PC' == computer:
+        foodAddress = dev + '/port3/line4'
+    if 'ERICWORKPC' == computer:
         foodAddress = dev + '/port3/line4'
     food = InterfaceOut(foodAddress)
     food.startTask()
@@ -147,6 +159,8 @@ def foodLightSetup():
     if 'EPHYS-2' in computer:
         foodLightAddress = dev + '/port3/line6' #Output line 7
     if 'ABETUSER-PC' == computer:
+        foodLightAddress = dev + '/port3/line5'
+    if 'ERICWORKPC' == computer:
         foodLightAddress = dev + '/port3/line5'
     try:
         foodLight = InterfaceOut(foodLightAddress)
@@ -168,6 +182,8 @@ def shockerSetup():
         print ("Be sure shocker connected to port1/Line6") #Output line 6
     elif 'ABETUSER-PC' == computer:
         shockerAddress = dev + '/port1/line6'
+    elif 'ERICWORKPC' == computer:
+        shockerAddress = dev + '/port1/line6'
     else:
         print("Unregistered computer!!!!!!!!!!  See daqAPI.py in current working directory.")
 
@@ -187,6 +203,10 @@ def fanSetup():
         fanAddress = dev + '/port2/line2'#
     elif 'ABETUSER-PC' == computer:
         fanAddress = dev + '/port4/line2'
+    elif 'ERICWORKPC' == computer:
+        fanAddress = dev + '/port4/line2'
+    else:
+        print("Unregistered computer!!!!!!!!!!  See daqAPI.py in current working directory.")
     fan = InterfaceOut(fanAddress)
     fan.startTask()
     return fan
@@ -200,6 +220,9 @@ def cabinLightSetup():
         fanAddress = dev + '/port4/line2'#
     if 'ABETUSER-PC' == computer:
         cabinLightAddress = dev + '/port3/line7'
+    if 'ERICWORKPC' == computer:
+        cabinLightAddress = dev + '/port3/line7'
+
     cabinLight = InterfaceOut(cabinLightAddress)
     cabinLight.startTask()
     return cabinLight
@@ -211,6 +234,8 @@ Returns a new low tone task
 def lowToneSetup():
     lowToneAddress = dev + '/port1/line6'#For 2Khz.  Note: #8 on Beh Box
     if 'ABETUSER-PC' == computer:
+        lowToneAddress = dev + '/port3/line7'
+    if 'ERICWORKPC' == computer:
         lowToneAddress = dev + '/port3/line7'
     lowTone = InterfaceOut(lowToneAddress)
     lowTone.startTask()
