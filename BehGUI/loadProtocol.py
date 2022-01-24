@@ -425,6 +425,8 @@ def load_expt_file(self):
                         self.openLoopPhaseDelay = float(str_after_equal)
 
                 elif currentlySetting == 'PARAMETER_SWEEPING':
+                    if "PHASE_DELAY" == str_before_equal:
+                        self.openLoopPhaseDelay = float(str_after_equal)
                     if "INTENSITY" == str_before_equal:
                         for c in '()':#Remove parenthesis from (x,y)
                             str_after_equal = str_after_equal.replace(c, "")
