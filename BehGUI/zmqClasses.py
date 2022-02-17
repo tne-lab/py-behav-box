@@ -118,6 +118,30 @@ class SNDEvent:
         self.socket.send(b"".join([b'TTL Channel=', TTL_CHAN, b' on=0']))
         self.socket.recv()
 
+    # sendEventTTL
+    # Sends a binary event code over TTL channels
+    #
+    # Input:
+    #   event = the numeric event code (maximum 255)
+    def sendEventTTL(self, event):
+        NBITS = 8
+        # Convert the code to binary
+        binA = [int(x) for x in bin(event)[2:]]
+        binA.reverse()
+        # Activate the TTL channels according to the bit sequence
+        for i in range(len(binA)):
+            self.socket.send(b"".join([b'TTL Channel=', str(i+1).encode('ascii'), b' on=', str(binA[i]).encode('ascii')]))
+            self.socket.recv()
+        # Deactivate remaining TTL channels
+        for i in range(NBITS-len(binA)):
+            self.socket.send(b"".join([b'TTL Channel=', str(i+len(binA)+1).encode('ascii'), b' on=0']))
+            self.socket.recv()
+        # Wait and send TTL OFF on all channels
+        time.sleep(0.005)
+        for i in range(NBITS):
+            self.socket.send(b"".join([b'TTL Channel=', str(i+1).encode('ascii'), b' on=0']))
+            self.socket.recv()
+
     # Function that acts as a C switch. Gets your desired string
     def switch(self, x):
         return {
