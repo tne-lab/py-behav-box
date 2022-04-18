@@ -7,11 +7,11 @@ In development python based GUI used to manage rat behavioral box's with customi
 ## Installation
 I recommend using anaconda and creating a new environment to use this software.
 
-Use the provided environment.yaml.
+Use the provided environment.yml.
 
 Set up your environment using
 ```
-conda env create -f environment.yaml
+conda env create -f environment.yml
 ```
 Otherwise see requirements.txt for a list of dependencies.
 
